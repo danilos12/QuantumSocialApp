@@ -21,7 +21,7 @@
                                     <span class="settings-item-label">Email Address</span>
                                   </div>  <!-- END .settings-item-label -->
                                   <div class="settings-item-data-wrap">
-                                    <span class="settings-item-data account-email">users-address@email.com</span>
+                                    <span class="settings-item-data account-email">{{ Auth::user()->email }}</span>
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-key.svg" class="ui-icon change-pass" />
                                   </div>  <!-- END .settings-item-data -->
                                 </div>  <!-- END .email-data-wrap -->
@@ -129,8 +129,8 @@
                                     <div class="menu-social-account-options">
                                       <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
                                       <span class="menu-account-icons">
-                                       <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
                                       </span>
                                     </div>  <!-- END .menu-social-account-options -->
 
@@ -139,9 +139,11 @@
                                 <!-- END .menu-social-account Instance -->
 
                                 <div class="menu-social-add-accounts-section">
-                                  <div class="add-account add-twitter-account">
-                                   <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" />
-                                    + Twitter
+                                  <div class="add-account add-twitter-account">                                   
+                                    <a href="{{ url('auth/twitter') }}">
+                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon vertical-middle" />
+                                        <span>+ Twitter</span>
+                                    </a>
                                   </div>  <!-- END .add-twitter-account -->
                                 </div>  <!-- END .menu-social-add-accounts-section -->
 
@@ -159,12 +161,12 @@
                                       Command Module Settings</span>
 
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
-                                      class="ui-icon menu-section-twirl-icon menu-section-command-twirl" />
+                                      class="ui-icon menu-section-twirl-icon menu-section-command-twirl" data-toggle="collapse" data-target="#menu-section-command-twirl" aria-expanded="true"/>
 
                                   </div>  <!-- END .menu-section-twirl-header-inner -->
                                 </div>  <!-- END .menu-section-twirl-header-outer -->
 
-                                <div class="menu-section-twirl-section-outer">
+                                <div class="menu-section-twirl-section-outer collapse" id="menu-section-command-twirl">
                                   <div class="menu-section-twirl-section-inner">
 
                                     <div class="menu-twirl-option-outer">
@@ -209,12 +211,12 @@
                                       Advanced Preferences</span>
 
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
-                                      class="ui-icon menu-section-twirl-icon menu-section-preferences-twirl" />
+                                      class="ui-icon menu-section-twirl-icon menu-section-preferences-twirl" data-toggle="collapse" data-target="#menu-section-preferences-twirl"  />
 
                                   </div>  <!-- END .menu-section-twirl-header-inner -->
                                 </div>  <!-- END .menu-section-twirl-header-outer -->
 
-                                <div class="menu-section-twirl-section-outer">
+                                <div class="menu-section-twirl-section-outer collapse" id="menu-section-preferences-twirl">
                                   <div class="menu-section-twirl-section-inner">
 
                                     <div class="menu-twirl-option-outer">
@@ -314,12 +316,12 @@
                                       Account Level - Command Module Settings</span>
 
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
-                                      class="ui-icon menu-section-twirl-icon menu-section-command-twirl" />
+                                      class="ui-icon menu-section-twirl-icon menu-section-command-twirl" data-toggle="collapse" data-target="#acct-menu-section-command-twirl" />
 
                                   </div>  <!-- END .menu-section-twirl-header-inner -->
                                 </div>  <!-- END .menu-section-twirl-header-outer -->
 
-                                <div class="menu-section-twirl-section-outer">
+                                <div class="menu-section-twirl-section-outer collapse" id="acct-menu-section-command-twirl">
                                   <div class="menu-section-twirl-section-inner">
 
                                     <div class="menu-twirl-option-outer">
@@ -383,12 +385,12 @@
                                       Automated Retweet Settings</span>
 
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
-                                      class="ui-icon menu-section-twirl-icon menu-section-preferences-twirl" />
+                                      class="ui-icon menu-section-twirl-icon menu-section-preferences-twirl" data-toggle="collapse" data-target="#automated-menu-section-preferences-twirl" />
 
                                   </div>  <!-- END .menu-section-twirl-header-inner -->
                                 </div>  <!-- END .menu-section-twirl-header-outer -->
 
-                                <div class="menu-section-twirl-section-outer">
+                                <div class="menu-section-twirl-section-outer collapse" id="automated-menu-section-preferences-twirl">
                                   <div class="menu-section-twirl-section-inner">
 
                                     <div class="menu-twirl-option-outer">
@@ -789,12 +791,12 @@
                                         Automated Monetization Boosters</span>
 
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
-                                        class="ui-icon menu-section-twirl-icon menu-section-command-twirl" />
+                                        class="ui-icon menu-section-twirl-icon menu-section-command-twirl" data-toggle="collapse" data-target="#monetization-menu-section-command-twirl" />
 
                                     </div>  <!-- END .menu-section-twirl-header-inner -->
                                   </div>  <!-- END .menu-section-twirl-header-outer -->
 
-                                  <div class="menu-section-twirl-section-outer">
+                                  <div class="menu-section-twirl-section-outer collapse" id="monetization-menu-section-command-twirl">
                                     <div class="menu-section-twirl-section-inner">
 
                                       <div class="menu-twirl-option-outer">

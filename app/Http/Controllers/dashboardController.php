@@ -26,5 +26,11 @@ class dashboardController extends Controller
 		$title = 'Dashboard page';
         return view('dashboard')->with('title', $title);
     }
+    
+    public function help()
+    {
+		$title = 'Help page';
+        return view('help')->with('title', $title);
+    }
 	
 }
