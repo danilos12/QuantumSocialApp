@@ -1,1 +1,1 @@
-# Quantum Social App 
+# Quantum App  
