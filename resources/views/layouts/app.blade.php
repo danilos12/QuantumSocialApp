@@ -23,8 +23,9 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 	
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
-	<link rel="stylesheet" href="{{ asset('public/js/jquery-ui/jquery-ui.min.css') }}">
-	
+	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
+	<link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
 	
 </head>
 <body>
@@ -156,13 +157,13 @@
                     <img src = "{{ asset('public/ui-images/icons/02-profile.svg') }}" class="menu-icon" />
                     Profile</a></li>
 					
-                  <li class="menu-item">
-				   <a href="{{ route('queue') }}">
+                  <li class="menu-item" data-toggle="collapse" data-target="#posting">
+                    <!-- <a href="{{ route('queue') }}">
+                      </a> -->
                     <img src = "{{ asset('public/ui-images/icons/03-posting.svg') }}" class="menu-icon" />
                     Posting
-					</a>
-					</li>
-                    <ul class="sub-menu menu-margin">
+                    </li>
+                    <ul class="sub-menu menu-margin collapse" id="posting">
 
                       <li>
                         <a href="{{ route('queue') }}"><img src = "{{asset('public/ui-images/icons/04-queue.svg')}} " class="menu-icon" />
@@ -188,13 +189,13 @@
                         <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
                         Bulk Uploader</a></li>
                     </ul>
-                  <li class="menu-item">
-                    <a href="{{ route('social-engage') }}">
-					<img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />
-                    Engagement
-					</a>
-					</li>
-                    <ul class="sub-menu menu-margin">
+                  <li class="menu-item" data-toggle="collapse" data-target="#engagement">
+                    <!-- <a href="{{ route('social-engage') }}">
+                      </a> -->
+                    <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />
+                              Engagement
+                  </li>
+                    <ul class="sub-menu menu-margin collapse" id="engagement">
                       <li>
 					  <a href="{{ route('social-engage') }}">
                         <img src = "{{asset('public/ui-images/icons/11-engage.svg')}} " class="menu-icon" />
@@ -212,13 +213,13 @@
                         <a href="{{ route('social-hashtag-feeds') }}"><img src = "{{asset('public/ui-images/icons/14-hashtag-feeds.svg')}}" class="menu-icon" />
                         Hashtag Feeds</a></li>
                     </ul>
-                  <li class="menu-item">
-				   <a href="{{ route('promo-tweets') }}">
+                  <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
+				   <!-- <a href="{{ route('promo-tweets') }}">
+             </a> -->
                     <img src = "{{asset('public/ui-images/icons/15-campaigns.svg')}} " class="menu-icon" />
                     Campaigns
-					</a>
 					</li>
-                    <ul class="sub-menu menu-margin">
+                    <ul class="sub-menu menu-margin collapse" id="campaigns">
                       <li> <a href="{{ route('promo-tweets') }}">
                         <img src = "{{asset('public/ui-images/icons/17-promos.svg')}} " class="menu-icon" />
                         Promo Tweets</a></li>
@@ -240,7 +241,9 @@
 						<div class="settings-bar-outer">
 						  <div class="settings-bar-inner">
 							<img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" />
-							<img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon" />
+							<a href="{{ route('help') }}">
+                <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon"  />
+              </a> 
 							<img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
 							<a class="dropdown-item" href="{{ route('logout') }}"
 					   onclick="event.preventDefault();
@@ -386,6 +389,7 @@
 	 @else
 	@endauth
 @endif	
- 
+ <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </body>
 </html>
