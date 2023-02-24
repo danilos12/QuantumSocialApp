@@ -49,7 +49,7 @@ class PostingController extends Controller
     }
 	 public function slot_scheduler()
     {
-		$title = 'Slot Schedulers';
+		$title = 'Slot Scheduler test';
 		$days = array(1 => 'sunday', 2 => 'monday', 3 => 'tuesday', 4 => 'wednesday', 5 => 'thursday', 6 => 'friday', 7 => 'saturday');
 		
 		$userId = Auth::id();
