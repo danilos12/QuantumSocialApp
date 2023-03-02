@@ -53,5 +53,9 @@ Route::get('/user-lists', [App\Http\Controllers\EngagementController::class, 'c_
 Route::get('/hashtag-feeds', [App\Http\Controllers\EngagementController::class, 'c_hashtag_feeds'])->name('social-hashtag-feeds');
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
 
-
 Route::get('/trending', [App\Http\Controllers\TrendingtopicsController::class, 'index'])->name('trending-topics');
+
+Route::get('/twitter/redirect', [App\Http\Controllers\Controller::class, 'twitterOAuth']);
+Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOAuthCallback']);
+
+Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets']);
