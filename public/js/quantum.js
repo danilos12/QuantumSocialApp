@@ -218,12 +218,33 @@ $twitterMenu = $(".twitter-dropdown-menu-outer");
 
 $hamburger.click(function () {
   if ( $twitterMenu.first().is( ":hidden" ) ) {
-      $twitterMenu.toggle( "slide", { direction: "up"  }, 800 );
+    twitterMenuOpen();
   } else {
-      $twitterMenu.toggle( "slide", { direction: "right"  }, 400 );
+    twitterMenuClose();
   }
 });
 
+// $("html").click(function(event) {
+//   if ( $twitterMenu.first().is( ":not(:hidden)" ) ) {
+//       twitterMenuClose();
+//   } 
+// })
+
+// when escape is clicked
+$(document).on("keydown", function(event) {
+  if (event.which === 27) {
+    if ( $twitterMenu.first().is( ":not(:hidden)" ) ) {
+      twitterMenuClose();
+    } 
+  }
+});
+
+function twitterMenuOpen() {
+  $twitterMenu.toggle( "slide", { direction: "up"  }, 800 );
+}
+function twitterMenuClose() {
+  $twitterMenu.toggle( "slide", { direction: "right"  }, 400 );
+}
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
@@ -464,6 +485,7 @@ $launchCommandModule.click( function() {
   $modalLargeAnchor.show();
   setTimeout(function() {
      $modalLargeBackdrop.fadeIn("slow");
+     console.log('show')
    }, 20);
    setTimeout(function() {
       $postingToolOuter.toggle( "slide", { direction: "up"  }, 700 );
@@ -483,6 +505,7 @@ $closeGeneralSettings.click( function() {
 
 // Launch General Settings
 $launchGeneralSettings.click( function() {
+  console.log(1)
   $modalLargeAnchor.show();
   setTimeout(function() {
      $modalLargeBackdrop.fadeIn("slow");

@@ -23,8 +23,9 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 	
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
-	<link rel="stylesheet" href="{{ asset('public/js/jquery-ui/jquery-ui.min.css') }}">
-	
+	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
+	<link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
 	
 </head>
 <body>
@@ -57,53 +58,44 @@
               <div class="twitter-dropdown-menu-outer">
                 <div class="twitter-dropdown-menu-inner frosted">
 
-                  <div class="twitter-stat-bar">
+                  @if(isset($twitter))
+                    @if ($acct_twitter_count > 0) 
+                      <div class="twitter-stat-bar">
+                        <div class="twitter-stat">
+                          <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
+                          <span class="stat-title">Following</span>
+                          <span class="stat-count count-following">{{ isset($twitter->twitter_followersCount) ? $twitter->twitter_followersCount : 0  }}</span></div>
 
-                    <div class="twitter-stat">
-                      <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
-                      <span class="stat-title">Following</span>
-                      <span class="stat-count count-following">1,520</span></div>
+                        <div class="twitter-stat twitter-stat-center">
+                          <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
+                          <span class="stat-title">Followers</span>
+                          <span class="stat-count count-followers">{{ isset($twitter->twitter_followersCount) ? $twitter->twitter_followersCount : 0  }}</span></div>
 
-                    <div class="twitter-stat twitter-stat-center">
-                      <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
-                      <span class="stat-title">Followers</span>
-                      <span class="stat-count count-followers">52,498</span></div>
+                        <div class="twitter-stat">
+                          <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
+                          <span class="stat-title">Unfollows</span>
+                          <span class="stat-count count-unfollows">240</span></div>
+                      </div>  <!-- END .twitter-stat-bar -->
 
-                    <div class="twitter-stat">
-                      <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
-                      <span class="stat-title">Unfollows</span>
-                      <span class="stat-count count-unfollows">240</span></div>
+              
+                      <span class="account-select-title">Select An Account</span>
 
-                  </div>  <!-- END .twitter-stat-bar -->
-
-                  <span class="account-select-title">
-                    Select An Account</span>
-
-                  <div class="twitter-account-select-bar">
-
-                    <div class="twitter-account-item">
-                      <a href="#">
-                      <div class="twitter-bar-profile-info">
-                        <img src="{{ asset('public/temp-images/william-wallace.jpg') }}" />
-                      @wimbleyJimbley</div></a>
-                      <a href="#">
-                      <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "
-                            class="menu-icon twitter-bar-settings-icon" /></a>
-                    </div>  <!-- END .twitter-account-item -->
-
-                                    <div class="twitter-account-item">
-                                      <a href="#">
-                                      <div class="twitter-bar-profile-info">
-                                        <img src="{{ asset('public/temp-images/william-wallace.jpg') }}" />
-                                      @wimbleyJimbley</div></a>
-                                      <a href="#">
-                                      <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}"
-                                            class="menu-icon twitter-bar-settings-icon" /></a>
-                                    </div>  <!-- END .twitter-account-item -->
-
-
-                  </div>  <!-- END .twitter-account-select-bar -->
-
+                      @foreach($twitter as $tweet)
+                      <div class="twitter-account-select-bar">
+                        <div class="twitter-account-item">
+                          <div class="twitter-bar-profile-info">
+                            <img src="{{ $tweet->twitter_photo }}" />
+                            @ {{ $tweet->twitter_username}}
+                          </div>
+                          <a href="#">
+                          <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" /></a>
+                        </div>  <!-- END .twitter-account-item -->                                            
+                      </div>  <!-- END .twitter-account-select-bar -->                    
+                      @endforeach
+                    @endif
+                  @else 
+                  <span class="account-select-title">You have {{$acct_twitter_count}} account.</span>
+                  @endif
                 </div>  <!-- END .twitter-dropdown-menu-inner -->
               </div>  <!-- END .twitter-dropdown-menu-outer -->
 
@@ -117,8 +109,8 @@
 			</div>
 			@endauth
 			@endif 	 
-			 
-			 
+			      
+			
 			@if (Route::has('login'))
 				@auth		
 			  <span class="toggle-wrap">
@@ -156,13 +148,13 @@
                     <img src = "{{ asset('public/ui-images/icons/02-profile.svg') }}" class="menu-icon" />
                     Profile</a></li>
 					
-                  <li class="menu-item">
-				   <a href="{{ route('queue') }}">
+                  <li class="menu-item" data-toggle="collapse" data-target="#posting">
+                    <!-- <a href="{{ route('queue') }}">
+                      </a> -->
                     <img src = "{{ asset('public/ui-images/icons/03-posting.svg') }}" class="menu-icon" />
                     Posting
-					</a>
-					</li>
-                    <ul class="sub-menu menu-margin">
+                    </li>
+                    <ul class="sub-menu menu-margin collapse" id="posting">
 
                       <li>
                         <a href="{{ route('queue') }}"><img src = "{{asset('public/ui-images/icons/04-queue.svg')}} " class="menu-icon" />
@@ -188,13 +180,13 @@
                         <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
                         Bulk Uploader</a></li>
                     </ul>
-                  <li class="menu-item">
-                    <a href="{{ route('social-engage') }}">
-					<img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />
-                    Engagement
-					</a>
-					</li>
-                    <ul class="sub-menu menu-margin">
+                  <li class="menu-item" data-toggle="collapse" data-target="#engagement">
+                    <!-- <a href="{{ route('social-engage') }}">
+                      </a> -->
+                    <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />
+                              Engagement
+                  </li>
+                    <ul class="sub-menu menu-margin collapse" id="engagement">
                       <li>
 					  <a href="{{ route('social-engage') }}">
                         <img src = "{{asset('public/ui-images/icons/11-engage.svg')}} " class="menu-icon" />
@@ -212,13 +204,13 @@
                         <a href="{{ route('social-hashtag-feeds') }}"><img src = "{{asset('public/ui-images/icons/14-hashtag-feeds.svg')}}" class="menu-icon" />
                         Hashtag Feeds</a></li>
                     </ul>
-                  <li class="menu-item">
-				   <a href="{{ route('promo-tweets') }}">
+                  <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
+				   <!-- <a href="{{ route('promo-tweets') }}">
+             </a> -->
                     <img src = "{{asset('public/ui-images/icons/15-campaigns.svg')}} " class="menu-icon" />
                     Campaigns
-					</a>
 					</li>
-                    <ul class="sub-menu menu-margin">
+                    <ul class="sub-menu menu-margin collapse" id="campaigns">
                       <li> <a href="{{ route('promo-tweets') }}">
                         <img src = "{{asset('public/ui-images/icons/17-promos.svg')}} " class="menu-icon" />
                         Promo Tweets</a></li>
@@ -240,7 +232,7 @@
 						<div class="settings-bar-outer">
 						  <div class="settings-bar-inner">
 							<img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" />
-							<img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon" />
+              <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon"  />
 							<img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
 							<a class="dropdown-item" href="{{ route('logout') }}"
 					   onclick="event.preventDefault();
@@ -269,7 +261,12 @@
 
 		<div class="content-outer">
 			<div class="content-inner">
-				@yield('content')
+        @if(session()->has('alert'))
+          <div class="alert alert-{{ session('alert_type', 'info') }}">
+              {{ session('alert') }}
+          </div>
+        @endif
+        @yield('content')
 				</div>
 		</div>
     </div>  <!-- END .interface-inner -->
@@ -386,6 +383,20 @@
 	 @else
 	@endauth
 @endif	
- 
+ <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
+ <script type='text/javascript' src="{{asset('public/js/genera1lSettings.js')}}"></script>
+ <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+ <script>
+$(document).ready(function() {
+  var alert = $('.alert ');
+
+  if(alert.length == 1) {
+    setTimeout(function(){
+      alert.fadeOut('slow');
+    }, 5000);
+  }
+});
+</script>
+
 </body>
 </html>
