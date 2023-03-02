@@ -4,7 +4,6 @@
                       <!-- BEGIN SETTINS MENUS -->
 
                       <div class="modal-large-outer main-settings-outer general-settings-outer frosted">
-
                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" />
                         <div class="menu-header">General Settings</div>
 
@@ -43,7 +42,7 @@
                                     <span class="settings-item-label">Time Zone</span>
                                   </div>  <!-- END .settings-item-label -->
                                   <div class="settings-item-data-wrap">
-                        <!-- CARLO - Here's the source for that, which has SQL and Array versions:  https://gist.github.com/nodesocket/3919205 -->
+                                    <!-- CARLO - Here's the source for that, which has SQL and Array versions:  https://gist.github.com/nodesocket/3919205 -->
                                     <select name="timezone_offset" id="timezone-offset" class="time-zone-data">
                                     	<option value="-12:00">(GMT -12:00) Eniwetok, Kwajalein</option>
                                     	<option value="-11:00">(GMT -11:00) Midway Island, Samoa</option>
@@ -95,52 +94,53 @@
 
                           <div class="menu-section-outer social-accounts-outer">
                             <div class="menu-section-inner social-accounts-inner">
-                              <span class="menu-section-header">
-                                Social Accounts</span>
+                              <span class="menu-section-header">Social Accounts</span>
+                                
+                                @if ($acct_twitter_count > 0)
+                                      @foreach($twitter_accts as $acct)
+                                      <!-- BEGIN .menu-social-account Instance -->
+                                      <div class="menu-social-account-outer">
+                                        <div class="menu-social-account-inner">
 
-                                <!-- BEGIN .menu-social-account Instance -->
-                                <div class="menu-social-account-outer">
-                                  <div class="menu-social-account-inner">
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
 
-                                   <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
+                                          <div class="global-twitter-profile-header">
+                                            <a href="#">
+                                            <img src="{{ $acct->twitter_photo }}"
+                                                class="global-profile-image" /></a>
+                                            <div class="global-profile-details">
+                                              <div class="global-profile-name">
+                                                <a href="#">
+                                                  {{ $acct->twitter_name }}</a>
+                                              </div>  <!-- END .global-author-name -->
+                                              <div class="global-profile-subdata">
+                                                <span class="global-profile-handle">
+                                                  @<a href="">{{ $acct->twitter_username }}</a>
+                                                </span>
+                                              </div>  <!-- END .global-post-date-wrap -->
+                                            </div>  <!-- END .global-author-details -->
+                                          </div>  <!-- END .global-twitter-profile-header -->
+                              
+                                          <div class="menu-social-account-options">
+                                            <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
+                                            <span class="menu-account-icons">
+                                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip" />
+                                            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
+                                            </span>
+                                          </div>  <!-- END .menu-social-account-options -->
 
-                                    <div class="global-twitter-profile-header">
-                                      <a href="#">
-                                       <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg"
-                                          class="global-profile-image" /></a>
-                                      <div class="global-profile-details">
-                                        <div class="global-profile-name">
-                                          <a href="#">
-                                            William Wallace</a>
-                                        </div>  <!-- END .global-author-name -->
-                                        <div class="global-profile-subdata">
-                                          <span class="global-profile-handle">
-                                            <a href="">
-                                              @WilliamWallace</a></span>
-                                        </div>  <!-- END .global-post-date-wrap -->
-                                      </div>  <!-- END .global-author-details -->
-                                    </div>  <!-- END .global-twitter-profile-header -->
-
-                          <!-- FAITH - We need a global jQuery function to have the tool tip show up on hover (see below).
-                                        - Use this for the class="tool-tip" and have it show up right below the element they hover on.
-
-                                        For anything beyond that, please coordinate with Ingrid on style.
-                          -->
-                                    <div class="menu-social-account-options">
-                                      <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
-                                      <span class="menu-account-icons">
-                                       <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
-                                      </span>
-                                    </div>  <!-- END .menu-social-account-options -->
-
-                                  </div>  <!-- END .menu-social-account-inner -->
-                                </div>  <!-- END .menu-social-account-outer -->
-                                <!-- END .menu-social-account Instance -->
+                                        </div>  <!-- END .menu-social-account-inner -->
+                                      </div>  <!-- END .menu-social-account-outer -->
+                                      <!-- END .menu-social-account Instance -->
+                                      @endforeach
+                                      
+                                @else
+                                    <p>No accounts found</p>
+                                @endif
 
                                 <div class="menu-social-add-accounts-section">
                                   <div class="add-account add-twitter-account">                                   
-                                    <a href="{{ url('auth/twitter') }}">
+                                    <a href="{{ url('twitter/redirect') }}">
                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon vertical-middle" />
                                         <span>+ Twitter</span>
                                     </a>
@@ -279,24 +279,23 @@
                       <div class="modal-large-outer main-settings-outer twitter-settings-outer frosted">
 
                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" />
+                       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" />
+
+                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" />
 
                         <div class="account-settings-header-wrap">
-
                           <div class="menu-header">Social Account Settings</div>
-
                           <div class="global-twitter-profile-header profile-header-left">
                             <a href="#">
-                             <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg"
+                             <img src="{{ $user->twitter_photo }}"
                                 class="global-profile-image" /></a>
                             <div class="global-profile-details">
-                              <div class="global-profile-name">
-                                <a href="#">
-                                  William Wallace</a>
+                              <div class="global-profile-name text-right">
+                                <a href="#"> {{ $user->twitter_name }}</a>
                               </div>  <!-- END .global-author-name -->
                               <div class="global-profile-subdata">
                                 <span class="global-profile-handle">
-                                  <a href="">
-                                    @WilliamWallace</a></span>
+                                  @<a href="">{{ $user->twitter_username }}</a></span>
                               </div>  <!-- END .global-post-date-wrap -->
                             </div>  <!-- END .global-author-details -->
                           </div>  <!-- END .global-twitter-profile-header -->
