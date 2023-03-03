@@ -38,16 +38,19 @@ class ProfileController extends Controller
 		$title = 'Profile page';
 
         $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
-        
-        $twitterApi = new TwitterApi();
-        $getTweets = $twitterApi->getTweets($info->twitter_id);
 
-        if ($getTweets) {
-            return view('profile')->with(['title' => $title, 'tweets' => $getTweets->data]);         
+        $tweets = [];
+        if ($info) {
+            
+            $twitterApi = new TwitterApi();
+            $tweets = $twitterApi->getTweets($info->twitter_id);
         } else {
-            return view('login');
+            $tweets = [];
         }
 
+        // dd($tweets);
+
+        return view('profile', ['title' => $title, 'tweets' => $tweets]);
     }
 	
 	public function edit_password()

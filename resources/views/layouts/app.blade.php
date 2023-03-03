@@ -48,8 +48,7 @@
               </div>  <!-- END .banner-twitter-profile-inner -->
             </a>
             <div class="banner-twitter-settings">
-              <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}"
-              class="menu-icon launch-twitter-settings" /></div>
+              <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" /></div>
 
             <div class="twitter-dropdown-wrap">
               <img src = "{{ asset('public/ui-images/icons/00-hamburger.svg') }}" class="menu-icon hamburger" />
@@ -139,7 +138,7 @@
                     Dashboard
 					</a>
 					</li>
-                  <li class="menu-item menu-margin launch-command-module">
+                  <li class="menu-item menu-margin launch-command-module" data-id="modal" id="command-module">
                     <img src = "{{ asset('public/ui-images/icons/pg-command.svg') }}" class="menu-icon" />
                     Command Module</li>
                   <li class="menu-item menu-margin">
@@ -230,7 +229,7 @@
 						</ul>
 						<div class="settings-bar-outer">
 						  <div class="settings-bar-inner">
-							<img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" />
+							<img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
               <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon"  />
 							<img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
 							<a class="dropdown-item" href="{{ route('logout') }}"
@@ -377,7 +376,7 @@
 		@if ($title == 'Slot Scheduler')
 		<script type='text/javascript' src="{{asset('public/js/schedule.js')}}"></script>
 		@endif
-	 <script type='text/javascript' src="{{asset('public/js/quantum.js')}}"></script>
+	 <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
 	  <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
 	 @else
 	@endauth
