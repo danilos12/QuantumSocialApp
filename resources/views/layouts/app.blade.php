@@ -383,7 +383,7 @@
 	@endauth
 @endif	
  <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
- <script type='text/javascript' src="{{asset('public/js/genera1lSettings.js')}}"></script>
+ <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
  <script>
 $(document).ready(function() {
