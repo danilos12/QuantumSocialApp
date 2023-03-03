@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UT_AcctMngt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class TwitterApi extends Controller
 {
@@ -26,12 +29,12 @@ class TwitterApi extends Controller
         $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets" ;
         $request = $this->curlGetHttpRequest($url, $headers, $data);
 
-        if ($request->data) {
+        if ($request->meta->result_count > 0) {
 
             // $obj = [];
 
             // get images of the tweet 
-            foreach($request as $k => $v) {
+            foreach($request->data as $k => $v) {
                 foreach($v as $info) {
                                         
                     if (isset($info->attachments->media_keys)) {
@@ -47,20 +50,59 @@ class TwitterApi extends Controller
                             
                             $info->image = $newObject;
                         }
-                        
-                        
+                                                
                     } 
                 }
                 
             }
             // dd($request);
-            return $request;
+            return $request->data;
 
             // exit;
         } else {
-            return response()->json("message", "Tweets are not pulled");
+            $message = array('status' => 201, 'message' => 'No tweets found.');
+
+            return response()->json($message);
         }
 
+    }
+
+    public function switchedAccount($twitterId) {
+
+        $title = "Profile";
+        
+        try {
+
+            // update current Active twitter to disable
+            $active = UT_AcctMngt::where(['selected' =>  1, 'user_id' => Auth::id()])->update(['selected' => 0]);
+
+            // update the new selected
+            $enabled = UT_AcctMngt::where('twitter_id' ,  $twitterId)->update(['selected' => 1]);
+
+            // $disabled = UT_AcctMngt::where(['selected' =>  0, 'user_id' => Auth::id() ])->update(['selected' => 1])
+    
+            // $temp = $active['selected'];
+            // $active->selected = $disabled['selected'];
+            // $disabled->selected = $temp;
+
+            // $active->save();
+            // $disabled->save();
+
+            // // DB::commit();
+
+            if ($enabled && $active) {
+                return redirect('profile')->with('title', $title)->with('alert', 'Tweets are updated')->with('alert_type', 'success');
+            } else {
+                return redirect('profile')->with('title', $title)->with('alert', 'Error in selecting')->with('alert_type', 'warning');
+            }
+
+        } catch (\Exception $e) {
+            
+            // return redirect('profile')->with('alert', 'Tweets are updated')->with('alert_type', 'success');
+            return response()->json([
+                'message' => 'Error updating records: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function curlGetHttpRequest($url, $headers,  $data) {
