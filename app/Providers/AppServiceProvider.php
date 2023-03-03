@@ -37,9 +37,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('twitter_accts', Twitter::where('user_id', auth()->id())->get());
             $view->with('twitter', Twitter::where('user_id', auth()->id())->get());         
             
-            $selectedUser = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
-            $twitterSelectedUser = Twitter::where('twitter_id', $selectedUser->getAttribute('twitter_id'))->first();
-            $view->with('user', $twitterSelectedUser);         
+            // $selectedUser = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
+            // $twitterSelectedUser = Twitter::where('twitter_id', $selectedUser->getAttribute('twitter_id'))->first();
+            // $view->with('user', $twitterSelectedUser);         
 
         });
 
