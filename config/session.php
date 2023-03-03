@@ -155,7 +155,7 @@ return [
     |
     */
 
-    'domain' => 'www.quantumsocial.local',
+    'domain' => env('SESSION_DOMAIN', null),
 
     /*
     |--------------------------------------------------------------------------
