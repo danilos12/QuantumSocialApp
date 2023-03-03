@@ -34,8 +34,7 @@
     <div class="interface-inner">
 		<div class="banner-outer">
         <div class="banner-inner">
-
-          <span class="image-placeholder">Quantum Social</span>
+          <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-horiz-white-app@2x.png" class="image-placeholder" height="100%" />
 			 <!-- Authentication Links -->
             @if (Route::has('login')) 
 			@auth	
