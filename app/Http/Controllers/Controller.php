@@ -103,7 +103,7 @@ class Controller extends BaseController
                 $selectedAcct = UT_AcctMngt::firstOrCreate([
                     'user_id' => Auth::user()->id,
                     'twitter_id' => $twitterId->id,
-                    'selected' => (Twitter::where('id', Auth::user()->id)->count() > 0) ? 1 : 0
+                    'selected' => (Twitter::where('id', Auth::user()->id)->count() > 0) ? 0 : 1
                 ]);
     
                 session()->put('id', Auth::id());
@@ -111,7 +111,7 @@ class Controller extends BaseController
                 // Check if token save was successful
                 if ($saveToken && $selectedAcct) {
                     // Redirect user to a new page with a success message
-                    return redirect('/profile?')->with('success', 'Twitter info and access token saved successfully!');
+                    return redirect('profile')->with('success', 'Twitter info and access token saved successfully!');
                 } 
             }
         }

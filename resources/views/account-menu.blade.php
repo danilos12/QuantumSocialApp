@@ -4,7 +4,7 @@
                       <!-- BEGIN SETTINS MENUS -->
 
                       <div class="modal-large-outer main-settings-outer general-settings-outer frosted">
-                       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" />
+                       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" id="general-settings"/>
                         <div class="menu-header">General Settings</div>
 
                         <div class="modal-large-inner main-settings-inner general-settings-inner">
@@ -90,88 +90,88 @@
 
                             </div>  <!-- END .quantum-settings-inner -->
                           </div>  <!-- END .quantum-settings-outer -->
+                          
+                          <!--     BEGIN TEAM MEMBERS   -->
+                            <div class="menu-section-outer team-account-outer">
 
-<!--     BEGIN TEAM MEMBERS   -->
-<div class="menu-section-outer team-account-outer">
+                            <div class="menu-section-inner team-account-inner">
+                            <span class="menu-section-header">
+                                Team Members </span>
 
-<div class="menu-section-inner team-account-inner">
-  <span class="menu-section-header">
-    Team Members </span>
+                                <!-- BEGIN .menu-team-account Instance -->
+                                <div class="menu-team-account-outer"> 
+                                <div class="menu-team-account-inner"> 
 
-    <!-- BEGIN .menu-team-account Instance -->
-    <div class="menu-team-account-outer"> 
-      <div class="menu-team-account-inner"> 
+                                    <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
 
-        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
+                                    <div class="global-team-profile-header"> 
+                                    <div class="global-profile-details">
+                                        <div class="global-profile-name">
+                                        <a href="#">
+                                            William Wallace</a>
+                                        </div>  <!-- END .global-profile-name -->
+                                        <div class="global-profile-subdata">
+                                        <span class="global-profile-email"> 
+                                            <a href="">
+                                            will-wallace@email.com</a></span>
+                                        </div>  <!-- END .global-post-date-wrap -->
+                                    </div>  <!-- END .global-team-profile-details -->
+                                    </div>  <!-- END .global-team-profile-header -->
 
-        <div class="global-team-profile-header"> 
-          <div class="global-profile-details">
-            <div class="global-profile-name">
-              <a href="#">
-                William Wallace</a>
-            </div>  <!-- END .global-profile-name -->
-            <div class="global-profile-subdata">
-              <span class="global-profile-email"> 
-                <a href="">
-                  will-wallace@email.com</a></span>
-            </div>  <!-- END .global-post-date-wrap -->
-          </div>  <!-- END .global-team-profile-details -->
-        </div>  <!-- END .global-team-profile-header -->
+                                    <div class="menu-social-account-options">
+                                    <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
+                                    <span class="menu-account-icons">
+                                        <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" />
+                                    </span>
+                                    </div>  <!-- END .menu-social-account-options -->
 
-        <div class="menu-social-account-options">
-          <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
-          <span class="menu-account-icons">
-            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" />
-            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" />
-          </span>
-        </div>  <!-- END .menu-social-account-options -->
-
-      </div>  <!-- END .menu-social-account-inner -->
-    </div>  <!-- END .menu-social-account-outer -->
-    <!-- END .menu-social-account Instance -->
-
-
-
-    <div class="menu-team-members-add-accounts-section"> 
-      <div class="add-account add-team">
-        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
-        + Add New Member
-      </div>  <!-- END .add-twitter-account -->
-    </div>  <!-- END .menu-social-add-accounts-section -->
-
-</div>  <!-- END .social-accounts-inner -->
+                                </div>  <!-- END .menu-social-account-inner -->
+                                </div>  <!-- END .menu-social-account-outer -->
+                                <!-- END .menu-social-account Instance -->
 
 
-                        <!-- BEGIN ADD TEAM MEMBER MODAL -->
 
-                        <div class="add-team-member-modal"> 
-                          <div class="add-team-member-inner frosted"> 
+                                <div class="menu-team-members-add-accounts-section"> 
+                                <div class="add-account add-team">
+                                    <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
+                                    + Add New Member
+                                </div>  <!-- END .add-twitter-account -->
+                                </div>  <!-- END .menu-social-add-accounts-section -->
 
-                            <!-- BEGIN input copied from engage.html -->
-                            <div class="global-input-email"> 
-                              <form>
-                                <div class="global-input-text input-text">  
-                                  <input type="text" placeholder="Name" />
-                                </div>
-
-                                <div class="global-input-text input-text">  
-                                  <input type="text" placeholder="Email address" />
-                                </div>
-
-                              </form>
-                              <span class="add-team-button"> 
-                                Add<span>
-                            </div>
-                            <!-- END copied from engage.html -->
-
-                          </div>  <!-- END .add-team-member-inner -->
-                        </div>  <!-- END .add-team-member-modal -->
+                            </div>  <!-- END .social-accounts-inner -->
 
 
-                        <!-- END ADD TEAM MEMBER MODAL -->
-</div>  <!-- END .team-account-outer -->
+                                                    <!-- BEGIN ADD TEAM MEMBER MODAL -->
 
-<!--     END TEAM MEMBERS    -->
+                                                    <div class="add-team-member-modal"> 
+                                                    <div class="add-team-member-inner frosted"> 
+
+                                                        <!-- BEGIN input copied from engage.html -->
+                                                        <div class="global-input-email"> 
+                                                        <form>
+                                                            <div class="global-input-text input-text">  
+                                                            <input type="text" placeholder="Name" />
+                                                            </div>
+
+                                                            <div class="global-input-text input-text">  
+                                                            <input type="text" placeholder="Email address" />
+                                                            </div>
+
+                                                        </form>
+                                                        <span class="add-team-button"> 
+                                                            Add<span>
+                                                        </div>
+                                                        <!-- END copied from engage.html -->
+
+                                                    </div>  <!-- END .add-team-member-inner -->
+                                                    </div>  <!-- END .add-team-member-modal -->
+
+
+                                                    <!-- END ADD TEAM MEMBER MODAL -->
+                            </div>  <!-- END .team-account-outer -->
+
+                            <!--     END TEAM MEMBERS    -->
 
                           <div class="menu-section-outer social-accounts-outer">
                             <div class="menu-section-inner social-accounts-inner">
@@ -203,7 +203,7 @@
                                           </div>  <!-- END .global-twitter-profile-header -->
                               
                                           <div class="menu-social-account-options">
-                                            <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
+                                            <span class="menu-account-default" tool-tip="Set default account." default="{{ $selected_user->twitter_id === $acct->twitter_id ? 'active' : '' }}"></span>
                                             <span class="menu-account-icons">
                                             <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" data-toggle="tooltip" />
                                             <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
@@ -358,23 +358,21 @@
                       </div>  <!-- END .general-settings-outer -->
 
                       <div class="modal-large-outer main-settings-outer twitter-settings-outer frosted">
-
-                       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" />
-                       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" />
-
-                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" />
+                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" id="twitter-settings"/>
 
                         <div class="account-settings-header-wrap">
                           <div class="menu-header">Social Account Settings</div>
                           <div class="global-twitter-profile-header profile-header-left">
                             <a href="#">
-                              
+                             <img src="{{ isset($user) ? $user->twitter_photo : asset('public/temp-images/william-wallace.jpg') }}"
+                                class="global-profile-image" /></a>
                             <div class="global-profile-details">
                               <div class="global-profile-name text-right">
-                              
+                                {{ isset($user) ? $user->twitter_name : Auth::user()->name }}
                               </div>  <!-- END .global-author-name -->
                               <div class="global-profile-subdata">
-                              
+                                <span class="global-profile-handle">
+                                  @<a href="">{{ isset($user) ? $user->twitter_username : "" }}</a></span>
                               </div>  <!-- END .global-post-date-wrap -->
                             </div>  <!-- END .global-author-details -->
                           </div>  <!-- END .global-twitter-profile-header -->
@@ -413,21 +411,20 @@
                                           <input type="checkbox" class="menu-twirl-toggle">
                                         </div>  <!-- END .menu-twirl-right -->
                                       </div>  <!-- END .menu-twirl-option-inner -->
+
                                       <!-- START auto-reply -->
-                                      <div class="menu-subTwirl-outer">
-                                                      <div class="subTwirl-header-wrap">
-                                                        <span class="subTwirl-header">
-                                                          Modify your Auto-reply message below:</span>
-                                                      </div>  <!-- END .subTwirl-header-wrap -->
-                                                      <div class="menu-subTwirl-inner">
-                                                        <textarea class="auto-reply-text">Hey thank you for following (@accountHandle)! <br /><br />{{01}}</textarea>
-                                                        <div class="auto-reply-counter">
-                                                          <span class="auto-reply-count">154</span>/280 remaining
-                                                        </div>  <!-- END .thread-ender-count -->
-                                                        <div class="subTwirl-button auto-reply-button">
-                                                          Save Auto-reply
-                                                        </div>  <!-- END .auto-reply-button -->
-                                                      </div>  <!-- END .menu-subTwirl-inner -->
+                                        <div class="menu-subTwirl-outer">
+                                            <div class="subTwirl-header-wrap">
+                                                <span class="subTwirl-header">Modify your Auto-reply message below:</span>
+                                            </div>  <!-- END .subTwirl-header-wrap -->
+                                            <div class="menu-subTwirl-inner"><textarea class="auto-reply-text">Hey thank you for following (@accountHandle)! <br /><br />{{01}}</textarea>
+                                            <div class="auto-reply-counter">
+                                                <span class="auto-reply-count">154</span>/280 remaining
+                                            </div>  <!-- END .thread-ender-count -->
+                                            <div class="subTwirl-button auto-reply-button">
+                                                Save Auto-reply
+                                            </div>  <!-- END .auto-reply-button -->
+                                        </div>  <!-- END .menu-subTwirl-inner -->
                                       <!-- END auto-reply -->
 
                                     </div>  <!-- END .menu-twirl-option-outer -->
@@ -499,34 +496,33 @@
                                           <input type="checkbox" class="menu-twirl-toggle">
                                         </div>  <!-- END .menu-twirl-right -->
                                       </div>  <!-- END .menu-twirl-option-inner -->
-
                                       <!-- Start Evergreen -->
-                                      <div class="menu-subTwirl-outer">
-                                                      <div class="subTwirl-header-wrap">
-                                                        <span class="subTwirl-header"></span>
-                                                      </div>  <!-- END .subTwirl-header-wrap -->
-                                                      <div class="menu-subTwirl-inner">
+                                       <div class="menu-subTwirl-outer">
+                                            <div class="subTwirl-header-wrap">
+                                                <span class="subTwirl-header"></span>
+                                            </div>  <!-- END .subTwirl-header-wrap -->
+                                            <div class="menu-subTwirl-inner">
 
-                                                        <div class="subTwirl-content">
-                                                          <div class="subTwirl-evergreen-retweets-wrap"> <!-- was "subTwirl-engagement-retweets-wrap" -->
-                                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon subTwirl-option-icon" />
-                                                            Retweet every
-                                                            <input type="text" class="subTwirl-micro-input" value="3"/>
-                                                            retweets.
-                                                          </div>  <!-- END .subTwirl-evergreen-retweets-wrap -->
-                                                          <div class="subTwirl-evergreen-likes-wrap">
-                                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-heart.svg" class="ui-icon subTwirl-option-icon" />
-                                                            Retweet every
-                                                            <input type="text" class="subTwirl-micro-input" value="7"/>
-                                                            likes.
-                                                          </div>  <!-- END .subTwirl-evergreen-likes-wrap -->
-                                                        </div>  <!-- END .subTwirl-content -->
+                                            <div class="subTwirl-content">
+                                                <div class="subTwirl-evergreen-retweets-wrap"> <!-- was "subTwirl-engagement-retweets-wrap" -->
+                                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon subTwirl-option-icon" />
+                                                    Retweet every
+                                                    <input type="text" class="subTwirl-micro-input" value="3"/>
+                                                retweets.
+                                                </div>  <!-- END .subTwirl-evergreen-retweets-wrap -->
+                                                <div class="subTwirl-evergreen-likes-wrap">
+                                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-heart.svg" class="ui-icon subTwirl-option-icon" />
+                                                    Retweet every
+                                                    <input type="text" class="subTwirl-micro-input" value="7"/>
+                                                likes.
+                                                </div>  <!-- END .subTwirl-evergreen-likes-wrap -->
+                                            </div>  <!-- END .subTwirl-content -->
 
-                                                        <div class="subTwirl-button">
-                                                          Save Evergreen Options
-                                                        </div>  <!-- END .subTwirl-button -->
-                                                      </div>  <!-- END .menu-subTwirl-inner -->
-                                                    </div>  <!-- END .menu-subTwirl-outer -->
+                                            <div class="subTwirl-button">
+                                                Save Evergreen Options
+                                            </div>  <!-- END .subTwirl-button -->
+                                            </div>  <!-- END .menu-subTwirl-inner -->
+                                        </div>  <!-- END .menu-subTwirl-outer -->
                                       <!-- End Evergreen -->
 
                                     </div>  <!-- END .menu-twirl-option-outer -->
@@ -770,7 +766,7 @@
                                     <div class="menu-twirl-option-outer">
                                       <div class="menu-twirl-option-inner">
                                         <div class="menu-twirl-left">
-              <!-- INGRID - We need a retweet icon like the retweet one above, except instead of a timer, we need a minus sign -->
+                                         <!-- INGRID - We need a retweet icon like the retweet one above, except instead of a timer, we need a minus sign -->
                                          <img src="{{ asset('public/')}}/ui-images/icons/pg-clone.svg" class="ui-icon menu-twirl-option-icon" />
                                           <span class="menu-twirl-option-text">
                                             Automatically remove retweets after a time (helps keep your account clean).</span>
@@ -781,122 +777,122 @@
                                       </div>  <!-- END .menu-twirl-option-inner -->
                                     </div>  <!-- END .menu-twirl-option-outer -->
 
-                                                  <div class="menu-subTwirl-outer">
-                                                    <div class="subTwirl-header-wrap">
+                                    <div class="menu-subTwirl-outer">
+                                      <div class="subTwirl-header-wrap">
 
-                                                      <span class="subTwirl-header"></span>
-                                                    </div>  <!-- END .subTwirl-header-wrap -->
-                                                    <div class="menu-subTwirl-inner">
+                                        <span class="subTwirl-header"></span>
+                                      </div>  <!-- END .subTwirl-header-wrap -->
+                                      <div class="menu-subTwirl-inner">
 
-                                                      <div class="subTwirl-content">
-                                                        <div class="subTwirl-remove-retweet-wrap">
-                                                          Automatically remove retweet after
-                                                          <select class="subTwirl-remove-retweet-time">
-                                                            <option>0</option>
-                                                            <option>1</option>
-                                                            <option>2</option>
-                                                            <option>3</option>
-                                                            <option>4</option>
-                                                            <option>5</option>
-                                                            <option>6</option>
-                                                            <option>7</option>
-                                                            <option>8</option>
-                                                            <option>9</option>
-                                                            <option>10</option>
-                                                            <option>11</option>
-                                                            <option>12</option>
-                                                            <option>13</option>
-                                                            <option>14</option>
-                                                            <option>15</option>
-                                                            <option>16</option>
-                                                            <option>17</option>
-                                                            <option>18</option>
-                                                            <option>19</option>
-                                                            <option>20</option>
-                                                            <option>21</option>
-                                                            <option>22</option>
-                                                            <option>23</option>
-                                                            <option>24</option>
-                                                            <option>25</option>
-                                                            <option>26</option>
-                                                            <option>27</option>
-                                                            <option>28</option>
-                                                            <option>29</option>
-                                                            <option>30</option>
-                                                            <option>31</option>
-                                                            <option>32</option>
-                                                            <option>33</option>
-                                                            <option>34</option>
-                                                            <option>35</option>
-                                                            <option>36</option>
-                                                            <option>37</option>
-                                                            <option>38</option>
-                                                            <option>39</option>
-                                                            <option>40</option>
-                                                            <option>41</option>
-                                                            <option>42</option>
-                                                            <option>43</option>
-                                                            <option>44</option>
-                                                            <option>45</option>
-                                                            <option>46</option>
-                                                            <option>47</option>
-                                                            <option>48</option>
-                                                            <option>49</option>
-                                                            <option>50</option>
-                                                            <option>51</option>
-                                                            <option>52</option>
-                                                            <option>53</option>
-                                                            <option>54</option>
-                                                            <option>55</option>
-                                                            <option>56</option>
-                                                            <option>57</option>
-                                                            <option>58</option>
-                                                            <option>59</option>
-                                                            <option>60</option>
-                                                            <option>61</option>
-                                                            <option>62</option>
-                                                            <option>63</option>
-                                                            <option>64</option>
-                                                            <option>65</option>
-                                                            <option>66</option>
-                                                            <option>67</option>
-                                                            <option>68</option>
-                                                            <option>69</option>
-                                                            <option>70</option>
-                                                            <option>71</option>
-                                                            <option>72</option>
-                                                            <option>73</option>
-                                                            <option>74</option>
-                                                            <option>75</option>
-                                                            <option>76</option>
-                                                            <option>77</option>
-                                                            <option>78</option>
-                                                            <option>79</option>
-                                                            <option>80</option>
-                                                            <option>81</option>
-                                                            <option>82</option>
-                                                            <option>83</option>
-                                                            <option>84</option>
-                                                            <option>85</option>
-                                                            <option>86</option>
-                                                            <option>87</option>
-                                                            <option>88</option>
-                                                            <option>89</option>
-                                                            <option>90</option>
-                                                          </select>
-                                                          <select class="subTwirl-remove-retweet-frame">
-                                                            <option>minutes</option>
-                                                            <option>hours</option>
-                                                            <option>days</option>
-                                                          </select>
-                                                        </div>  <!-- END .subTwirl-auto-retweet-wrap -->
-                                                      </div>  <!-- END .subTwirl-content -->
+                                        <div class="subTwirl-content">
+                                          <div class="subTwirl-remove-retweet-wrap">
+                                            Automatically remove retweet after
+                                            <select class="subTwirl-remove-retweet-time">
+                                              <option>0</option>
+                                              <option>1</option>
+                                              <option>2</option>
+                                              <option>3</option>
+                                              <option>4</option>
+                                              <option>5</option>
+                                              <option>6</option>
+                                              <option>7</option>
+                                              <option>8</option>
+                                              <option>9</option>
+                                              <option>10</option>
+                                              <option>11</option>
+                                              <option>12</option>
+                                              <option>13</option>
+                                              <option>14</option>
+                                              <option>15</option>
+                                              <option>16</option>
+                                              <option>17</option>
+                                              <option>18</option>
+                                              <option>19</option>
+                                              <option>20</option>
+                                              <option>21</option>
+                                              <option>22</option>
+                                              <option>23</option>
+                                              <option>24</option>
+                                              <option>25</option>
+                                              <option>26</option>
+                                              <option>27</option>
+                                              <option>28</option>
+                                              <option>29</option>
+                                              <option>30</option>
+                                              <option>31</option>
+                                              <option>32</option>
+                                              <option>33</option>
+                                              <option>34</option>
+                                              <option>35</option>
+                                              <option>36</option>
+                                              <option>37</option>
+                                              <option>38</option>
+                                              <option>39</option>
+                                              <option>40</option>
+                                              <option>41</option>
+                                              <option>42</option>
+                                              <option>43</option>
+                                              <option>44</option>
+                                              <option>45</option>
+                                              <option>46</option>
+                                              <option>47</option>
+                                              <option>48</option>
+                                              <option>49</option>
+                                              <option>50</option>
+                                              <option>51</option>
+                                              <option>52</option>
+                                              <option>53</option>
+                                              <option>54</option>
+                                              <option>55</option>
+                                              <option>56</option>
+                                              <option>57</option>
+                                              <option>58</option>
+                                              <option>59</option>
+                                              <option>60</option>
+                                              <option>61</option>
+                                              <option>62</option>
+                                              <option>63</option>
+                                              <option>64</option>
+                                              <option>65</option>
+                                              <option>66</option>
+                                              <option>67</option>
+                                              <option>68</option>
+                                              <option>69</option>
+                                              <option>70</option>
+                                              <option>71</option>
+                                              <option>72</option>
+                                              <option>73</option>
+                                              <option>74</option>
+                                              <option>75</option>
+                                              <option>76</option>
+                                              <option>77</option>
+                                              <option>78</option>
+                                              <option>79</option>
+                                              <option>80</option>
+                                              <option>81</option>
+                                              <option>82</option>
+                                              <option>83</option>
+                                              <option>84</option>
+                                              <option>85</option>
+                                              <option>86</option>
+                                              <option>87</option>
+                                              <option>88</option>
+                                              <option>89</option>
+                                              <option>90</option>
+                                            </select>
+                                            <select class="subTwirl-remove-retweet-frame">
+                                              <option>minutes</option>
+                                              <option>hours</option>
+                                              <option>days</option>
+                                            </select>
+                                          </div>  <!-- END .subTwirl-auto-retweet-wrap -->
+                                        </div>  <!-- END .subTwirl-content -->
 
-                                                      <div class="subTwirl-button">
-                                                        Save Retweet Removal Options
-                                                      </div>  <!-- END .subTwirl-button -->
-                                                    </div>  <!-- END .menu-subTwirl-inner -->
-                                                  </div>  <!-- END .menu-subTwirl-outer -->
+                                        <div class="subTwirl-button">
+                                          Save Retweet Removal Options
+                                        </div>  <!-- END .subTwirl-button -->
+                                      </div>  <!-- END .menu-subTwirl-inner -->
+                                    </div>  <!-- END .menu-subTwirl-outer -->
 
                                   </div>  <!-- END .menu-section-twirl-section-inner -->
                                 </div>  <!-- END .menu-section-twirl-section-outer -->
@@ -927,7 +923,7 @@
                                       <div class="menu-twirl-option-outer">
                                         <div class="menu-twirl-option-inner">
                                           <div class="menu-twirl-left">
-                  <!-- INGRID - We need a retweet icon like the retweet one above, except instead of a timer, we need a comment icon -->
+                                          <!-- INGRID - We need a retweet icon like the retweet one above, except instead of a timer, we need a comment icon -->
                                            <img src="{{ asset('public/')}}/ui-images/icons/pg-clone.svg" class="ui-icon menu-twirl-option-icon" />
                                             <span class="menu-twirl-option-text">
                                               Automatically comment your offer, if any tweet goes viral.</span>
@@ -1004,14 +1000,15 @@
                       <!-- END SETTINGS MENUS -->
 
 
-                      <!-- BEGIN COMMAND MODULE -->
+                     
+
+                    </div>  <!-- END .main-settings-background -->
+                    <!-- BEGIN COMMAND MODULE -->
 
                     @include('commandmodule')
 
-                      <!-- END COMMAND MODULE -->
-
-                    </div>  <!-- END .main-settings-background -->
-                  </div>  <!-- END .main-settings-anchor -->
+                    <!-- END COMMAND MODULE -->
+                </div>  <!-- END .main-settings-anchor -->
 
 <style>
 .general-settings-outer, .twitter-settings-outer {display: none;}

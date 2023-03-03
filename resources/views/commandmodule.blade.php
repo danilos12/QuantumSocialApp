@@ -6,10 +6,10 @@ div[data-schedule="none"] {
 	display: none;
 }
 </style>
-<div class="modal-large-outer posting-tool-outer">
+<div class="modal-large-outer posting-tool-outer command-module-outer">
                         <div class="modal-large-inner posting-tool-inner">
 
-                         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close posting-tool-close" />
+                         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close posting-tool-close" id="command-module"/>
 
                           <div class="posting-tool-banner">
                             <div class="global-twitter-profile-header">
