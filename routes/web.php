@@ -59,3 +59,4 @@ Route::get('/twitter/redirect', [App\Http\Controllers\Controller::class, 'twitte
 Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOAuthCallback']);
 
 Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets']);
+Route::get('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');

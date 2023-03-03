@@ -57,7 +57,8 @@
                   <div class="profile-posts-outer">
                     <div class="profile-posts-inner">
                       
-                      @if (isset($tweets))
+                      @if (is_array($tweets))
+                      {{-- {{ $tweets }} --}}
                         @foreach($tweets as $tweet)      
                         <!-- BEGIN Single Post Instance -->
                         <div class="mosaic-posts-outer">
