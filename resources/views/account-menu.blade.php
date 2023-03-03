@@ -91,6 +91,87 @@
                             </div>  <!-- END .quantum-settings-inner -->
                           </div>  <!-- END .quantum-settings-outer -->
 
+<!--     BEGIN TEAM MEMBERS   -->
+<div class="menu-section-outer team-account-outer">
+
+<div class="menu-section-inner team-account-inner">
+  <span class="menu-section-header">
+    Team Members </span>
+
+    <!-- BEGIN .menu-team-account Instance -->
+    <div class="menu-team-account-outer"> 
+      <div class="menu-team-account-inner"> 
+
+        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
+
+        <div class="global-team-profile-header"> 
+          <div class="global-profile-details">
+            <div class="global-profile-name">
+              <a href="#">
+                William Wallace</a>
+            </div>  <!-- END .global-profile-name -->
+            <div class="global-profile-subdata">
+              <span class="global-profile-email"> 
+                <a href="">
+                  will-wallace@email.com</a></span>
+            </div>  <!-- END .global-post-date-wrap -->
+          </div>  <!-- END .global-team-profile-details -->
+        </div>  <!-- END .global-team-profile-header -->
+
+        <div class="menu-social-account-options">
+          <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
+          <span class="menu-account-icons">
+            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" />
+            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" />
+          </span>
+        </div>  <!-- END .menu-social-account-options -->
+
+      </div>  <!-- END .menu-social-account-inner -->
+    </div>  <!-- END .menu-social-account-outer -->
+    <!-- END .menu-social-account Instance -->
+
+
+
+    <div class="menu-team-members-add-accounts-section"> 
+      <div class="add-account add-team">
+        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
+        + Add New Member
+      </div>  <!-- END .add-twitter-account -->
+    </div>  <!-- END .menu-social-add-accounts-section -->
+
+</div>  <!-- END .social-accounts-inner -->
+
+
+                        <!-- BEGIN ADD TEAM MEMBER MODAL -->
+
+                        <div class="add-team-member-modal"> 
+                          <div class="add-team-member-inner frosted"> 
+
+                            <!-- BEGIN input copied from engage.html -->
+                            <div class="global-input-email"> 
+                              <form>
+                                <div class="global-input-text input-text">  
+                                  <input type="text" placeholder="Name" />
+                                </div>
+
+                                <div class="global-input-text input-text">  
+                                  <input type="text" placeholder="Email address" />
+                                </div>
+
+                              </form>
+                              <span class="add-team-button"> 
+                                Add<span>
+                            </div>
+                            <!-- END copied from engage.html -->
+
+                          </div>  <!-- END .add-team-member-inner -->
+                        </div>  <!-- END .add-team-member-modal -->
+
+
+                        <!-- END ADD TEAM MEMBER MODAL -->
+</div>  <!-- END .team-account-outer -->
+
+<!--     END TEAM MEMBERS    -->
 
                           <div class="menu-section-outer social-accounts-outer">
                             <div class="menu-section-inner social-accounts-inner">
@@ -124,7 +205,7 @@
                                           <div class="menu-social-account-options">
                                             <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
                                             <span class="menu-account-icons">
-                                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip" />
+                                            <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" data-toggle="tooltip" />
                                             <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
                                             </span>
                                           </div>  <!-- END .menu-social-account-options -->
@@ -332,6 +413,23 @@
                                           <input type="checkbox" class="menu-twirl-toggle">
                                         </div>  <!-- END .menu-twirl-right -->
                                       </div>  <!-- END .menu-twirl-option-inner -->
+                                      <!-- START auto-reply -->
+                                      <div class="menu-subTwirl-outer">
+                                                      <div class="subTwirl-header-wrap">
+                                                        <span class="subTwirl-header">
+                                                          Modify your Auto-reply message below:</span>
+                                                      </div>  <!-- END .subTwirl-header-wrap -->
+                                                      <div class="menu-subTwirl-inner">
+                                                        <textarea class="auto-reply-text">Hey thank you for following (@accountHandle)! <br /><br />{{01}}</textarea>
+                                                        <div class="auto-reply-counter">
+                                                          <span class="auto-reply-count">154</span>/280 remaining
+                                                        </div>  <!-- END .thread-ender-count -->
+                                                        <div class="subTwirl-button auto-reply-button">
+                                                          Save Auto-reply
+                                                        </div>  <!-- END .auto-reply-button -->
+                                                      </div>  <!-- END .menu-subTwirl-inner -->
+                                      <!-- END auto-reply -->
+
                                     </div>  <!-- END .menu-twirl-option-outer -->
 
                                     <div class="menu-twirl-option-outer">
@@ -401,6 +499,36 @@
                                           <input type="checkbox" class="menu-twirl-toggle">
                                         </div>  <!-- END .menu-twirl-right -->
                                       </div>  <!-- END .menu-twirl-option-inner -->
+
+                                      <!-- Start Evergreen -->
+                                      <div class="menu-subTwirl-outer">
+                                                      <div class="subTwirl-header-wrap">
+                                                        <span class="subTwirl-header"></span>
+                                                      </div>  <!-- END .subTwirl-header-wrap -->
+                                                      <div class="menu-subTwirl-inner">
+
+                                                        <div class="subTwirl-content">
+                                                          <div class="subTwirl-evergreen-retweets-wrap"> <!-- was "subTwirl-engagement-retweets-wrap" -->
+                                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon subTwirl-option-icon" />
+                                                            Retweet every
+                                                            <input type="text" class="subTwirl-micro-input" value="3"/>
+                                                            retweets.
+                                                          </div>  <!-- END .subTwirl-evergreen-retweets-wrap -->
+                                                          <div class="subTwirl-evergreen-likes-wrap">
+                                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-heart.svg" class="ui-icon subTwirl-option-icon" />
+                                                            Retweet every
+                                                            <input type="text" class="subTwirl-micro-input" value="7"/>
+                                                            likes.
+                                                          </div>  <!-- END .subTwirl-evergreen-likes-wrap -->
+                                                        </div>  <!-- END .subTwirl-content -->
+
+                                                        <div class="subTwirl-button">
+                                                          Save Evergreen Options
+                                                        </div>  <!-- END .subTwirl-button -->
+                                                      </div>  <!-- END .menu-subTwirl-inner -->
+                                                    </div>  <!-- END .menu-subTwirl-outer -->
+                                      <!-- End Evergreen -->
+
                                     </div>  <!-- END .menu-twirl-option-outer -->
 
                                     <div class="menu-twirl-option-outer">

@@ -45,3 +45,15 @@
 // };
 
 
+  // add team member modal
+
+$addTeamIcon = $(".add-team");
+$addTeamModal = $(".add-team-member-inner");
+  
+  $addTeamIcon.click(function () {
+    if ( $addTeamModal.first().is( ":hidden" ) ) {
+        $addTeamModal.toggle( "slide", { direction: "up"  }, 800 );
+    } else {
+        $addTeamModal.toggle( "slide", { direction: "up"  }, 400 );
+    }
+  });

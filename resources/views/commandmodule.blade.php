@@ -57,8 +57,8 @@ div[data-schedule="none"] {
                                       <span class="post-option-buttons primary-post-option-buttons">
                                        <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon post-tool-icon retweet-timer-icon" />
-                                        <span class="post-counter">1/2</span>
+                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" cla ss="ui-icon post-tool-icon retweet-timer-icon" /> 
+                                    <span class="post-counter">1/2</span>
                                       </span>  <!-- END .primary-post-option-buttons -->
 
 
