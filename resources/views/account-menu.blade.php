@@ -287,15 +287,13 @@
                           <div class="menu-header">Social Account Settings</div>
                           <div class="global-twitter-profile-header profile-header-left">
                             <a href="#">
-                             <img src="{{ $user->twitter_photo }}"
-                                class="global-profile-image" /></a>
+                              
                             <div class="global-profile-details">
                               <div class="global-profile-name text-right">
-                                <a href="#"> {{ $user->twitter_name }}</a>
+                              
                               </div>  <!-- END .global-author-name -->
                               <div class="global-profile-subdata">
-                                <span class="global-profile-handle">
-                                  @<a href="">{{ $user->twitter_username }}</a></span>
+                              
                               </div>  <!-- END .global-post-date-wrap -->
                             </div>  <!-- END .global-author-details -->
                           </div>  <!-- END .global-twitter-profile-header -->
