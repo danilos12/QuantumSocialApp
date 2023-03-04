@@ -62,12 +62,12 @@
                         <div class="twitter-stat">
                           <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
                           <span class="stat-title">Following</span>
-                          <span class="stat-count count-following">{{ isset($twitter->twitter_followersCount) ? $twitter->twitter_followersCount : 0  }}</span></div>
+                          <span class="stat-count count-following">{{ $user->twitter_followersCount ? $user->twitter_followersCount : 0  }}</span></div>
 
                         <div class="twitter-stat twitter-stat-center">
                           <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
                           <span class="stat-title">Followers</span>
-                          <span class="stat-count count-followers">{{ isset($twitter->twitter_followersCount) ? $twitter->twitter_followersCount : 0  }}</span></div>
+                          <span class="stat-count count-followers">{{ $user->twitter_followingCount ? $user->twitter_followingCount : 0  }}</span></div>
 
                         <div class="twitter-stat">
                           <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
