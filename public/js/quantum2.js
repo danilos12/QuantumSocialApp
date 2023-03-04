@@ -217,6 +217,7 @@ $hamburger = $(".hamburger");
 $twitterMenu = $(".twitter-dropdown-menu-outer");
 
 $hamburger.click(function () {
+  $twitterMenu.addClass('-active')
   if ( $twitterMenu.first().is( ":hidden" ) ) {
     twitterMenuOpen();
   } else {
@@ -224,11 +225,15 @@ $hamburger.click(function () {
   }
 });
 
-// $("html").click(function(event) {
-//   if ( $twitterMenu.first().is( ":not(:hidden)" ) ) {
-//       twitterMenuClose();
-//   } 
-// })
+
+// Close modal when the user clicks outside the modal or presses the escape key
+$('canvas').on('click', function(event) {
+  console.log(event)
+  if ( $twitterMenu.hasClass('-active')) {
+    console.log(1);
+    twitterMenuClose();
+  } 
+});
 
 // when escape is clicked
 $(document).on("keydown", function(event) {
@@ -244,6 +249,7 @@ function twitterMenuOpen() {
 }
 function twitterMenuClose() {
   $twitterMenu.toggle( "slide", { direction: "right"  }, 400 );
+  $twitterMenu.removeClass('-active')
 }
 
 ///////////////////////////////////////////////////////////////
