@@ -21,7 +21,7 @@
         </div>  <!-- END .global-twitter-profile-header -->
 
     </div>  <!-- END .account-settings-header-wrap -->
-    <div data-form-url="{{ route('save-settings') }}" data-twitterid=" {{ $user->twitter_id }}" id="twitter-settings"></div>
+    <div data-form-url="{{ route('save-settings') }}" data-twitterid=" {{ isset($user) ? $user->twitter_id : " " }}" id="twitter-settings"></div>
     
     <div class="modal-large-inner main-settings-inner twitter-settings-inner">
 
