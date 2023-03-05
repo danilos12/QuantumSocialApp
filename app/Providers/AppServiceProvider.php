@@ -34,8 +34,13 @@ class AppServiceProvider extends ServiceProvider
     {
         // share to all views
         View::composer('*', function ($view) {
+            // to show no tweets found if 0 in general settings
             $view->with('acct_twitter_count', Twitter::where('user_id', auth()->id())->count());
+
+            // to loop all the twitter accts
             $view->with('twitter_accts', Twitter::where('user_id', auth()->id())->get());
+
+            
             $twitter = Twitter::where('user_id', auth()->id())->get();
             $view->with('twitter', $twitter);         
 
