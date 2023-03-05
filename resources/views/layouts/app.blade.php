@@ -48,8 +48,9 @@
               </div>  <!-- END .banner-twitter-profile-inner -->
             </a>
             <div class="banner-twitter-settings">
-              <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" /></div>
-
+            @if ($twitter) 
+            <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" /></div>
+            @endif
             <div class="twitter-dropdown-wrap">
               <img src = "{{ asset('public/ui-images/icons/00-hamburger.svg') }}" class="menu-icon hamburger" />
 
