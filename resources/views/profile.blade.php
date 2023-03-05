@@ -58,7 +58,7 @@
                     <div class="profile-posts-inner">
                       
                       @if (is_array($tweets))
-                      {{-- {{ $tweets }} --}}
+                    
                         @foreach($tweets as $tweet)      
                         <!-- BEGIN Single Post Instance -->
                         <div class="mosaic-posts-outer">
@@ -75,11 +75,11 @@
 
                               <div class="global-twitter-profile-header">
                                 <a href="#">
-                                  <img src="{{ isset($twitter->twitter_photo) ? $twitter->twitter_photo : asset('public/temp-images/william-wallace.jpg') }}"
+                                  <img src="{{ $user ? $user->twitter_photo : asset('public/temp-images/william-wallace.jpg') }}"
                                     class="global-profile-image" /></a>
                                 <div class="global-profile-details">
                                   <div class="global-profile-name">
-                                    <a href="#">{{ isset($twitter->twitter_name) ? $twitter->twitter_name : "Test"  }}</a>
+                                    <a href="#">{{ $user ? $user->twitter_name : "Test"  }}</a>
                                   </div>  <!-- END .global-author-name -->
                                   <div class="global-profile-subdata">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-time.svg" class="ui-icon" />
