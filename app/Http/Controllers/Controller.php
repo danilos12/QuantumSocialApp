@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
+use App\Models\TwitterSettingsMeta;
 
 class Controller extends BaseController
 {
@@ -93,7 +94,7 @@ class Controller extends BaseController
             // Check if save was successful
             if ($saveTwitterInfo) {
                 // Save token to database
-                $saveToken = TwitterToken::updateOrCreate([
+                $saveToken = TwitterToken::firstOrCreate([
                     'user_id' => Auth::user()->id,
                     'twitter_id' => $twitterId->id,
                     'access_token' => $accessToken
@@ -103,8 +104,22 @@ class Controller extends BaseController
                 $selectedAcct = UT_AcctMngt::firstOrCreate([
                     'user_id' => Auth::user()->id,
                     'twitter_id' => $twitterId->id,
-                    'selected' => (Twitter::where('id', Auth::user()->id)->count() > 0) ? 0 : 1
+                    'selected' => (Twitter::where('id', Auth::user()->id)->count() === 0) ? 1 : 0
                 ]);
+
+                // save twitter settings meta
+                $twitterSettingsMeta = [
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'mentions', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'threads', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'clone-engagement-to-evergreen', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'retweet-high-engagement-tweets', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'set-default-auto-retweet', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'retweet-after-time-elapse', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'remove-retweets', 'meta_value' => 0],
+                    ['twitter_id' => $twitterId->id, 'meta_key' => 'comment-offer-viral', 'meta_value' => 0],
+                ];
+
+                TwitterSettingsMeta::insert($twitterSettingsMeta);
     
                 session()->put('id', Auth::id());
     
