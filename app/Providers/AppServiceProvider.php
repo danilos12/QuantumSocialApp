@@ -44,12 +44,9 @@ class AppServiceProvider extends ServiceProvider
                 $twitterSelectedUser = Twitter::where('twitter_id', $selectedUser->getAttribute('twitter_id'))->first();
                 $view->with('user', $twitterSelectedUser);         
                 $view->with('selected_user', $selectedUser);         
-            }
-            
-            $twitterSettingsMentions = TwitterSettingsMeta::where(['twitter_id' => $selectedUser->getAttribute('twitter_id')])->get();
-
-            // dd($twitterSettingsMentions->toArray());
-            $view->with('twitter_settings', $twitterSettingsMentions);         
+                $twitterSettingsMentions = TwitterSettingsMeta::where(['twitter_id' => $selectedUser->getAttribute('twitter_id')])->get();
+                $view->with('twitter_settings', $twitterSettingsMentions);         
+            }            
         });
 
     }
