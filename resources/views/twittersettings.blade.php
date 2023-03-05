@@ -49,7 +49,7 @@
                                 Automatically reply to mentions on all scheduled posts.</span>
                             </div>  <!-- END .menu-twirl-left -->
                             <div class="menu-twirl-right">
-                                <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="mentions" {{ $twitter_settings[0]->meta_value > 0 ? 'checked' : '' }}>
+                                <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="mentions" {{ $twitter_settings ? $twitter_settings[0]->meta_value > 0 ? 'checked' : ''  : '' }}>
                             </div>  <!-- END .menu-twirl-right -->
                             </div>  <!-- END .menu-twirl-option-inner -->
 
@@ -79,7 +79,7 @@
                                     Add a Thread Ender post to the end of threads asking them to follow and retweet the 1st tweet in your thread.</span>
                                 </div>  <!-- END .menu-twirl-left -->
                                 <div class="menu-twirl-right">                                    
-                                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="threads" {{ $twitter_settings[1]->meta_value > 0 ? 'checked' : '' }}>
+                                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="threads" {{ $twitter_settings ? $twitter_settings[1]->meta_value > 0 ? 'checked' : ''  : '' }}>
                                 </div>  <!-- END .menu-twirl-right -->
                             </div>  <!-- END .menu-twirl-option-inner -->
 
@@ -134,7 +134,7 @@
                             Clone high-engagement tweets into an Evergreen post.</span>
                         </div>  <!-- END .menu-twirl-left -->
                         <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="clone-engagement-to-evergreen" {{ $twitter_settings[2]->meta_value > 0 ? 'checked' : '' }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="clone-engagement-to-evergreen" {{ $twitter_settings ? $twitter_settings[2]->meta_value > 0 ? 'checked' : ''  : '' }}>
                         </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
                         <!-- Start Evergreen -->
@@ -176,7 +176,7 @@
                             Automatically retweet your own high-engagement tweets.</span>
                         </div>  <!-- END .menu-twirl-left -->
                         <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="retweet-high-engagement-tweets" {{ $twitter_settings[3]->meta_value > 0 ? 'checked' : '' }} >
+                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="retweet-high-engagement-tweets" {{ $twitter_settings ? $twitter_settings[3]->meta_value > 0 ? 'checked' : ''  : '' }} >
                         </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
 
@@ -218,7 +218,7 @@
                             Set default accounts for automatic cross-retweeting via @WilliamWallace.</span>
                         </div>  <!-- END .menu-twirl-left -->
                         <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="set-default-auto-retweet" {{ $twitter_settings[4]->meta_value > 0 ? 'checked' : '' }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="set-default-auto-retweet" {{ $twitter_settings ? $twitter_settings[4]->meta_value > 0 ? 'checked' : ''  : '' }}>
                         </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
 
@@ -266,7 +266,7 @@
                             Automatically retweet your own tweets after some time has elapsed.</span>
                         </div>  <!-- END .menu-twirl-left -->
                         <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="retweet-after-time-elapse" {{ $twitter_settings[5]->meta_value > 0 ? 'checked' : '' }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="retweet-after-time-elapse" {{ $twitter_settings ? $twitter_settings[5]->meta_value > 0 ? 'checked' : ''  : '' }}>
                         </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
                     </div>  <!-- END .menu-twirl-option-outer -->
@@ -318,7 +318,7 @@
                                 <span class="menu-twirl-option-text">Automatically remove retweets after a time (helps keep your account clean).</span>
                             </div>  <!-- END .menu-twirl-left -->
                             <div class="menu-twirl-right">
-                                <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="remove-retweets" {{ $twitter_settings[6]->meta_value > 0 ? 'checked' : '' }}>
+                                <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="remove-retweets" {{ $twitter_settings ? $twitter_settings[6]->meta_value > 0 ? 'checked' : ''  : '' }}>
                             </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
                     </div>  <!-- END .menu-twirl-option-outer -->
@@ -389,7 +389,7 @@
                         Automatically comment your offer, if any tweet goes viral.</span>
                     </div>  <!-- END .menu-twirl-left -->
                     <div class="menu-twirl-right">
-                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="comment-offer-viral" {{ $twitter_settings[7]->meta_value > 0 ? 'checked' : '' }}>
+                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="comment-offer-viral" {{ $twitter_settings ? $twitter_settings[7]->meta_value > 0 ? 'checked' : ''  : '' }}>
                     </div>  <!-- END .menu-twirl-right -->
                 </div>  <!-- END .menu-twirl-option-inner -->
 
@@ -420,7 +420,7 @@
                         Auto-send welcome Direct Message to new followers</span>
                     </div>  <!-- END .menu-twirl-left -->
                     <div class="menu-twirl-right">
-                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="send-direct-msg-new" {{ $twitter_settings[8]->meta_value > 0 ? 'checked' : '' }}>
+                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="send-direct-msg-new" {{ $twitter_settings ? $twitter_settings[8]->meta_value > 0 ? 'checked' : ''  : '' }}>
                     </div>  <!-- END .menu-twirl-right -->
                 </div>  <!-- END .menu-twirl-option-inner -->
 
