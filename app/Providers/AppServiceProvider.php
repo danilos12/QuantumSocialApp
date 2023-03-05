@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\Twitter;
+use App\Models\TwitterSettingsMeta;
 use App\Models\UT_AcctMngt;
 use App\Models\TwitterToken;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('selected_user', $selectedUser);         
             }
             
+            $twitterSettingsMentions = TwitterSettingsMeta::where(['twitter_id' => $selectedUser->getAttribute('twitter_id')])->get();
+
+            // dd($twitterSettingsMentions->toArray());
+            $view->with('twitter_settings', $twitterSettingsMentions);         
         });
 
     }

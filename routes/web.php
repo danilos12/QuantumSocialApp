@@ -60,3 +60,5 @@ Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOA
 
 Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets']);
 Route::get('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
+
+Route::post('/twitter/settings', [App\Http\Controllers\GeneralSettingController::class, 'save'])->name('save-settings');
