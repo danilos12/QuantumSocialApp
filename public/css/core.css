@@ -496,6 +496,7 @@ canvas {
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+
   color: var(--menu-text);
   z-index: 75;
 }
@@ -505,6 +506,7 @@ canvas {
   font-size: 1.3em;
   color: var(--menu-text);
   margin: 0;
+  height: 100px;
 /*  margin-top: 10px; */
 }
 .banner-twitter-profile-wrap {
