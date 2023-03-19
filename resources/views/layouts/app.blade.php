@@ -58,41 +58,39 @@
               <div class="twitter-dropdown-menu-outer">
                 <div class="twitter-dropdown-menu-inner frosted">
 
-                  @if(isset($twitter))
-                    @if ($acct_twitter_count > 0) 
-                      <div class="twitter-stat-bar">
-                        <div class="twitter-stat">
-                          <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
-                          <span class="stat-title">Following</span>
-                          <span class="stat-count count-following">{{ $user->twitter_followersCount ? $user->twitter_followersCount : 0  }}</span></div>
+                  @if ($acct_twitter_count > 0) 
+                    <div class="twitter-stat-bar">
+                      <div class="twitter-stat">
+                        <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
+                        <span class="stat-title">Following</span>
+                        <span class="stat-count count-following">{{ isset($user) ? $user->twitter_followersCount : 0  }}</span></div>
 
-                        <div class="twitter-stat twitter-stat-center">
-                          <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
-                          <span class="stat-title">Followers</span>
-                          <span class="stat-count count-followers">{{ $user->twitter_followingCount ? $user->twitter_followingCount : 0  }}</span></div>
+                      <div class="twitter-stat twitter-stat-center">
+                        <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
+                        <span class="stat-title">Followers</span>
+                        <span class="stat-count count-followers">{{ isset($user) ? $user->twitter_followingCount : 0  }}</span></div>
 
-                        <div class="twitter-stat">
-                          <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
-                          <span class="stat-title">Unfollows</span>
-                          <span class="stat-count count-unfollows">240</span></div>
-                      </div>  <!-- END .twitter-stat-bar -->
+                      <div class="twitter-stat">
+                        <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
+                        <span class="stat-title">Unfollows</span>
+                        <span class="stat-count count-unfollows">240</span></div>
+                    </div>  <!-- END .twitter-stat-bar -->
 
-              
-                      <span class="account-select-title">Select An Account</span>
+            
+                    <span class="account-select-title">Select An Account</span>
 
-                      @foreach($twitter as $tweet)
-                      <div class="twitter-account-select-bar">
-                        <div class="twitter-account-item">
-                          <div class="twitter-bar-profile-info">
-                            <img src="{{ $tweet->twitter_photo }}" />
-                            @ {{ $tweet->twitter_username}}
-                          </div>
-                          <a href="#">
-                          <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" /></a>
-                        </div>  <!-- END .twitter-account-item -->                                            
-                      </div>  <!-- END .twitter-account-select-bar -->                    
-                      @endforeach
-                    @endif
+                    @foreach($twitter_accts as $twitter)
+                    <div class="twitter-account-select-bar">
+                      <div class="twitter-account-item">
+                        <div class="twitter-bar-profile-info">
+                          <img src="{{ $twitter->twitter_photo }}" />
+                          @ {{ $twitter->twitter_username}}
+                        </div>
+                        <a href="#">
+                        <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" /></a>
+                      </div>  <!-- END .twitter-account-item -->                                            
+                    </div>  <!-- END .twitter-account-select-bar -->                    
+                    @endforeach
                   @else 
                   <span class="account-select-title">You have {{$acct_twitter_count}} account.</span>
                   @endif
@@ -232,7 +230,7 @@
 						<div class="settings-bar-outer">
 						  <div class="settings-bar-inner">
 							<img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
-              <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon"  />
+              <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" />
 							<img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
 							<a class="dropdown-item" href="{{ route('logout') }}"
 					   onclick="event.preventDefault();
@@ -388,15 +386,16 @@
  <script type='text/javascript' src="{{asset('public/js/twitterSettings.js')}}"></script>
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
  <script>
-$(document).ready(function() {
-  var alert = $('.alert ');
+  $(document).ready(function() {
+    var alert = $('.alert ');
 
-  if(alert.length == 1) {
-    setTimeout(function(){
-      alert.fadeOut('slow');
-    }, 5000);
-  }
-});
+    if(alert.length == 1) {
+      setTimeout(function(){
+        alert.fadeOut('slow');
+      }, 5000);
+    }
+  });
+
 </script>
 
 </body>
