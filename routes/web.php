@@ -60,5 +60,7 @@ Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOA
 
 Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets']);
 Route::get('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
+Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('remove.twitter');
 
-Route::post('/twitter/settings', [App\Http\Controllers\GeneralSettingController::class, 'save'])->name('save-settings');
+Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
+
