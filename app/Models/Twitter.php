@@ -26,5 +26,6 @@ class Twitter extends Model
         'twitter_followersCount',
         'twitter_tweetCount',
         'user_id',
+        'deleted'
     ];
 }
