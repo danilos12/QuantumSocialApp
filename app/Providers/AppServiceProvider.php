@@ -86,17 +86,12 @@ class AppServiceProvider extends ServiceProvider
             $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
             $view->with('membership', $membership);
             
-            // social account settings of selected user 
-            $metas = TwitterSettingsMeta::where(['user_id' => Auth::id(), 'twitter_id' => $selectedUser->twitter_id])->get();
+            // // social account settings of selected user 
+            // if ($selectedUser !== null) {
+            //     $metas = TwitterSettingsMeta::where(['user_id' => Auth::id(), 'twitter_id' => $selectedUser->twitter_id])->get();
+            //     $view->with('meta', $metas);
+            // }
 
-            // $meta = [];
-
-            // foreach($metas as $meta) {
-            //     $meta[$];
-            // };
-            // dd($metas);
-            // exit;
-            $view->with('meta', $metas);
         });
 
     }
