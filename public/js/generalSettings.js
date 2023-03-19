@@ -52,7 +52,7 @@ $('#membership').change(function(event) {
     data: {
       subscription: selectedValue,
       user_id: $('div#quantum-general-settings').data('userid'),
-      id: $('div#quantum-general-settings')[0].id
+      id: "quantum-general-settings"
     },
     headers: {
       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
