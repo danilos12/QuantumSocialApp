@@ -86,7 +86,8 @@ class Controller extends BaseController
                 'twitter_followersCount' => $twitterId->public_metrics->followers_count,
                 'twitter_followingCount' => $twitterId->public_metrics->following_count,
                 'twitter_tweetCount' => $twitterId->public_metrics->tweet_count,
-                'user_id' => Auth::user()->id
+                'user_id' => Auth::user()->id,
+                'deleted' => 0
             ]);
             
             $saveTwitterInfo->save();        
@@ -104,19 +105,33 @@ class Controller extends BaseController
                 $selectedAcct = UT_AcctMngt::firstOrCreate([
                     'user_id' => Auth::user()->id,
                     'twitter_id' => $twitterId->id,
-                    'selected' => (Twitter::where('id', Auth::user()->id)->count() === 0) ? 1 : 0
+                    'selected' => Twitter::where('user_id', Auth::id())->count() === 0 ? 1 : 0
                 ]);
 
                 // save twitter settings meta
                 $twitterSettingsMeta = [
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'mentions', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'threads', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'clone-engagement-to-evergreen', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'retweet-high-engagement-tweets', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'set-default-auto-retweet', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'retweet-after-time-elapse', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'remove-retweets', 'meta_value' => 0],
-                    ['twitter_id' => $twitterId->id, 'meta_key' => 'comment-offer-viral', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'mentions', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'threads', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'clone-engagement-to-evergreen', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'retweet-high-engagement-tweets', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'set-default-auto-retweet', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'retweet-after-time-elapse', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'remove-retweets', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'comment-offer-viral', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'send-direct-msg-new', 'meta_value' => 0],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'auto-reply-text', 'meta_value' => 'Hey thank you for following (@' . $twitterId->id . ')! <br /><br />1'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'text-dft-ender', 'meta_value' => 'If you liked this thread then please follow me (@' . $twitterId->id . ') and share this thread by retweeting the first tweet: <br /><br />1'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'eg_rt_retweets', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'eg_rt_likes', 'meta_value' => '7'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'he_rt_likes', 'meta_value' => '7'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'he_rt_retweets', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_time', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_frame', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_ite', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt-auto-remove-time', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt-auto-remove-frame', 'meta_value' => '3'],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'text-comment-offer', 'meta_value' => 'For more great content please follow me @' . $twitterId->id],
+                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'text_ender_dm', 'meta_value' => 'For more great content please follow me @' . $twitterId->id],
                 ];
 
                 TwitterSettingsMeta::insert($twitterSettingsMeta);
