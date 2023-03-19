@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
 	
 </head>
-<body>
+<body class="{{ Route::has('login') ? 'darkmode' : '' }}">
   <canvas></canvas>
   <div class="interface-outer">
     <div class="interface-inner">
@@ -36,8 +36,8 @@
         <div class="banner-inner">
           <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-horiz-white-app@2x.png" class="image-placeholder" height="100%" />
 			 <!-- Authentication Links -->
-            @if (Route::has('login')) 
-			@auth	
+        @if (Route::has('login')) 
+			    @auth	
           <div class="banner-twitter-profile-wrap">
             <a href="#">
               <div class="banner-twitter-profile-inner">
@@ -100,10 +100,10 @@
             </div>  <!-- END .twitter-dropdown-wrap -->
           </div>  <!-- END .banner-twitter-profile-wrap -->
 			 @else
-			<div>
-			<a href="{{ route('login') }}">
-			Login
-			</a>
+      <div style="display:flex;align-items:center">
+        <a href="{{ route('register') }}">
+        Register
+        </a>
 			</div>
 			@endauth
 			@endif 	 
@@ -379,7 +379,7 @@
 	 <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
 	  <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
 	 @else
-	@endauth
+	@endauth 
 @endif	
  <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
  <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
