@@ -75,11 +75,11 @@
 
                               <div class="global-twitter-profile-header">
                                 <a href="#">
-                                  <img src="{{ $user ? $user->twitter_photo : asset('public/temp-images/william-wallace.jpg') }}"
+                                  <img src="{{ $selected_user ? $selected_user->twitter_photo : asset('public/temp-images/william-wallace.jpg') }}"
                                     class="global-profile-image" /></a>
                                 <div class="global-profile-details">
                                   <div class="global-profile-name">
-                                    <a href="#">{{ $user ? $user->twitter_name : "Test"  }}</a>
+                                    <a href="#">{{ $selected_user ? $selected_user->twitter_name : "Test"  }}</a>
                                   </div>  <!-- END .global-author-name -->
                                   <div class="global-profile-subdata">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-time.svg" class="ui-icon" />
