@@ -4,7 +4,6 @@
 <div class="login-outer">
     <div class="login-inner">
 
-        {{-- <h1 class="login-heading mb-3" >{{ __('Quantum Social Login') }} </h1> --}}
         <div class="logo-center">
             <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-horiz-white-app@2x.png" class="image-placeholder" width="300" />
         </div>
