@@ -376,11 +376,11 @@
 		@if ($title == 'Slot Scheduler')
 		<script type='text/javascript' src="{{asset('public/js/schedule.js')}}"></script>
 		@endif
-	 <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
 	  <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
-	 @else
-	@endauth 
-@endif	
+    @else
+    @endauth 
+    @endif	
+  <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
  <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
  <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
  <script type='text/javascript' src="{{asset('public/js/twitterSettings.js')}}"></script>
