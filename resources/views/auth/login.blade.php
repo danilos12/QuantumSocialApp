@@ -4,7 +4,10 @@
 <div class="login-outer">
     <div class="login-inner">
 
-        <h1 class="login-heading mb-3" >{{ __('Quantum Social Login') }} </h1>
+        {{-- <h1 class="login-heading mb-3" >{{ __('Quantum Social Login') }} </h1> --}}
+        <div class="logo-center">
+            <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-horiz-white-app@2x.png" class="image-placeholder" width="300" />
+        </div>
 
         <div class="form p-135">
             <form method="POST" action="{{ route('login') }}">
@@ -38,7 +41,7 @@
     
                 <div class="row mb-3">
                     <div class="col-md-12 offset-md-4">
-                        <div class="form-check">
+                        <div class="form-check p_05">
                             <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
     
                             <label class="form-check-label" for="remember">
@@ -56,14 +59,26 @@
                     </div>
                 </div>
     
-                <div class="row mb-0">
-                    <div class="col-md-12 offset-md-4">
+                <div class>
+                    {{-- <div class="col-md-12 offset-md-4">
     
-                        @if (Route::has('password.request'))
-                            <a class="btn btn-link" href="{{ route('password.request') }}">
-                                {{ __('Forgot Your Password?') }}
-                            </a>
-                        @endif
+                        
+                    </div> --}}
+                    <div class="d-flex justify-space-between">
+                        <div class="p-2">
+                            @if (Route::has('password.request'))
+                                <a class="btn btn-link p-0" href="{{ route('password.request') }}">
+                                    {{ __('Forgot Your Password?') }}
+                                </a>
+                            @endif
+                        </div>
+                        <div class="ml-auto p-2">
+                            @if (Route::has('register'))
+                                <a class="btn btn-link p-0" href="{{ route('register') }}">
+                                    {{ __('Register') }}
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </form>
@@ -136,6 +151,31 @@
     justify-item: center;
     margin-left: 0;
     /* text-color: #ffffff */
+}
+
+.banner-outer {
+    display: none;
+}
+
+.logo-center {
+    display:flex;
+    justify-content: center;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.justify-space-between {
+    justify-content: space-between
+}
+
+.p-0 {
+    padding: 0;
+}
+
+.p_05 {
+    padding: 0.5em 0;
 }
 
 </style>
