@@ -456,3 +456,5 @@
         -->
 
 </div>  <!-- END .twitter-settings-outer -->
+
+<script type='text/javascript' src="{{asset('public/js/twitterSettings.js')}}"></script>
