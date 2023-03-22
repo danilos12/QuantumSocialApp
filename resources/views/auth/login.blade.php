@@ -5,7 +5,7 @@
     <div class="login-inner">
 
         <div class="logo-center">
-            <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-horiz-white-app@2x.png" class="image-placeholder" width="300" />
+            <img src="{{ asset('public/')}}/ui-images/logo/quantum-logo-white-lg.png" class="image-placeholder" width="300" />
         </div>
 
         <div class="form p-135">
@@ -58,11 +58,7 @@
                     </div>
                 </div>
     
-                <div class>
-                    {{-- <div class="col-md-12 offset-md-4">
-    
-                        
-                    </div> --}}
+                <div class>                  
                     <div class="d-flex justify-space-between">
                         <div class="p-2">
                             @if (Route::has('password.request'))
@@ -74,7 +70,7 @@
                         <div class="ml-auto p-2">
                             @if (Route::has('register'))
                                 <a class="btn btn-link p-0" href="{{ route('register') }}">
-                                    {{ __('Register') }}
+                                    {{ __('Sign up') }}
                                 </a>
                             @endif
                         </div>
