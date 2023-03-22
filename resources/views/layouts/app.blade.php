@@ -26,6 +26,9 @@
 	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
+ {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> --}}
+
+  
 	
 </head>
 <body class="{{ Route::has('login') ? 'darkmode' : '' }}">
@@ -130,119 +133,123 @@
               <div class="main-menu">
 
                 <ul>
-				    @if (Route::has('login'))
-					@auth		
+                  @if (Route::has('login'))
+                  @auth		
                   <li class="menu-item menu-margin">
-				  <a href="{{ route('dashboard') }}">
-                    <img src = "{{ asset('public/ui-images/icons/01-dashboard.svg') }}" class="menu-icon" />
-                    Dashboard
-					</a>
-					</li>
+                    <a href="{{ route('dashboard') }}">
+                    <img src = "{{ asset('public/ui-images/icons/01-dashboard.svg') }}" class="menu-icon" />Dashboard
+                    </a>                  
+                  </li>
                   <li class="menu-item menu-margin launch-command-module" data-id="modal" id="command-module">
                     <img src = "{{ asset('public/ui-images/icons/pg-command.svg') }}" class="menu-icon" />
-                    Command Module</li>
-                  <li class="menu-item menu-margin">
-				 <a href="{{ route('profiles') }}">
-                    <img src = "{{ asset('public/ui-images/icons/02-profile.svg') }}" class="menu-icon" />
-                    Profile</a></li>
-					
-                  <li class="menu-item" data-toggle="collapse" data-target="#posting">
-                    <!-- <a href="{{ route('queue') }}">
-                      </a> -->
-                    <img src = "{{ asset('public/ui-images/icons/03-posting.svg') }}" class="menu-icon" />
-                    Posting
-                    </li>
-                    <ul class="sub-menu menu-margin collapse" id="posting">
-
-                      <li>
-                        <a href="{{ route('queue') }}"><img src = "{{asset('public/ui-images/icons/04-queue.svg')}} " class="menu-icon" />
-                        Queue</a></li>
-						
-                      <li>
-                        <a href="{{ route('drafts') }}"><img src = " {{asset('public/ui-images/icons/05-drafts.svg')}} " class="menu-icon" />
-                        Drafts</a></li>
-						
-                      <li><a href="{{ route('posted') }}">
-                        <img src = "{{asset('public/ui-images/icons/06-posted.svg')}} " class="menu-icon" />
-                        Posted</a></li>
-					
-                      <li>	<a href="{{ route('slot-scheduler') }}">
-                        <img src = "{{asset('public/ui-images/icons/07-schedule.svg')}} " class="menu-icon" />
-                        Slot Scheduler</a></li>
-					
-                      <li>	<a href="{{ route('tweet-stormer') }}">
-                        <img src = "{{asset('public/ui-images/icons/08-tweet-storm.svg')}} " class="menu-icon" />
-                        Tweet Stormer</a></li>
-						
-                      <li><a href="{{ route('bulk-uploader') }}">
-                        <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
-                        Bulk Uploader</a></li>
-                    </ul>
-                  <li class="menu-item" data-toggle="collapse" data-target="#engagement">
-                    <!-- <a href="{{ route('social-engage') }}">
-                      </a> -->
-                    <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />
-                              Engagement
+                    Command Module
                   </li>
-                    <ul class="sub-menu menu-margin collapse" id="engagement">
-                      <li>
-					  <a href="{{ route('social-engage') }}">
-                        <img src = "{{asset('public/ui-images/icons/11-engage.svg')}} " class="menu-icon" />
-                        Engage</a></li>
-                      <li>
-                        <a href="{{ route('social-mentions') }}"><img src = " {{asset('public/ui-images/icons/12-mentions.svg')}}" class="menu-icon" />
-                        Mentions</a></li>
-                      <li>
-                        <a href="{{ route('social-user-feeds') }}"><img src = " {{asset('public/ui-images/icons/13-user-feeds.svg')}} " class="menu-icon" />
-                        User Feeds</a></li>
-                      <li>
-                        <a href="{{ route('social-user-lists') }}"><img src = " {{asset('public/ui-images/icons/pg-list.svg')}} " class="menu-icon" />
-                        User Lists</a></li>
-                      <li>
-                        <a href="{{ route('social-hashtag-feeds') }}"><img src = "{{asset('public/ui-images/icons/14-hashtag-feeds.svg')}}" class="menu-icon" />
-                        Hashtag Feeds</a></li>
-                    </ul>
+                  <li class="menu-item menu-margin">
+                    <a href="{{ route('profiles') }}">
+                      <img src = "{{ asset('public/ui-images/icons/02-profile.svg') }}" class="menu-icon" />Profile
+                    </a>
+                  </li>
+					
+                  <li class="menu-item" data-toggle="collapse" data-target="#posting" aria-expanded="false">                    
+                    <img src = "{{ asset('public/ui-images/icons/03-posting.svg') }}" class="menu-icon" />Posting
+                  </li>
+                  <ul class="sub-menu menu-margin" id="posting" aria-expanded="false">
+                    <li id="queue">
+                      <a href="{{ route('queue') }}"><img src = "{{asset('public/ui-images/icons/04-queue.svg')}} " class="menu-icon" />
+                      Queue</a></li>
+          
+                    <li id="drafts">
+                      <a href="{{ route('drafts') }}"><img src = " {{asset('public/ui-images/icons/05-drafts.svg')}} " class="menu-icon" />
+                      Drafts</a></li>
+          
+                    <li id="posted">
+                      <a href="{{ route('posted') }}">
+                        <img src = "{{asset('public/ui-images/icons/06-posted.svg')}} " class="menu-icon" />
+                        Posted
+                      </a>
+                    </li>
+        
+                    <li id="slot-scheduler">	
+                      <a href="{{ route('slot-scheduler') }}">
+                      <img src = "{{asset('public/ui-images/icons/07-schedule.svg')}} " class="menu-icon" />
+                      Slot Scheduler</a>
+                    </li>
+        
+                    <li id="tweet-stormer">	<a href="{{ route('tweet-stormer') }}">
+                      <img src = "{{asset('public/ui-images/icons/08-tweet-storm.svg')}} " class="menu-icon" />
+                      Tweet Stormer</a></li>
+          
+                    <li id="bulk-uploader"><a href="{{ route('bulk-uploader') }}">
+                      <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
+                      Bulk Uploader</a>
+                    </li>
+                  </ul>
+
+                  <li class="menu-item" data-toggle="collapse" data-target="#engagement">
+                    <!-- <a href="{{ route('social-engage') }}"></a> -->
+                    <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />Engagement
+                  </li>
+                  <ul  class="sub-menu menu-margin" id="engagement">
+                    <li id="engage">
+                      <a href="{{ route('social-engage') }}">
+                      <img src = "{{asset('public/ui-images/icons/11-engage.svg')}} " class="menu-icon" />
+                      Engage</a></li>
+                    <li id="mentions">
+                      <a href="{{ route('social-mentions') }}"><img src = " {{asset('public/ui-images/icons/12-mentions.svg')}}" class="menu-icon" />
+                      Mentions</a></li>
+                    <li id="user-feeds">
+                      <a href="{{ route('social-user-feeds') }}"><img src = " {{asset('public/ui-images/icons/13-user-feeds.svg')}} " class="menu-icon" />
+                      User Feeds</a></li>
+                    <li id="user-lists">
+                      <a href="{{ route('social-user-lists') }}"><img src = " {{asset('public/ui-images/icons/pg-list.svg')}} " class="menu-icon" />
+                      User Lists</a></li>
+                    <li id="hashtag-feeds">
+                      <a href="{{ route('social-hashtag-feeds') }}"><img src = "{{asset('public/ui-images/icons/14-hashtag-feeds.svg')}}" class="menu-icon" />
+                      Hashtag Feeds</a></li>
+                  </ul>
+
                   <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
-				   <!-- <a href="{{ route('promo-tweets') }}">
-             </a> -->
+                    <!-- <a href="{{ route('promo-tweets') }}"></a> -->
                     <img src = "{{asset('public/ui-images/icons/15-campaigns.svg')}} " class="menu-icon" />
                     Campaigns
-					</li>
-                    <ul class="sub-menu menu-margin collapse" id="campaigns">
-                      <li> <a href="{{ route('promo-tweets') }}">
-                        <img src = "{{asset('public/ui-images/icons/17-promos.svg')}} " class="menu-icon" />
-                        Promo Tweets</a></li>
-                      <li>
-                        <a href="{{ route('evergreen-tweets') }}"><img src = "{{asset('public/ui-images/icons/16-evergreen.svg')}} " class="menu-icon" />
-                        Evergreen Tweets</a></li>
-                      <li>
-                       <a href="{{ route('tweet-storms') }}"> <img src = "{{asset('public/ui-images/icons/pg-storms.svg')}} " class="menu-icon" />
-                        Tweet Storms</a></li>
-                      <li>
-                         <a href="{{ route('tag-groups') }}"> <img src = "{{asset('public/ui-images/icons/18-tag-groups.svg')}} " class="menu-icon" />
-                        Tag Groups</a></li>
-                    </ul>
+                  </li>
+                  <ul class="sub-menu menu-margin" id="campaigns">
+                    <li id="promo"> <a href="{{ route('promo-tweets') }}">
+                      <img src = "{{asset('public/ui-images/icons/17-promos.svg')}} " class="menu-icon" />
+                      Promo Tweets</a></li>
+                    <li id="evergreen">
+                      <a href="{{ route('evergreen-tweets') }}"><img src = "{{asset('public/ui-images/icons/16-evergreen.svg')}} " class="menu-icon" />
+                      Evergreen Tweets</a></li>
+                    <li id="tweet-storms">
+                      <a href="{{ route('tweet-storms') }}"> <img src = "{{asset('public/ui-images/icons/pg-storms.svg')}} " class="menu-icon" />
+                      Tweet Storms</a></li>
+                    <li id="tag-groups">
+                        <a href="{{ route('tag-groups') }}"> <img src = "{{asset('public/ui-images/icons/18-tag-groups.svg')}} " class="menu-icon" />
+                      Tag Groups</a></li>
+                  </ul>
+
                   <li class="menu-item">
-				   <a href="{{ route('trending-topics') }}">
-                    <img src = "{{asset('public/ui-images/icons/19-trending.svg')}} " class="menu-icon" />
-                    Trending Topics</a></li>
-						</ul>
-						<div class="settings-bar-outer">
-						  <div class="settings-bar-inner">
-							<img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
-              <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" />
-							<img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
-							<a class="dropdown-item" href="{{ route('logout') }}"
-					   onclick="event.preventDefault();
-									 document.getElementById('logout-form').submit();">
-							<img src = "{{ asset('public/ui-images/icons/00e-logout.svg') }}" class="menu-icon" />
-							</a>
-							<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-								@csrf
-							</form>
-							
-						  </div>  <!-- END .settings-bar-inner -->
-						</div>  <!-- END .settings-bar-outer -->
+                    <a href="{{ route('trending-topics') }}">
+                      <img src = "{{asset('public/ui-images/icons/19-trending.svg')}} " class="menu-icon" />Trending Topics
+                    </a>
+                  </li>
+                </ul>
+                  <div class="settings-bar-outer">
+                    <div class="settings-bar-inner">
+                    <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+                    <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" />
+                    <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
+                    <a class="dropdown-item" href="{{ route('logout') }}"
+                  onclick="event.preventDefault();
+                        document.getElementById('logout-form').submit();">
+                    <img src = "{{ asset('public/ui-images/icons/00e-logout.svg') }}" class="menu-icon" />
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                      @csrf
+                    </form>
+                    
+                    </div>  <!-- END .settings-bar-inner -->
+                  </div>  <!-- END .settings-bar-outer -->
 					
 					
 					@else
@@ -383,7 +390,6 @@
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
  <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
  <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
- <script type='text/javascript' src="{{asset('public/js/twitterSettings.js')}}"></script>
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
  <script>
   $(document).ready(function() {
@@ -394,6 +400,28 @@
         alert.fadeOut('slow');
       }, 5000);
     }
+
+    $('.sub-menu').css('display', 'none');
+    $('.menu-item').click(function(e) {
+      var menuId = e.target.dataset.target;
+      $(`${menuId}`).toggle();
+    })
+
+    var uri =  "{{  basename($_SERVER['REQUEST_URI']) }}";
+    
+    $('.sub-menu').each(function(e, i) {
+      var slug = $(this).text().toLowerCase();
+
+      $(this).find('li').each(function(index, value) {
+      
+        if (value.id === $.trim(uri)) {
+          $(this).closest('ul.sub-menu').toggle();
+          console.log(3)
+        } 
+        var li = $(this).find('li');
+      });
+      
+    })
   });
 
 </script>
