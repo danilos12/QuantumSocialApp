@@ -395,7 +395,7 @@
 
                         <div class="menu-subTwirl-outer">
                             <div class="subTwirl-header-wrap">
-                                <span class="subTwirl-header"> {{ var_dump(collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer')->meta_value) }}
+                                <span class="subTwirl-header"> 
                                 Modify your viral post comment below:</span>
                             </div>  <!-- END .subTwirl-header-wrap -->
                             <div class="menu-subTwirl-inner">
