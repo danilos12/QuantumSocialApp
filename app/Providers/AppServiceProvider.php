@@ -62,8 +62,11 @@ class AppServiceProvider extends ServiceProvider
             $twitterSettings = DB::table('qts_tweetmeta')
                             ->join('ut_acct_mngt', 'qts_tweetmeta.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                             ->select('qts_tweetmeta.*', 'ut_acct_mngt.selected')
+                            ->where('qts_tweetmeta.twitter_id', '=', $selectedUser->twitter_id)
                             ->get();
             $view->with('twitter_settings', $twitterSettings);
+
+            // dd($twitterSettings);
             
             // main quantum user 
             $main_user = User::find(Auth::id());
