@@ -57,12 +57,13 @@ class AppServiceProvider extends ServiceProvider
             // dd($selectedUser);   
             $view->with('selected_user', $selectedUser);       
 
+            $twitterID = $selectedUser->twitter_id ?? 0;
 
             // twitter settings DB 
             $twitterSettings = DB::table('qts_tweetmeta')
                             ->join('ut_acct_mngt', 'qts_tweetmeta.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                             ->select('qts_tweetmeta.*', 'ut_acct_mngt.selected')
-                            ->where('qts_tweetmeta.twitter_id', '=', $selectedUser->twitter_id)
+                            ->where('qts_tweetmeta.twitter_id', '=', $twitterID)
                             ->get();
             $view->with('twitter_settings', $twitterSettings);
 
