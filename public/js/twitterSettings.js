@@ -15,33 +15,33 @@ $(document).ready(function() {
   });
 
 
-  $('.auto-reply-button').on('click', function(event) {
+  // $('.auto-reply-button').on('click', function(event) {
 
-    var autoReplytext = $('.auto-reply-text').val();
-    console.log(autoReplytext);
+  //   var autoReplytext = $('.auto-reply-text').val();
+  //   console.log(autoReplytext);
 
-    $.ajax({
-      url: $('div#twitter-settings').data('form-url'),
-      method: 'POST',
-      data: {
-        meta_key: event.target.id,
-        meta_value: isChecked === true ? 1 : 0,
-        twitter_id: $('div#twitter-settings').data('twitterid'),
-        id: 'twitter-settings'
-      },
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function(response) {
-        // Handle success        
-        $('input#' + event.target.id,).attr('default', response.data === 1 ? 'active' : '');
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        // Handle error
-        console.log(jqXHR, textStatus, errorThrown)
-      }
-    });
-  })
+  //   $.ajax({
+  //     url: $('div#twitter-settings').data('form-url'),
+  //     method: 'POST',
+  //     data: {
+  //       meta_key: event.target.id,
+  //       meta_value: isChecked === true ? 1 : 0,
+  //       twitter_id: $('div#twitter-settings').data('twitterid'),
+  //       id: 'twitter-settings'
+  //     },
+  //     headers: {
+  //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  //     },
+  //     success: function(response) {
+  //       // Handle success        
+  //       $('input#' + event.target.id,).attr('default', response.data === 1 ? 'active' : '');
+  //     },
+  //     error: function(jqXHR, textStatus, errorThrown) {
+  //       // Handle error
+  //       console.log(jqXHR, textStatus, errorThrown)
+  //     }
+  //   });
+  // })
 
   $('input[name="twitter-settings[]"]').change(function(event) {
     var isChecked = $(this).is(':checked');
@@ -59,7 +59,8 @@ $(document).ready(function() {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       },
       success: function(response) {
-        // Handle success        
+        // Handle success    
+        console.log(response)    
         $('input#' + event.target.id,).attr('default', response.data === 1 ? 'active' : '');
       },
       error: function(jqXHR, textStatus, errorThrown) {
