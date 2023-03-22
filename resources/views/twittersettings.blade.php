@@ -58,7 +58,7 @@
                                     <span class="subTwirl-header">Modify your Auto-reply message below:</span>
                                 </div>  <!-- END .subTwirl-header-wrap -->
                                 <div class="menu-subTwirl-inner">
-                                    <textarea class="auto-reply-text" id="auto-reply-text">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'auto-reply-text')  && collect($twitter_settings)->firstWhere('meta_key', 'auto-reply-text')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'auto-reply-text')->meta_value : 'Please add text' }}</textarea>
+                                    <textarea class="auto-reply-text" id="auto-reply-text">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'auto-reply-text')  && collect($twitter_settings)->firstWhere('meta_key', 'auto-reply-text')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'auto-reply-text')->meta_value : 'Please add text' }}</textarea>
                                 <div class="auto-reply-counter">
                                     <span class="auto-reply-count"></span><span class="auto-reply-limit">/200 remaining</span>
                                 </div>  <!-- END .thread-ender-count -->
@@ -89,7 +89,7 @@
                                     Modify your default Thread Ender below:</span>
                                 </div>  <!-- END .subTwirl-header-wrap -->
                                 <div class="menu-subTwirl-inner">
-                                <textarea class="thread-ender-text" id="text-dft-ender">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'text-dft-ender')  && collect($twitter_settings)->firstWhere('meta_key', 'text-dft-ender')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'text-dft-ender')->meta_value : 'Please add text' }}</textarea>
+                                <textarea class="thread-ender-text" id="text-dft-ender">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'text-dft-ender')  && collect($twitter_settings)->firstWhere('meta_key', 'text-dft-ender')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'text-dft-ender')->meta_value : 'Please add text' }}</textarea>
                                 <div class="thread-ender-counter">
                                     <span class="thread-ender-count">154</span>/280 remaining
                                 </div>  <!-- END .thread-ender-count -->
@@ -148,13 +148,13 @@
                                 <div class="subTwirl-evergreen-retweets-wrap"> <!-- was "subTwirl-engagement-retweets-wrap" -->
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon subTwirl-option-icon" />
                                     Retweet every
-                                    <input type="text" class="subTwirl-micro-input" id="eg_rt_retweets" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_retweets')  && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_retweets')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_retweets')->meta_value : '' }}"/>
+                                    <input type="text" class="subTwirl-micro-input" id="eg_rt_retweets" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_retweets')  && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_retweets')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_retweets')->meta_value : '' }}"/>
                                 retweets.
                                 </div>  <!-- END .subTwirl-evergreen-retweets-wrap -->
                                 <div class="subTwirl-evergreen-likes-wrap">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-heart.svg" class="ui-icon subTwirl-option-icon" />
                                     Retweet every
-                                    <input type="text" class="subTwirl-micro-input" id="eg_rt_likes" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_likes')  && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_likes')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_likes')->meta_value : 'Please add text' }}"/>
+                                    <input type="text" class="subTwirl-micro-input" id="eg_rt_likes" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_likes')  && collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_likes')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'eg_rt_likes')->meta_value : 'Please add text' }}"/>
                                 likes.
                                 </div>  <!-- END .subTwirl-evergreen-likes-wrap -->
                             </div>  <!-- END .subTwirl-content -->
@@ -190,13 +190,13 @@
                                             <div class="subTwirl-engagement-retweets-wrap">
                                             <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon subTwirl-option-icon" />
                                             Retweet every
-                                            <input type="text" class="subTwirl-micro-input" id="he_rt_retweets" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_retweets')  && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_retweets')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'he_rt_retweets')->meta_value : 'Please add text' }}"/>
+                                            <input type="text" class="subTwirl-micro-input" id="he_rt_retweets" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_retweets')  && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_retweets')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'he_rt_retweets')->meta_value : 'Please add text' }}"/>
                                             retweets.
                                             </div>  <!-- END .subTwirl-engagement-retweets-wrap -->
                                             <div class="subTwirl-engagement-likes-wrap">
                                             <img src="{{ asset('public/')}}/ui-images/icons/pg-heart.svg" class="ui-icon subTwirl-option-icon" />
                                             Retweet every
-                                            <input type="text" class="subTwirl-micro-input" id="he_rt_likes" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_likes')  && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_likes')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'he_rt_likes')->meta_value: 'Please add text' }}"/>
+                                            <input type="text" class="subTwirl-micro-input" id="he_rt_likes" value="{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_likes')  && collect($twitter_settings)->firstWhere('meta_key', 'he_rt_likes')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'he_rt_likes')->meta_value: 'Please add text' }}"/>
                                             likes.
                                             </div>  <!-- END .subTwirl-engagement-likes-wrap -->
                                         </div>  <!-- END .subTwirl-content -->
@@ -399,7 +399,7 @@
                                 Modify your viral post comment below:</span>
                             </div>  <!-- END .subTwirl-header-wrap -->
                             <div class="menu-subTwirl-inner">
-                                <textarea class="thread-ender-text" id="text_comment_offer">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer') && collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer')->meta_value ?  collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer')->meta_value : 'Please add text' }}</textarea>
+                                <textarea class="thread-ender-text" id="text_comment_offer">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer') && collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer')->meta_value !== null ?  collect($twitter_settings)->firstWhere('meta_key', 'text-comment-offer')->meta_value : 'Please add text' }}</textarea>
                                 <div class="thread-ender-counter">
                                 <span class="thread-ender-count">154</span>/280 remaining
                                 </div>  <!-- END .thread-ender-count -->
@@ -430,7 +430,7 @@
                                         Modify your DM to your new followers:</span>
                                     </div>  <!-- END .subTwirl-header-wrap -->
                                     <div class="menu-subTwirl-inner">
-                                        <textarea class="thread-ender-text" id="text_ender_dm">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'text_ender_dm') && collect($twitter_settings)->firstWhere('meta_key', 'text_ender_dm')->meta_value ? collect($twitter_settings)->firstWhere('meta_key', 'text_ender_dm')->meta_value : '' }}</textarea>
+                                        <textarea class="thread-ender-text" id="text_ender_dm">{{ !empty($twitter_settings) && collect($twitter_settings)->firstWhere('meta_key', 'text_ender_dm') && collect($twitter_settings)->firstWhere('meta_key', 'text_ender_dm')->meta_value !== null ? collect($twitter_settings)->firstWhere('meta_key', 'text_ender_dm')->meta_value : '' }}</textarea>
                                         <div class="thread-ender-counter">
                                         <span class="thread-ender-count">154</span>/280 remaining
                                         </div>  <!-- END .thread-ender-count -->
