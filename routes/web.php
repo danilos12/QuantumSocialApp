@@ -58,9 +58,11 @@ Route::get('/trending', [App\Http\Controllers\TrendingtopicsController::class, '
 Route::get('/twitter/redirect', [App\Http\Controllers\Controller::class, 'twitterOAuth']);
 Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOAuthCallback']);
 
-Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets']);
-Route::get('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
+Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets'])->name('getTweets');
+Route::post('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
 Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('remove.twitter');
 
 Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
 
+Route::post('/command-module-save', [App\Http\Controllers\CommandmoduleController::class, 'ss'])->name('command-module-save');
+Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
