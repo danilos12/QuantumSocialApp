@@ -6,6 +6,7 @@ use App\Models\UT_AcctMngt;
 use App\Models\Twitter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class TwitterApi extends Controller
@@ -64,26 +65,29 @@ class TwitterApi extends Controller
 
     }
 
-    public function switchedAccount($twitterId) {
+    public function switchedAccount(Request $request) {
 
         $title = "Profile";
         
         try {
+            $twitterId = $request->input('twitter_id');
 
-            // update current Active twitter to disable
-            $active = UT_AcctMngt::where(['selected' =>  1, 'user_id' => Auth::id()])->update(['selected' => 0]);
 
-            // update the new selected
-            $enabled = UT_AcctMngt::where('twitter_id' ,  $twitterId)->update(['selected' => 1]);
+            // Update the selected Twitter account
+            $updated = DB::table('ut_acct_mngt')
+                ->where('user_id', Auth::id())
+                ->update([
+                    'selected' => DB::raw("CASE WHEN twitter_id = $twitterId THEN 1 ELSE 0 END")
+                ]);
+           
 
-            // check            
-
-            if ($enabled && $active) {
-                return redirect('profile')->with('title', $title)->with('alert', 'Tweets are updated')->with('alert_type', 'success');
+            // Check if update was successful
+            if ($updated) {
+                return response()->json(['success' => true, 'message' => 'Tweets are updated', 'get_tweets' => 'getTweets']);
             } else {
-                return redirect('profile')->with('title', $title)->with('alert', 'Error in selecting')->with('alert_type', 'warning');
+                return response()->json(['success' => false, 'message' => 'Tweets are not updated']);                
             }
-
+              
         } catch (\Exception $e) {
             
             // return redirect('profile')->with('alert', 'Tweets are updated')->with('alert_type', 'success');
@@ -91,6 +95,23 @@ class TwitterApi extends Controller
                 'message' => 'Error updating records: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function tweets($id) {
+        $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
+
+        $tweets = [];
+        if ($info) {
+
+            $twitterApi = new TwitterApi();
+            $tweets = $twitterApi->getTweets($info->twitter_id);
+        } else {
+            $tweets = [];
+        }
+
+        $html = view('selectedAcctTweets', compact('tweets'))->render();
+
+        return response()->json(['html' => $html]);
     }
 
     public function removeTwitterAccount(Request $request)
