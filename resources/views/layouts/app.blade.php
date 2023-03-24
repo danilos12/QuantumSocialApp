@@ -44,9 +44,9 @@
           <div class="banner-twitter-profile-wrap">
             <a href="#">
               <div class="banner-twitter-profile-inner">
-                <img src="{{ asset('public/temp-images/william-wallace.jpg') }}" class="twitter-profile-image" />
+                <img src="{{ asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                 <span class="twitter-profile-name">
-                  {{ Auth::user()->name }}
+                  {{ $selected_user->twitter_name ?? 'Quantum User' }}
                 </span>
               </div>  <!-- END .banner-twitter-profile-inner -->
             </a>
@@ -83,13 +83,12 @@
                     <span class="account-select-title">Select An Account</span>
 
                     @foreach($twitter_accts as $twitter)
-                    <div class="twitter-account-select-bar">
-                      <div class="twitter-account-item">
+                    <div class="twitter-account-select-bar {{ $selected_user->twitter_id === $twitter->twitter_id ? "active" : "" }}" data-url="{{ route("twitter.switchUser", ['twitter_id', $twitter->twitter_id ]) }}" data-id="twitter-{{ $twitter->twitter_id }}" data-content="{{ route('getTweets', ['id' => $twitter->twitter_id]) }}">
+                      <div class="twitter-account-item ">                                                                       
                         <div class="twitter-bar-profile-info">
                           <img src="{{ $twitter->twitter_photo }}" />
                           @ {{ $twitter->twitter_username}}
                         </div>
-                        <a href="#">
                         <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" /></a>
                       </div>  <!-- END .twitter-account-item -->                                            
                     </div>  <!-- END .twitter-account-select-bar -->                    
