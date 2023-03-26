@@ -5,7 +5,7 @@
 
 jQuery(function($) {
 	
-	// bgIcon changes
+	// bgIcon changes and post-alert
 	jQuery('.post-type-icon').click(function(){
 		var id = jQuery(this).attr('id');
 		var ggg = jQuery(this).attr('data-select');
@@ -13,28 +13,36 @@ jQuery(function($) {
 		
 		jQuery('input[name="post_type_tweets"]').val('regular_tweets');
 		
-		// for first 3 icons
-		if (ttt === "evergreen-tweets" || ttt === "promos-tweets" || ttt === "tweet-storms-tweets") {
-			jQuery('.post-type-icon').each(function(){			
-				var ccc = jQuery(this).attr('data-type');
-				jQuery(this).attr('data-select', 0);
-				jQuery(this).removeAttr('style');
-				jQuery('div[data-post="'+ccc+'"]').addClass('tweets-hide');
-			});
+		jQuery('.post-type-icon').each(function(){			
+			var ccc = jQuery(this).attr('data-type');
+
 			
-			if(ggg === 0) {
-				jQuery('#'+id).attr('data-select', 1);
-				jQuery('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');
-				jQuery('input[name="post_type_tweets"]').val(ttt);
-				jQuery('div[data-post="'+ttt+'"]').removeClass('tweets-hide');
+			jQuery(this).attr('data-select', 0);
+			jQuery(this).removeAttr('style');
+			
+			// show the icon only in retweet
+			console.log(ttt);
+			console.log(ccc);
+			if (ttt === 'retweet-tweets') {
+				jQuery('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');				
+			} else {
+				jQuery('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');				
 			}
+			
+			jQuery('div[data-post="'+ccc+'"]').addClass('tweets-hide');
+		});
+			
+		if(ggg == 0) {			
+			jQuery('#'+id).attr('data-select', 1);
+			jQuery('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');
+			jQuery('input[name="post_type_tweets"]').val(ttt);
+			jQuery('div[data-post="'+ttt+'"]').removeClass('tweets-hide');
 		}
 			
 		// last 2 icons
 		jQuery('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active');
-		var bgIcon = jQuery('.primary-post-area-wrap').find('img.post-type-indicator[data-src="'+ttt+'"').addClass('indicator-active');
+		jQuery('.primary-post-area-wrap').find('img.post-type-indicator[data-src="'+ttt+'"').addClass('indicator-active');
 		
-		console.log('post type');
 	});	
 	
 	jQuery('.custom-dhms').change(function(){
@@ -192,86 +200,74 @@ jQuery(function($) {
 		
 		textArea.val(withTags)
 	})
-	// $('#beam-btn').on('click', function() {
-	// 	// get the button element
-	// 	var $myButton = $(this);
-
-	// 	// check if validation passes
-	// 	if (validationPasses) {
-	// 	// enable the button and remove the tooltip
-	// 	$myButton.prop('disabled', false).removeAttr('title');
-	// 	} else {
-	// 	// disable the button and show the tooltip
-	// 	$myButton.prop('disabled', true).attr('title', 'Please add a Twitter account first');
-	// 	}
-	// })
+	
 
 	jQuery('.add-tweet-initial').on("click", function() {
 		var innerText = `<div class="add-tweet-inner">
 						<div class="wait-to-tweet-col">
 						<span class="wait-title">Wait</span>
 						<select id="wait-number" name="wait-number" data-info="wait-timer" class="wait-number">
-																	<option value="0"> 0</option>
-																	<option value="1"> 1</option>
-																	<option value="2"> 2</option>
-																	<option value="3"> 3</option>
-																	<option value="4"> 4</option>
-																	<option value="5"> 5</option>
-																	<option value="6"> 6</option>
-																	<option value="7"> 7</option>
-																	<option value="8"> 8</option>
-																	<option value="9"> 9</option>
-																	<option value="10"> 10</option>
-																	<option value="11"> 11</option>
-																	<option value="12"> 12</option>
-																	<option value="13"> 13</option>
-																	<option value="14"> 14</option>
-																	<option value="15"> 15</option>
-																	<option value="16"> 16</option>
-																	<option value="17"> 17</option>
-																	<option value="18"> 18</option>
-																	<option value="19"> 19</option>
-																	<option value="20"> 20</option>
-																	<option value="21"> 21</option>
-																	<option value="22"> 22</option>
-																	<option value="23"> 23</option>
-																	<option value="24"> 24</option>
-																	<option value="25"> 25</option>
-																	<option value="26"> 26</option>
-																	<option value="27"> 27</option>
-																	<option value="28"> 28</option>
-																	<option value="29"> 29</option>
-																	<option value="30"> 30</option>
-																	<option value="31"> 31</option>
-																	<option value="32"> 32</option>
-																	<option value="33"> 33</option>
-																	<option value="34"> 34</option>
-																	<option value="35"> 35</option>
-																	<option value="36"> 36</option>
-																	<option value="37"> 37</option>
-																	<option value="38"> 38</option>
-																	<option value="39"> 39</option>
-																	<option value="40"> 40</option>
-																	<option value="41"> 41</option>
-																	<option value="42"> 42</option>
-																	<option value="43"> 43</option>
-																	<option value="44"> 44</option>
-																	<option value="45"> 45</option>
-																	<option value="46"> 46</option>
-																	<option value="47"> 47</option>
-																	<option value="48"> 48</option>
-																	<option value="49"> 49</option>
-																	<option value="50"> 50</option>
-																	<option value="51"> 51</option>
-																	<option value="52"> 52</option>
-																	<option value="53"> 53</option>
-																	<option value="54"> 54</option>
-																	<option value="55"> 55</option>
-																	<option value="56"> 56</option>
-																	<option value="57"> 57</option>
-																	<option value="58"> 58</option>
-																	<option value="59"> 59</option>
-																</select>
+							<option value="0"> 0</option>
+							<option value="1"> 1</option>
+							<option value="2"> 2</option>
+							<option value="3"> 3</option>
+							<option value="4"> 4</option>
+							<option value="5"> 5</option>
+							<option value="6"> 6</option>
+							<option value="7"> 7</option>
+							<option value="8"> 8</option>
+							<option value="9"> 9</option>
+							<option value="10"> 10</option>
+							<option value="11"> 11</option>
+							<option value="12"> 12</option>
+							<option value="13"> 13</option>
+							<option value="14"> 14</option>
+							<option value="15"> 15</option>
+							<option value="16"> 16</option>
+							<option value="17"> 17</option>
+							<option value="18"> 18</option>
+							<option value="19"> 19</option>
+							<option value="20"> 20</option>
+							<option value="21"> 21</option>
+							<option value="22"> 22</option>
+							<option value="23"> 23</option>
+							<option value="24"> 24</option>
+							<option value="25"> 25</option>
+							<option value="26"> 26</option>
+							<option value="27"> 27</option>
+							<option value="28"> 28</option>
+							<option value="29"> 29</option>
+							<option value="30"> 30</option>
+							<option value="31"> 31</option>
+							<option value="32"> 32</option>
+							<option value="33"> 33</option>
+							<option value="34"> 34</option>
+							<option value="35"> 35</option>
+							<option value="36"> 36</option>
+							<option value="37"> 37</option>
+							<option value="38"> 38</option>
+							<option value="39"> 39</option>
+							<option value="40"> 40</option>
+							<option value="41"> 41</option>
+							<option value="42"> 42</option>
+							<option value="43"> 43</option>
+							<option value="44"> 44</option>
+							<option value="45"> 45</option>
+							<option value="46"> 46</option>
+							<option value="47"> 47</option>
+							<option value="48"> 48</option>
+							<option value="49"> 49</option>
+							<option value="50"> 50</option>
+							<option value="51"> 51</option>
+							<option value="52"> 52</option>
+							<option value="53"> 53</option>
+							<option value="54"> 54</option>
+							<option value="55"> 55</option>
+							<option value="56"> 56</option>
+							<option value="57"> 57</option>
+							<option value="58"> 58</option>
+							<option value="59"> 59</option>
+						</select>
 						<select id="wait-duration" name="wait-duration" data-check="wait-timer" class="custom-dhms wait-duration">
 							
 							
