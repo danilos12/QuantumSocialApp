@@ -3496,3 +3496,9 @@ img.mosaic-watermark.evergreen-watermark {
 .modal-large-anchor {
     display: none;
 }
+
+.selected-popover { 
+      color: #333;
+      font-size: 14px;
+      font-weight: bold;
+}

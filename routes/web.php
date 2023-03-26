@@ -64,5 +64,5 @@ Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeT
 
 Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
 
-Route::post('/command-module-save', [App\Http\Controllers\CommandmoduleController::class, 'ss'])->name('command-module-save');
+Route::post('/command-module-save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('command-module-save');
 Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');

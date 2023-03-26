@@ -29,7 +29,7 @@ div[data-schedule="none"] {
                             </div>  <!-- END .global-twitter-profile-header -->
                           </div>  <!-- END .posting-tool-banner -->
 
-                          <form id="posting-tool-form-001" class="posting-tool-form" data-url="{{ route('command-module-save') }}">
+                          <form id="posting-tool-form-001" class="posting-tool-form" data-url="{{ route('command-module-save') }}" enctype="multipart/form-data" method="post">
                             <div class="posting-tool-columns">
                               <div class="posting-tool-col posting-tool-left-col">
 
@@ -37,12 +37,12 @@ div[data-schedule="none"] {
 
                                   <div class="post-area-left primary-post-left">
                                     <div class="post-area-wrap primary-post-area-wrap">
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon post-type-indicator" />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" />
+                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="twitter-tweets"/>
+                                     <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon post-type-indicator" data-src="evergreen-tweets"/>
+                                     <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" data-src="promos-tweets" />
+                                     <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-tweets"/>
+                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-tweets"/>
+                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comments-tweets"/>
                                       <textarea class="post-textarea primary-post-area" name="tweet_text_area"></textarea>  <!-- END .primary-post-area -->
                                     </div>  <!-- END .primary-post-area-wrap -->
                                     <div class="post-bottom-buttons primary-post-bottom-buttons">
@@ -50,8 +50,8 @@ div[data-schedule="none"] {
                                        <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" />
                                        <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" />
                                        <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-tool-icon retweet-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-tool-icon comment-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
                                       </span>  <!-- END .primary-post-type-buttons -->
                                       <span class="post-option-buttons primary-post-option-buttons">
                                        <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
@@ -171,12 +171,12 @@ div[data-schedule="none"] {
                                       <div class="new-post-wrap add-tweet-col">
                                         <div class="post-area-left new-post-left">
                                           <div class="post-area-wrap new-post-area-wrap">
-                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" />
-                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" />
-                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" />
-                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon post-type-indicator" />
-                                           <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" />
-                                           <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" />
+                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="" />
+                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-type-icon" />
+                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comment-type-icon"/>
+                                           <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg"  class="ui-icon post-type-indicator" data-src="evergreen-type-icon" />
+                                           <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" data-src="promo-type-icon" />
+                                           <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-type-icon" />
                                             <textarea class="post-textarea new-post-area"></textarea>  <!-- END .primary-post-area -->
                                           </div>  <!-- END .post-area-wrap -->
                                           <div class="post-bottom-buttons new-post-bottom-buttons">
@@ -249,7 +249,7 @@ div[data-schedule="none"] {
                                   <span>
                                     Tweet to Retweet:
                                   </span>
-                                  <input type="text" placeholder="...paste tweet link here..." class="retweet-link-input" />
+                                  <input type="text" name="retweet-link-input" placeholder="...paste tweet link here..." class="retweet-link-input" />
                                     <!-- CARLO - Just have this grab the tweet in the URL when it is pasted. -->
                                 </div>  <!-- END .comment-alert -->
 
@@ -258,7 +258,7 @@ div[data-schedule="none"] {
                                   <span>
                                     Tweet to Comment On:
                                   </span>
-                                  <input type="text" placeholder="...paste tweet link here..." class="comment-link-input" />
+                                  <input type="text" name="comment-link-input" placeholder="...paste tweet link here..." class="comment-link-input" />
                                     <!-- CARLO - Just have this grab the tweet in the URL when it is pasted. -->
                                 </div>  <!-- END .comment-alert -->
 
