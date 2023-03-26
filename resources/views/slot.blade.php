@@ -13,7 +13,7 @@
 
                           <div class="global-twitter-profile-header profile-header-left">
                             <a href="#">
-                             <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg"
+                             <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png"
                                 class="global-profile-image" /></a>
                             <div class="global-profile-details">
                               <div class="global-profile-name">
@@ -196,24 +196,24 @@
                                                         <div class="cross-tweet-profiles-outer subTwirl-profiles-outer">
                                                           <div class="cross-tweet-header"></div>
                                                           <div class="cross-tweet-profiles-inner">
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                           <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" />
-                                                               <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg" class="cross-tweet-profile-image" status="active" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                           <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
+                                                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
                                                           </div>  <!-- END .cross-tweet-profiles-inner -->
                                                         </div>  <!-- END .cross-tweet-profiles-outer -->
 

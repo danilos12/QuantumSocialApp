@@ -12,3 +12,20 @@
       
 
 </div>  <!-- END .twitter-settings-outer -->
+
+<script>
+
+    
+// $.get(`https://api.twitter.com/2/users/1617469651407220736/tweets`)
+//   .then(function(response) {
+//     console.log(11)
+//   })
+//   .then(function(response) {
+//     console.log(response);
+//   })
+//   .catch(function(error) {
+//     console.error(error);
+//   });
+
+  
+</script>
