@@ -50,14 +50,14 @@ div[data-schedule="none"] {
                                        <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" />
                                        <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" />
                                        <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-retweet-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
                                       </span>  <!-- END .primary-post-type-buttons -->
                                       <span class="post-option-buttons primary-post-option-buttons">
-                                       <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" />
-                                      {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon post-tool-icon retweet-timer-icon" />  --}}
-                                    <span class="post-counter">1/2</span>
+                                        <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon post-tool-icon retweet-timer-icon tweets-hide" /> 
+                                        <span class="post-counter">1/2</span>
                                       </span>  <!-- END .primary-post-option-buttons -->
 
 
@@ -215,8 +215,9 @@ div[data-schedule="none"] {
                               </div>  <!-- END .posting-tool-left-col -->
 
 
-                              <div class="posting-tool-col posting-tool-right-col">
+                              <div class="posting-tool-col posting-tool-right-col right-section">
 								                <input type="hidden" name="post_type_tweets" value="regular_tweets" id="post_type_tweets" class="post_type_tweets">
+
                                 <div id="post_evergreen" data-post="evergreen-tweets" class="post-alert evergreen-alert tweets-hide">
                                  <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
                                   <span>
@@ -253,7 +254,7 @@ div[data-schedule="none"] {
                                     <!-- CARLO - Just have this grab the tweet in the URL when it is pasted. -->
                                 </div>  <!-- END .comment-alert -->
 
-                                <div class="post-alert comment-alert">
+                                <div id="post_comment" data-post="comments-tweets" class="post-alert comment-alert tweets-hide">
                                  <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Tweet to Comment On:
@@ -263,7 +264,7 @@ div[data-schedule="none"] {
                                 </div>  <!-- END .comment-alert -->
 
 
-                                <div class="post-alert retweet-timer-alert">
+                                <div id="post_retweet_timer" data-post="retweet-tweets" class="post-alert retweet-timer-alert tweets-hide">
                                   <div class="retweet-timer-alert-heading">
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon alert-icon" />
                                     <span>
@@ -293,7 +294,7 @@ div[data-schedule="none"] {
                                     </select>
                                     iterations.
                                   </div>  <!-- END .retweet-timer-settings -->
-                                </div>  <!-- END .promo-alert -->
+                                </div>  <!-- END .retweet-alert -->
 
                                 <div class="cross-tweet-profiles-outer">
                                   <div class="cross-tweet-header">
