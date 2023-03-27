@@ -332,9 +332,9 @@ div[data-schedule="none"] {
 
 
 
-    <!-- INGRID - Please finish these, based on the UI of the rest of the page -->
+                                <!-- INGRID - Please finish these, based on the UI of the rest of the page -->
 
-    <!-- CARLO - These options only show up if certain options are selected in the scheduling method options -->
+                                  <!-- CARLO - These options only show up if certain options are selected in the scheduling method options -->
 
                                   <div id="scheduling-method-xxx" class="scheduling-details-countdown" data-schedule="none">
                                     <!-- CARLO - if Countdown -->
@@ -365,3 +365,7 @@ div[data-schedule="none"] {
 
                         </div>  <!-- END .posting-tool-inner -->
                       </div>  <!-- END .posting-tool-outer -->
+
+@section('scripts')
+<script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
+@endsection
