@@ -19,10 +19,7 @@ jQuery(function($) {
 			
 			jQuery(this).attr('data-select', 0);
 			jQuery(this).removeAttr('style');
-			
-			// show the icon only in retweet
-			console.log(ttt);
-			console.log(ccc);
+					
 			if (ttt === 'retweet-tweets') {
 				jQuery('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');				
 			} else {
