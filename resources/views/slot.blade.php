@@ -607,3 +607,7 @@
                   </div>  <!-- END .main-settings-anchor -->
 
                   <!-- END POSTING TOOL -->
+
+@section('scripts')
+  <script type='text/javascript' src="{{asset('public/js/schedule.js')}}"></script>
+@endsection
