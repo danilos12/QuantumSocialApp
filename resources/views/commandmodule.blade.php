@@ -245,7 +245,7 @@ div[data-schedule="none"] {
                                   </span>
                                 </div>  <!-- END .promo-alert -->
 
-                                <div id="post_regular_retweet" class="post-alert retweet-alert tweets-hide">
+                                <div id="post_regular_retweet" data-post="retweet-tweets" class="post-alert retweet-alert tweets-hide">
                                  <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Tweet to Retweet:
