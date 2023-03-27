@@ -24,7 +24,7 @@
 
                         <div class="global-twitter-profile-header" style="display:none;">
                           <a href="#">
-                            <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg"
+                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png"
                               class="global-profile-image" /></a>
                           <div class="global-profile-details">
                             <div class="global-profile-name">
@@ -125,7 +125,7 @@
 
                             <div class="global-twitter-profile-header">
                               <a href="#">
-                                <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg"
+                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png"
                                   class="global-profile-image" /></a>
                               <div class="global-profile-details">
                                 <div class="global-profile-name">
@@ -197,7 +197,7 @@
 
                                           <div class="global-twitter-profile-header">
                                             <a href="#">
-                                              <img src="{{ asset('public/')}}/temp-images/william-wallace.jpg"
+                                              <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png"
                                                 class="global-profile-image" /></a>
                                             <div class="global-profile-details">
                                               <div class="global-profile-name">

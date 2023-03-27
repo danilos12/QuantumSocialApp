@@ -562,7 +562,6 @@ function openModal(modalId) {
   if (currentModal !== null) {
     closeModal(currentModal);
   }
-  console.log(currentModal)
 
   $modalLargeAnchor.show();
   // Open the requested modal
@@ -598,7 +597,6 @@ function closeModal(modalId) {
 
 // Close modal when the user clicks outside the modal or presses the escape key
 window.onclick = function(event) {
- console.log(event)
   if (event.target.classList.contains('modal-large-backdrop')) {
     closeModal(currentModal);
   }

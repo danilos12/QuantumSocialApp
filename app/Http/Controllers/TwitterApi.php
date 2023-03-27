@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\UT_AcctMngt;
+use App\Models\Twitter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class TwitterApi extends Controller
@@ -29,33 +31,29 @@ class TwitterApi extends Controller
         $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets" ;
         $request = $this->curlGetHttpRequest($url, $headers, $data);
 
-        if ($request->meta->result_count > 0) {
+        if (property_exists($request, "data")) {
 
             // $obj = [];
-
+            
+            
             // get images of the tweet 
-            foreach($request->data as $k => $v) {
-                foreach($v as $info) {
-                                        
-                    if (isset($info->attachments->media_keys)) {
+            foreach($request->data as $v) {
+                if (property_exists($v, "attachments")) {
 
-                        //call cURL request for API        
-                        $data = "expansions=attachments.media_keys&media.fields=url";                
-                        $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $info->id, array("Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')), $data);
-
-                        $getAttachmentURL = $getAttachment->includes->media;                                               
-                        foreach($getAttachmentURL as $media) {
-                            $newObject = $media->url;
-                            
-                            
-                            $info->image = $newObject;
-                        }
-                                                
-                    } 
+                    // call cURL request for API        
+                    $data = "expansions=attachments.media_keys&media.fields=url";
+                    $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')), $data);
+    
+                    $getAttachmentURL = $getAttachment->includes->media;
+                    foreach ($getAttachmentURL as $media) {
+                        $newObject = $media->url;
+    
+                        $v->image = $newObject;
+                    }
                 }
-                
+                                            
             }
-            // dd($request);
+
             return $request->data;
 
             // exit;
@@ -67,35 +65,29 @@ class TwitterApi extends Controller
 
     }
 
-    public function switchedAccount($twitterId) {
+    public function switchedAccount(Request $request) {
 
         $title = "Profile";
         
         try {
+            $twitterId = $request->input('twitter_id');
 
-            // update current Active twitter to disable
-            $active = UT_AcctMngt::where(['selected' =>  1, 'user_id' => Auth::id()])->update(['selected' => 0]);
 
-            // update the new selected
-            $enabled = UT_AcctMngt::where('twitter_id' ,  $twitterId)->update(['selected' => 1]);
+            // Update the selected Twitter account
+            $updated = DB::table('ut_acct_mngt')
+                ->where('user_id', Auth::id())
+                ->update([
+                    'selected' => DB::raw("CASE WHEN twitter_id = $twitterId THEN 1 ELSE 0 END")
+                ]);
+           
 
-            // $disabled = UT_AcctMngt::where(['selected' =>  0, 'user_id' => Auth::id() ])->update(['selected' => 1])
-    
-            // $temp = $active['selected'];
-            // $active->selected = $disabled['selected'];
-            // $disabled->selected = $temp;
-
-            // $active->save();
-            // $disabled->save();
-
-            // // DB::commit();
-
-            if ($enabled && $active) {
-                return redirect('profile')->with('title', $title)->with('alert', 'Tweets are updated')->with('alert_type', 'success');
+            // Check if update was successful
+            if ($updated) {
+                return response()->json(['success' => true, 'message' => 'Tweets are updated', 'get_tweets' => 'getTweets']);
             } else {
-                return redirect('profile')->with('title', $title)->with('alert', 'Error in selecting')->with('alert_type', 'warning');
+                return response()->json(['success' => false, 'message' => 'Tweets are not updated']);                
             }
-
+              
         } catch (\Exception $e) {
             
             // return redirect('profile')->with('alert', 'Tweets are updated')->with('alert_type', 'success');
@@ -103,6 +95,32 @@ class TwitterApi extends Controller
                 'message' => 'Error updating records: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function tweets($id) {
+        $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
+
+        $tweets = [];
+        if ($info) {
+
+            $twitterApi = new TwitterApi();
+            $tweets = $twitterApi->getTweets($info->twitter_id);
+        } else {
+            $tweets = [];
+        }
+
+        $html = view('selectedAcctTweets', compact('tweets'))->render();
+
+        return response()->json(['html' => $html]);
+    }
+
+    public function removeTwitterAccount(Request $request)
+    {
+
+        $id = $request->input('twitter_id');
+        $delete = Twitter::where('twitter_id', $id)->update(['deleted' => 1]);
+
+        return response()->json(['success' => true, "deleted" => $delete, 'message' => 'Twitter account is now deleted']);
     }
 
     public function curlGetHttpRequest($url, $headers,  $data) {
