@@ -4,12 +4,15 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use App\Models\TwitterToken;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\Twitter;
 use App\Models\TwitterSettingsMeta;
 use App\Models\UT_AcctMngt;
-use App\Models\TwitterToken;
-use Illuminate\Support\Facades\Auth;
-
+use App\Models\User;
+use DateTime;
+use DateTimeZone;
 
 
 
@@ -35,25 +38,64 @@ class AppServiceProvider extends ServiceProvider
         // share to all views
         View::composer('*', function ($view) {
             // to show no tweets found if 0 in general settings
-            $view->with('acct_twitter_count', Twitter::where('user_id', auth()->id())->count());
+            $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
+            $view->with('acct_twitter_count', $count);
+            
+            $twitter = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->get();
 
             // to loop all the twitter accts
-            $view->with('twitter_accts', Twitter::where('user_id', auth()->id())->get());
+            $view->with('twitter_accts', $twitter);        
 
+            $selectedUser = DB::table('twitter_accts')
+                ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                ->where('ut_acct_mngt.selected', "=", 1) // selected
+                ->where('ut_acct_mngt.user_id', "=", Auth::id()) 
+                ->where('twitter_accts.deleted', "=", 0)
+                ->first();
+
+            // dd($selectedUser);   
+            $view->with('selected_user', $selectedUser);       
+
+            $twitterID = $selectedUser->twitter_id ?? 0;
+
+            // twitter settings DB 
+            $twitterSettings = DB::table('qts_tweetmeta')
+                            ->join('ut_acct_mngt', 'qts_tweetmeta.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                            ->select('qts_tweetmeta.*', 'ut_acct_mngt.selected')
+                            ->where('qts_tweetmeta.twitter_id', '=', $twitterID)
+                            ->get();
+            $view->with('twitter_settings', $twitterSettings);
+
+            // dd($twitterSettings);
             
-            $twitter = Twitter::where('user_id', auth()->id())->get();
-            $view->with('twitter', $twitter);         
+            // main quantum user 
+            $main_user = User::find(Auth::id());
+            $view->with('main_user', $main_user);
 
-            $selectedUser = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
-            if ($selectedUser !== null) {
-                $view->with('selected_user', $selectedUser);       
+            // timezone 
+            $timezones = DB::table('timezones')->get();
+            $view->with('timezones', $timezones);
 
-                $twitterSelectedUser = Twitter::where('twitter_id', $selectedUser->getAttribute('twitter_id'))->first();
-                $view->with('user', $twitterSelectedUser);         
-                
-                $twitterSettings = TwitterSettingsMeta::where(['twitter_id' => $selectedUser->getAttribute('twitter_id')])->get();
-                $view->with('twitter_settings', $twitterSettings);         
-            }            
+            // retrieve timezone
+            $getTimezone = DB::table('users_meta')->where('user_id', Auth::id())->first();
+            // dd($getTimezone);
+            $view->with('getTimezone', $getTimezone);
+            
+            // general settings sliders
+            $generalSettings = DB::table('qgs_settingsmeta')->where('user_id', Auth::id())->get();
+            $view->with('generalSettings', $generalSettings);
+            
+            // membership 
+            $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
+            $view->with('membership', $membership);
+            
+            // // social account settings of selected user 
+            // if ($selectedUser !== null) {
+            //     $metas = TwitterSettingsMeta::where(['user_id' => Auth::id(), 'twitter_id' => $selectedUser->twitter_id])->get();
+            //     $view->with('meta', $metas);
+            // }
+
         });
 
     }
