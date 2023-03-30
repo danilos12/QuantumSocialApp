@@ -66,6 +66,14 @@
                           Campaign #15</li>
                       </ul>
                     </div>  <!-- END .filter-wrap -->
+
+
+
+                    <div class=""><!--drop-button-wrap filter-wrap user-list-wrap-->
+                      <span class="white-select-button-small"> <!--profile-filter-select -->
+                        <img src="{{ asset('public/')}}/ui-images/icons/pg-plus.svg" class="ui-icon" />
+                      </span>
+                    </div>  <!-- END .filter-wrap -->
                   </div>  <!-- END .filter-controls -->
 
 
@@ -86,10 +94,11 @@
                                     <!-- This one gets deleted after JS toggle & status is working. -->
                                     <span class="mosaic-control-icon">
                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-remove.svg" class="ui-icon"/></span>
-
+<!--
                               <span class="mosaic-control-icon">
                                 <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
-                              <span class="mosaic-control-icon">
+-->
+                                <span class="mosaic-control-icon">
                                 <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
                             </div>  <!-- END .mosaic-post-controls -->
 
@@ -140,10 +149,11 @@
                                           <!-- This one gets deleted after JS toggle & status is working. -->
                                           <span class="mosaic-control-icon">
                                             <img src="{{ asset('public/')}}/ui-images/icons/pg-remove.svg" class="ui-icon"/></span>
-
+<!--
                                     <span class="mosaic-control-icon">
-                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
-                                    <span class="mosaic-control-icon">
+                               <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
+    -->   
+                                      <span class="mosaic-control-icon">
                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
                                   </div>  <!-- END .mosaic-post-controls -->
 

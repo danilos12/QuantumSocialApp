@@ -105,7 +105,7 @@ select:focus {
   --banner-shadow: 5px 0px 5px #C7B9DD;
 
   /* Light Mode Frost Overlays */
-  --frost-background: rgba(143,116,188,.4);
+  --frost-background: rgba(143,116,188,.4); 
   --frost-heavy: rgba(143,116,188,.5);
   --shadow-background: rgba(45,32,66,1);
   --frost-text-alt: #2D2042;
@@ -178,9 +178,11 @@ select:focus {
   --banner-shadow: 5px 0px 5px #2C0A27;
 
   /* Dark Mode Frost Overlays */
-  --frost-background: rgba(255,255,255,.2);
-  --frost-heavy: rgba(255,255,255,.3);
-  --shadow-background: rgba(45,32,66,.5);
+/*--frost-background: rgba(255,255,255,.2); */
+--frost-background: rgba(255,255,255,.3);
+--frost-heavy: rgba(255,255,255,.3);
+--shadow-background: rgba(45,32,66,.5);
+  --shadow-background: rgba(45,32,66,1);
   --frost-text-alt: #2D2042;
   --frost-icon-alt: invert(10%) sepia(9%) saturate(6853%) hue-rotate(231deg) brightness(97%) contrast(90%);
 
@@ -247,7 +249,8 @@ canvas {
 /* Reusable Assets */
 .frosted {
   background: var(--frost-background);
-  backdrop-filter: blur(2px);
+  /* backdrop-filter: blur(2px); */
+  backdrop-filter: blur(3px);
 }
 
     /* Global Twitter Profile Header */
@@ -496,6 +499,7 @@ canvas {
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
+
   color: var(--menu-text);
   z-index: 75;
 }
@@ -505,6 +509,7 @@ canvas {
   font-size: 1.3em;
   color: var(--menu-text);
   margin: 0;
+  height: 100px;
 /*  margin-top: 10px; */
 }
 .banner-twitter-profile-wrap {
@@ -917,6 +922,18 @@ canvas {
 }
 .white-select-button .ui-icon {
   margin-right: 1em;
+}
+.white-select-button-small {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+/*  min-width: 100px; */
+  background: rgba(255,255,255,.5);
+  font-weight: 600;
+  border-radius: 7px;
+  padding: .5em .8em;
+  cursor: pointer;
 }
 .profile-filter-select {
 }
