@@ -3093,7 +3093,7 @@ input#file-upload-button {
 }
 
 .tag-group-modal-outer {
-  bottom: -245px;
+  /* bottom: -245px; */
   width: 50%;
   display: none;
 }

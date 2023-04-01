@@ -6,14 +6,16 @@
         url: APP_URL + '/get-tag-groups/' + TWITTER_ID, // Use the URL of your server-side script here
         success: function(response) {
             // Add the existing tag groups to the page
-            
-            $.each(response, function(index, k, value) {
-                
-                // console.log(this)
-                var template = tagGrptemplateItem(this.tag_group_mvalue, this.tag_group_mkey);
-                $('#tag-groups-content').append(template);
-            })
-            
+            if (response.length > 0) {
+                $.each(response, function(index, k, value) {
+                    
+                    // console.log(this)
+                    var template = tagGrptemplateItem(this.tag_group_mvalue, this.tag_group_mkey);
+                    $('#tag-groups-content').append(template);
+                })
+            } else {
+                $('.tag-groups-column-wrap').html('<div>No twitter accounts linked</div>')
+            }
         },
         error: function(xhr, status, error) {
             console.log('An error occurred while fetching the existing tag groups: ' + error);

@@ -41,7 +41,7 @@
           <div class="banner-twitter-profile-wrap">
             <a href="#">
               <div class="banner-twitter-profile-inner">
-                <img src="{{ asset('public/temp-images/william-wallace.jpg') }}" class="twitter-profile-image" />
+                <img src="{{ asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                 <span class="twitter-profile-name">
                   {{ Auth::user()->name }}
                 </span>
@@ -84,7 +84,7 @@
                     <div class="twitter-account-item">
                       <a href="#">
                       <div class="twitter-bar-profile-info">
-                        <img src="{{ asset('public/temp-images/william-wallace.jpg') }}" />
+                        <img src="{{ asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" />
                       @wimbleyJimbley</div></a>
                       <a href="#">
                       <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "
@@ -94,7 +94,7 @@
                                     <div class="twitter-account-item">
                                       <a href="#">
                                       <div class="twitter-bar-profile-info">
-                                        <img src="{{ asset('public/temp-images/william-wallace.jpg') }}" />
+                                        <img src="{{ asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" />
                                       @wimbleyJimbley</div></a>
                                       <a href="#">
                                       <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}"
