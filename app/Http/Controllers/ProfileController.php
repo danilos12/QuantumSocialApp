@@ -37,16 +37,16 @@ class ProfileController extends Controller
     {
 		$title = 'Profile page';
 
-        $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
+        // $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
 
         $tweets = [];
-        if ($info) {
+        // if ($info) {
             
-            $twitterApi = new TwitterApi();
-            $tweets = $twitterApi->getTweets($info->twitter_id);
-        } else {
-            $tweets = [];
-        }
+        //     $twitterApi = new TwitterApi();
+        //     $tweets = $twitterApi->getTweets($info->twitter_id);
+        // } else {
+        //     $tweets = [];
+        // }
 
         // dd($tweets);
 

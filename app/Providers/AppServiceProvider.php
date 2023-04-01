@@ -56,8 +56,11 @@ class AppServiceProvider extends ServiceProvider
 
             // dd($selectedUser);   
             $view->with('selected_user', $selectedUser);       
-
+            
             $twitterID = $selectedUser->twitter_id ?? 0;
+            $view->with('twitter_id', $twitterID);       
+            $view->with('twitter_name', $selectedUser->twitter_name ?? "");       
+            $view->with('twitter_usn', $selectedUser->twitter_username ?? "");       
 
             // twitter settings DB 
             $twitterSettings = DB::table('qts_tweetmeta')

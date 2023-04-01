@@ -19,14 +19,23 @@
 	<script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+  <link rel="dns-prefetch" href="//fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 	
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
  {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> --}}	
+  <script> var APP_URL = `{{ url('/') }}`; </script>
+
+  @if (Route::has('login')) 
+  @auth	
+  <script> var TWITTER_ID = `{{ $twitter_id }}`; </script>
+  <script> var TWITTER_NAME = `{{ $twitter_name }}`; </script>
+  <script> var TWITTER_USN = `{{ $twitter_usn }}`; </script>
+  @endauth
+  @endif
 </head>
 <body class="{{ Route::has('login') ? 'darkmode' : '' }}">
   <canvas></canvas>
@@ -81,7 +90,7 @@
                       <span class="account-select-title">Select An Account</span>
 
                       @foreach($twitter_accts as $twitter)
-                      <div class="twitter-account-select-bar {{ $selected_user->twitter_id === $twitter->twitter_id ? "active" : "" }}" data-url="{{ route("twitter.switchUser", ['twitter_id', $twitter->twitter_id ]) }}" data-id="twitter-{{ $twitter->twitter_id }}" data-content="{{ route('getTweets', ['id' => $twitter->twitter_id]) }}">
+                      <div class="twitter-account-select-bar {{ $selected_user->twitter_id === $twitter->twitter_id ? "active" : "" }}" data-url="{{ route("twitter.switchUser", ['twitter_id', $twitter->twitter_id ]) }}" data-id="twitter-{{ $twitter->twitter_id }}">
                         <div class="twitter-account-item ">                                                                       
                           <div class="twitter-bar-profile-info">
                             <img src="{{ $twitter->twitter_photo }}" />
@@ -129,7 +138,7 @@
                 <ul>
                 @if (Route::has('login'))
                   @auth		
-                  @include('main-menu')
+                  @include('main-menu')                
                 </ul>
                                   
                 <div class="settings-bar-outer">
@@ -190,13 +199,13 @@
   @else
     @endauth 
   @endif	
-  @yield('scripts')
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  @yield('scripts')
   <script>
-    $(document).ready(function() {
+     $(document).ready(function() {
       // Alert
       var alert = $('.alert ');
 

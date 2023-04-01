@@ -13,6 +13,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB; 
 
 
 
@@ -35,8 +36,6 @@ class GeneralSettingController extends Controller
         $value = $request->input('meta_value');
         $id = $request->input('id');
 
-        // dd($request);
-
 
         try {
             switch ($id) {
@@ -49,6 +48,7 @@ class GeneralSettingController extends Controller
                     }
 
                     $lastSavedData = GeneralSettingsMeta::where(['user_id' => $userId, 'meta_key' => $key])->pluck('meta_value')->first();
+
                     return response()->json(['success' => true, 'data' => $lastSavedData]);
                 
                 case "twitter-settings":
@@ -58,14 +58,17 @@ class GeneralSettingController extends Controller
                     if (!$settings) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
                     }
-
+                    
                     $lastSavedData = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => $key])->pluck('meta_value')->first();
+                    // dd($lastSavedData);
                     return response()->json(['success' => true, 'data' => $lastSavedData]);
     
                 case "quantum-general-settings":
                     $subs = $request->input('subscription');
-    
-                    QuantumAcctMeta::where('user_id', Auth::id())->update(['subscription' => $subs]);
+
+                    QuantumAcctMeta::where('user_id', $request->input('user_id'))->update(['subscription' => $subs]);
+
+                    // dd($request);
                     $retrieveSubs = QuantumAcctMeta::where('user_id', Auth::id())->pluck('subscription');
     
                     return response()->json(['success' => true, 'data' => $retrieveSubs]);
