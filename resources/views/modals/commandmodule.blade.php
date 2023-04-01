@@ -363,6 +363,3 @@ div[data-schedule="none"] {
     z-index: 0;
   }
 </style>
-@section('scripts')
-<script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
-@endsection
