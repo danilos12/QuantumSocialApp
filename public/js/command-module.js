@@ -3,72 +3,161 @@
  * 
 */
 
-jQuery(function($) {
+$(document).ready(function($) {
+	
+	// pull tags from database
+	$.ajax({
+        type: 'GET',
+        url: APP_URL + '/get-tag-groups/' + TWITTER_ID, // Use the URL of your server-side script here
+        success: function(response) {
+            // Add the existing tag groups to the page
+            
+			console.log(response)
+            $.each(response, function(index, k) {
+				console.log(k);
+                
+				var option = $('<option>').addClass('modal-select-tag-group').attr('value', k.tag_group_mkey).text(k.tag_group_mvalue)                
+                $(option).appendTo($('select#tag-groups'));
+            })
+            
+        },
+        error: function(xhr, status, error) {
+            console.log('An error occurred while fetching the existing tag groups: ' + error);
+        }
+    });
+
+ 
+   	$('select#tag-groups').on('click', function(e) {
+
+		$('.modal-tag-group-display').empty()
+        $.ajax({
+            type: 'GET',
+            url: APP_URL + '/get-tag-items/' , // Use the URL of your server-side script here
+            data: {
+                twitter_id: TWITTER_ID,
+                tag_id : this.value
+            },
+            success: function(response) {
+                // Add the existing tag groups to the page       
+                if (response.length > 0) {
+                    $.each(response, function(index, k) {
+                        console.log(k)
+						var span = $('<span>').addClass('modal-tag-instance').text(k.tag_meta_value);       
+						$(span).appendTo($('.modal-tag-group-display'))         
+                    })
+                }       
+
+				// add active in hashtag instance 
+				$(".modal-tag-instance").click(function(e) {
+					$(this).attr('status', 'active')
+				})
+
+				console.log(response)
+            },
+            error: function(xhr, status, error) {
+                console.log('An error occurred while fetching the existing tag groups: ' + error);
+            }
+        });
+    });   
+
+	
 	
 	// bgIcon changes and post-alert
-	jQuery('.post-type-icon').click(function(){
-		var id = jQuery(this).attr('id');
-		var ggg = jQuery(this).attr('data-select');
-		var ttt = jQuery(this).attr('data-type');
+	$('.post-type-icon').click(function(){
+		var id = $(this).attr('id');
+		var ggg = $(this).attr('data-select');
+		var ttt = $(this).attr('data-type');
 		
-		jQuery('input[name="post_type_tweets"]').val('regular_tweets');
+		// add value for non special
+		$('input[name="post_type_tweets"]').val('regular_tweets');
 		
-		jQuery('.post-type-icon').each(function(){			
-			var ccc = jQuery(this).attr('data-type');
+		// loop all icons
+		$('.post-type-icon').each(function(){			
+			var ccc = $(this).attr('data-type');			
 
-			
-			jQuery(this).attr('data-select', 0);
-			jQuery(this).removeAttr('style');
+			// set select to hide
+			$(this).attr('data-select', 0);
+			// remove the style
+			$(this).removeAttr('style');					
 					
+			// if the data type is retweet open the timer
 			if (ttt === 'retweet-tweets') {
-				jQuery('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');				
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');				
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('data-select', '1');				
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');				
 			} else {
-				jQuery('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');				
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');				
 			}
 			
-			jQuery('div[data-post="'+ccc+'"]').addClass('tweets-hide');
+			// hide all section panels
+			$('div[data-post="'+ccc+'"]').addClass('tweets-hide');
 		});
 			
+		// update the data to 1 to activate the icon
 		if(ggg == 0) {			
-			jQuery('#'+id).attr('data-select', 1);
-			jQuery('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');
-			jQuery('input[name="post_type_tweets"]').val(ttt);
-			jQuery('div[data-post="'+ttt+'"]').removeClass('tweets-hide');
-		}
+			$('#'+id).attr('data-select', 1); // select as enabled
+			$('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;background-color:#43EBF1;'); // add styles
+			$('input[name="post_type_tweets"]').val(ttt); // add the post_type for database
+			$('div[data-post="'+ttt+'"]').removeClass('tweets-hide'); // open the panel to activate			
 			
-		// last 2 icons
-		jQuery('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active');
-		jQuery('.primary-post-area-wrap').find('img.post-type-indicator[data-src="'+ttt+'"').addClass('indicator-active');
-		
-	});	
+			// last 2 icons
+			$('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active');
+			$('.primary-post-area-wrap').find('img.post-type-indicator[data-src="'+ttt+'"]').addClass('indicator-active');
+		} else {			
+			$('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');	
+			$('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active');
+			$('.primary-post-area-wrap img.post-type-indicator[data-src="twitter-tweets"]').addClass('indicator-active');		
+		}				
+	});		
+
+	// retweet toggle the section (open)
+	$('img.retweet-timer-icon').click(function() {
+		var ggg = $(this).attr('data-select');
+		var id = $(this).attr('data-type');
+		// $(this).attr('data-select', 0);
+
+		console.log(ggg, id)
+
+		if(ggg == 1) {			
+			$(this).attr('data-select', 0);
+			$(this).attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
+			$('div[data-retweet="' + id + '"]').addClass('tweets-hide');
+		} else {
+			$(this).attr('data-select', 1);
+			$(this).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');
+			$('div[data-retweet="' + id + '"]').removeClass('tweets-hide');
+			// $('#' + id).removeClass('tweets-hide');
+		}
+	})
 	
-	jQuery('.custom-dhms').change(function(){
-		var bgg = jQuery(this).attr('data-check');
+	$('.custom-dhms').change(function(){
+		var bgg = $(this).attr('data-check');
 		
-		var txx = jQuery('select[data-info="'+bgg+'"]');
+		var txx = $('select[data-info="'+bgg+'"]');
 		var opp = '';
 		
 		txx.html('');
 		
-		if(jQuery(this).val() == 'hours') {
+		if($(this).val() == 'hours') {
 			for (let i = 1; i < 24; i++) {
 			  opp += '<option value="'+i+'">'+i+'</option>';
 			}
 		}
 		
-		if(jQuery(this).val() == 'days') {
+		if($(this).val() == 'days') {
 			for (let i = 1; i <= 90; i++) {
 			  opp += '<option value="'+i+'">'+i+'</option>';
 			}
 		}
 		
-		if(jQuery(this).val() == 'mins') {
+		if($(this).val() == 'mins') {
 			for (let i = 1; i <= 59; i++) {
 			  opp += '<option value="'+i+'">'+i+'</option>';
 			}
 		}
 		
-		if(jQuery(this).val() == 'seconds') {
+		if($(this).val() == 'seconds') {
 			for (let i = 1; i <= 59; i++) {
 			  opp += '<option value="'+i+'">'+i+'</option>';
 			}
@@ -80,44 +169,44 @@ jQuery(function($) {
 		
 	});	
 	
-	jQuery('select[name="scheduling-options"]').change(function(){
-		var fvv = jQuery('#scheduling-method-xxx');
-		var svv = jQuery(this).val();
+	$('select[name="scheduling-options"]').change(function(){
+		var fvv = $('#scheduling-method-xxx');
+		var svv = $(this).val();
 		var sopp = '';
 		
 		fvv.attr('data-schedule', 'none');
 		
 		
-		jQuery('#scheduling-cdn').removeAttr('data-info name');
-		jQuery('#scheduling-cdmins').removeAttr('data-check name');
+		$('#scheduling-cdn').removeAttr('data-info name');
+		$('#scheduling-cdmins').removeAttr('data-check name');
 		
 		if(svv == 'set-countdown') {
 			fvv.attr('data-schedule', svv);
 			
-			jQuery('#scheduling-cdn').attr({"data-info":svv, "name":"c-"+svv});
-			jQuery('#scheduling-cdmins').attr({"data-check":svv, "name":"ct-"+svv});
+			$('#scheduling-cdn').attr({"data-info":svv, "name":"c-"+svv});
+			$('#scheduling-cdmins').attr({"data-check":svv, "name":"ct-"+svv});
 			
-			jQuery('#scheduling-cdn').html('');
+			$('#scheduling-cdn').html('');
 			
 			for (let i = 1; i <= 59; i++) {
 			  sopp += '<option value="'+i+'">'+i+'</option>';
 			}
 			
-			jQuery('#scheduling-cdn').append(sopp);
+			$('#scheduling-cdn').append(sopp);
 		}
 		if(svv == 'custom-time') {
 			
 			fvv.attr('data-schedule', svv);
-			jQuery('#scheduling-cdn').attr({"data-info":svv, "name":"c-"+svv});
-			jQuery('#scheduling-cdmins').attr({"data-check":svv, "name":"ct-"+svv});
+			$('#scheduling-cdn').attr({"data-info":svv, "name":"c-"+svv});
+			$('#scheduling-cdmins').attr({"data-check":svv, "name":"ct-"+svv});
 			
-			jQuery('#scheduling-cdn').html('');
+			$('#scheduling-cdn').html('');
 			
 			for (let i = 1; i <= 59; i++) {
 			  sopp += '<option value="'+i+'">'+i+'</option>';
 			}
 			
-			jQuery('#scheduling-cdn').append(sopp);
+			$('#scheduling-cdn').append(sopp);
 			
 		}
 		
@@ -126,11 +215,12 @@ jQuery(function($) {
 	});	
 	
 	
+	const form = $('#posting-tool-form-001');
 	$('#posting-tool-form-001').submit(function(e){
-		console.log(e);
 		e.preventDefault();
+
+		console.log(e);
 		// const form = document.querySelector('#posting-tool-form-001');
-		const form = $('#posting-tool-form-001');
 		const formData = new FormData(form[0]);
 		
 		console.log(formData)
@@ -162,17 +252,17 @@ jQuery(function($) {
 			complete: function() {				
 				// loop through each input field in the form
 				for (let i = 0; i < form[0].elements.length; i++) {
-					console.log(form[0].elements.length)
+					// console.log(form[0].elements.length)
 					const element = form[0].elements[i];
-					console.log(element)
+					// console.log(element)
 
 
 					// check if the element is an input field
 					if (element.nodeName === "INPUT" || element.nodeName === "SELECT" || element.nodeName === "TEXTAREA") {
 						// clear the value of the input field
 						element.value = "";
-						console.log(element.nodeName)
-						console.log(element.value)
+						// console.log(element.nodeName)
+						// console.log(element.value)
 						
 					}
 				}
@@ -180,7 +270,7 @@ jQuery(function($) {
 				form.find('input[type="submit"]').val('Beam me up scotty!');
 
 			}		
-		});
+		});		
 	});
 
 	$('.tags-submit').on('click', function() {
@@ -199,7 +289,7 @@ jQuery(function($) {
 	})
 	
 
-	jQuery('.add-tweet-initial').on("click", function() {
+	$('.add-tweet-initial').on("click", function() {
 		var innerText = `<div class="add-tweet-inner">
 						<div class="wait-to-tweet-col">
 						<span class="wait-title">Wait</span>
