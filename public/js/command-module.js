@@ -3,7 +3,32 @@
  * 
 */
 
-$(document).ready(function($) {
+$(function($) {
+	// emoji-picker
+	$("#emojionearea").emojioneArea({
+      // container: "#primary_post_text_area", // by selector
+      pickerPosition: "left",
+      filtersPosition: "bottom",
+      tonesStyle: "square",
+      recentEmojis: false,
+	  search: false,
+	  tones: false
+    });
+  
+    $('.primary-post-right-buttons .add-emoji-icon').on('click', function () {
+		var isOpen = $(this).data('emoji-open');
+
+		if (isOpen == 0) {
+			$(this).data('emoji-open', 1);
+			$('.emojionearea-button').addClass('active');
+			$('.emojionearea-picker.emojionearea-picker-position-left.emojionearea-filters-position-bottom.emojionearea-search-position-top').removeClass('hidden');
+		} else {
+			$(this).data('emoji-open', 0);
+			$('.emojionearea-button').removeClass('active');
+			$('.emojionearea-picker.emojionearea-picker-position-left.emojionearea-filters-position-bottom.emojionearea-search-position-top').addClass('hidden');
+
+		}
+    })
 	
 	// pull tags from database
 	$.ajax({
@@ -26,9 +51,8 @@ $(document).ready(function($) {
         }
     });
 
- 
+    // selecting the tag
    	$('select#tag-groups').on('click', function(e) {
-
 		$('.modal-tag-group-display').empty()
         $.ajax({
             type: 'GET',
@@ -59,11 +83,10 @@ $(document).ready(function($) {
             }
         });
     });   
-
 	
 	
 	// bgIcon changes and post-alert
-	$('.post-type-icon').click(function(){
+	$('.post-type-icon').on('click', function(){
 		var id = $(this).attr('id');
 		var ggg = $(this).attr('data-select');
 		var ttt = $(this).attr('data-type');
@@ -79,14 +102,15 @@ $(document).ready(function($) {
 			$(this).attr('data-select', 0);
 			// remove the style
 			$(this).removeAttr('style');					
+			$(this).parent('.img-icon-btn').removeAttr('style'); // add styles
 					
 			// if the data type is retweet open the timer
 			if (ttt === 'retweet-tweets') {
 				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');				
-				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('data-select', '1');				
-				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');				
+				// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('data-select', '1');				
+				// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');				
 			} else {
-				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
+				// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
 				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');				
 			}
 			
@@ -97,7 +121,8 @@ $(document).ready(function($) {
 		// update the data to 1 to activate the icon
 		if(ggg == 0) {			
 			$('#'+id).attr('data-select', 1); // select as enabled
-			$('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;background-color:#43EBF1;'); // add styles
+			$('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;'); // add styles
+			$('#'+id).parent('.img-icon-btn').attr('style','background:#43EBF1'); // add styles
 			$('input[name="post_type_tweets"]').val(ttt); // add the post_type for database
 			$('div[data-post="'+ttt+'"]').removeClass('tweets-hide'); // open the panel to activate			
 			
@@ -112,7 +137,7 @@ $(document).ready(function($) {
 	});		
 
 	// retweet toggle the section (open)
-	$('img.retweet-timer-icon').click(function() {
+	$('img.retweet-timer-icon').on('click',function() {
 		var ggg = $(this).attr('data-select');
 		var id = $(this).attr('data-type');
 		// $(this).attr('data-select', 0);
@@ -122,16 +147,17 @@ $(document).ready(function($) {
 		if(ggg == 1) {			
 			$(this).attr('data-select', 0);
 			$(this).attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
-			$('div[data-retweet="' + id + '"]').addClass('tweets-hide');
+			$('div[data-post="' + id + '"]').addClass('tweets-hide');
 		} else {
 			$(this).attr('data-select', 1);
 			$(this).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');
-			$('div[data-retweet="' + id + '"]').removeClass('tweets-hide');
+			$('div[data-post="' + id + '"]').removeClass('tweets-hide');
 			// $('#' + id).removeClass('tweets-hide');
 		}
 	})
 	
-	$('.custom-dhms').change(function(){
+	// time
+	$('.custom-dhms').on('change', function(){
 		var bgg = $(this).attr('data-check');
 		
 		var txx = $('select[data-info="'+bgg+'"]');
@@ -169,7 +195,8 @@ $(document).ready(function($) {
 		
 	});	
 	
-	$('select[name="scheduling-options"]').change(function(){
+	// schedule
+	$('select[name="scheduling-options"]').on('change', function(){
 		var fvv = $('#scheduling-method-xxx');
 		var svv = $(this).val();
 		var sopp = '';
@@ -214,9 +241,9 @@ $(document).ready(function($) {
 		
 	});	
 	
-	
+	// form submit
 	const form = $('#posting-tool-form-001');
-	$('#posting-tool-form-001').submit(function(e){
+	$('#posting-tool-form-001').on('submit', function(e){
 		e.preventDefault();
 
 		console.log(e);
@@ -273,6 +300,7 @@ $(document).ready(function($) {
 		});		
 	});
 
+	// send tags to textarea
 	$('.tags-submit').on('click', function() {
 		const activeTags = $(".modal-tag-instance[status='active']");
 		const activeTagTexts = activeTags.map(function() {
@@ -280,16 +308,20 @@ $(document).ready(function($) {
 		}).get();
 
 		console.log(activeTagTexts);
-		var textArea = $('.post-textarea');
+		var textArea = $('#emojionearea');
+		var textAreaMoji = $('.emojionearea-editor');
 		var textInside = textArea.val();
+		var textInsideMoji = textAreaMoji.html();
 
 		var withTags = textInside + ' ' + activeTagTexts.join(' ');
+		var withTagsMoji = textInsideMoji + ' ' + activeTagTexts.join(' ');
 		
 		textArea.val(withTags)
+		textAreaMoji.html(withTagsMoji)
 	})
 	
 
-	$('.add-tweet-initial').on("click", function() {
+	$('.add-tweet-initial').on('click', function() {
 		var innerText = `<div class="add-tweet-inner">
 						<div class="wait-to-tweet-col">
 						<span class="wait-title">Wait</span>
@@ -407,5 +439,7 @@ $(document).ready(function($) {
 					</div>`
 		$('.add-tweet-inner').after(innerText);
 	})
+	
+	// add new tweet instance
 	
 });
