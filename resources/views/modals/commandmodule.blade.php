@@ -56,7 +56,7 @@ div[data-schedule="none"] {
                                       <span class="post-option-buttons primary-post-option-buttons">
                                         <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
                                         <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" />
-                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon post-tool-icon retweet-timer-icon tweets-hide" /> 
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" data-select="0" data-type="post_regular_retweet" class="ui-icon post-tool-icon retweet-timer-icon tweets-hide" /> 
                                         <span class="post-counter">1/2</span>
                                       </span>  <!-- END .primary-post-option-buttons -->
 
@@ -64,34 +64,10 @@ div[data-schedule="none"] {
                                       <div class="post-tool-modal tag-group-modal-outer frosted">
                                         <div class="tag-group-modal-inner">
                                          <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close tag-group-modal-close" />
-                                          <select>
-                                            <option disabled selected class="modal-select-tag-group">Select a Tag Group:</option>
-                                              <option class="modal-select-tag-group">Group #1</option>
-                                              <option class="modal-select-tag-group">Group #2</option>
-                                              <option class="modal-select-tag-group">Group #3</option>
+                                          <select id="tag-groups">
+                                            <option disabled selected class="modal-select-tag-group">Select a Tag Group:</option>                                            
                                           </select>
-                                          <div class="modal-tag-group-display">
-                                            <span class="modal-tag-instance" status="active">
-                                              #marketing
-                                            </span>
-                                            <span class="modal-tag-instance">
-                                              #business
-                                            </span>
-                                            <span class="modal-tag-instance" status="active">
-                                              #onlineBusiness
-                                            </span>
-                                            <span class="modal-tag-instance" status="active">
-                                              #entrepreneurs
-                                            </span>
-                                            <span class="modal-tag-instance">
-                                              #entrepreneurGrind
-                                            </span>
-                                            <span class="modal-tag-instance">
-                                              #businessIntegrity
-                                            </span>
-                                            <span class="modal-tag-instance" status="active">
-                                              #businessValues
-                                            </span>
+                                          <div class="modal-tag-group-display">                                            
                                           </div>  <!-- END .modal-tag-group-display -->
                                           <div class="tags-submit">
                                             Add Tags
@@ -100,9 +76,10 @@ div[data-schedule="none"] {
                                       </div>  <!-- END .tag-group-modal-outer -->
 
 
-                                      <div class="post-tool-modal schedule-retweet-modal-outer frosted">
+                                      <!--
+                                      <div class="post-tool-modal schedule-retweet-modal-outer frosted" >
                                         <div class="schedule-retweet-modal-inner">
-                                         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close retweet-modal-close" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close retweet-modal-close" />
                                           Select A Post Time:
                                           <div class="schedule-time-selectors">
                                             <select id="post-time-hour" name="post-time-hour" class="post-time-hour">
@@ -122,12 +99,13 @@ div[data-schedule="none"] {
                                               <option value="AM">AM</option>
                                               <option value="PM">PM</option>
                                             </select>
-                                          </div>  <!-- END .schedule-time-selectors -->
+                                          </div>  
                                           <div class="date-picker-wrapper">
-                                          		<input type="text" id="datepicker" autocomplete="off">
-                                          </div>  <!-- END .date-picker-wrapper -->
-                                        </div>  <!-- END .schedule-retweet-modal-inner -->
-                                      </div>  <!-- END .schedule-retweet-modal-outer -->
+                                              <input type="text" id="datepicker" autocomplete="off">
+                                          </div>  
+                                        </div>  
+                                      </div>  
+                                    -->
                                     </div>  <!-- END .primary-post-bottom-buttons -->
                                   </div>  <!-- END .primary-post-left -->
 
@@ -217,6 +195,7 @@ div[data-schedule="none"] {
 
                               <div class="posting-tool-col posting-tool-right-col right-section">
 								                <input type="hidden" name="post_type_tweets" value="regular_tweets" id="post_type_tweets" class="post_type_tweets">
+								                <input type="hidden" name="twitter_id" value="{{ $twitter_id }}" id="twitter_id" class="twitter_id">
 
                                 <div id="post_evergreen" data-post="evergreen-tweets" class="post-alert evergreen-alert tweets-hide">
                                  <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
@@ -264,7 +243,7 @@ div[data-schedule="none"] {
                                 </div>  <!-- END .comment-alert -->
 
 
-                                <div id="post_retweet_timer" data-post="retweet-tweets" class="post-alert retweet-timer-alert tweets-hide">
+                                <div id="post_retweet_timer" data-post="retweet-tweets" data-retweet="post_regular_retweet" class="post-alert retweet-timer-alert tweets-hide">
                                   <div class="retweet-timer-alert-heading">
                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon alert-icon" />
                                     <span>
@@ -359,13 +338,31 @@ div[data-schedule="none"] {
                                   </div>  <!-- END .scheduling-details-custom-slot -->
                                 </div>  <!-- END .scheduling-details -->
                               </div>  <!-- END .post-tool-submit-left -->
-                              <input type="submit" class="posting-tool-submit" id="beam-btn" value="Beam Me Up Scotty!" data-twitter=""/>
+                              <input type="submit" class="posting-tool-submit" value="Beam me up Scotty" id="beam-btn"{{ $twitter_id === 0 ? 'disabled' : "" }} />
                             </div>  <!-- END .posting-tool-submit-wrap -->
                           </form>  <!-- END .posting-tool-form -->
 
                         </div>  <!-- END .posting-tool-inner -->
                       </div>  <!-- END .posting-tool-outer -->
 
+<style>
+  .beam-btn:disabled {
+    width: 100%;
+    cursor: not-allowed!important;
+  }
+
+  .tag-group-modal-outer {
+    /* bottom: auto; */
+    top: 180px;
+    border-radius: 11px;
+    z-index: 99!important;
+    height: 100%
+  }
+
+  .post-tool-modal {
+    z-index: 0;
+  }
+</style>
 @section('scripts')
 <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
 @endsection
