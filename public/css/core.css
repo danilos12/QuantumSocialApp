@@ -2708,7 +2708,7 @@ input#file-upload-button {
   min-height: 77px;
   max-height: 350px;
   background: var(--frost-background);
-  color: var(--body-text);
+  color: var(--body-text)!important;
   text-align: left;
   align-items: flex-start;
   padding: 1em;
