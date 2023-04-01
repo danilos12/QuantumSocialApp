@@ -22,46 +22,56 @@ class TwitterApi extends Controller
     }
 
     public function getTweets($twitterId) {
-
-        $headers = array(
-            "Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')
-        );
-
-        $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments";
-        $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets" ;
-        $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-        if (property_exists($request, "data")) {
-
-            // $obj = [];
-            
-            
-            // get images of the tweet 
-            foreach($request->data as $v) {
-                if (property_exists($v, "attachments")) {
-
-                    // call cURL request for API        
-                    $data = "expansions=attachments.media_keys&media.fields=url";
-                    $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')), $data);
+        try {
+            //code...
+            $headers = array(
+                "Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')
+            );
     
-                    $getAttachmentURL = $getAttachment->includes->media;
-                    foreach ($getAttachmentURL as $media) {
-                        $newObject = $media->url;
+            $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments";
+            $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets" ;
+            $request = $this->curlGetHttpRequest($url, $headers, $data);
     
-                        $v->image = $newObject;
+            if (property_exists($request, "data")) {
+                    
+                // get images of the tweet 
+                foreach($request->data as $v) {
+                    if (property_exists($v, "attachments")) {
+    
+                        // call cURL request for API        
+                        $data = "expansions=attachments.media_keys&media.fields=url";
+                        $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')), $data);
+        
+                        $getAttachmentURL = $getAttachment->includes->media;
+                        foreach ($getAttachmentURL as $media) {
+                            $newObject = $media->url;
+        
+                            $v->image = $newObject;
+                        }
                     }
+                                                
                 }
-                                            
+
+                // dd($request->data);
+    
+                return response()->json([
+                    'status' => 200, 
+                    'data' => $request->data
+                ]);
+    
+            } else {
+                return response()->json([
+                    'status' => 201 , 
+                    'message' => 'Tweets not found'
+                ]);
             }
-
-            return $request->data;
-
-            // exit;
-        } else {
-            $message = array('status' => 201, 'message' => 'No tweets found.');
-
-            return response()->json($message);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => $th
+            ]);
         }
+
 
     }
 
@@ -90,7 +100,6 @@ class TwitterApi extends Controller
               
         } catch (\Exception $e) {
             
-            // return redirect('profile')->with('alert', 'Tweets are updated')->with('alert_type', 'success');
             return response()->json([
                 'message' => 'Error updating records: ' . $e->getMessage(),
             ], 500);

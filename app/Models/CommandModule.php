@@ -23,4 +23,5 @@ class CommandModule extends Model
         'sched_method',
         'sched_time',
     ];
+    public $timestamps = true;
 }
