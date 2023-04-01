@@ -15,8 +15,9 @@
 	@endif	
 	
     <!-- Scripts -->
-	<script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script>
-	<script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
+  <script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script>
+  {{-- <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> --}}
+  <script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
 
     <!-- Fonts -->
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -25,8 +26,13 @@
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
+	<link rel="stylesheet" href="{{ asset('public/css/command-module.css') }}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
- {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> --}}	
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+  {{-- <link rel="stylesheet" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css"> --}}
+  <link rel="stylesheet" href="{{ asset('public/js/emojionearea-master/dist/emojionearea.css') }}">
+
+  
   <script> var APP_URL = `{{ url('/') }}`; </script>
 
   @if (Route::has('login')) 
@@ -202,8 +208,11 @@
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/core.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
-  <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
+  <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>  
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  {{-- <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script> --}}
+  <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>  
+
   @yield('scripts')
   <script>
      $(document).ready(function() {
@@ -239,6 +248,7 @@
         });
         
       })
+      
     });
   </script>
 
