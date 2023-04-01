@@ -129,18 +129,22 @@ class CommandmoduleController extends Controller
     }
 
     public function getTagGroups($id) {
-        $tagGroups = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
-        // $tagItems = Tag_items::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
-
-        // $getTag = DB::table('tag_groups_meta')
-        //     ->join('tag_items_meta', 'tag_groups_meta.twitter_id', '=', 'tag_items_meta.twitter_id')
-        //     ->select('tag_groups_meta.tag_group_mkey', 'tag_items_meta.tag_meta_key')
-        //     ->where('tag_groups_meta.tag_group_mkey', "=", "tag_1")
-        //     ->where('tag_items_meta.tag_meta_key', "=", "_tag_1")
-        //     ->orWhere('tag_items_meta.tag_meta_key', "=", "tag_1")
-        //     ->first();
-
-        return response()->json($tagGroups);
+        try {     
+            $tagGroups = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
+            // $tagItems = Tag_items::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
+    
+            // $getTag = DB::table('tag_groups_meta')
+            //     ->join('tag_items_meta', 'tag_groups_meta.twitter_id', '=', 'tag_items_meta.twitter_id')
+            //     ->select('tag_groups_meta.tag_group_mkey', 'tag_items_meta.tag_meta_key')
+            //     ->where('tag_groups_meta.tag_group_mkey', "=", "tag_1")
+            //     ->where('tag_items_meta.tag_meta_key', "=", "_tag_1")
+            //     ->orWhere('tag_items_meta.tag_meta_key', "=", "tag_1")
+            //     ->first();
+    
+            return response()->json($tagGroups);
+        }  catch (Exception $e) {
+            return response()->json(['status' => '400', 'message' => $e]);
+        } 
     }
     
     public function getTagItems(Request $request) {
