@@ -129,4 +129,3 @@
                 <img src = "{{asset('public/ui-images/icons/19-trending.svg')}} " class="menu-icon" />Trending Topics
             </a>
         </li>
-  
