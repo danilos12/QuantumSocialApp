@@ -61,8 +61,13 @@ Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOA
 Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets'])->name('getTweets');
 Route::post('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
 Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('remove.twitter');
+Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
 
 Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
 
 Route::post('/command-module-save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('command-module-save');
-Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
+// Route::post('/add_tag', [App\Http\Controllers\CommandmoduleController::class, 'create_tag'])->name('add_tag');
+Route::post('/add_tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('add_tag');
+Route::post('/add_tag_item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('add_tag_item');
+Route::get('/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('get-tag-groups');
+Route::get('/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('get-tag-items');

@@ -18,7 +18,7 @@
                         <img src="{{ asset('public/')}}/ui-images/icons/18-tag-groups.svg" class="ui-icon" />
                         <span>New Tag Group Name:</span>
                       </div>  <!-- END .new-title-wrap -->
-                      <form>
+                      <form id="addNewTagGrp">
                         <input type="text" class="group-title-input" placeholder="New Tag Group title here..." />
                         <input type="submit" class="group-title-submit" value="Add New Tag Group" />
                       </form>
@@ -32,77 +32,28 @@
                         <div class="tag-groups-column-wrap">
 
                           <div class="tag-groups-column tag-groups-left-column">
-                            <div class="tag-groups-left-column-inside">
-
-
-                            <!-- BEGIN Tag Option Instance -->
-                            <div class="tag-group-controller">
-                              <div class"tag-group-option">
-                                <span class="tag-option-title-wrap">
-                                  <img src="{{ asset('public/')}}/" class="ui-icon tag-option-icon" />
-                                  <span class="tag-option-title">
-                                    Group #1</span>
-                                </span>  <!-- END .tag-option-title-wrap -->
-                              </div>  <!-- END .tag-group-option -->
-                            </div>  <!-- END .tag-group-controller -->
-                            <!-- END Tag Option Instance -->
-
-                                          <!-- BEGIN Tag Option Instance -->
-                                          <div class="tag-group-controller active-tag-group">
-                                            <div class"tag-group-option">
-                                              <span class="tag-option-title-wrap">
-                                                <img src="{{ asset('public/')}}/" class="ui-icon tag-option-icon" />
-                                                <span class="tag-option-title">
-                                                  Group #2</span>
-                                              </span>  <!-- END .tag-option-title-wrap -->
-                                            </div>  <!-- END .tag-group-option -->
-                                          </div>  <!-- END .tag-group-controller -->
-                                          <!-- END Tag Option Instance -->
-
-                                          <!-- BEGIN Tag Option Instance -->
-                                          <div class="tag-group-controller">
-                                            <div class"tag-group-option">
-                                              <span class="tag-option-title-wrap">
-                                                <img src="{{ asset('public/')}}/" class="ui-icon tag-option-icon" />
-                                                <span class="tag-option-title">
-                                                  Group #3</span>
-                                              </span>  <!-- END .tag-option-title-wrap -->
-                                            </div>  <!-- END .tag-group-option -->
-                                          </div>  <!-- END .tag-group-controller -->
-                                          <!-- END Tag Option Instance -->
-
+                            <div class="tag-groups-left-column-inside" id="tag-groups-content">
+                                                         
                             </div>  <!-- END .tag-groups-left-column-inside -->
                           </div>  <!-- END .tag-groups-left-column -->
-
-
-                          <div class="tag-groups-column tag-groups-right-column">
+                          <div class="tag-groups-column tag-groups-right-column section-hide">
                             <div class="tag-group-display">
 
                                 <div class="tagset-wrap">
 
                                   <div class="add-tag-to-tagset">
-                                    <form>
-                                      <input type="text" placeholder="Add a new tag here and press enter..." />
+                                    <form id="addTagForm">
+                                      <input type="text" id="addTagForm_tags" name="addTagForm_tags" placeholder="Add a new tag here and press enter..." />
                                     </form>
-                                  </div>  <!-- END .add-tag-to-tagset -->
-
-                                  <span class="existing-tag">
-                                    #marketing</span>
-
-                                                <span class="existing-tag">
-                                                #business</span>
-                                                <span class="existing-tag">
-                                                #entrepreneurs</span>
-                                                <span class="existing-tag">
-                                                #onlineBusiness</span>
-                                                <span class="existing-tag">
-                                                #entrepreneurGrind</span>
+                                    <div class="tag-container"></div>                                    
+                                  </div>  <!-- END .add-tag-to-tagset -->                                  
 
                                 </div>  <!-- END .tagset-wrap -->
 
                             </div>  <!-- END .tag-group-display -->
-                          </div>  <!-- END .tag-groups-right-column -->
+                        </div>  <!-- END .tag-groups-right-column -->
 
+                        
                         </div>  <!-- END .tag-groups-column-wrap -->
 
                     </div>  <!-- END .tag-groups-tool-inner -->
@@ -110,4 +61,64 @@
 
                 </div>  <!-- END .profile-inner -->
               </div>  <!-- END .profile-outer -->
+@endsection
+
+<style>
+  .add-tag-to-tagset div input {
+    width: 100%;
+    background: none;
+    color: var(--body-text);
+    font-size: 1.35em;
+    letter-spacing: .025em;
+    padding: 0.25em 0;
+    border: none;
+    border-bottom: 2px solid var(--frost-background);
+    margin-bottom: 1em;
+  } ,
+  .xtag{
+    pointer-events: none;
+    background-color: #242424;
+    color: white;
+    padding: 6px;
+    margin: 5px;
+  } 
+
+  .section-hide {
+    display: none!important;
+  }
+
+  .xtag {
+    pointer-events: all;
+    display: inline-block;
+    content: 'x';  
+    height: 20px;
+    width: 20px;
+    margin-right: 6px;
+    text-align: center;
+    color: #ccc;
+    background-color: #111;
+    cursor: pointer;
+  }
+
+  .badge {
+  display: inline-block;
+  padding: 0.3em 0.5em;
+  background-color: #17a2b8;
+  color: #fff;
+  border-radius: 0.25rem;
+}
+
+.badge i {
+  margin-right: 0.5em;
+  cursor: pointer;
+}
+
+.badge i:hover {
+  color: red;
+}
+
+</style>
+
+@section('scripts')
+<script src="{{ asset('public/js/tag-groups.js') }}"></script>
 @endsection
