@@ -30,7 +30,7 @@ $(function($) {
 		}
     })
 	
-	// pull tags from database
+	// pull hashtags from database
 	$.ajax({
         type: 'GET',
         url: APP_URL + '/get-tag-groups/' + TWITTER_ID, // Use the URL of your server-side script here
@@ -51,7 +51,7 @@ $(function($) {
         }
     });
 
-    // selecting the tag
+    // selecting the hashtag
    	$('select#tag-groups').on('click', function(e) {
 		$('.modal-tag-group-display').empty()
         $.ajax({
@@ -88,51 +88,64 @@ $(function($) {
 	// bgIcon changes and post-alert
 	$('.post-type-icon').on('click', function(){
 		var id = $(this).attr('id');
-		var ggg = $(this).attr('data-select');
-		var ttt = $(this).attr('data-type');
+		var selected = $(this).attr('data-select');
+		var type = $(this).attr('data-type');
 		
 		// add value for non special
 		$('input[name="post_type_tweets"]').val('regular_tweets');
 		
+		
 		// loop all icons
 		$('.post-type-icon').each(function(){			
-			var ccc = $(this).attr('data-type');			
+			var indType = $(this).attr('data-type');			
 
 			// set select to hide
 			$(this).attr('data-select', 0);
+			
+			// $('img[data-type="retweet-timer-tweets"').attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
+
 			// remove the style
 			$(this).removeAttr('style');					
 			$(this).parent('.img-icon-btn').removeAttr('style'); // add styles
-					
+
 			// if the data type is retweet open the timer
-			if (ttt === 'retweet-tweets') {
-				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');				
+			if (type === 'retweet-tweets') {
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');	
+				$('img[data-type="retweet-timer-tweets"').attr('data-select', 0);			
 				// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('data-select', '1');				
 				// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;');				
 			} else {
 				// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
 				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');				
+				// $('div[data-post="retweet-timer-tweets"]').addClass('tweets-hide');
 			}
 			
 			// hide all section panels
-			$('div[data-post="'+ccc+'"]').addClass('tweets-hide');
+			$('div[data-post="'+indType+'"]').addClass('tweets-hide');
 		});
 			
 		// update the data to 1 to activate the icon
-		if(ggg == 0) {			
+		if(selected == 0) {			
 			$('#'+id).attr('data-select', 1); // select as enabled
 			$('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;'); // add styles
 			$('#'+id).parent('.img-icon-btn').attr('style','background:#43EBF1'); // add styles
-			$('input[name="post_type_tweets"]').val(ttt); // add the post_type for database
-			$('div[data-post="'+ttt+'"]').removeClass('tweets-hide'); // open the panel to activate			
+			$('input[name="post_type_tweets"]').val(type); // add the post_type for database
+			$('div[data-post="'+type+'"]').removeClass('tweets-hide'); // open the panel to activate			
+			if (type === 'retweet-tweets') {
+				$('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');	
+			}
+			$('div[data-post="retweet-timer-tweets"]').addClass('tweets-hide');
 			
 			// last 2 icons
-			$('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active');
-			$('.primary-post-area-wrap').find('img.post-type-indicator[data-src="'+ttt+'"]').addClass('indicator-active');
+			$('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active'); // remove active in all icons
+			$('.primary-post-area-wrap').find('img.post-type-indicator[data-src="'+type+'"]').addClass('indicator-active'); // activate the clicked icon
 		} else {			
-			$('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');	
-			$('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active');
-			$('.primary-post-area-wrap img.post-type-indicator[data-src="twitter-tweets"]').addClass('indicator-active');		
+			// $('span.primary-post-option-buttons').find('img.retweet-timer-icon').addClass('tweets-hide');	// hide the timer
+			$('#'+id).attr('style','opacity: .75;min-width: 20px;max-width: 20px;max-height: 20px;'); // add styles
+			$('span.primary-post-option-buttons').find('img.retweet-timer-icon').attr('style','opacity: 0.75;min-width: 20px;max-width: 20px;max-height: 20px;');
+			$('.primary-post-area-wrap').find('img.post-type-indicator').removeClass('indicator-active'); // remove active in all icons
+			$('.primary-post-area-wrap img.post-type-indicator[data-src="twitter-tweets"]').addClass('indicator-active'); // logo to default state		
+			$('span.primary-post-option-buttons').find('img.retweet-timer-icon').removeClass('tweets-hide');	// hide the timer
 		}				
 	});		
 
