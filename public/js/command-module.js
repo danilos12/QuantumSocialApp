@@ -453,6 +453,11 @@ $(function($) {
 		$('.add-tweet-inner').after(innerText);
 	})
 	
+
+	$('.cross-tweet-profile-image').on('click', function() {
+		$(this).attr('status', 'active');
+	})
+
 	// add new tweet instance
 	
 });
