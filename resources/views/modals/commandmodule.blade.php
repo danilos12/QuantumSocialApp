@@ -219,15 +219,15 @@ div[data-schedule="none"] {
                                   <div class="cross-tweet-header">
                                     Cross-Tweet On:</div>
                                   <div class="cross-tweet-profiles-inner">
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (2).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (3).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (4).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (5).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (6).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (7).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (8).png" class="cross-tweet-profile-image" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (9).png" class="cross-tweet-profile-image" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" id="img1" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (2).png" class="cross-tweet-profile-image" id="img2" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (3).png" class="cross-tweet-profile-image" id="img3" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (4).png" class="cross-tweet-profile-image" id="img4" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (5).png" class="cross-tweet-profile-image" id="img5" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (6).png" class="cross-tweet-profile-image" id="img6" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (7).png" class="cross-tweet-profile-image" id="img7" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (8).png" class="cross-tweet-profile-image" id="img8" />
+                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (9).png" class="cross-tweet-profile-image" id="img9" />
                                   </div>  <!-- END .cross-tweet-profiles-inner -->
                                 </div>  <!-- END .cross-tweet-profiles-outer -->
 
