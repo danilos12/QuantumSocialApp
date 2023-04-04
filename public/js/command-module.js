@@ -128,7 +128,7 @@ $(function($) {
 		if(selected == 0) {			
 			$('#'+id).attr('data-select', 1); // select as enabled
 			$('#'+id).attr('style','opacity: 1;min-width: 25px;max-width: 25px;max-height: 25px;'); // add styles
-			$('#'+id).parent('.img-icon-btn').attr('style','background:#43EBF1'); // add styles
+			// $('#'+id).parent('.img-icon-btn').attr('style','background:#43EBF1'); // add styles
 			$('input[name="post_type_tweets"]').val(type); // add the post_type for database
 			$('div[data-post="'+type+'"]').removeClass('tweets-hide'); // open the panel to activate			
 			if (type === 'retweet-tweets') {
