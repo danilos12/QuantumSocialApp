@@ -74,3 +74,12 @@
 .emojionearea.form-control {
     background: rgba(255, 255, 255, .3)!important
 }
+
+
+.posting-tool-columns .post-tool-icon:.icon-active {
+    filter: var(--color-nova-filter);
+  }
+  
+  .primary-post-option-buttons .ui-icon.post-tool-icon:.icon-active {
+    filter: var(--color-nova-filter);
+  }

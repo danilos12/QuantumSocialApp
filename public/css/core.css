@@ -54,6 +54,7 @@ select:focus {
   --color-nova-5: rgba(67, 235, 241, .5);
   --color-nova-75: rgba(67, 235, 241, .75);
   --color-nova-filter: invert(76%) sepia(87%) saturate(397%) hue-rotate(137deg) brightness(95%) contrast(99%);
+  --color-cosmic-purple-60: rgba(45, 32, 66, .6);
 
 
 
@@ -1725,6 +1726,8 @@ img.mosaic-watermark.evergreen-watermark {
   border-radius: 10px;
   background: var(--frost-background);
   overflow: hidden;
+  -webkit-line-clamp: 1;
+
 }
 
 .queued-watermark {
@@ -2514,7 +2517,9 @@ input#file-upload-button {
   position: relative;
   width: 100%;
   height: 100vh;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  background-color: var(--color-cosmic-purple-60);
 }
 
 .posting-tool-background {}
@@ -2603,16 +2608,10 @@ input#file-upload-button {
 
 .posting-tool-columns .post-tool-icon:hover {
   opacity: 1;
-}
-
-.posting-tool-columns .post-tool-icon:active {
-  color:
-    /* edit this ingrid */
-}
-
-.primary-post-option-buttons .ui-icon.post-tool-icon:active {
   filter: var(--color-nova-filter);
 }
+
+
 
 .posting-tool-col {
   height: calc(80vh - 4em - 79px - 61px);
