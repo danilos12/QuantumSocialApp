@@ -14,15 +14,15 @@ div[data-schedule="none"] {
                           <div class="posting-tool-banner">
                             <div class="global-twitter-profile-header">
                               <a href="#">
-                               <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png"
+                               <img src="{{ $twitter_photo ?? asset('public//temp-images/imgpsh_fullsize_anim (1).png') }}"
                                   class="global-profile-image" /></a>
                               <div class="global-profile-details">
                                 <div class="global-profile-name">
-                                  <a href="#">{{ isset($selected_user) ? $selected_user->twitter_name : Auth::user()->name }}</a>
+                                  <a href="#">{{ $twitter_name ?? Auth::user()->name }}</a>
                                 </div>  <!-- END .global-author-name -->
                                 <div class="global-profile-subdata">
                                   <span class="global-profile-handle">
-                                    <a href="">{{ isset($selected_user) ? "@" .$selected_user->twitter_username : "" }}</a>
+                                    @<a href="">{{ $twitter_usn ?? "" }}</a>
                                   </span>
                                 </div>  <!-- END .global-post-date-wrap -->
                               </div>  <!-- END .global-author-details -->
