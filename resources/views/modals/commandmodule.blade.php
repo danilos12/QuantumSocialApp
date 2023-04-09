@@ -14,11 +14,11 @@ div[data-schedule="none"] {
                           <div class="posting-tool-banner">
                             <div class="global-twitter-profile-header">
                               <a href="#">
-                               <img src="{{ $twitter_photo ?? asset('public//temp-images/imgpsh_fullsize_anim (1).png') }}"
+                               <img src="{{ $twitter_photo ?: asset('public//temp-images/imgpsh_fullsize_anim (1).png') }}"
                                   class="global-profile-image" /></a>
                               <div class="global-profile-details">
                                 <div class="global-profile-name">
-                                  <a href="#">{{ $twitter_name ?? Auth::user()->name }}</a>
+                                  <a href="#">{{ $twitter_name ?: 'Quantum User' }}</a>
                                 </div>  <!-- END .global-author-name -->
                                 <div class="global-profile-subdata">
                                   <span class="global-profile-handle">
