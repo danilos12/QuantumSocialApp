@@ -58,9 +58,9 @@
             <div class="banner-twitter-profile-wrap">
               <a href="#">
                 <div class="banner-twitter-profile-inner">
-                  <img src="{{ $twitter_photo ?? asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
+                  <img src="{{ $twitter_photo ?: asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                   <span class="twitter-profile-name">
-                    {{ $twitter_name ?? 'Quantum User' }}
+                    {{ $twitter_name ?: 'Quantum User' }}
                   </span>
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
