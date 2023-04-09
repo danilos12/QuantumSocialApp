@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UT_AcctMngt;
 use App\Models\Twitter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,59 +20,55 @@ class TwitterApi extends Controller
         $this->middleware('auth');
     }
 
-    public function getTweets($twitterId) {
+    public function getTweets($twitterId)
+    {
         try {
-            //code...
             $headers = array(
                 "Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')
-            );
-    
+            );          
+
             $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments";
-            $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets" ;
+            $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
             $request = $this->curlGetHttpRequest($url, $headers, $data);
-    
-            if (property_exists($request, "data")) {
-                    
+
+            if (!empty($request->data)) {
                 // get images of the tweet 
-                foreach($request->data as $v) {
+                foreach ($request->data as $v) {
                     if (property_exists($v, "attachments")) {
-    
                         // call cURL request for API        
                         $data = "expansions=attachments.media_keys&media.fields=url";
                         $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')), $data);
-        
-                        $getAttachmentURL = $getAttachment->includes->media;
-                        foreach ($getAttachmentURL as $media) {
-                            $newObject = $media->url;
-        
-                            $v->image = $newObject;
+
+                        if (property_exists($getAttachment, 'includes')) {
+                            $getAttachmentURL = $getAttachment->includes->media;
+                            foreach ($getAttachmentURL as $media) {
+                                $newObject = $media->url;
+                                $v->image = $newObject;
+                            }
                         }
                     }
-                                                
                 }
 
-                // dd($request->data);
-    
+                // return the modified data as a JSON response
                 return response()->json([
-                    'status' => 200, 
-                    'data' => $request->data
+                    'status' => 200,
+                    'data' => $request->data,
                 ]);
-    
             } else {
                 return response()->json([
-                    'status' => 201 , 
-                    'message' => 'Tweets not found'
+                    'status' => 201,
+                    'message' => 'Tweets not found',
+                    'b' => env("TWITTER_BEARER_TOKEN")
                 ]);
             }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 500,
-                'message' => $th
+                'message' => $th->getMessage()
             ]);
         }
-
-
     }
+
 
     public function switchedAccount(Request $request) {
 
@@ -107,20 +102,8 @@ class TwitterApi extends Controller
     }
 
     public function tweets($id) {
-        $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
-
-        $tweets = [];
-        if ($info) {
-
-            $twitterApi = new TwitterApi();
-            $tweets = $twitterApi->getTweets($info->twitter_id);
-        } else {
-            $tweets = [];
-        }
-
-        $html = view('selectedAcctTweets', compact('tweets'))->render();
-
-        return response()->json(['html' => $html]);
+        $tweets = $this->getTweets($id);
+        return $tweets;
     }
 
     public function removeTwitterAccount(Request $request)
@@ -140,7 +123,7 @@ class TwitterApi extends Controller
 
 
         $response = curl_exec($curl);      
-        $info = curl_getinfo($curl);      
+        $info = curl_getinfo($curl);     
 
         curl_close($curl);   
         
