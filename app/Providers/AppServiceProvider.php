@@ -61,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('twitter_id', $twitterID);       
             $view->with('twitter_name', $selectedUser->twitter_name ?? "");       
             $view->with('twitter_usn', $selectedUser->twitter_username ?? "");       
+            $view->with('twitter_photo', $selectedUser->twitter_photo ?? "");       
 
             // twitter settings DB 
             $twitterSettings = DB::table('qts_tweetmeta')
@@ -100,6 +101,9 @@ class AppServiceProvider extends ServiceProvider
             // }
 
         });
+
+        // Set the TWITTER_BEARER_TOKEN environment variable
+        putenv('TWITTER_BEARER_TOKEN=AAAAAAAAAAAAAAAAAAAAAAX4lAEAAAAANMt4THwRzGff8IzPOSJAxsYDfnw%3D3UBzwDd2HJg4HZdl7vreAG5HoVNibNzXkIDL1qaER0UJ076wAX');
 
     }
 }

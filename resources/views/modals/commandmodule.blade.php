@@ -43,21 +43,23 @@ div[data-schedule="none"] {
                                      <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-tweets"/>
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-tweets"/>
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comments-tweets"/>
+                                     <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
+                                     <img src="{{ asset('public/')}}/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
                                      <textarea class="post-textarea primary-post-area" name="tweet_text_area" id="emojionearea"></textarea>  <!-- END .primary-post-area -->                                    
                                     </div>  <!-- END .primary-post-area-wrap -->
                                     <div class="post-bottom-buttons primary-post-bottom-buttons">
                                       <span class="post-type-buttons primary-post-type-buttons">
-                                       <div class="img-icon-btn"><img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" /></div>
-                                       <div class="img-icon-btn"><img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" /></div>
-                                       <div class="img-icon-btn"><img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" /></div>
-                                       <div class="img-icon-btn"><img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-retweet-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" /></div>
-                                       <div class="img-icon-btn"><img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" /></div>
+                                       <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-retweet-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
+                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
                                       </span>  <!-- END .primary-post-type-buttons -->
                                       <span class="post-option-buttons primary-post-option-buttons">
                                         <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
                                         <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" />
                                         <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" data-select="0" data-type="retweet-timer-tweets" class="ui-icon post-tool-icon retweet-timer-icon" /> 
-                                        <span class="post-counter">1/2</span>
+                                        <span class="post-counter">1/1</span>
                                       </span>  <!-- END .primary-post-option-buttons -->
 
 
@@ -112,30 +114,23 @@ div[data-schedule="none"] {
 
                                   <div class="post-area-right primary-post-right">
                                     <div class="post-right-buttons primary-post-right-buttons">
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" class="ui-icon post-tool-icon add-image-icon" /><br />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon emojionearea-button" data-emoji-open="0" /><br />
+                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" data-clicked="0" class="ui-icon post-tool-icon add-image-icon" /><br />
+                                     {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br /> --}}
+                                     {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon emojionearea-button" data-emoji-open="0" /><br /> --}}
                                     </div>  <!-- END .primary-post-right-buttons -->
                                   </div>  <!-- END .primary-post-right -->
 
                                 </div>  <!-- END .primary-post-wrap -->
 
-                               <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon add-tweet-icon add-tweet-initial" />
+                               <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" data-select="0" class="ui-icon add-tweet-icon add-tweet-initial" />
 
-                                <div class="more-tweets-roster">
-
-                                  <!-- BEGIN NEW TWEET INSTANCE -->
-                                  
-                                  <!-- END NEW TWEET INSTANCE -->
-
-
+                                <div class="more-tweets-roster">                                
                                 </div>  <!-- END .more-tweets-roster -->
                               </div>  <!-- END .posting-tool-left-col -->
                               
 
                               <div class="posting-tool-col posting-tool-right-col right-section">
 								                <input type="hidden" name="post_type_tweets" value="regular_tweets" id="post_type_tweets" class="post_type_tweets">
-								                <input type="hidden" name="twitter_id" value="{{ $twitter_id }}" id="twitter_id" class="twitter_id">
 
                                 <div id="post_evergreen" data-post="evergreen-tweets" class="post-alert evergreen-alert tweets-hide">
                                  <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
@@ -218,16 +213,7 @@ div[data-schedule="none"] {
                                 <div class="cross-tweet-profiles-outer">
                                   <div class="cross-tweet-header">
                                     Cross-Tweet On:</div>
-                                  <div class="cross-tweet-profiles-inner">
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" id="img1" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (2).png" class="cross-tweet-profile-image" id="img2" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (3).png" class="cross-tweet-profile-image" id="img3" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (4).png" class="cross-tweet-profile-image" id="img4" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (5).png" class="cross-tweet-profile-image" id="img5" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (6).png" class="cross-tweet-profile-image" id="img6" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (7).png" class="cross-tweet-profile-image" id="img7" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (8).png" class="cross-tweet-profile-image" id="img8" />
-                                   <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (9).png" class="cross-tweet-profile-image" id="img9" />
+                                  <div class="cross-tweet-profiles-inner cmd">                                  
                                   </div>  <!-- END .cross-tweet-profiles-inner -->
                                 </div>  <!-- END .cross-tweet-profiles-outer -->
 
@@ -254,10 +240,12 @@ div[data-schedule="none"] {
 
                                   <!-- CARLO - These options only show up if certain options are selected in the scheduling method options -->
 
-                                  <div id="scheduling-method-xxx" class="scheduling-details-countdown" data-schedule="none">
+                                  <div id="scheduling-method-xxx" class="scheduling-details-countdown" data-schedule="none" name="scheduling-method">
                                     <!-- CARLO - if Countdown -->
-                                    <select id="scheduling-cdn" class="scheduling-countdown-number">
-                                      
+                                    <select id="scheduling-cdn" class="scheduling-countdown-number">                                      
+                                      <option value="mins">Minutes</option>
+                                      <option value="hours">Hours</option>
+                                      <option value="days">Days</option>
                                     </select>
                                     <select id="scheduling-cdmins" name="scheduling-cdmins" class="custom-dhms scheduling-countdown-minutes">
                                       <option value="mins">Minutes</option>
