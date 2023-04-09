@@ -163,8 +163,6 @@ $(function($) {
            
             if ($(".more-tweets-roster .add-tweet-outer").length > 0) {
                 confirmation("tweet-storm-tweets");
-                $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");     
-                $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="twitter-tweets"]`).addClass("indicator-active");
             } else {
                 addTweetTextArea("tweet-storm-tweets")
             } 
@@ -178,7 +176,7 @@ $(function($) {
     function confirmation(type) {        
         if (confirm("Do you want to cancel or your changes?")) {
             // User clicked "Yes"
-            $(".more-tweets-roster").empty();              
+            originalState();
         }
               
     }
@@ -531,14 +529,23 @@ $(function($) {
                         // console.log(element.value)
                     }
                 }
+               
+                originalState();
 
-                var getActive = $postIcon.filter(".icon-active").data("type");
-                $("#post_type_tweets").val(getActive);
 
                 form.find('input[type="submit"]').val("Beam me up scotty!");
             },
         });
     });
+
+    function originalState() {
+        $(".cross-tweet-profiles-inner.cmd img").attr('status', '');
+        $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");     
+        $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="twitter-tweets"]`).addClass("indicator-active");
+        $(".post-type-buttons img").removeClass("icon-active");
+        $postPanels.find('[data-post]').addClass('tweets-hide');
+        $(".more-tweets-roster").empty();
+    }
 
     // add new tweet instance
     function tweetInstance(items) {
