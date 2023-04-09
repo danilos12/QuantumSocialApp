@@ -7,12 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Routing\Controller;
-use App\Http\Controllers\TwitterApi;
-use Illuminate\Support\Facades\View;
 use Illuminate\View\Factory as ViewFactory;
-use Illuminate\Support\Facades\Auth;
-use App\Models\UT_AcctMngt;
-use App\Models\Twitter;
 
 
 class ProfileController extends Controller
@@ -35,22 +30,9 @@ class ProfileController extends Controller
      */
     public function index(Request $request)
     {
-		$title = 'Profile page';
+		$title = 'Profile page';        
+        return view('profile')->with('title', $title);
 
-        // $info = UT_AcctMngt::where(['user_id' => Auth::id(), 'selected' => 1])->first();
-
-        $tweets = [];
-        // if ($info) {
-            
-        //     $twitterApi = new TwitterApi();
-        //     $tweets = $twitterApi->getTweets($info->twitter_id);
-        // } else {
-        //     $tweets = [];
-        // }
-
-        // dd($tweets);
-
-        return view('profile', ['title' => $title, 'tweets' => $tweets]);
     }
 	
 	public function edit_password()

@@ -76,10 +76,24 @@
 }
 
 
-.posting-tool-columns .post-tool-icon:.icon-active {
+.icon-active {
     filter: var(--color-nova-filter);
-  }
-  
-  .primary-post-option-buttons .ui-icon.post-tool-icon:.icon-active {
-    filter: var(--color-nova-filter);
-  }
+    opacity: 1;
+    min-width:25px!important;
+    max-width:25px!important;
+    max-height:25px!important;
+}
+
+.posting-tool-columns .post-tool-icon:hover {
+    opacity: 1;
+}
+
+.primary-post-option-buttons .ui-icon.post-tool-icon .icon-active {
+filter: var(--color-nova-filter);
+}
+
+img.disabled {
+    pointer-events: none;
+    opacity: 0.3!important;
+    /* Optional: reduce the opacity of the image to indicate that it's disabled */
+}
