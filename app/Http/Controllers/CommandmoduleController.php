@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\url_decode;
 use Exception;
 use App\Models\CommandModule;
 use Illuminate\Support\Facades\DB;
@@ -35,32 +37,78 @@ class CommandmoduleController extends Controller
     }
 
     public function create(Request $request) {
+        try {            
+            $postData = $request->all();
+            $user_id = Auth::id();
+            $main_twitter_id = $postData['twitter_id'];
 
-        try {
-            $insert = CommandModule::create([
-                'user_id' => Auth::id(),
-                'twitter_id' => $request->input('twitter_id'),
-                'post_type' => $request->input('post_type_tweets'),
-                'post_description' => $request->input('tweet_text_area'),
-                'tweetlink' => $request->input('tweetlink'),
-                'rt_time' => $request->input('num-custom-cm'),
-                'rt_frame' => $request->input('time-custom-cm'),
-                'rt_ite' => $request->input('iterations-custom-cm'),
-                'promo_id' => $request->input('promo_id'),
-                'sched_method' => $request->input('scheduling-method'),
-                'sched_time' => $request->input('scheduling-cdmins'),
-            ]);
-    
-            if ($insert) {
-                // Return success response
-                return response()->json(['status' => '201', 'message' => 'Data has been created.']);
-            } else {
-                // Return error response
-                return response()->json(['status' => '400', 'message' => 'Bad request']);
+            // Save the regular tweet for main account
+            $insertData = [
+                'user_id' => $user_id,
+                'twitter_id' => $main_twitter_id,
+                'post_type' => $postData['post_type_tweets'],
+                'post_description' => urldecode($postData['tweet_text_area']) ?? null,
+                'tweetlink' => $postData['retweet-link-input'] ?? null,
+                'rt_time' => $postData['num-custom-cm'] ?? null,
+                'rt_frame' => $postData['time-custom-cm'] ?? null,
+                'rt_ite' => $postData['iterations-custom-cm'] ?? null,
+                'promo_id' => $postData['retweet'] ?? null,
+                'sched_method' => $postData['scheduling-options'] ?? null,
+                'sched_time' => $postData['scheduling-cdmins'] ?? null,          
+                'post_type_code' => rand(10000, 99999),
+            ];
+            CommandModule::create($insertData);
+
+            // Save tweetstorm for main account
+            $tweetStormKeys = preg_grep('/^tweet_text_area_\d+$/', array_keys($postData));
+            if (isset($tweetStormKeys)) {
+                foreach ($tweetStormKeys as $tweetStormKey) {
+                    $tweetStormValue = $postData[$tweetStormKey];
+                    if ($tweetStormValue) {
+                        $tweetStormNumber = str_replace('tweet_text_area_', '', $tweetStormKey);
+                        $insertData['twitter_id'] = $main_twitter_id;
+                        $insertData['post_description'] = urldecode($tweetStormValue);
+                        CommandModule::create($insertData);
+                    }
+                }
             }
 
+            // Save regular tweet for cross tweet account
+            $crossTweetKeys = preg_grep('/^crossTweetAcct_\d+$/', array_keys($postData));
+            if (isset($crossTweetKeys)) {
+                foreach ($crossTweetKeys as $crossTweetKey) {
+                    $crossTweetValue = $postData[$crossTweetKey];
+                    if ($crossTweetValue) {
+                        $crossTweetNumber = str_replace('crossTweetAcct_', '', $crossTweetKey);
+                        $insertData['twitter_id'] = $crossTweetValue;
+                        $insertData['crosstweet_accts'] = $crossTweetNumber;
+                        CommandModule::create($insertData);
+                    }
+                }
+            }
+
+                
+            // Save tweetstorm for cross tweet account
+            $tweetStormKeys = preg_grep('/^tweet_text_area_\d+$/', array_keys($postData));
+            if (isset($tweetStormKeys)) {
+                foreach ($tweetStormKeys as $tweetStormKey) {
+                    $tweetStormValue = $postData[$tweetStormKey];
+                    $tweetStormNumber = str_replace('tweet_text_area_', '', $tweetStormKey);
+                    if (isset($postData['crossTweetAcct_' . $tweetStormNumber])) {
+                        $insertData['twitter_id'] = $postData['crossTweetAcct_' . $tweetStormNumber];
+                        $insertData['post_description'] = urldecode($tweetStormValue);
+                        CommandModule::create($insertData);
+                    }
+                }
+            }
+
+            // Return success response
+            return response()->json(['status' => '201', 'message' => 'Data has been created.']);
+
         } catch (Exception $e) {
-            return response()->json(['status' => '409', 'error' => $e]);
+            Log::error('Error creating data: ' . $e->getMessage());
+            return response()->json(['status' => '409', 'error' => 'Failed to create data.']);
+   
         }
     }
 
@@ -131,16 +179,7 @@ class CommandmoduleController extends Controller
     public function getTagGroups($id) {
         try {     
             $tagGroups = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
-            // $tagItems = Tag_items::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
-    
-            // $getTag = DB::table('tag_groups_meta')
-            //     ->join('tag_items_meta', 'tag_groups_meta.twitter_id', '=', 'tag_items_meta.twitter_id')
-            //     ->select('tag_groups_meta.tag_group_mkey', 'tag_items_meta.tag_meta_key')
-            //     ->where('tag_groups_meta.tag_group_mkey', "=", "tag_1")
-            //     ->where('tag_items_meta.tag_meta_key', "=", "_tag_1")
-            //     ->orWhere('tag_items_meta.tag_meta_key', "=", "tag_1")
-            //     ->first();
-    
+            
             return response()->json($tagGroups);
         }  catch (Exception $e) {
             return response()->json(['status' => '400', 'message' => $e]);
@@ -153,5 +192,18 @@ class CommandmoduleController extends Controller
 
         $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get();
         return response()->json($tagItems);
+    }
+
+    public function getUnselectedTwitterAccounts(Request $request) {
+
+        $getUnselectedTwitter = DB::table('twitter_accts')
+                ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                ->where('ut_acct_mngt.selected', "=", 0) // selected
+                ->where('ut_acct_mngt.user_id', "=", Auth::id())
+                ->where('twitter_accts.deleted', "=", 0)
+                ->get();
+
+        return response()->json($getUnselectedTwitter);
     }
 }

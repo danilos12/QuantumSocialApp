@@ -7,7 +7,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
@@ -105,7 +104,7 @@ class Controller extends BaseController
                 $selectedAcct = UT_AcctMngt::firstOrCreate([
                     'user_id' => Auth::user()->id,
                     'twitter_id' => $twitterId->id,
-                    'selected' => Twitter::where('user_id', Auth::id())->count() === 0 ? 1 : 0
+                    'selected' => Twitter::where('user_id', Auth::id())->count() === 1 ? 1 : 0
                 ]);
 
                 // save twitter settings meta

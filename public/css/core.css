@@ -2608,6 +2608,14 @@ input#file-upload-button {
 
 .posting-tool-columns .post-tool-icon:hover {
   opacity: 1;
+}
+
+.posting-tool-columns .post-tool-icon:active {
+  /* color: */
+    /* edit this ingrid */
+}
+
+.primary-post-option-buttons .ui-icon.post-tool-icon:active {
   filter: var(--color-nova-filter);
 }
 

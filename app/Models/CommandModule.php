@@ -22,6 +22,8 @@ class CommandModule extends Model
         'promo_id',
         'sched_method',
         'sched_time',
+        'crosstweet_accts',
+        'post_type_code',
     ];
     public $timestamps = true;
 }
