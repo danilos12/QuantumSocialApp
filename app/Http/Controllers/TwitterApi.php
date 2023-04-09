@@ -23,9 +23,11 @@ class TwitterApi extends Controller
     public function getTweets($twitterId)
     {
         try {
+            $_ENV =  env('TWITTER_BEARER_TOKEN') ?? "AAAAAAAAAAAAAAAAAAAAAAX4lAEAAAAANMt4THwRzGff8IzPOSJAxsYDfnw%3D3UBzwDd2HJg4HZdl7vreAG5HoVNibNzXkIDL1qaER0UJ076wAX";
+
             $headers = array(
-                "Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')
-            );          
+                "Authorization: Bearer " . $_ENV
+            );       
 
             $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments";
             $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
@@ -37,7 +39,7 @@ class TwitterApi extends Controller
                     if (property_exists($v, "attachments")) {
                         // call cURL request for API        
                         $data = "expansions=attachments.media_keys&media.fields=url";
-                        $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . env('TWITTER_BEARER_TOKEN')), $data);
+                        $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
 
                         if (property_exists($getAttachment, 'includes')) {
                             $getAttachmentURL = $getAttachment->includes->media;
