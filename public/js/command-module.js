@@ -99,60 +99,59 @@ $(function($) {
         if (type !== "tweet-storm-tweets") {
             // Check if tweetstorm is already active
             if ($("#select-tweet-storm-icon").data("select") === 1) {
-                // Check if clicked icon is already active
+                // Check if clicked icon is already active //deactivated
                 if ($(this).hasClass("icon-active")) {
                     // Remove active class from clicked icon
                     $(this).removeClass("icon-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(`img.post-type-indicator`)
-                        .removeClass("indicator-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(
-                            `img.post-type-indicator[data-src="tweet-storm-tweets"]`
-                        )
-                        .addClass("indicator-active");
-                    console.log('oo')
+                    // $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");
+                    // $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="tweet-storm-tweets"]`).addClass("indicator-active");
+                    disableWatermark("tweet-storm-tweets");
+                    console.log(1)
+
+                    $postPanels.filter(`div[data-post=${type}]`).addClass('tweets-hide')
                 } else {
                     // Remove active class from other regular icons and add to clicked icon
+                    $("#post_type_tweets").val(type);                    
                     $(".post-type-buttons img[data-type!='tweet-storm-tweets']").removeClass("icon-active");
                     $(this).addClass("icon-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(`img.post-type-indicator`)
-                        .removeClass("indicator-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(
-                            `img.post-type-indicator[data-src="${
-                                type === "evergreen-tweets"
-                                    ? "evergreen-storm-tweets"
-                                    : "promos-storm-tweets"
-                            }"]`
-                        )
-                        .addClass("indicator-active");
-                    $("#post_type_tweets").val(type);
 
-                    if (type === "comments-tweets") {
-                        originalState()
-                        $(this).data('select', 1).addClass('icon-active')
-                        $(".cross-tweet-profiles-outer").addClass(
-                            "tweets-hide"
-                        );
-                        $postIcon
-                            .filter("img.post-tool-icon")
-                            .addClass("disabled"); // disable all the icons
-                        $postIcon
-                            .filter('img[data-type="comments-tweets"]')
-                            .removeClass("disabled"); // enable the comment icon
-                        $("span.primary-post-option-buttons")
-                            .find("img.retweet-timer-icon")
-                            .addClass("tweets-hide");
-                            $("img[data-type='tweet-storm-tweets']").data('select', 0)
+                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");
+                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="${type === "evergreen-tweets"? "evergreen-storm-tweets" : "promos-storm-tweets"}"]`).addClass("indicator-active");
+                    
+                    if ($('.more-tweets-roster .add-tweet-outer').length > 0) {
+                        $(".new-post-area-wrap").find("img.post-type-indicator").removeClass("indicator-active");
+                        $(`.new-post-area-wrap img.post-type-indicator[data-src="${type === "evergreen-tweets"? "evergreen-storm-tweets" : "promos-storm-tweets"}"]`).addClass('indicator-active')
                     }
 
+                    // hide panel from previous clicked icon except tst, add panel for the clicked icon
+                    $postPanels.filter(`div[data-post!='tweet-storm-tweets']`).addClass('tweets-hide')
+                    $postPanels.filter(`div[data-post=${type}]`).removeClass('tweets-hide')
+
+                    if (type === "comments-tweets") {
+                        originalState();
+                        $(this).data('select', 1).addClass('icon-active')
+                        $(".cross-tweet-profiles-outer").addClass("tweets-hide");
+                        $postIcon.filter("img.post-tool-icon").addClass("disabled"); // disable all the icons
+                        $postIcon.filter('img[data-type="comments-tweets"]').removeClass("disabled"); // enable the comment icon
+                        $("span.primary-post-option-buttons").find("img.retweet-timer-icon").addClass("tweets-hide");
+                        $("img[data-type='tweet-storm-tweets']").data('select', 0)
+                    }
+
+                    console.log(1)
                 }
             } else {
                 if ($(this).hasClass("icon-active")) {
                     // Remove active class from clicked icon
+                    $("#post_type_tweets").val("regular_tweets");
                     $(this).removeClass("icon-active");
+                    $("span.primary-post-option-buttons").find("img.retweet-timer-icon").removeClass("tweets-hide");
+
+                    // $postPanels.find(`[data-post="${type}"]`).addClass('tweets-hide')
+                    $postPanels.addClass('tweets-hide')
+                    $postPanels.find(`div[data-post=${type}]`).removeClass('tweets-hide')                    
+
+                    disableWatermark("twitter-tweets", "")
+
 
                     if (type === "comments-tweets") {
                         $(".cross-tweet-profiles-outer").removeClass("tweets-hide");
@@ -162,54 +161,25 @@ $(function($) {
                     if (type === "tweet-storm-active") {
                         confirmation(type);
                     }
-
-                    $("span.primary-post-option-buttons").find("img.retweet-timer-icon")
-                        .removeClass("tweets-hide");
-                    $(`.primary-post-area-wrap`)
-                        .find(`img.post-type-indicator`)
-                        .removeClass("indicator-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(
-                            `img.post-type-indicator[data-src="twitter-tweets"]`
-                        )
-                        .addClass("indicator-active");
-
-                    $("#post_type_tweets").val("regular_tweets");
                 } else {
                     // If tweetstorm is not active, remove active class from other regular icons and add to clicked icon
-                    $(
-                        ".post-type-buttons img[data-type!='tweet-storm-tweets']"
-                    ).removeClass("icon-active");
-                    $postPanels
-                        .filter("[data-post!='tweet-storm-tweets']")
-                        .addClass("tweets-hide");
-                    $("span.primary-post-option-buttons")
-                        .find("img.retweet-timer-icon")
-                        .addClass("tweets-hide");
+                    $(".post-type-buttons img[data-type!='tweet-storm-tweets']").removeClass("icon-active");
                     $(this).addClass("icon-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(`img.post-type-indicator`)
-                        .removeClass("indicator-active");
-                    $(`.primary-post-area-wrap`)
-                        .find(`img.post-type-indicator[data-src="${type}"]`)
-                        .addClass("indicator-active");
+
+                    // $postPanels.find("[data-post!='tweet-storm-tweets']").addClass("tweets-hide");
+                    $postPanels.filter("[data-post!='tweet-storm-tweets']").addClass("tweets-hide"); console.log(11)
+                    $("span.primary-post-option-buttons").find("img.retweet-timer-icon").addClass("tweets-hide");
+                                      
+                    disableWatermark(type, "")
 
                     if (type === "retweet-tweets") {
-                        $("span.primary-post-option-buttons")
-                            .find("img.retweet-timer-icon")
-                            .removeClass("tweets-hide");
+                        $("span.primary-post-option-buttons").find("img.retweet-timer-icon").removeClass("tweets-hide");
                     }
 
                     if (type === "comments-tweets") {
-                        $(".cross-tweet-profiles-outer").addClass(
-                            "tweets-hide"
-                        );
-                        $postIcon
-                            .filter("img.post-tool-icon")
-                            .addClass("disabled"); // disable all the icons
-                        $postIcon
-                            .filter('img[data-type="comments-tweets"]')
-                            .removeClass("disabled"); // enable the comment icon
+                        $(".cross-tweet-profiles-outer").addClass("tweets-hide");
+                        $postIcon.filter("img.post-tool-icon").addClass("disabled"); // disable all the icons
+                        $postIcon.filter('img[data-type="comments-tweets"]').removeClass("disabled"); // enable the comment icon
                         $(".more-tweets-roster").empty();
                     }
 
@@ -219,27 +189,16 @@ $(function($) {
         } else {
             // If clicked icon is tweetstorm, toggle active class
             $(this).toggleClass("icon-active");
-            console.log(type)
-            disableWatermark(type)            
             
             if ($(".post-type-buttons img[data-type!='tweet-storm-tweets']").hasClass("icon-active")) {
                 var combo = $("img[data-type!='tweet-storm-tweets'].icon-active").attr("data-type")
                 disableWatermark(type, combo)            
+                console.log('change icon in text area')
                 
-                // $(`.primary-post-area-wrap`)
-                //     .find(`img.post-type-indicator`)
-                //     .removeClass("indicator-active");
-                // $(`.primary-post-area-wrap`)
-                //     .find(
-                //         `img.post-type-indicator[data-src="${
-                //             combo === "evergreen-tweets"
-                //                 ? "evergreen-storm-tweets"
-                //                 : "promos-storm-tweets"
-                //         }"]`
-                //     )
-                //     .addClass("indicator-active");
-
                 $("#post_type_tweets").val(combo);
+            } else {
+                disableWatermark(type);
+                console.log(12);                            
             }
 
             if ($(".more-tweets-roster .add-tweet-outer").length > 0) {
@@ -247,7 +206,6 @@ $(function($) {
             } else {
                 var combod = $("img[data-type!='tweet-storm-tweets'].icon-active").attr("data-type")
                 addTweetTextArea(type, ($("img[data-type!='tweet-storm-tweets'].icon-active").length > 0) ? combod : "");
-                // addTweetTextArea(combo);
             }
         }
 
@@ -384,7 +342,21 @@ $(function($) {
 
     // add new text area instance
     $(".posting-tool-col").on("click", ".add-tweet-initial", function() {
-        addTweetTextArea("add-tweet-initial");
+
+        var type = null;
+        var combo = null;
+
+        if ($(".post-type-buttons img[data-type!='tweet-storm-tweets']").hasClass("icon-active")) {
+            type = $(".post-type-buttons img[data-type!='tweet-storm-tweets'].icon-active").attr('data-type');                        
+            combo = $(".post-type-buttons img[data-type!='tweet-storm-tweets'].icon-active").attr('data-type');                        
+        } else {
+            type = "tweet-storm-tweets";
+
+        }
+
+        addTweetTextArea(type, combo);
+        $postIcon.filter('img[data-type="tweet-storm-tweets"]').addClass('icon-active');
+        $postPanels.filter('div[data-post="tweet-storm-tweets"]').removeClass('tweets-hide');
     });
 
 
@@ -636,26 +608,21 @@ $(function($) {
 
     function disableWatermark(src, combo = null) {
 
-        var source = (combo) ? (combo === "evergreen-tweets") ? "evergreen-storm-tweets" : "promos-storm-tweets" : src;
-        console.log(src, combo, source)
+        var source = (combo) ? (combo === "evergreen-tweets") ? "evergreen-storm-tweets" : "promos-storm-tweets" : (src === "add-tweet-initial") ? src: src;
+        console.log(src)
+        console.log(combo)
+        console.log(source)
 
-        $(".primary-post-area-wrap")
-            .find("img.post-type-indicator")
-            .removeClass("indicator-active");
-        $(
-            `.primary-post-area-wrap img.post-type-indicator[data-src="${source}"]`
-        ).addClass("indicator-active");
+        $(".primary-post-area-wrap").find("img.post-type-indicator").removeClass("indicator-active");
+        $(`.primary-post-area-wrap img.post-type-indicator[data-src="${source}"]`).addClass("indicator-active");
 
         if (combo) {
-            console.log(combo, 646)
-            $(`.new-post-area-wrap > img`).removeClass("indicator-active");
-            // $(`.add-tweet-outer .new-post-area-wrap > new_post_area`).prepend(`<img src="${APP_URL}/public/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-type-icon" />`);
-            console.log(combo, 653)
-            $('.add-tweet-outer').find(`.new-post-area-wrap > img[data-src=""]`).addClass('indicator-active')
-            console.log(combo, 655)
+            $(".new-post-area-wrap").find("img.post-type-indicator").removeClass("indicator-active");
+            $(`.new-post-area-wrap img.post-type-indicator[data-src="${source}"]`).addClass('indicator-active')
         } else {
-            $('.add-tweet-outer').find(`.new-post-area-wrap > img`).removeClass("indicator-active");
-            $('.add-tweet-outer').find(`[data-src="tweet-storm-tweets"]`).addClass('indicator-active')
+            console.log("add initial")
+            $(".new-post-area-wrap").find("img.post-type-indicator").removeClass("indicator-active");
+            $('.new-post-area-wrap').find('img.post-type-indicator[data-src="tweet-storm-tweets"]').addClass('indicator-active')
         }
     }
 
@@ -665,18 +632,18 @@ $(function($) {
 
     function addTweetTextArea(entryPoint, combo) {
 
-        if (entryPoint === "add-tweet-initial") {
-            $postIcon
-                .filter('[data-type="tweet-storm-tweets"]')
-                .addClass("icon-active");
-            $postPanels
-                .filter('[data-post="tweet-storm-tweets"]')
-                .removeClass("tweets-hide");
-            // disableWatermark("tweet-storm-tweets", 259);
-        }
-        else {
-            disableWatermark(entryPoint, combo);
-        }
+        // if (entryPoint === "add-tweet-initial") {
+        //     $postIcon
+        //         .filter('[data-type="tweet-storm-tweets"]')
+        //         .addClass("icon-active");
+        //     $postPanels
+        //         .filter('[data-post="tweet-storm-tweets"]')
+        //         .removeClass("tweets-hide");
+        //     // disableWatermark("tweet-storm-tweets", 259);
+        // }
+              
+            
+       
 
         var newTextbox = tweetInstance(numItems);
         newTextbox = $(newTextbox);
@@ -694,6 +661,8 @@ $(function($) {
         // Increment the number of items and pages
         numItems++;
         numPages = Math.ceil(numItems / itemsPerPage);
+
+        disableWatermark(entryPoint, combo);
 
         // Update page info
         updateItemInfo();
@@ -752,7 +721,7 @@ $(function($) {
 					<div class="new-post-wrap add-tweet-col">
                         <div class="post-area-left new-post-left">
                             <div class="post-area-wrap new-post-area-wrap">                                
-                                <img src="${APP_URL}/public/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator indicator-active" data-src="tweet-storm-type-icon" />
+                                <img src="${APP_URL}/public/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator indicator-active" data-src="tweet-storm-tweets" />
                                 <img src="${APP_URL}/public/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
                                 <img src="${APP_URL}/public/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
                                 <textarea class="post-textarea new-post-area" name="tweet_text_area_${items}" ></textarea>  <!-- END .primary-post-area -->
