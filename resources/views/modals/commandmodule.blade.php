@@ -29,7 +29,7 @@ div[data-schedule="none"] {
                             </div>  <!-- END .global-twitter-profile-header -->
                           </div>  <!-- END .posting-tool-banner -->
 
-                          <form id="posting-tool-form-001" class="posting-tool-form" data-url="{{ route('command-module-save') }}" enctype="multipart/form-data" method="post">
+                          <form id="posting-tool-form-001" class="posting-tool-form" enctype="multipart/form-data" method="post">
                             <div class="posting-tool-columns">
                               <div class="posting-tool-col posting-tool-left-col">
 
@@ -45,7 +45,14 @@ div[data-schedule="none"] {
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comments-tweets"/>
                                      <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
                                      <img src="{{ asset('public/')}}/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
-                                     <textarea class="post-textarea primary-post-area" name="tweet_text_area" id="emojionearea"></textarea>  <!-- END .primary-post-area -->                                    
+                                     {{-- <div>
+                                       <div  class="post-textarea primary-post-area" name="tweet_text_area" id="emojionearea"  contentEditable="true">
+                                         <span>
+                                           <img id="image-preview" src="#" alt="Image Preview" style="display:none" />  
+                                          </span>                              
+                                       </div>
+                                     </div> --}}
+                                     <textarea class="post-textarea primary-post-area" name="tweet_text_area" id="emojionearea"></textarea>  <!-- END .primary-post-area -->      
                                     </div>  <!-- END .primary-post-area-wrap -->
                                     <div class="post-bottom-buttons primary-post-bottom-buttons">
                                       <span class="post-type-buttons primary-post-type-buttons">
@@ -118,6 +125,7 @@ div[data-schedule="none"] {
                                      {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br /> --}}
                                      {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon emojionearea-button" data-emoji-open="0" /><br /> --}}
                                     </div>  <!-- END .primary-post-right-buttons -->
+                                    <input id="image-upload-input" type="file" accept="image/*" style="display: none;">
                                   </div>  <!-- END .primary-post-right -->
 
                                 </div>  <!-- END .primary-post-wrap -->
