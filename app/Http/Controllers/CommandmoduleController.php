@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\url_decode;
-use Exception;
-use App\Models\CommandModule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\url_decode;
+use App\Models\CommandModule;
 use App\Models\Tag_groups;
 use App\Models\Tag_items;
 
@@ -111,10 +111,7 @@ class CommandmoduleController extends Controller
    
         }
     }
-
-    // public function promoTweets($post_type) {
-    //     dd('test');
-    // } 
+   
     
     public function addTagGroup(Request $request) {
         
@@ -206,4 +203,21 @@ class CommandmoduleController extends Controller
 
         return response()->json($getUnselectedTwitter);
     }
+
+    
+    public function getTweetsUsingPostTypes($id, $post_type) {
+        $tweets = CommandModule::where(['twitter_id'=> $id, 'sched_method' => $post_type])->get();
+
+        return response()->json($tweets);
+    }
+
+    public function getDrafts($twitterId)
+    {
+        $drafts = CommandModule::where(['twitter' => $twitterId, 'sched_method' => 'save-draft'])->get();
+
+        dd($drafts);
+
+        return response()->json($drafts);
+    }
+  
 }

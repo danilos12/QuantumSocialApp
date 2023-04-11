@@ -64,7 +64,11 @@
 <style>
 
     .mosaic-post-data {
-        height: 300px
+        height: auto
+    }
+
+    .tweetSection {
+        margin-bottom: 10em
     }
 </style>
 

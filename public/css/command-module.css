@@ -97,3 +97,16 @@ img.disabled {
     opacity: 0.3!important;
     /* Optional: reduce the opacity of the image to indicate that it's disabled */
 }
+
+
+select option {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.post-textarea span img {
+    width: 5em;
+    height: 5em;
+}
