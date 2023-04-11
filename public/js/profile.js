@@ -53,7 +53,7 @@ function renderProfileCards(cardSection, index, value, numItems) {
     $cloneTemplate.find(".mosaic-post-text").append(value.text);
 
     if (value.image) {
-        var image = `<img src="${value.image}" alt="tweet image" data-twitter-image="imgId" height="500" width="auto">`;
+        var image = `<img src="${value.image}" alt="tweet image" data-twitter-image="imgId" height="300" width="auto">`;
         $cloneTemplate.find(".mosaic-post-data").append(image);
     }
 

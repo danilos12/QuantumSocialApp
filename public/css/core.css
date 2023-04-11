@@ -2608,14 +2608,6 @@ input#file-upload-button {
 
 .posting-tool-columns .post-tool-icon:hover {
   opacity: 1;
-}
-
-.posting-tool-columns .post-tool-icon:active {
-  /* color: */
-    /* edit this ingrid */
-}
-
-.primary-post-option-buttons .ui-icon.post-tool-icon:active {
   filter: var(--color-nova-filter);
 }
 
@@ -2715,7 +2707,7 @@ input#file-upload-button {
   min-height: 77px;
   max-height: 350px;
   background: var(--frost-background);
-  color: var(--body-text)!important;
+  color: var(--body-text) !important;
   text-align: left;
   align-items: flex-start;
   padding: 1em;
