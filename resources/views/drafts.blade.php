@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="page-outer queue-outer">
-                <div class="page-inner queue-inner">
+                <div class="page-inner queue-inner" data-sched-method="save-draft">
 
                   <div class="page-head-n-sort">
                     <div class="head-left-wrap">
@@ -219,4 +219,7 @@ Queue Types:
                 </div>  <!-- END .profile-inner -->
               </div>  <!-- END .profile-outer -->
 
+@endsection
+@section('scripts')
+<script type='text/javascript' src="{{asset('public/js/posting.js')}}"></script>
 @endsection

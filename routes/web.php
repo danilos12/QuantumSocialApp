@@ -68,10 +68,14 @@ Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeT
 
 Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
 
-Route::post('/command-module-save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('command-module-save');
+Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 
-Route::post('/add_tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('add_tag');
-Route::post('/add_tag_item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('add_tag_item');
-Route::get('/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('get-tag-groups');
-Route::get('/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('get-tag-items');
-Route::get('/getUnselectedTwitterAccounts',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('getUnselectedTwitterAccounts');
+Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
+Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
+Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
+Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
+Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
+Route::get('/cmd/{id}/post-type/{type}',[App\Http\Controllers\CommandmoduleController::class, 'getTweetsUsingPostTypes'])->name('cmd.post_type');
+
+
+Route::get('/promos/get/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getPromos'])->name('promos.get');
