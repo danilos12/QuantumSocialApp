@@ -1,8 +1,7 @@
 /**
- * Authors: Carlo Ariel Sandig
+ * Authors: Faith Hidalgo
  * 
-*/
-
+ */
 $(function($) {
     // // emoji-picker
     // $("#emojionearea").emojioneArea({
@@ -15,31 +14,31 @@ $(function($) {
     //     tones: false,
     // });
 
-    $(".primary-post-right-buttons .add-emoji-icon").on("click", function () {
-        var isOpen = $(this).data("emoji-open");
+    // $(".primary-post-right-buttons .add-emoji-icon").on("click", function () {
+    //     var isOpen = $(this).data("emoji-open");
 
-        if (isOpen == 0) {
-            $(this).data("emoji-open", 1);
-            $(".emojionearea-button").addClass("active");
-            $(
-                ".emojionearea-picker.emojionearea-picker-position-left.emojionearea-filters-position-bottom.emojionearea-search-position-top"
-            ).removeClass("hidden");
-        } else {
-            $(this).data("emoji-open", 0);
-            $(".emojionearea-button").removeClass("active");
-            $(
-                ".emojionearea-picker.emojionearea-picker-position-left.emojionearea-filters-position-bottom.emojionearea-search-position-top"
-            ).addClass("hidden");
-        }
-    });
+    //     if (isOpen == 0) {
+    //         $(this).data("emoji-open", 1);
+    //         $(".emojionearea-button").addClass("active");
+    //         $(
+    //             ".emojionearea-picker.emojionearea-picker-position-left.emojionearea-filters-position-bottom.emojionearea-search-position-top"
+    //         ).removeClass("hidden");
+    //     } else {
+    //         $(this).data("emoji-open", 0);
+    //         $(".emojionearea-button").removeClass("active");
+    //         $(
+    //             ".emojionearea-picker.emojionearea-picker-position-left.emojionearea-filters-position-bottom.emojionearea-search-position-top"
+    //         ).addClass("hidden");
+    //     }
+    // });
 
     // pull hashtags from database
     $.ajax({
         type: "GET",
-        url: APP_URL + "/get-tag-groups/" + TWITTER_ID, // Use the URL of your server-side script here
-        success: function (response) {
+        url: APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID, // Use the URL of your server-side script here
+        success: function(response) {
             // Add the existing tag groups to the page
-            $.each(response, function (index, k) {
+            $.each(response, function(index, k) {
                 var option = $("<option>")
                     .addClass("modal-select-tag-group")
                     .attr("value", k.tag_group_mkey)
@@ -47,10 +46,10 @@ $(function($) {
                 $(option).appendTo($("select#tag-groups"));
             });
         },
-        error: function (xhr, status, error) {
+        error: function(xhr, status, error) {
             console.log(
                 "An error occurred while fetching the existing tag groups: " +
-                    error
+                error
             );
         },
     });
@@ -58,14 +57,14 @@ $(function($) {
     // pull non selected twitter from database
     $.ajax({
         type: "GET",
-        url: APP_URL + "/getUnselectedTwitterAccounts", // Use the URL of your server-side script here
+        url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
         data: {
             twitter_id: TWITTER_ID,
         },
-        success: function (response) {
+        success: function(response) {
             // Add the existing tag groups to the page
             if (response.length > 0) {
-                $.each(response, function (index, k) {
+                $.each(response, function(index, k) {
                     var img = $("<img>")
                         .addClass("cross-tweet-profile-image")
                         .attr("src", k.twitter_photo)
@@ -79,10 +78,10 @@ $(function($) {
                     .append("<div>No other twitter accounts linked</div>");
             }
         },
-        error: function (xhr, status, error) {
+        error: function(xhr, status, error) {
             console.log(
                 "An error occurred while fetching the existing tag groups: " +
-                    error
+                error
             );
         },
     });
@@ -90,115 +89,284 @@ $(function($) {
     // bgIcon and post types
     const $postPanels = $("div[data-post]");
     const $postIcon = $("img[data-type]");
-    let $lastButtonClicked = null;    
-    $(".post-type-buttons img").on("click", function () {
-        var type = $(this).data('type');
+    let $lastButtonClicked = null;
+    $(".post-type-buttons img").on("click", function() {
+        var type = $(this).data("type");
+
+        $('#post_type_tweets').val(type);
 
         // Check if clicked icon is a regular icon (not tweetstorm)
         if (type !== "tweet-storm-tweets") {
             // Check if tweetstorm is already active
             if ($("#select-tweet-storm-icon").data("select") === 1) {
-               // Check if clicked icon is already active
-               if ($(this).hasClass("icon-active")) {
+                // Check if clicked icon is already active
+                if ($(this).hasClass("icon-active")) {
                     // Remove active class from clicked icon
                     $(this).removeClass("icon-active");
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");   
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="tweet-storm-tweets"]`).addClass("indicator-active");                          
-               } else {
+                    $(`.primary-post-area-wrap`)
+                        .find(`img.post-type-indicator`)
+                        .removeClass("indicator-active");
+                    $(`.primary-post-area-wrap`)
+                        .find(
+                            `img.post-type-indicator[data-src="tweet-storm-tweets"]`
+                        )
+                        .addClass("indicator-active");
+                    console.log('oo')
+                } else {
                     // Remove active class from other regular icons and add to clicked icon
                     $(".post-type-buttons img[data-type!='tweet-storm-tweets']").removeClass("icon-active");
                     $(this).addClass("icon-active");
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");                       
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="${(type === "evergreen-tweets") ? "evergreen-storm-tweets": "promos-storm-tweets"}"]`).addClass("indicator-active");       
-               }
+                    $(`.primary-post-area-wrap`)
+                        .find(`img.post-type-indicator`)
+                        .removeClass("indicator-active");
+                    $(`.primary-post-area-wrap`)
+                        .find(
+                            `img.post-type-indicator[data-src="${
+                                type === "evergreen-tweets"
+                                    ? "evergreen-storm-tweets"
+                                    : "promos-storm-tweets"
+                            }"]`
+                        )
+                        .addClass("indicator-active");
+                    $("#post_type_tweets").val(type);
+
+                    if (type === "comments-tweets") {
+                        originalState()
+                        $(this).data('select', 1).addClass('icon-active')
+                        $(".cross-tweet-profiles-outer").addClass(
+                            "tweets-hide"
+                        );
+                        $postIcon
+                            .filter("img.post-tool-icon")
+                            .addClass("disabled"); // disable all the icons
+                        $postIcon
+                            .filter('img[data-type="comments-tweets"]')
+                            .removeClass("disabled"); // enable the comment icon
+                        $("span.primary-post-option-buttons")
+                            .find("img.retweet-timer-icon")
+                            .addClass("tweets-hide");
+                            $("img[data-type='tweet-storm-tweets']").data('select', 0)
+                    }
+
+                }
             } else {
                 if ($(this).hasClass("icon-active")) {
                     // Remove active class from clicked icon
                     $(this).removeClass("icon-active");
 
                     if (type === "comments-tweets") {
-                        $(".cross-tweet-profiles-outer").removeClass(
-                            "tweets-hide"
-                        );
-                        $postIcon.filter("img.post-tool-icon").removeClass("disabled"); // disable all the icons                        
-                    } 
-                    
-                    if (type === "tweet-storm-active") {
-                        confirmation(type)
+                        $(".cross-tweet-profiles-outer").removeClass("tweets-hide");
+                        $postIcon.filter("img.post-tool-icon").removeClass("disabled"); // disable all the icons
                     }
 
-                    $("span.primary-post-option-buttons").find("img.retweet-timer-icon").removeClass('tweets-hide');
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active")
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="twitter-tweets"]`).addClass("indicator-active");
-                         
+                    if (type === "tweet-storm-active") {
+                        confirmation(type);
+                    }
+
+                    $("span.primary-post-option-buttons").find("img.retweet-timer-icon")
+                        .removeClass("tweets-hide");
+                    $(`.primary-post-area-wrap`)
+                        .find(`img.post-type-indicator`)
+                        .removeClass("indicator-active");
+                    $(`.primary-post-area-wrap`)
+                        .find(
+                            `img.post-type-indicator[data-src="twitter-tweets"]`
+                        )
+                        .addClass("indicator-active");
+
+                    $("#post_type_tweets").val("regular_tweets");
                 } else {
                     // If tweetstorm is not active, remove active class from other regular icons and add to clicked icon
-                    $(".post-type-buttons img[data-type!='tweet-storm-tweets']").removeClass("icon-active");
-                    $postPanels.filter("[data-post!='tweet-storm-tweets']").addClass("tweets-hide"); 
-                    $("span.primary-post-option-buttons").find("img.retweet-timer-icon").addClass("tweets-hide");
+                    $(
+                        ".post-type-buttons img[data-type!='tweet-storm-tweets']"
+                    ).removeClass("icon-active");
+                    $postPanels
+                        .filter("[data-post!='tweet-storm-tweets']")
+                        .addClass("tweets-hide");
+                    $("span.primary-post-option-buttons")
+                        .find("img.retweet-timer-icon")
+                        .addClass("tweets-hide");
                     $(this).addClass("icon-active");
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active")
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="${type}"]`).addClass("indicator-active");          
-                         
+                    $(`.primary-post-area-wrap`)
+                        .find(`img.post-type-indicator`)
+                        .removeClass("indicator-active");
+                    $(`.primary-post-area-wrap`)
+                        .find(`img.post-type-indicator[data-src="${type}"]`)
+                        .addClass("indicator-active");
 
                     if (type === "retweet-tweets") {
-                        $("span.primary-post-option-buttons").find("img.retweet-timer-icon").removeClass('tweets-hide');
+                        $("span.primary-post-option-buttons")
+                            .find("img.retweet-timer-icon")
+                            .removeClass("tweets-hide");
                     }
-                    
+
                     if (type === "comments-tweets") {
                         $(".cross-tweet-profiles-outer").addClass(
                             "tweets-hide"
-                        ); 
-                        $postIcon.filter("img.post-tool-icon").addClass("disabled"); // disable all the icons
+                        );
+                        $postIcon
+                            .filter("img.post-tool-icon")
+                            .addClass("disabled"); // disable all the icons
                         $postIcon
                             .filter('img[data-type="comments-tweets"]')
                             .removeClass("disabled"); // enable the comment icon
                         $(".more-tweets-roster").empty();
                     }
-               }
-           }
+
+
+                }
+            }
         } else {
             // If clicked icon is tweetstorm, toggle active class
             $(this).toggleClass("icon-active");
-           
+            console.log(type)
+            disableWatermark(type)            
+            
+            if ($(".post-type-buttons img[data-type!='tweet-storm-tweets']").hasClass("icon-active")) {
+                var combo = $("img[data-type!='tweet-storm-tweets'].icon-active").attr("data-type")
+                disableWatermark(type, combo)            
+                
+                // $(`.primary-post-area-wrap`)
+                //     .find(`img.post-type-indicator`)
+                //     .removeClass("indicator-active");
+                // $(`.primary-post-area-wrap`)
+                //     .find(
+                //         `img.post-type-indicator[data-src="${
+                //             combo === "evergreen-tweets"
+                //                 ? "evergreen-storm-tweets"
+                //                 : "promos-storm-tweets"
+                //         }"]`
+                //     )
+                //     .addClass("indicator-active");
+
+                $("#post_type_tweets").val(combo);
+            }
+
             if ($(".more-tweets-roster .add-tweet-outer").length > 0) {
                 confirmation("tweet-storm-tweets");
             } else {
-                addTweetTextArea("tweet-storm-tweets")
-            } 
+                var combod = $("img[data-type!='tweet-storm-tweets'].icon-active").attr("data-type")
+                addTweetTextArea(type, ($("img[data-type!='tweet-storm-tweets'].icon-active").length > 0) ? combod : "");
+                // addTweetTextArea(combo);
+            }
         }
-        
+
         // Toggle select data attribute on clicked icon
         $(this).data("select", $(this).hasClass("icon-active") ? 1 : 0);
-        $postPanels.filter(`[data-post=${type}]`).toggleClass('tweets-hide'); 
-   });
+        ($(this).hasClass("icon-active")) ?
+            $postPanels.filter(`[data-post=${type}]`).removeClass("tweets-hide") :        
+            $postPanels.filter(`[data-post=${type}]`).addClass("tweets-hide");
+        
+    });
 
-    function confirmation(type) {        
-        if (confirm("Do you want to cancel or your changes?")) {
-            // User clicked "Yes"
-            originalState();
-        }
-              
-    }
+    // selecting the hashtag
+    $("select#tag-groups").on("click", function(e) {
+        $(".modal-tag-group-display").empty();
+        $.ajax({
+            type: "GET",
+            url: APP_URL + "/cmd/get-tag-items/", // Use the URL of your server-side script here
+            data: {
+                twitter_id: TWITTER_ID,
+                tag_id: this.value,
+            },
+            success: function(response) {
+                // Add the existing tag groups to the page
+                if (response.length > 0) {
+                    $.each(response, function(index, k) {
+                        // console.log(k);
+                        var span = $("<span>")
+                            .addClass("modal-tag-instance")
+                            .text(k.tag_meta_value);
+                        $(span).appendTo($(".modal-tag-group-display"));
+                    });
+                }
 
+                // add active in hashtag instance
+                $(".modal-tag-instance").click(function(e) {
+                    $(this).attr("status", "active");
+                });
+
+                // console.log(response);
+            },
+            error: function(xhr, status, error) {
+                console.log(
+                    "An error occurred while fetching the existing tag groups: " +
+                    error
+                );
+            },
+        });
+    });
+
+    // send tags to textarea
+    $(".tags-submit").on("click", function() {
+        const activeTags = $(".modal-tag-instance[status='active']");
+        const activeTagTexts = activeTags
+            .map(function() {
+                return $(this).text().trim();
+            })
+            .get();
+
+        // div
+        // var textArea = $("#emojionearea");
+        // var textInside = textArea.text();
+        // var withTags = textInside + " " + activeTagTexts.join(" ");
+        // console.log(withTags);
+        // textArea.text(withTags);
+
+        // textarea
+        var textArea = $("#emojionearea");
+        var textInside = textArea.val();
+        var withTags = textInside + " " + activeTagTexts.join(" ");
+        textArea.val(withTags);
+
+        // textwithmoji
+        // var textAreaMoji = $(".emojionearea-editor");
+        // var textInsideMoji = textAreaMoji.html();
+        // var withTagsMoji = textInsideMoji + " " + activeTagTexts.join(" ");
+        // textAreaMoji.html(withTagsMoji);
+    });
+
+    // retweet toggle the section (open)
+    $("img.retweet-timer-icon").on("click", function() {
+        var id = $(this).attr("data-type");
+
+        $(this).toggleClass("icon-active");
+        $postPanels.filter(`[data-post="${id}"]`).toggleClass("tweets-hide");
+    });
+
+    // post counter
     $(".primary-post-option-buttons").on(
         "click",
         "span.post-counter",
-        function (e) {
+        function(e) {
+            // for textbox
             var mainTextBox = $(".primary-post-area-wrap")
                 .find('[name="tweet_text_area"]')
                 .val();
+
+            // for div
+            // var mainTextBox = $(".primary-post-area-wrap")
+            //     .find('[name="tweet_text_area"]')
+            //     .text();
+
+
             var getPagination = $(".primary-post-option-buttons")
                 .find(".post-counter")
                 .text();
             var textWithPagination = `${mainTextBox}\n${getPagination}`;
             console.log(textWithPagination);
+            // text area
             $(".primary-post-area-wrap")
                 .find('[name="tweet_text_area"]')
                 .val(textWithPagination);
 
+            // div   
+            // $(".primary-post-area-wrap")
+            //     .find('[name="tweet_text_area"]')
+            //     .text(textWithPagination);
+
             if ($(".add-tweet-outer").length > 0) {
-                $(".add-tweet-outer").each(function (e) {
+                $(".add-tweet-outer").each(function(e) {
                     var currentVal = $(this)
                         .find(`.new-post-area[name="tweet_text_area_${e}"]`)
                         .val();
@@ -214,96 +382,52 @@ $(function($) {
         }
     );
 
-    $(".posting-tool-col").on("click", ".add-tweet-initial", function () {
+    // add new text area instance
+    $(".posting-tool-col").on("click", ".add-tweet-initial", function() {
         addTweetTextArea("add-tweet-initial");
     });
 
-    var itemsPerPage = 10;
-    var numItems = $(".new-post-area").length;
-    var numPages = Math.ceil(numItems / itemsPerPage);
 
-    function addTweetTextArea(entryPoint) {
-        if (entryPoint === "add-tweet-initial") {
-            $postIcon
-                .filter('[data-type="tweet-storm-tweets"]')
-                .addClass("icon-active");
-            $postPanels
-                .filter('[data-post="tweet-storm-tweets"]')
-                .removeClass("tweets-hide");
-            disableWatermark("tweet-storm-tweets", 259);
-        } else {
-            disableWatermark(entryPoint, 267);
-        }
+    $(document).on("click", ".remove-new-tweet", function() {
+        var removedBlock = $(this).closest(".add-tweet-outer");
+        // var indexToRemove = removedBlock.attr("id", "textbox-");
 
-        var newTextbox = tweetInstance(numItems);
-        newTextbox = $(newTextbox);
+        removedBlock.remove();
+        // console.log(indexToRemove);
 
-        // Increment the ID and name attributes of the input element
-        var newId = "textbox-" + (numItems + 1);
-        newTextbox
-            .find(".add-tweet-outer")
-            .attr("id", newId)
-            .attr("name", newId);
-
-        // Append the new textbox to the container
-        $(".more-tweets-roster").append(newTextbox);
-
-        // Increment the number of items and pages
-        numItems++;
-        numPages = Math.ceil(numItems / itemsPerPage);
-
-        // Update page info
-        updateItemInfo();
-    }
-
-    function updateItemInfo() {
-        // Update current page based on current item count and items per page
-        var currentPage = Math.ceil(
-            $(".add-tweet-outer").length / itemsPerPage
-        );
         var totalItems = $(".add-tweet-outer").length + 1;
-        var startIndex = (currentPage - 1) * itemsPerPage + 1;
-        var endIndex = Math.min(currentPage * itemsPerPage, totalItems);
-        // console.log(currentPage, totalItems, startIndex, endIndex);
-
-        $(".add-tweet-outer").each(function (index) {
-            // get the textbox element
-            var textbox = $(this);
-            // console.log(textbox, index);
-
-            // update the page info for this textbox
-            var newId = "textbox-" + index;
-            textbox.attr("id", newId).attr("name", newId);
-            textbox
-                .find("span.post-counter")
-                .text(`${currentPage + index + 1}/${totalItems}`);
+        $(".add-tweet-outer").each(function(i, k) {
+            var newId = "textbox-" + i;
+            $(this).attr("id", newId).attr("name", newId);
+            $(this).find("span.post-counter").text(`${i + 2}/${totalItems}`);
+            console.log(i + 1)
         });
-
         $(".primary-post-option-buttons span").text(
-            `${startIndex}/${totalItems}`
+            `1/${totalItems}`
         );
-    }
+    });
 
-    function disableWatermark(src, line) {
-        console.log(src, line);
-        $(".primary-post-area-wrap")
-            .find("img.post-type-indicator")
-            .removeClass("indicator-active");
-        $(
-            `.primary-post-area-wrap img.post-type-indicator[data-src="${src}"]`
-        ).addClass("indicator-active");
-    }
+    $(document).on("click", ".add-image-icon", function() {
+        // programmatically click the hidden file input field
+        $("#image-upload-input").trigger("click");
 
-    // retweet toggle the section (open)
-    $("img.retweet-timer-icon").on("click", function () {
-        var id = $(this).attr("data-type");
+    });
 
-        $(this).toggleClass("icon-active");
-        $postPanels.filter(`[data-post="${id}"]`).toggleClass("tweets-hide");
+    $("#image-upload-input").on("change", function(e) {
+        var file = e.target.files[0];
+        console.log(file)
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#image-preview').attr('style', '')
+                $("#image-preview").attr("src", e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
     });
 
     // time
-    $(".custom-dhms").on("change", function () {
+    $(".custom-dhms").on("change", function() {
         var bgg = $(this).attr("data-check");
 
         var txx = $('select[data-info="' + bgg + '"]');
@@ -340,7 +464,7 @@ $(function($) {
     });
 
     // schedule
-    $('select[name="scheduling-options"]').on("change", function () {
+    $('select[name="scheduling-options"]').on("change", function() {
         var fvv = $("#scheduling-method-xxx");
         var svv = $(this).val();
         var sopp = "";
@@ -353,7 +477,10 @@ $(function($) {
         if (svv == "set-countdown") {
             fvv.attr("data-schedule", svv);
 
-            $("#scheduling-cdn").attr({ "data-info": svv, name: "c-" + svv });
+            $("#scheduling-cdn").attr({
+                "data-info": svv,
+                name: "c-" + svv
+            });
             $("#scheduling-cdmins").attr({
                 "data-check": svv,
                 name: "ct-" + svv,
@@ -369,7 +496,10 @@ $(function($) {
         }
         if (svv == "custom-time") {
             fvv.attr("data-schedule", svv);
-            $("#scheduling-cdn").attr({ "data-info": svv, name: "c-" + svv });
+            $("#scheduling-cdn").attr({
+                "data-info": svv,
+                name: "c-" + svv
+            });
             $("#scheduling-cdmins").attr({
                 "data-check": svv,
                 name: "ct-" + svv,
@@ -387,70 +517,11 @@ $(function($) {
         // console.log("scheduling");
     });
 
-    // send tags to textarea
-    $(".tags-submit").on("click", function () {
-        const activeTags = $(".modal-tag-instance[status='active']");
-        const activeTagTexts = activeTags
-            .map(function () {
-                return $(this).text().trim();
-            })
-            .get();
-
-        // console.log(activeTagTexts);
-        var textArea = $("#emojionearea");
-        var textAreaMoji = $(".emojionearea-editor");
-        var textInside = textArea.val();
-        var textInsideMoji = textAreaMoji.html();
-
-        var withTags = textInside + " " + activeTagTexts.join(" ");
-        var withTagsMoji = textInsideMoji + " " + activeTagTexts.join(" ");
-
-        textArea.val(withTags);
-        textAreaMoji.html(withTagsMoji);
-    });
-
-    // selecting the hashtag
-    $("select#tag-groups").on("click", function (e) {
-        $(".modal-tag-group-display").empty();
-        $.ajax({
-            type: "GET",
-            url: APP_URL + "/get-tag-items/", // Use the URL of your server-side script here
-            data: {
-                twitter_id: TWITTER_ID,
-                tag_id: this.value,
-            },
-            success: function (response) {
-                // Add the existing tag groups to the page
-                if (response.length > 0) {
-                    $.each(response, function (index, k) {
-                        // console.log(k);
-                        var span = $("<span>")
-                            .addClass("modal-tag-instance")
-                            .text(k.tag_meta_value);
-                        $(span).appendTo($(".modal-tag-group-display"));
-                    });
-                }
-
-                // add active in hashtag instance
-                $(".modal-tag-instance").click(function (e) {
-                    $(this).attr("status", "active");
-                });
-
-                // console.log(response);
-            },
-            error: function (xhr, status, error) {
-                console.log(
-                    "An error occurred while fetching the existing tag groups: " +
-                        error
-                );
-            },
-        });
-    });
-
+    // cross tweet profiles
     $(".cross-tweet-profiles-inner").on(
         "click",
         "img.cross-tweet-profile-image",
-        function (e) {
+        function(e) {
             // e.preventDefault();
             console.log(e);
             if ($(this).attr("status") === "active") {
@@ -461,14 +532,15 @@ $(function($) {
         }
     );
 
+
     // form submit
-    const form = $("#posting-tool-form-001");
-    $("#posting-tool-form-001").on("submit", function (e) {
+    $("#posting-tool-form-001").on("submit", function(e) {
+        const form = $(this);
         e.preventDefault();
 
         var crossTweet = [];
 
-        $(".cross-tweet-profiles-inner.cmd img").each(function () {
+        $(".cross-tweet-profiles-inner.cmd img").each(function() {
             if ($(this).attr("status")) {
                 crossTweet.push(this.id);
             }
@@ -476,48 +548,53 @@ $(function($) {
 
         var crossTweetAcct = "";
         if (crossTweet.length > 0) {
-            crossTweet.forEach(function (e, index) {
+            crossTweet.forEach(function(e, index) {
                 console.log(e, index);
                 crossTweetAcct += `&crossTweetAcct_${index}=${e.split("-")[1]}`;
             });
         }
 
         const $form = $(form).serialize();
-        const formData = `${$form}&twitter_id=${TWITTER_ID}${crossTweetAcct}`;
+        const textarea = $(".post-textarea").text();
+        // const formData = `${$form}&twitter_id=${TWITTER_ID}${crossTweetAcct}&tweet_text_area=${textarea}`;
+        const formData = `${$form}&twitter_id=${TWITTER_ID}${crossTweetAcct}`
         const params = {};
         formData.split("&").forEach((param) => {
             const [key, value] = param.split("=");
             params[key] = value;
         });
 
+        // console.log(params)
+
+
         form.find('input[type="submit"]').prop("disabled", true);
         form.find('input[type="submit"]').val("Please wait..");
 
         $.ajax({
-            url: APP_URL + "/command-module-save",
+            url: APP_URL + "/cmd/save",
             method: "POST",
             data: params,
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
-            success: function (response) {
+            success: function(response) {
                 // Handle the server response here
                 console.log(response);
                 form.find('input[type="submit"]').prop("disabled", false);
                 form.find('input[type="submit"]').val("Data Saved!");
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus, errorThrown) {
                 // Handle errors here
                 console.log(jqXHR, textStatus, errorThrown);
             },
-            complete: function () {
+            complete: function() {
                 // loop through each input field in the form
                 for (let i = 0; i < form[0].elements.length; i++) {
                     // console.log(form[0].elements.length)
                     const element = form[0].elements[i];
                     // console.log(element)
 
-                    // check if the element is an input field
+                    // check if the element is an input field      
                     if (
                         element.nodeName === "INPUT" ||
                         element.nodeName === "SELECT" ||
@@ -529,22 +606,125 @@ $(function($) {
                         // console.log(element.value)
                     }
                 }
-               
-                originalState();
 
+                originalState();
 
                 form.find('input[type="submit"]').val("Beam me up scotty!");
             },
         });
     });
 
+    function confirmation(type) {
+        if (confirm("Do you want to cancel or your changes?")) {
+            // User clicked "Yes"
+            originalState();
+        }
+    }
+
     function originalState() {
-        $(".cross-tweet-profiles-inner.cmd img").attr('status', '');
-        $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");     
-        $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="twitter-tweets"]`).addClass("indicator-active");
-        $(".post-type-buttons img").removeClass("icon-active");
-        $postPanels.find('[data-post]').addClass('tweets-hide');
+        // console.log(type)
+        $(".cross-tweet-profiles-inner.cmd img").attr("status", "");
+
+        disableWatermark("twitter-tweets")
+        $postIcon.removeClass("icon-active");
+        $postPanels.addClass("tweets-hide");
+        $postPanels.find('[data-post="tweet-storm-tweets"]').addClass("tweets-hide");
         $(".more-tweets-roster").empty();
+        $("#post_type_tweets").val("regular_tweets");
+    }
+
+
+    function disableWatermark(src, combo = null) {
+
+        var source = (combo) ? (combo === "evergreen-tweets") ? "evergreen-storm-tweets" : "promos-storm-tweets" : src;
+        console.log(src, combo, source)
+
+        $(".primary-post-area-wrap")
+            .find("img.post-type-indicator")
+            .removeClass("indicator-active");
+        $(
+            `.primary-post-area-wrap img.post-type-indicator[data-src="${source}"]`
+        ).addClass("indicator-active");
+
+        if (combo) {
+            console.log(combo, 646)
+            $(`.new-post-area-wrap > img`).removeClass("indicator-active");
+            // $(`.add-tweet-outer .new-post-area-wrap > new_post_area`).prepend(`<img src="${APP_URL}/public/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-type-icon" />`);
+            console.log(combo, 653)
+            $('.add-tweet-outer').find(`.new-post-area-wrap > img[data-src=""]`).addClass('indicator-active')
+            console.log(combo, 655)
+        } else {
+            $('.add-tweet-outer').find(`.new-post-area-wrap > img`).removeClass("indicator-active");
+            $('.add-tweet-outer').find(`[data-src="tweet-storm-tweets"]`).addClass('indicator-active')
+        }
+    }
+
+    var itemsPerPage = 10;
+    var numItems = $(".new-post-area").length;
+    var numPages = Math.ceil(numItems / itemsPerPage);
+
+    function addTweetTextArea(entryPoint, combo) {
+
+        if (entryPoint === "add-tweet-initial") {
+            $postIcon
+                .filter('[data-type="tweet-storm-tweets"]')
+                .addClass("icon-active");
+            $postPanels
+                .filter('[data-post="tweet-storm-tweets"]')
+                .removeClass("tweets-hide");
+            // disableWatermark("tweet-storm-tweets", 259);
+        }
+        else {
+            disableWatermark(entryPoint, combo);
+        }
+
+        var newTextbox = tweetInstance(numItems);
+        newTextbox = $(newTextbox);
+
+        // Increment the ID and name attributes of the input element
+        var newId = "textbox-" + (numItems + 1);
+        newTextbox
+            .find(".add-tweet-outer")
+            .attr("id", newId)
+            .attr("name", newId);
+
+        // Append the new textbox to the container
+        $(".more-tweets-roster").append(newTextbox);
+
+        // Increment the number of items and pages
+        numItems++;
+        numPages = Math.ceil(numItems / itemsPerPage);
+
+        // Update page info
+        updateItemInfo();
+    }
+
+    function updateItemInfo() {
+        // Update current page based on current item count and items per page
+        var currentPage = Math.ceil(
+            $(".add-tweet-outer").length / itemsPerPage
+        );
+        var totalItems = $(".add-tweet-outer").length + 1;
+        var startIndex = (currentPage - 1) * itemsPerPage + 1;
+        var endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+        // console.log(currentPage, totalItems, startIndex, endIndex);
+
+        $(".add-tweet-outer").each(function(index) {
+            // get the textbox element
+            var textbox = $(this);
+            // console.log(textbox, index);
+
+            // update the page info for this textbox
+            var newId = "textbox-" + index;
+            textbox.attr("id", newId).attr("name", newId);
+            textbox
+                .find("span.post-counter")
+                .text(`${currentPage + index + 1}/${totalItems}`);
+        });
+
+        $(".primary-post-option-buttons span").text(
+            `${startIndex}/${totalItems}`
+        );
     }
 
     // add new tweet instance
@@ -571,8 +751,10 @@ $(function($) {
 					</div>  <!-- END .wait-to-tweet-col -->
 					<div class="new-post-wrap add-tweet-col">
                         <div class="post-area-left new-post-left">
-                            <div class="post-area-wrap new-post-area-wrap">
+                            <div class="post-area-wrap new-post-area-wrap">                                
                                 <img src="${APP_URL}/public/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator indicator-active" data-src="tweet-storm-type-icon" />
+                                <img src="${APP_URL}/public/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
+                                <img src="${APP_URL}/public/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
                                 <textarea class="post-textarea new-post-area" name="tweet_text_area_${items}" ></textarea>  <!-- END .primary-post-area -->
                             </div>  <!-- END .post-area-wrap -->
                             <div class="post-bottom-buttons new-post-bottom-buttons">
@@ -594,7 +776,7 @@ $(function($) {
 					</div>  <!-- END .new-post-wrap -->
 				</div>  <!-- END .add-tweet-inner -->
 				<img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon add-tweet-icon add-tweet-again-button" />
-			</div>  <!-- END .add-tweet-outer -->
+			</div> 
 				`;
 
         return $template;
