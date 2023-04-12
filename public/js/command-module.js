@@ -137,7 +137,6 @@ $(function($) {
                         $("img[data-type='tweet-storm-tweets']").data('select', 0)
                     }
 
-                    console.log(1)
                 }
             } else {
                 if ($(this).hasClass("icon-active")) {
@@ -169,8 +168,8 @@ $(function($) {
                     // $postPanels.find("[data-post!='tweet-storm-tweets']").addClass("tweets-hide");
                     $postPanels.filter("[data-post!='tweet-storm-tweets']").addClass("tweets-hide"); console.log(11)
                     $("span.primary-post-option-buttons").find("img.retweet-timer-icon").addClass("tweets-hide");
-                                      
-                    disableWatermark(type, "")
+
+                    disableWatermark(type, ($(".add-tweet-outer").length > 0) ? type : "")
 
                     if (type === "retweet-tweets") {
                         $("span.primary-post-option-buttons").find("img.retweet-timer-icon").removeClass("tweets-hide");
@@ -180,7 +179,7 @@ $(function($) {
                         $(".cross-tweet-profiles-outer").addClass("tweets-hide");
                         $postIcon.filter("img.post-tool-icon").addClass("disabled"); // disable all the icons
                         $postIcon.filter('img[data-type="comments-tweets"]').removeClass("disabled"); // enable the comment icon
-                        $(".more-tweets-roster").empty();
+                        $(".more-tweets-roster").remove();
                     }
 
 
@@ -205,7 +204,7 @@ $(function($) {
                 confirmation("tweet-storm-tweets");
             } else {
                 var combod = $("img[data-type!='tweet-storm-tweets'].icon-active").attr("data-type")
-                addTweetTextArea(type, ($("img[data-type!='tweet-storm-tweets'].icon-active").length > 0) ? combod : "");
+                addTweetTextArea(type, ($("img[data-type!='tweet-storm-tweets'].icon-active").length > 0) ? combod : "")
             }
         }
 
@@ -293,10 +292,11 @@ $(function($) {
     });
 
     // post counter
-    $(".primary-post-option-buttons").on(
-        "click",
-        "span.post-counter",
-        function(e) {
+    $(".primary-post-option-buttons").on("click", "span.post-counter", function() {
+        postCounter();
+    });
+
+    function postCounter() {
             // for textbox
             var mainTextBox = $(".primary-post-area-wrap")
                 .find('[name="tweet_text_area"]')
@@ -325,6 +325,7 @@ $(function($) {
 
             if ($(".add-tweet-outer").length > 0) {
                 $(".add-tweet-outer").each(function(e) {
+                    console.log(e)
                     var currentVal = $(this)
                         .find(`.new-post-area[name="tweet_text_area_${e}"]`)
                         .val();
@@ -332,13 +333,15 @@ $(function($) {
                     var getPagination1 = $(this).find(".post-counter").text();
                     var newTextWithPagination = `${currentVal}\n${getPagination1}`;
 
+                    console.log(currentVal, getPagination1)
+                    console.log(newTextWithPagination)
+
                     $(this)
                         .find(`.new-post-area[name="tweet_text_area_${e}"]`)
                         .val(newTextWithPagination);
                 });
             }
         }
-    );
 
     // add new text area instance
     $(".posting-tool-col").on("click", ".add-tweet-initial", function() {
@@ -586,6 +589,7 @@ $(function($) {
         });
     });
 
+    
     function confirmation(type) {
         if (confirm("Do you want to cancel or your changes?")) {
             // User clicked "Yes"
@@ -598,6 +602,7 @@ $(function($) {
         $(".cross-tweet-profiles-inner.cmd img").attr("status", "");
 
         disableWatermark("twitter-tweets")
+        $postIcon.data('select', 0)
         $postIcon.removeClass("icon-active");
         $postPanels.addClass("tweets-hide");
         $postPanels.find('[data-post="tweet-storm-tweets"]').addClass("tweets-hide");
@@ -627,23 +632,41 @@ $(function($) {
     }
 
     var itemsPerPage = 10;
-    var numItems = $(".new-post-area").length;
+    var $items = 0;
+   
     var numPages = Math.ceil(numItems / itemsPerPage);
 
-    function addTweetTextArea(entryPoint, combo) {
-
-        // if (entryPoint === "add-tweet-initial") {
-        //     $postIcon
-        //         .filter('[data-type="tweet-storm-tweets"]')
-        //         .addClass("icon-active");
-        //     $postPanels
-        //         .filter('[data-post="tweet-storm-tweets"]')
-        //         .removeClass("tweets-hide");
-        //     // disableWatermark("tweet-storm-tweets", 259);
-        // }
-              
+    function addTweetTextArea(entryPoint, combo) {   
             
-       
+       console.log(numItems);
+
+        var newTextbox = tweetInstance($items);
+        newTextbox = $(newTextbox);
+
+        // Increment the ID and name attributes of the input element
+        var newId = "textbox-" + ($items + 1);
+        newTextbox
+            .find(".add-tweet-outer")
+            .attr("id", newId)
+            .attr("name", newId);
+
+        // Append the new textbox to the container
+        $(".more-tweets-roster").append(newTextbox);
+
+        // Increment the number of items and pages
+        $items++;
+        numPages = Math.ceil($items / itemsPerPage);
+
+        disableWatermark(entryPoint, combo);
+
+        // Update page info
+        updateItemInfo();
+    }
+
+    var numItems = 0;
+    function addTweetTextAreaFromThunder(entryPoint, combo) {   
+            
+       console.log(numItems);
 
         var newTextbox = tweetInstance(numItems);
         newTextbox = $(newTextbox);
@@ -659,8 +682,8 @@ $(function($) {
         $(".more-tweets-roster").append(newTextbox);
 
         // Increment the number of items and pages
-        numItems++;
-        numPages = Math.ceil(numItems / itemsPerPage);
+        // numItems++;
+        // numPages = Math.ceil(numItems / itemsPerPage);
 
         disableWatermark(entryPoint, combo);
 
