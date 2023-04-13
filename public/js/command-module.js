@@ -115,12 +115,18 @@ $(function($) {
                     $(".post-type-buttons img[data-type!='tweet-storm-tweets']").removeClass("icon-active");
                     $(this).addClass("icon-active");
 
+                    var dtype = (type === "evergreen-tweets")
+                                ? "evergreen-storm-tweets"
+                                : ((type === "retweet-tweets")
+                                    ? "retweet-tweets"
+                                    : "promos-storm-tweets")
+                                    
                     $(`.primary-post-area-wrap`).find(`img.post-type-indicator`).removeClass("indicator-active");
-                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="${type === "evergreen-tweets"? "evergreen-storm-tweets" : "promos-storm-tweets"}"]`).addClass("indicator-active");
+                    $(`.primary-post-area-wrap`).find(`img.post-type-indicator[data-src="${dtype}"]`).addClass("indicator-active");
                     
                     if ($('.more-tweets-roster .add-tweet-outer').length > 0) {
                         $(".new-post-area-wrap").find("img.post-type-indicator").removeClass("indicator-active");
-                        $(`.new-post-area-wrap img.post-type-indicator[data-src="${type === "evergreen-tweets"? "evergreen-storm-tweets" : "promos-storm-tweets"}"]`).addClass('indicator-active')
+                        $(`.new-post-area-wrap img.post-type-indicator[data-src="${dtype}"]`).addClass('indicator-active')
                     }
 
                     // hide panel from previous clicked icon except tst, add panel for the clicked icon
@@ -166,7 +172,7 @@ $(function($) {
                     $(this).addClass("icon-active");
 
                     // $postPanels.find("[data-post!='tweet-storm-tweets']").addClass("tweets-hide");
-                    $postPanels.filter("[data-post!='tweet-storm-tweets']").addClass("tweets-hide"); console.log(11)
+                    $postPanels.filter("[data-post!='tweet-storm-tweets']").addClass("tweets-hide"); 
                     $("span.primary-post-option-buttons").find("img.retweet-timer-icon").addClass("tweets-hide");
 
                     disableWatermark(type, ($(".add-tweet-outer").length > 0) ? type : "")
@@ -613,7 +619,11 @@ $(function($) {
 
     function disableWatermark(src, combo = null) {
 
-        var source = (combo) ? (combo === "evergreen-tweets") ? "evergreen-storm-tweets" : "promos-storm-tweets" : (src === "add-tweet-initial") ? src: src;
+        var source = (combo === "evergreen-tweets")
+                        ? "evergreen-storm-tweets"
+                        : ((combo === "retweet")
+                            ? "retweet-tweets"
+                            : ((combo === "promos-tweets") ? "promos-storm-tweets" : ((src === "add-tweet-initial") ? src : src)))
         console.log(src)
         console.log(combo)
         console.log(source)
@@ -746,6 +756,7 @@ $(function($) {
                             <div class="post-area-wrap new-post-area-wrap">                                
                                 <img src="${APP_URL}/public/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator indicator-active" data-src="tweet-storm-tweets" />
                                 <img src="${APP_URL}/public/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
+                                <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-tweets"/>
                                 <img src="${APP_URL}/public/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
                                 <textarea class="post-textarea new-post-area" name="tweet_text_area_${items}" ></textarea>  <!-- END .primary-post-area -->
                             </div>  <!-- END .post-area-wrap -->
