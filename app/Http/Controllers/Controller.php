@@ -25,7 +25,7 @@ class Controller extends BaseController
             'response_type' => 'code',
             'client_id' => env('TWITTER_CLIENT_ID'),
             'redirect_uri' => env('TWITTER_CALLBACK_URL'),
-            'scope' => 'tweet.read users.read follows.read follows.write'           
+            'scope' => 'tweet.read users.read follows.read follows.write tweet.write'           
         ]);
 
         if ($url) {
@@ -43,7 +43,7 @@ class Controller extends BaseController
         if (isset($_GET['error'])) {
             // return redirect('/');
             // If there was an error saving data, redirect back to the previous page with an error message
-            return redirect('/')->with('alert', 'Adding the account was denied')->with('alert_type', 'success');
+            return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'warning');
 
         } else {
 

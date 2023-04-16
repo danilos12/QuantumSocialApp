@@ -1,22 +1,27 @@
 // Fetch the existing tag groups when the page loads
-$(document).ready(function() {    
+$(document).ready(function() {        
+
     $.ajax({
         type: "GET",
-        url: APP_URL + "/tweets/" + TWITTER_ID, // Use the URL of your server-side script here
+        url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets",
         beforeSend: function () {
             $("#spinner").show();
         },
         success: function (response) {
-            console.log(response.data);
+            // console.log(response.data);
             $(".profileSection").show();
             
-            if (response.data.length > 0) {
+            if (response.status === 200) {
                 var cardSection = $(".profile-posts-inner");
-                var numItems = response.data.length;
-                 
+                var numItems = 0;
+                
                 $.each(response.data, function (index, value) {     
                     renderProfileCards(cardSection, index, value, numItems);                                  
+
+                    numItems++;
                 });        
+            } else {
+                $(".profile-posts-inner").text('No tweets found');
             }
         },
         error: function (xhr, status, error) {
@@ -28,6 +33,40 @@ $(document).ready(function() {
             $("#spinner").hide();
         },
     });
+
+   // Bind click event to li elements inside dropdown
+    $(".profile-page-dd li").click(function(e) {
+        // Get text inside li element
+        var type = $(this).attr('id');
+
+        $.ajax({
+            url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/" + type,
+            method: "GET", 
+            beforeSend: function() {
+                $(".profile-posts-inner").empty();
+            },          
+            success: function (response) {
+                // Do something with the data    
+                
+                if (response.status === 200) {
+                    var cardSection = $(".profile-posts-inner");
+                    var numItems = 0;
+                    
+                    $.each(response.data, function (index, value) {     
+                        renderProfileCards(cardSection, index, value, numItems);                                  
+
+                        numItems++;
+                    });        
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log(
+                    "An error occurred while fetching the tweets: " + error
+                );
+            },
+        });
+    });
+    
 });
 
 
@@ -47,7 +86,7 @@ function renderProfileCards(cardSection, index, value, numItems) {
         year: "numeric",
     }).format(date);
 
-    $cloneTemplate.attr("id", "template-" + index);
+    $cloneTemplate.attr("id", "template-" + numItems);
     $cloneTemplate.find(".global-profile-name").text(TWITTER_NAME);
     $cloneTemplate.find(".global-post-date").text(formattedDate);
     $cloneTemplate.find(".mosaic-post-text").append(value.text);
@@ -60,7 +99,7 @@ function renderProfileCards(cardSection, index, value, numItems) {
     cardSection.append($cloneTemplate);
 }
 
-function tweetInstance(numItems) {
+function tweetInstance() {
     var profileImg = (TWITTER_PHOTO !== "") ? TWITTER_PHOTO : APP_URL + "/public/temp-images/imgpsh_fullsize_anim (1).png";    
     return ($template = `
          <div class="mosaic-posts-outer template">
@@ -158,4 +197,42 @@ function tweetInstance(numItems) {
 
         </div>  <!-- END .mosaic-posts-outer -->
         `);
+
+
+        // var nextToken = null;
+
+        // function getTweets() {
+        // var url = "https://api.twitter.com/1.1/statuses/user_timeline.json";
+        // var params = {
+        //     screen_name: "twitterusername",
+        //     count: 10
+        // };
+        // if (nextToken !== null) {
+        //     params.max_id = nextToken;
+        // }
+        // $.ajax({
+        //     url: url,
+        //     data: params,
+        //     dataType: "json",
+        //     success: function(response) {
+        //     // Handle the response here
+        //     console.log(response);
+        //     // Save the next_token parameter for the next request
+        //     nextToken = response[response.length-1].id_str;
+        //     },
+        //     error: function(error) {
+        //     console.log(error);
+        //     }
+        // });
+        // }
+
+        // // Call the function to fetch the initial set of tweets
+        // getTweets();
+
+        // // Call the function again to fetch the next set of tweets
+        // $("#load-more-btn").on("click", function() {
+        // getTweets();
+        // });
+
+
 }

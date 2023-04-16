@@ -64,13 +64,13 @@ Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, '
 Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
 
 Route::post('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
-Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('remove.twitter');
+Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
+Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
 
 Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
 
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
-
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
 Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
@@ -78,5 +78,17 @@ Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::c
 Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
 Route::get('/cmd/{id}/post-type/{type}',[App\Http\Controllers\CommandmoduleController::class, 'getTweetsUsingPostTypes'])->name('cmd.post_type');
 
-
 Route::get('/promos/get/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getPromos'])->name('promos.get');
+
+
+
+
+Route::middleware(['web','guest', 'CheckSessionExpiration'])
+    ->group(function () {
+        Route::get('/session-login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])
+            ->name('session-login')
+            ->withoutMiddleware(['CheckSessionExpiration']);
+        Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])
+            ->withoutMiddleware(['CheckSessionExpiration']);
+    });
+
