@@ -199,3 +199,7 @@
 
 
 @endsection
+
+@section('scripts')
+<script type='text/javascript' src="{{asset('public/js/promo.js')}}"></script>
+@endsection
