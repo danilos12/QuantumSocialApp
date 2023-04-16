@@ -8,6 +8,8 @@
             <img src="{{ asset('public/')}}/ui-images/logo/quantum-logo-white-lg.png" class="image-placeholder" width="300" />
         </div>
 
+       
+
         <div class="form p-135">
             <form method="POST" action="{{ route('login') }}">
                 @csrf
@@ -23,7 +25,7 @@
                             </span>
                         @enderror
                     </div>
-                </div>
+                </div>               
     
                 <div class="row mb-3">
                     
@@ -78,6 +80,10 @@
                 </div>
             </form>
         </div>
+
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
     </div>
 </div>
 
