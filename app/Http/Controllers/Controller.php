@@ -25,7 +25,7 @@ class Controller extends BaseController
             'response_type' => 'code',
             'client_id' => env('TWITTER_CLIENT_ID'),
             'redirect_uri' => env('TWITTER_CALLBACK_URL'),
-            'scope' => 'tweet.read users.read follows.read follows.write tweet.write'           
+            'scope' => 'tweet.read users.read follows.read follows.write tweet.write offline.access'           
         ]);
 
         if ($url) {
@@ -43,7 +43,7 @@ class Controller extends BaseController
         if (isset($_GET['error'])) {
             // return redirect('/');
             // If there was an error saving data, redirect back to the previous page with an error message
-            return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'warning');
+            return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
 
         } else {
 
@@ -68,12 +68,11 @@ class Controller extends BaseController
                 'Content-Type: application/x-www-form-urlencoded'
             );
     
-            $response = $this->curlHttpRequest($url, $headers, $data);
-            // dd($response);
-            
-            $accessToken = $response->access_token;        
-    
-            $twitterId = $this->getTwitterdetails($accessToken);
+            $response = $this->curlHttpRequest($url, $headers, $data);                       
+            $twitterId = $this->getTwitterdetails($response->access_token);
+
+            // implement error when twitter is already saved before
+            // if ($twitterId)
     
             // save the twitter details to database
             $saveTwitterInfo = Twitter::updateOrCreate([
@@ -97,7 +96,9 @@ class Controller extends BaseController
                 $saveToken = TwitterToken::firstOrCreate([
                     'user_id' => Auth::user()->id,
                     'twitter_id' => $twitterId->id,
-                    'access_token' => $accessToken
+                    'access_token' => $response->access_token,
+                    'refresh_token' => $response->refresh_token,
+                    'expires_in' => $response->expires_in
                 ]);
     
                 // save ut_user_mngt
@@ -148,16 +149,13 @@ class Controller extends BaseController
         
     }    
 
-    public function getTwitterdetails($accessToken) {
-       
-
+    public function getTwitterdetails($accessToken) {    
         $headers = array(
             'Authorization: Bearer ' . $accessToken,
-            'User-Agent: My Twitter App v2.0.0',
+            'User-Agent: My Quantum App v2.0.0',
             'Content-Type: application/json'
         );
         
-
         $url = 'https://api.twitter.com/2/users/me?user.fields=created_at,description,public_metrics,profile_image_url';
 
         $curl = curl_init();
@@ -243,19 +241,5 @@ class Controller extends BaseController
         $encoded = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
         return $encoded;
     }
-
-    // public function oauthv2($endpoint, $params) {
-    //     $url = $this->buildAuthorizedURL("https://twitter.com/i/" . $endpoint, [
-    //         'response_type' => 'code',
-    //         'client_id' => env('TWITTER_CLIENT_ID'),
-    //         'redirect_uri' => env('TWITTER_CALLBACK_URL'),
-    //         'scope' => 'tweet.read users.read follows.read follows.write'           
-    //     ]);
-
-    //     return $url; 
-    // }
-
-    public function getTokens($endpoint, ) {
-
-    }
+    
 }

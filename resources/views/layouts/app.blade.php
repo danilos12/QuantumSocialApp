@@ -97,7 +97,7 @@
                       <span class="account-select-title">Select An Account</span>
 
                       @foreach($twitter_accts as $twitter)
-                      <div class="twitter-account-select-bar {{ $selected_user->twitter_id === $twitter->twitter_id ? "active" : "" }}" data-url="{{ route("twitter.switchUser", ['twitter_id', $twitter->twitter_id ]) }}" data-id="twitter-{{ $twitter->twitter_id }}">
+                      <div class="twitter-account-select-bar {{ $twitter->twitter_id === $twitter_id ? "active" : "" }}" data-url="{{ route("twitter.switchUser", ['twitter_id', $twitter->twitter_id ]) }}" data-id="twitter-{{ $twitter->twitter_id }}">
                         <div class="twitter-account-item ">                                                                       
                           <div class="twitter-bar-profile-info">
                             <img src="{{ $twitter->twitter_photo }}" />
