@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="page-outer queue-outer">
-  <div class="page-inner queue-inner" data-sched-method="rush-queue">
+  <div class="page-inner queue-inner" data-sched-method="queue">
 
     <div class="page-head-n-sort">
       <div class="head-left-wrap">
@@ -32,43 +32,27 @@
           Sort by Source:
           <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon drop-arrow" />
         </span>
-        <ul class="page-filters-dropdown profile-filter-dropdown frosted">
-          <li>
+        <ul class="page-filters-dropdown profile-filter-dropdown frosted queue-page-dd">
+          <li id="all">
             <img src="{{ asset('public/')}}/ui-images/icons/04-queue.svg" class="ui-icon" />
             All (0)
           </li>
-          <li>
+          <li id="non-campaign">
             <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" />
             Non-Campaign (0)
           </li>
-          <li>
+          <li id="evergreen">
             <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon" />
             Evergreen
           </li>
-          <li>
+          <li id="retweets">
             <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon" />
             Retweets
           </li>
-          <li>
+          <li id="promo">
             <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
             Promo Campaign 01
-          </li>
-          <li>
-            <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
-            Promo Campaign 02
-          </li>
-          <li>
-            <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
-            Promo Campaign 03
-          </li>
-          <li>
-            <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
-            Promo Campaign 04
-          </li>
-          <li>
-            <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
-            Promo Campaign 05
-          </li>
+          </li>         
         </ul>
       </div>  <!-- END .filter-wrap -->
       <div class="drop-button-wrap sort-wrap">
@@ -81,27 +65,7 @@
           <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
             December 2022</li>
           <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            January 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            February 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            March 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            April 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            May 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            June 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            July 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            August 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            September 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            October 2023</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            November 2023</li>
+            January 2023</li>          
         </ul>
       </div>  <!-- END .sort-wrap -->
     </div>  <!-- END .filter-controls -->
