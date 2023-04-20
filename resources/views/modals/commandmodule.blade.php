@@ -234,7 +234,7 @@ div[data-schedule="none"] {
                                 <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
                                   <option disabled selected>Select a scheduling method...</option>
                                   <option value="add-queue">Add to Queue (default)</option>
-                                  <option value="send-now">Send Now</option>
+                                  <option value="send-now">Tweet Now</option>
                                   <option value="set-countdown">Set Countdown</option>
                                   <option value="custom-time">Custom Time</option>
                                   <option value="custom-slot">Custom Slot</option>

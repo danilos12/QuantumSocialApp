@@ -54,8 +54,15 @@ class AppServiceProvider extends ServiceProvider
                 ->where('twitter_accts.deleted', "=", 0)
                 ->first();
 
-            // dd($selectedUser);   
             $view->with('selected_user', $selectedUser);       
+            
+            $token = TwitterToken::where(['user_id' => Auth::id(), 'twitter_id' => $selectedUser->twitter_id ?? 0 ])->first();
+            // $t = $token->pluck('refresh_token');
+            // dd($t->fi);
+            if ($token) {
+                $view->with('refresh_token', $token->refresh_token ?? "");       
+            }
+                    
             
             $twitterID = $selectedUser->twitter_id ?? 0;
             $view->with('twitter_id', $twitterID);       
@@ -92,7 +99,7 @@ class AppServiceProvider extends ServiceProvider
             
             // membership 
             $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
-            $view->with('membership', $membership);
+            $view->with('membership', $membership);                       
             
             // // social account settings of selected user 
             // if ($selectedUser !== null) {

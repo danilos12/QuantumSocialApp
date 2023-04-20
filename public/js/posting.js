@@ -5,23 +5,18 @@ $(document).ready(function() {
         type: "GET",
         url: APP_URL + "/cmd/" + TWITTER_ID + "/post-type/" + method, // Use the URL of your server-side script here        
         success: function (response) {
-            // // Add the existing tag groups to the page
-    
-            // console.log(response.length);
+            if (response.length > 0) {                
+                // var details = fetchTwitterDetails(TWITTER_ID);
 
-
-            if (response.length > 0) {
-                var details = fetchTwitterDetails(TWITTER_ID);
                 $.each(response, function (index, k) {
+                    console.log(k.sched_method)
                     var postType = getPostType(k.post_type);
-                    var wrapper = postWrapper(k, postType);
+                    var wrapper = postWrapper(k, postType);                    
 
                     $('.queue-day-wrapper').append(wrapper);
                 });
             } else {
-                $(".posting-tool-columns")
-                    .find(".cross-tweet-profiles-outer")
-                    .append("<div>No other twitter accounts linked</div>");
+                $(".queue-day-wrapper").html("<div>No other twitter accounts linked</div>");
             }
         },
         error: function (xhr, status, error) {
@@ -31,9 +26,18 @@ $(document).ready(function() {
         },
     });
 
-    function postWrapper(info, post_type) {
-        console.log(info)
-        console.log(post_type)
+    $('.queue-page-dd li').on('click', function(e) {
+        console.log($(this));
+    }) 
+
+    function postWrapper(info, post_type) {        
+        const dateTimeString = info.created_at;
+        const dateTime = new Date(dateTimeString);
+        const month = dateTime.toLocaleString('default', { month: 'long' });
+        const day = dateTime.getDate();
+        const year = dateTime.getFullYear();
+        const timeString = dateTime.toLocaleTimeString();
+        const fullDate = month + ", " + day + " " + year;
 
         // var data = fetchTwitterDetails(info.twitter_id);
         // console.log(data)
@@ -46,10 +50,11 @@ $(document).ready(function() {
 
                     <div class="queued-single-start">
                         <span class="queued-post-time">
-                        
-                        10:30am</span>
+                        ${fullDate + " " + timeString}
+                        </span>
                         <span class="queued-post-data">
-                        ${info.post_description.substring(0, 17) + "..." }
+                        ${info.sched_method + ": " + info.post_description}
+                        <!--info.post_description.substring(0, 17) + "..." -->
                         </span>
                     </div>  <!-- END .queue-single-start -->
 
