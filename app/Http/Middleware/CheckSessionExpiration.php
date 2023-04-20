@@ -11,13 +11,13 @@ class CheckSessionExpiration
     {
         $loginRoute = route('session-login');
         $postLoginRoute = url('/login');
-
+        
         if (!$request->session()->has('last_activity') && $request->url() !== $loginRoute) {
             // Redirect to login page if session has expired
             session()->flash('error', 'Session expired');
             return redirect()->route('session-login');
         }
-
+        
         $lastActivity = $request->session()->get('last_activity');
         if ($lastActivity < time() - config('session.lifetime') * 60 && $request->url() !== $loginRoute && $request->url() !== $postLoginRoute) {
             // Redirect to login page if session has expired
