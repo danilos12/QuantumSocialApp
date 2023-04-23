@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\url_decode;
 use App\Http\Controllers\Controller;
 use App\Models\CommandModule;
 use App\Models\Tag_groups;
 use App\Models\Tag_items;
 use App\Models\TwitterToken;
-
+use App\Models\QuantumAcctMeta;
+use DateTime;
+use DateTimeZone;
 
 class CommandmoduleController extends Controller
 {
@@ -39,14 +40,17 @@ class CommandmoduleController extends Controller
     }
 
     public function create(Request $request) {
-        try {
+        try {            
+            $acctMeta = QuantumAcctMeta::where('user_id' , Auth::id())->first();
+            $utc = new DateTime("now", new DateTimeZone($acctMeta->timezone));
+            $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
+
             $postData = $request->all();
-
-            // dd($postData);
-
             $user_id = Auth::id();
-            $main_twitter_id = $postData['twitter_id'];
-
+            $main_twitter_id = $postData['twitter_id'];      
+            
+            $post = null;
+            
             // Save the regular tweet for main account
             $insertData = [
                 'user_id' => $user_id,
@@ -59,13 +63,49 @@ class CommandmoduleController extends Controller
                 'rt_ite' => $postData['iterations-custom-cm'] ?? null,
                 'promo_id' => $postData['retweet'] ?? null, 
                 'sched_method' => $postData['scheduling-options'] ?? null,
-                'sched_time' => $postData['scheduling-cdmins'] ?? null,          
+                'sched_time' => $datetime,
                 'post_type_code' => rand(10000, 99999),
             ];
-            CommandModule::create($insertData);
 
+            if ($postData['scheduling-options'] === 'set-countdown') {
+                $countDown = ($postData['c-set-countdown'] === '1') ? rtrim($postData['ct-set-countdown'], 's') : $postData['ct-set-countdown'];
+                $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
+
+                // modify the UTC datetime object by adding the countdown time
+                $utc->modify($countDownWithWords);
+
+                // format the resulting datetime object as a string in the 'YYYY-MM-DD HH:MM:SS' format
+                $scheduled_time = $utc->format('Y-m-d H:i:s');
+
+                $insertData['sched_time'] = $scheduled_time;
+            }
+
+            if ($postData['scheduling-options'] === 'custom-time') {
+                $custom = ($postData['c-custom-time'] === '1') ? rtrim($postData['ct-custom-time'], 's') : $postData['ct-custom-time'];
+                $customTimeWithWords = $postData['c-set-countdown'] . ' ' . $custom;
+
+                // modify the UTC datetime object by adding the countdown time
+                $utc->modify($customTimeWithWords);
+
+                // format the resulting datetime object as a string in the 'YYYY-MM-DD HH:MM:SS' format
+                $custom_time = $utc->format('Y-m-d H:i:s');
+
+                $insertData['sched_time'] = $custom_time;
+            }
+          
+            if ($postData['scheduling-options'] === 'custom-slot') {                
+                $insertData['sched_time'] = $datetime;
+            }
+
+            CommandModule::create($insertData);   
+
+            // post tweet
             if ($postData['scheduling-options'] === "send-now") {
-                $this->postTweet2twitter($main_twitter_id, urldecode($postData['tweet_text_area']));
+                $post = $this->postTweet2twitter($main_twitter_id, urldecode($postData['tweet_text_area']));
+
+                // dd($post);
+
+                return $post;
             }
 
 
@@ -126,7 +166,7 @@ class CommandmoduleController extends Controller
             }          
            
             // Return success response
-            return response()->json(['status' => '201', 'message' => 'Data has been created.']);
+            return response()->json(['status' => '201', 'message' => 'Data has been created.', 'tweet' => $post]);
 
         } catch (Exception $e) {
             Log::error('Error creating data: ' . $e->getMessage());
@@ -308,7 +348,6 @@ class CommandmoduleController extends Controller
                 'client_id' => env('TWITTER_CLIENT_ID')
             );
 
-            // dd($rt_data);
             $getNewToken = Controller::curlHttpRequest($rt_url, $rt_headers, $rt_data);
 
 
