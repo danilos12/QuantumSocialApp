@@ -201,7 +201,7 @@ div[data-schedule="none"] {
                                     </select>
                                     <select id="time-custom-cm" name="time-custom-cm" data-check="retweet-timer" class="custom-dhms retweet-timer-select time-custom-cm">
                                         @php 
-                                          $times = ['seconds', 'mins', 'hours', 'days']
+                                          $times = ['seconds', 'minutes', 'hours', 'days']
                                         @endphp
 
                                         @foreach($times as $time) 
@@ -251,12 +251,12 @@ div[data-schedule="none"] {
                                   <div id="scheduling-method-xxx" class="scheduling-details-countdown" data-schedule="none" name="scheduling-method">
                                     <!-- CARLO - if Countdown -->
                                     <select id="scheduling-cdn" class="scheduling-countdown-number">                                      
-                                      <option value="mins">Minutes</option>
+                                      <option value="minutes">Minutes</option>
                                       <option value="hours">Hours</option>
                                       <option value="days">Days</option>
                                     </select>
                                     <select id="scheduling-cdmins" name="scheduling-cdmins" class="custom-dhms scheduling-countdown-minutes">
-                                      <option value="mins">Minutes</option>
+                                      <option value="minutes">Minutes</option>
                                       <option value="hours">Hours</option>
                                       <option value="days">Days</option>
                                     </select>
