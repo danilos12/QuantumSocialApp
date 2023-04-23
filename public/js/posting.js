@@ -16,7 +16,7 @@ $(document).ready(function() {
                     $('.queue-day-wrapper').append(wrapper);
                 });
             } else {
-                $(".queue-day-wrapper").html("<div>No other twitter accounts linked</div>");
+                $(".queue-day-wrapper").html("<div>No tweets found</div>");
             }
         },
         error: function (xhr, status, error) {
@@ -59,10 +59,10 @@ $(document).ready(function() {
                     </div>  <!-- END .queue-single-start -->
 
                     <div class="queued-single-end">
-                        <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/pg-view.svg" class="ui-icon queued-icon queued-view-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon" />
+                        <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon" title="More" data-toggle="tooltip" />
+                        <img src="${APP_URL}/public/ui-images/icons/pg-view.svg" class="ui-icon queued-icon queued-view-icon" title="View" data-toggle="tooltip" />
+                        <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon" title="Drafts" data-toggle="tooltip" />
+                        <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon" title="Delete" data-toggle="tooltip" />
                     </div>  <!-- END .queued-single-end -->
 
                     </div>  <!-- END .queued-single-post -->
