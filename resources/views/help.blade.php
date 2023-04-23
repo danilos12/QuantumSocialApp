@@ -7,7 +7,7 @@
     {{-- <div data-form-url="{{ route('save-settings') }}" data-twitterid=" {{ isset($user) ? $user->twitter_id : " " }}" id="help-settings"></div> --}}
 
     <div>
-        <p>This section is brought to you by Quantum Social</p>
+        <p>This section is brought to you by Quantum Social hello</p>
     </div>
       
 
