@@ -1,0 +1,23 @@
+name: SSH Deploy CI/CD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: SSH Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: vps40603.dreamhostps.com
+        username: quantum_social
+        key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCytUXO+9MLUhphEJE3vzPYPIgLTPbnJO3j67JbS0nW9+GsAWwzJWUUaGUurTkUYdAz6D2gVm1ByjmS7qtoRoQup10fVWkl4EwH9Z/GNNaclwhM/GCGWDbJqWtk05dcS8N8To2NNiuFe0nUU7UNqqKdt4nSZ5FvVXxn3/LvmUwWmIKJ8tM8mPqicv8pvEPayhcVAGmHBSrmFqgIdu5R8bNCEokZ8I5ytBTeCK81hdOx3vbWbQIxS+61hFeGKmCQwNo1OCzy/tDNQ/Sam1dbs8zQYoXbBd9tUYF065cbucv5X1S2Gm9gkoydSbHENmNOy+ytWhaA4jYulCT1R1PzibvT quantum_social@ps396065
+        script: |
+          cd app.quantumsocial.io
+          git pull
