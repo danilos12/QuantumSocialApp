@@ -31,7 +31,7 @@ $(document).ready(function() {
     }) 
 
     function postWrapper(info, post_type) {        
-        const dateTimeString = info.created_at;
+        const dateTimeString = info.sched_time;
         const dateTime = new Date(dateTimeString);
         const month = dateTime.toLocaleString('default', { month: 'long' });
         const day = dateTime.getDate();

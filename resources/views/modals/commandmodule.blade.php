@@ -85,23 +85,23 @@ div[data-schedule="none"] {
                                       </div>  <!-- END .tag-group-modal-outer -->
 
 
-                                      <!--
-                                      <div class="post-tool-modal schedule-retweet-modal-outer frosted" >
+                                      
+                                      {{-- <div class="post-tool-modal schedule-retweet-modal-outer frosted" >
                                         <div class="schedule-retweet-modal-inner">
                                         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close retweet-modal-close" />
                                           Select A Post Time:
                                           <div class="schedule-time-selectors">
                                             <select id="post-time-hour" name="post-time-hour" class="post-time-hour">
                                               <option disabled selected>Hour</option>
-                                              {{-- @for ($i = 1; $i <= 12; $i++)
+                                              @for ($i = 1; $i <= 12; $i++)
                                                 <option value="{{  $i }}"> {{  $i }}</option>
-                                              @endfor --}}
+                                              @endfor
                                             </select>
                                             <select class="post-time-minute">
                                               <option disabled selected>Minute</option>
-                                              {{-- @for ($i = 0; $i <= 59; $i++)
+                                              @for ($i = 0; $i <= 59; $i++)
                                                 <option value="{{  $i }}"> {{  $i }}</option>
-                                              @endfor --}}
+                                              @endfor
                                             </select>
                                             <select id="post-time-am-pm" name="post-time-am-pm" class="post-time-am-pm">
                                               <option disabled selected>AM / PM</option>
@@ -110,11 +110,11 @@ div[data-schedule="none"] {
                                             </select>
                                           </div>  
                                           <div class="date-picker-wrapper">
-                                              <input type="text" id="datepicker" autocomplete="off">
+                                            <input type="text" id="datepicker" autocomplete="off">
                                           </div>  
                                         </div>  
-                                      </div>  
-                                    -->
+                                      </div>   --}}
+                                    
                                     </div>  <!-- END .primary-post-bottom-buttons -->
                                   </div>  <!-- END .primary-post-left -->
 
@@ -132,7 +132,8 @@ div[data-schedule="none"] {
 
                                <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" data-select="0" class="ui-icon add-tweet-icon add-tweet-initial" />
 
-                                <div class="more-tweets-roster">                                
+                                <div class="more-tweets-roster">     
+                                                              
                                 </div>  <!-- END .more-tweets-roster -->
                               </div>  <!-- END .posting-tool-left-col -->
                               
@@ -247,29 +248,91 @@ div[data-schedule="none"] {
                                 <!-- INGRID - Please finish these, based on the UI of the rest of the page -->
 
                                   <!-- CARLO - These options only show up if certain options are selected in the scheduling method options -->
-
-                                  <div id="scheduling-method-xxx" class="scheduling-details-countdown" data-schedule="none" name="scheduling-method">
+ 
+                                  <div class="scheduling-details-countdown sop" id="scheduling-method-set-countdown" data-schedule="none" data-name="set-countdown" name="scheduling-method">
                                     <!-- CARLO - if Countdown -->
-                                    <select id="scheduling-cdn" class="scheduling-countdown-number">                                      
-                                      <option value="minutes">Minutes</option>
-                                      <option value="hours">Hours</option>
-                                      <option value="days">Days</option>
+                                    <select id="scheduling-cdn" class="scheduling-options-dd scheduling-countdown-number">                                      
+                                      @for ($i = 0; $i <= 59; $i++)
+                                        <option value="{{  $i }}"> {{  $i }}</option>
+                                      @endfor
                                     </select>
-                                    <select id="scheduling-cdmins" name="scheduling-cdmins" class="custom-dhms scheduling-countdown-minutes">
+                                    <select id="scheduling-cdmins" name="scheduling-cdmins" class="custom-dhms scheduling-countdown-minutes scheduling-options-dd">
                                       <option value="minutes">Minutes</option>
                                       <option value="hours">Hours</option>
                                       <option value="days">Days</option>
                                     </select>
                                   </div>  <!-- END .scheduling-details-countdown -->
-                                  <div class="scheduling-details-date-picker">
-                                    <!-- CARLO - if Custom Time -->
-                                    Ingrid, use RetweetTimer options
-                                  </div>  <!-- END .scheduling-details-date-picker -->
-                                  <div class="scheduling-details-custom-slot">
-                                    <!-- CARLO - if Custom Slot, show available time slots -->
-                                    <select>
-                                      <option>Custom Time Slot List</option>
+                                  <div class="scheduling-details-custom-time sop" id="scheduling-method-custom-time" data-schedule="none" data-name="custom-time" name="scheduling-method">
+                                    <div class="date-picker-wrapper"></div>
+                                    <select id="post-time-hour" name="ct-hour" class="post-time-hour scheduling-options-dd">
+                                      <option disabled selected>Hour</option>
+                                      @for ($i = 1; $i <= 12; $i++)
+                                        <option value="{{  $i }}"> {{  $i }}</option>
+                                      @endfor
                                     </select>
+                                    <select class="post-time-minute scheduling-options-dd" name="ct-min">
+                                      <option disabled selected>Minute</option>
+                                      @for ($i = 0; $i <= 59; $i++)
+                                        <option value="{{  $i }}"> {{  $i }}</option>
+                                      @endfor
+                                    </select>
+                                    <select id="post-time-am-pm" name="ct-am-pm" class="post-time-am-pm scheduling-options-dd">
+                                      <option disabled selected>AM / PM</option>
+                                      <option value="AM">AM</option>
+                                      <option value="PM">PM</option>
+                                    </select>
+                                    <img src="{{ asset('public/')}}/ui-images/icons/calendar.svg" class="sched-custom-time">
+                                    
+                                    {{-- Select a post time: <img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg " class="sched-custom-time"> --}}
+                                  </div>  <!-- END .scheduling-details-date-picker -->
+                                  <div class="scheduling-details-custom-slot sop" id="scheduling-method-custom-slot" data-schedule="none" data-name="custom-slot" name="scheduling-method">
+                                    <!-- CARLO - if Custom Slot, show available time slots -->
+                                    <div class="inner">
+                                      <select id="days-selector" name="days-selector" class="scheduling-options-dd">
+                                        <option value="">Choose days</option>
+                                        <option value="sunday">Sunday</option>
+                                        <option value="monday">Monday</option>
+                                        <option value="tuesday">Tuesday</option>
+                                        <option value="wednesday">Wednesday</option>
+                                        <option value="thursday">Thursday</option>
+                                        <option value="friday">Friday</option>
+                                        <option value="saturday">Saturday</option>
+                                        <option value="weekdays">Weekdays</option>
+                                        <option value="weekend">Weekend Days</option>
+                                        <option value="everyday">Every Day</option>
+                                      </select>  <!-- END .days-selector -->
+  
+                                      <div class="new-slot-time-wrapper1">
+  
+                                          <select id="hour-selector" name="hour-selector" class="hour-selector scheduling-options-dd">
+                                          <option value="">Hour</option>
+                                          @for ($i = 0; $i <= 12; $i++)
+                                              @if( $i < 10 ) 
+                                                  <option value="0{{  $i }}"> 0{{  $i }}</option>
+                                              @else
+                                                  <option value="{{  $i }}"> {{  $i }}</option>
+                                              @endif
+                                              
+                                          @endfor                                        
+                                          </select>  <!-- END .hour-selector -->
+                                          <select id="minute-selector" name="minute-selector" class="minute-selector scheduling-options-dd">
+                                              <option value="">Minute</option>
+                                              @for ($i = 0; $i <= 59; $i++)
+                                              @if( $i < 10 ) 
+                                                  <option value="0{{  $i }}"> 0{{  $i }}</option>
+                                              @else
+                                                  <option value="{{  $i }}"> {{  $i }}</option>
+                                              @endif
+                                              
+                                          @endfor
+                                          </select>  <!-- END .minute-selector -->
+                                          <select id="am-pm-selector" name="am-pm-selector" class="am-pm-selector scheduling-options-dd">
+                                            <option value="am">AM</option>
+                                            <option value="pm">PM</option>
+                                          </select>  <!-- END .am-pm-selector -->
+  
+                                      </div>  <!-- END .new-slot-time-wrapper -->
+                                    </div>
                                   </div>  <!-- END .scheduling-details-custom-slot -->
                                 </div>  <!-- END .scheduling-details -->
                               </div>  <!-- END .post-tool-submit-left -->
@@ -284,3 +347,7 @@ div[data-schedule="none"] {
 
 <script>           
 </script>
+
+<style>
+
+</style>
