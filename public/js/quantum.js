@@ -542,25 +542,6 @@ $launchTwitterSettings.click( function() {
 ///////////////////////////////////////////////////////////////
 
 
-// Retweet Timer Settings
-
-$retweetTimerModalClose = $(".retweet-modal-close");
-
-$retweetTimerModal = $(".schedule-retweet-modal-outer");
-$retweetTimerIcon = $(".retweet-timer-icon");
-
-$retweetTimerIcon.click( function() {
-  if ( $retweetTimerModal.first().is( ":hidden" ) ) {
-      $retweetTimerModal.toggle( "slide", { direction: "up"  }, 400 );
-  } else {
-      $retweetTimerModal.toggle( "slide", { direction: "up"  }, 300 );
-  }
-});
-
-$retweetTimerModalClose.click( function (){
-  $retweetTimerModal.toggle( "slide", { direction: "up"  }, 300 );
-});
-
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////

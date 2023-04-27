@@ -3,6 +3,9 @@
  * 
  */
 $(function($) {
+
+     
+    
     // // emoji-picker
     // $("#emojionearea").emojioneArea({
     //     // container: "#primary_post_text_area", // by selector
@@ -430,7 +433,7 @@ $(function($) {
             }
         }
 
-        if ($(this).val() == "mins") {
+        if ($(this).val() == "minutes") {
             for (let i = 1; i <= 59; i++) {
                 opp += '<option value="' + i + '">' + i + "</option>";
             }
@@ -447,28 +450,30 @@ $(function($) {
     });
 
     // schedule
-    $('select[name="scheduling-options"]').on("change", function() {
-        var fvv = $("#scheduling-method-xxx");
-        var svv = $(this).val();
+    $('select[name="scheduling-options"]').on("change", function(e) {
+        var option = $(this).val();
+        var div = $("#scheduling-method-" + option);
         var sopp = "";
+        console.log(option)
+        
+        $('div[name="scheduling-method"]').filter('div[data-name!="' + option + '"]').attr("data-schedule", "none");
+        $(".date-picker-wrapper").empty()
+        $(".inner").empty()
 
-        fvv.attr("data-schedule", "none");
+        // $("#scheduling-cdn").removeAttr("data-info name");
+        // $("#scheduling-cdmins").removeAttr("data-check name");
 
-        $("#scheduling-cdn").removeAttr("data-info name");
-        $("#scheduling-cdmins").removeAttr("data-check name");
-
-        if (svv == "set-countdown") {
-            fvv.attr("data-schedule", svv);
-
+        if (option == "set-countdown") {            
+            div.attr("data-schedule", option);            
+            
             $("#scheduling-cdn").attr({
-                "data-info": svv,
-                name: "c-" + svv
+                "data-info": option,
+                name: "c-" + option
             });
             $("#scheduling-cdmins").attr({
-                "data-check": svv,
-                name: "ct-" + svv,
-            });
-
+                "data-check": option,
+                name: "ct-" + option,
+            });       
             $("#scheduling-cdn").html("");
 
             for (let i = 1; i <= 59; i++) {
@@ -476,29 +481,64 @@ $(function($) {
             }
 
             $("#scheduling-cdn").append(sopp);
-        }
-        if (svv == "custom-time") {
-            fvv.attr("data-schedule", svv);
-            $("#scheduling-cdn").attr({
-                "data-info": svv,
-                name: "c-" + svv
+        } 
+        if (option === "custom-time") {
+            div.attr("data-schedule", option);            
+
+            $("img.sched-custom-time").on('click', function(e) {
+
+                var datepicker = $("<input>").attr("type", "text").attr("id", "datepicker").attr('name', 'ct-time-date');
+
+                // Append the datepicker element to the container
+                $(".date-picker-wrapper").empty().append(datepicker);
+                $('#scheduling-method-custom-time').attr('style', 'display: flex');
+                $('#scheduling-method-custom-time .date-picker-wrapper input').attr('style', 'font-family: inherit;font-size: inherit;line-height: inherit;margin: 0;padding: 0.5em 1em; color: white');
+                $('#scheduling-method-custom-time select').attr('style', 'margin: 0 0.2em')
+                
+                // Initialize the datepicker with the specified options
+                datepicker.datepicker({
+                    dateFormat: "dd-mm-yy",
+                    duration: "fast"
+                })
+    
+                // Show the datepicker
+                datepicker.datepicker("show");
             });
-            $("#scheduling-cdmins").attr({
-                "data-check": svv,
-                name: "ct-" + svv,
-            });
-
-            $("#scheduling-cdn").html("");
-
-            for (let i = 1; i <= 59; i++) {
-                sopp += '<option value="' + i + '">' + i + "</option>";
-            }
-
-            $("#scheduling-cdn").append(sopp);
         }
+
+        if (option === "custom-slot") {
+            div.attr("data-schedule", option);    
+            console.log(div.attr("data-schedule", option)) 
+
+            $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
+            $('#scheduling-method-custom-slot .inner .new-slot-time-wrapper1').attr('style', 'margin-left: 0.3em');
+        }
+        
+        // }
+        // if (svv == "custom-time") {
+        //     console.log(1);
+        //     fvv.attr("data-schedule", svv);
+        //     $("#scheduling-cdn").attr({
+        //         "data-info": svv,
+        //         name: "c-" + svv
+        //     });
+        //     $("#scheduling-cdmins").attr({
+        //         "data-check": svv,
+        //         name: "ct-" + svv,
+        //     });
+
+        //     $("#scheduling-cdn").html("");
+
+        //     for (let i = 1; i <= 59; i++) {
+        //         sopp += '<option value="' + i + '">' + i + "</option>";
+        //     }
+
+        //     $("#scheduling-cdn").append(sopp);
+        // }
 
         // console.log("scheduling");
     });
+
 
     // cross tweet profiles
     $(".cross-tweet-profiles-inner").on(
@@ -514,6 +554,26 @@ $(function($) {
             }
         }
     );
+
+
+    // Retweet Timer Settings
+
+    // $retweetTimerModalClose = $(".retweet-modal-close");
+
+    // $retweetTimerModal = $(".schedule-retweet-modal-outer");
+    // $retweetTimerIcon = $(".sched-custom-time");
+
+    // $retweetTimerIcon.click( function() {
+    // if ( $retweetTimerModal.first().is( ":hidden" ) ) {
+    //     $retweetTimerModal.toggle( "slide", { direction: "up"  }, 400 );
+    // } else {
+    //     $retweetTimerModal.toggle( "slide", { direction: "up"  }, 300 );
+    // }
+    // });
+
+    // $retweetTimerModalClose.click( function (){
+    // $retweetTimerModal.toggle( "slide", { direction: "up"  }, 300 );
+    // });
 
 
     // form submit
@@ -732,7 +792,7 @@ $(function($) {
         $(".primary-post-option-buttons span").text(
             `${startIndex}/${totalItems}`
         );
-    }
+      }
 
     // add new tweet instance
     function tweetInstance(items) {
@@ -790,3 +850,4 @@ $(function($) {
         return $template;
     }
 });
+

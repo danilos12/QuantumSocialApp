@@ -447,12 +447,12 @@ $TagGroupModalClose.click( function (){
 
 // Date Picker Settings
 
-$( function() {
-	$( "#datepicker" ).datepicker({
-		dateFormat: "dd-mm-yy"
-		,	duration: "fast"
-	});
-} );
+// $( function() {
+// 	$( "#datepicker" ).datepicker({
+// 		dateFormat: "dd-mm-yy" 
+// 		,	duration: "fast"
+// 	});
+// } );
 
 
 ///////////////////////////////////////////////////////////////
@@ -600,7 +600,7 @@ window.onclick = function(event) {
   if (event.target.classList.contains('modal-large-backdrop')) {
     closeModal(currentModal);
   }
-}
+} 
 
 window.onkeyup = function(event) {
   if (event.key === 'Escape') {
