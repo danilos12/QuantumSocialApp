@@ -19,6 +19,7 @@ class TwitterToken extends Model
         'user_id', 
         'twitter_id', 
         'access_token', 
-        'refresh_token'
+        'refresh_token',
+        'expires_in'
     ];
 }
