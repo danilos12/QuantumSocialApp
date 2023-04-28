@@ -2978,7 +2978,7 @@ input#file-upload-button {
 }
 
 .scheduling-options {
-  width: 47.5%;
+  width: 40%;
   background: var(--frost-background);
   color: var(--body-text);
   font-size: 1em;
@@ -2994,8 +2994,9 @@ input#file-upload-button {
   background: var(--frost-heavy);
 }
 
+
 .scheduling-details {
-  width: 47.5%;
+  width: 59%;
   background: var(--frost-background);
   padding: .75em;
 }
@@ -3198,7 +3199,7 @@ input#file-upload-button {
   bottom: -130px;
   width: 50%;
   backdrop-filter: blur(5px);
-  display: none;
+  display: block;
 }
 
 .schedule-retweet-modal-inner {
@@ -3215,10 +3216,11 @@ input#file-upload-button {
 .date-picker-wrapper {
   width: 100%;
   margin-left: auto;
-  margin-right: auto;
+  /* margin-right: auto; */
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+  margin-right: 0.2em;
 }
 
 .date-picker-wrapper input {
@@ -3351,12 +3353,12 @@ input#file-upload-button {
 .scheduling-details-date-picker {
   display: none !important;
 }
-
-.scheduling-details-custom-slot {
+ 
+/* .scheduling-details-custom-slot {
   display: none !important;
-}
+} */
 
-.scheduling-countdown-number {
+.scheduling-countdown-number, .scheduling-options-dd {
   background: var(--frost-background);
   color: var(--body-text);
   padding: .5em 1em;
