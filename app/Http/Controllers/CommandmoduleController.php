@@ -113,7 +113,7 @@ class CommandmoduleController extends Controller
                 return $retweet;
             }
 
-            // CommandModule::create($insertData);   
+            CommandModule::create($insertData);   
 
             // post tweet
             if ($postData['scheduling-options'] === "send-now") {
