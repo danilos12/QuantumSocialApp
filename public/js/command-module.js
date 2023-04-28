@@ -458,7 +458,6 @@ $(function($) {
         
         $('div[name="scheduling-method"]').filter('div[data-name!="' + option + '"]').attr("data-schedule", "none");
         $(".date-picker-wrapper").empty()
-        $(".inner").empty()
 
         // $("#scheduling-cdn").removeAttr("data-info name");
         // $("#scheduling-cdmins").removeAttr("data-check name");
