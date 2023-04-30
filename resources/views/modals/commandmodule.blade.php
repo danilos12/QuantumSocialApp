@@ -287,7 +287,7 @@ div[data-schedule="none"] {
                                   </div>  <!-- END .scheduling-details-date-picker -->
                                   <div class="scheduling-details-custom-slot sop" id="scheduling-method-custom-slot" data-schedule="none" data-name="custom-slot" name="scheduling-method">
                                     <!-- CARLO - if Custom Slot, show available time slots -->
-                                    <div class="inner">
+                                    {{-- <div class="inner">
                                       <select id="days-selector" name="days-selector" class="scheduling-options-dd">
                                         <option value="">Choose days</option>
                                         <option value="sunday">Sunday</option>
@@ -332,7 +332,12 @@ div[data-schedule="none"] {
                                           </select>  <!-- END .am-pm-selector -->
   
                                       </div>  <!-- END .new-slot-time-wrapper -->
-                                    </div>
+                                    </div> --}}
+
+                                    <select name="custom-slot-datetime" class="scheduling-options-dd">
+                                      <option value="">Monday 10:45 AM</option>
+                                      <option value="monday">Saturday 10:45 AM</option>
+                                    </select>
                                   </div>  <!-- END .scheduling-details-custom-slot -->
                                 </div>  <!-- END .scheduling-details -->
                               </div>  <!-- END .post-tool-submit-left -->
