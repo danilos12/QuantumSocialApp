@@ -4175,3 +4175,30 @@ input#file-upload-button {
   font-size: 14px;
   font-weight: bold;
 }
+
+/* Reset Page */
+.card-header {
+  color: var(--body-text);
+}
+.card-body {
+  color: var(--body-text);
+}
+
+.btn-primary {
+  /* width: 35%; */
+  background: var(--frost-background);
+  background: var(--color-nova-5);
+  color: var(--body-text);
+  padding: 0.5em 0.7em;
+  font-size: 1.25em;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--frost-heavy);
+  background: var(--color-nova-75);
+}
