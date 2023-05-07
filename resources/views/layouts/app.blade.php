@@ -60,7 +60,7 @@
                 <div class="banner-twitter-profile-inner">
                   <img src="{{ $twitter_photo ?: asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                   <span class="twitter-profile-name">
-                    {{ $twitter_name ?: 'Quantum User' }}
+                    {{ isset($selected_user) ? $selected_user->twitter_name: 'Quantum User' }}
                   </span>
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
@@ -80,17 +80,17 @@
                         <div class="twitter-stat">
                           <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
                           <span class="stat-title">Following</span>
-                          <span class="stat-count count-following">{{ isset($user) ? $user->twitter_followersCount : 0  }}</span></div>
+                          <span class="stat-count count-following">{{ isset($selected_user) ? $selected_user->twitter_followingCount : 0 }}</span></div>
 
                         <div class="twitter-stat twitter-stat-center">
                           <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
                           <span class="stat-title">Followers</span>
-                          <span class="stat-count count-followers">{{ isset($user) ? $user->twitter_followingCount : 0  }}</span></div>
+                          <span class="stat-count count-followers">{{ isset($selected_user) ? $selected_user->twitter_followersCount  : 0 }}</span></div>
 
                         <div class="twitter-stat">
                           <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
                           <span class="stat-title">Unfollows</span>
-                          <span class="stat-count count-unfollows">240</span></div>
+                          <span class="stat-count count-unfollows">{{ 0 }}</span></div>
                       </div>  <!-- END .twitter-stat-bar -->
 
               
@@ -151,8 +151,13 @@
                 <div class="settings-bar-outer">
                   <div class="settings-bar-inner">
                       <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
-                      <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" />
-                      <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
+                      <a href="https://quantumsocial.io/help/" target="new">
+                        <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
+                        {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" /> --}}
+                      </a>
+                      <a href="https://quantumsocial.io/roadmap/" target="new">
+                        <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
+                      </a>
                       <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                           <img src = "{{ asset('public/ui-images/icons/00e-logout.svg') }}" class="menu-icon" />
                       </a>

@@ -33,6 +33,7 @@ Route::get('/queue', [App\Http\Controllers\PostingController::class, 'queue'])->
 Route::get('/drafts', [App\Http\Controllers\PostingController::class, 'drafts'])->name('drafts');
 Route::get('/posted', [App\Http\Controllers\PostingController::class, 'posted'])->name('posted');
 Route::get('/schedule', [App\Http\Controllers\PostingController::class, 'slot_scheduler'])->name('slot-scheduler');
+Route::post('/schedule/save', [App\Http\Controllers\PostingController::class, 'schedule_save'])->name('schedule.save');
 Route::match(['get', 'post'], '/add-new-slot', [App\Http\Controllers\PostingController::class, 'add_new_slot'])->name('add-new-slot');
 
 Route::get('/tweet-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('tweet-stormer');
@@ -62,7 +63,6 @@ Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOA
 // get Tweets
 Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, 'getTweets'])->name('getTweets');
 Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
-
 Route::post('/twitter/switchUser/{twitter_id}', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
 Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
@@ -77,6 +77,7 @@ Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleControl
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
 Route::get('/cmd/{id}/post-type/{type}',[App\Http\Controllers\CommandmoduleController::class, 'getTweetsUsingPostTypes'])->name('cmd.post_type');
+Route::get('/custom-slot',[App\Http\Controllers\CommandmoduleController::class, 'customSlot'])->name('custom.slot');
 
 Route::get('/promos/get/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getPromos'])->name('promos.get');
 

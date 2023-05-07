@@ -33,11 +33,11 @@ $(document).ready(function() {
     function postWrapper(info, post_type) {        
         const dateTimeString = info.sched_time;
         const dateTime = new Date(dateTimeString);
-        const month = dateTime.toLocaleString('default', { month: 'long' });
+        const month = dateTime.toLocaleString('default', { month: 'short' });
         const day = dateTime.getDate();
         const year = dateTime.getFullYear();
         const timeString = dateTime.toLocaleTimeString();
-        const fullDate = month + ", " + day + " " + year;
+        const fullDate = month + " " + day + ", " + year;
 
         // var data = fetchTwitterDetails(info.twitter_id);
         // console.log(data)
