@@ -386,13 +386,41 @@ $closeSlotOverlay = $(".slot-popup-close");
 $saveNewSlot = $(".save-new-slot");
 $editSlot = $(".edit-scheduled");
 
-
-$newSlot.click( function () {
+$newSlot.click( function (e) {  
+  $newSlotOverlay.addClass('_active')
   $newSlotOverlay.show();
+  if ($newSlotOverlay.css('display') == 'block') {
+    var colday = $(this).data('col');
+    var time = $(this).data('time');
+    var row = $(this).data('row');
+    var day = $('.colday[data-col="day-' + colday + '"]').data('text');
+
+    console.log(colday, time, row)
+    $('.new-slot-form select').find('option[value="' + day + '"]').attr('selected', true);
+    $('.new-slot-form .new-slot-time-wrapper select#hour-selector').find('option[value="' + row + '"]').attr('selected', true);
+    $('.new-slot-form .new-slot-time-wrapper select#minute-selector').find('option[value="00"]').attr('selected', true);
+    $('.new-slot-form .new-slot-time-wrapper select#am-pm-selector').find('option[value="' + time + '"]').attr('selected', true);
+  }
 });
 
 $closeSlotOverlay.click( function() {
   $newSlotOverlay.hide();
+});
+
+
+// // // Close modal when the user clicks outside the modal or presses the escape key
+// $newSlotOverlay.on('click', function(event) {
+//   $newSlotOverlay.hide();
+// });
+
+// // when escape is clicked
+$(document).on("keydown", function(event) {
+  console.log(event)
+  if (event.which === 27) {
+    if ( $newSlotOverlay.first().is( ":not(:hidden)" ) ) {
+      $newSlotOverlay.hide();
+    } 
+  }
 });
 
 $editSlot.click( function () {

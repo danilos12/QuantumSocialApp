@@ -167,7 +167,7 @@ function tweetInstance() {
                     <div class="mosaic-scheduling mosaic-post-analytics">
 
                         <span class="mosaic-label mosaic-analytics-label">
-                        <img src="${APP_URL}/ui-images/icons/pg-analytics.svg" class="ui-icon" />
+                        <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
                         Analytics
                         </span>
                         <span class="mosaic-sched-buttons mosaic-analytics-buttons">

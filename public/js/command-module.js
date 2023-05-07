@@ -511,6 +511,24 @@ $(function($) {
 
             $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
             $('#scheduling-method-custom-slot .inner .new-slot-time-wrapper1').attr('style', 'margin-left: 0.3em');
+
+            $.get(APP_URL + '/custom-slot', function(data) {
+                // success code here
+                // var option = $('<option>').val(data.slot_day).text(data.slot_day.toUpperCase());
+                data.forEach(function(item) {
+                    console.log(item)
+                    var str = item.slot_day;
+                    var day = str.charAt(0).toUpperCase() + str.substring(1);
+                    var time = item.hour + ":" + item.minute_at + " " + item.ampm;
+                    var opt = $('<option>').val(item.datetime).text(day + " " + time);
+                                       
+                    $('select[name="custom-slot-datetime"]').append(opt)
+                })
+            })
+            .fail(function(xhr, status, error) {
+            // error code here
+                console.log(xhr)
+            });
         }
         
         // }
