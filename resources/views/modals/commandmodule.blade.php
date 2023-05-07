@@ -334,9 +334,7 @@ div[data-schedule="none"] {
                                       </div>  <!-- END .new-slot-time-wrapper -->
                                     </div> --}}
 
-                                    <select name="custom-slot-datetime" class="scheduling-options-dd">
-                                      <option value="">Monday 10:45 AM</option>
-                                      <option value="monday">Saturday 10:45 AM</option>
+                                    <select name="custom-slot-datetime" class="scheduling-options-dd">                                      
                                     </select>
                                   </div>  <!-- END .scheduling-details-custom-slot -->
                                 </div>  <!-- END .scheduling-details -->
