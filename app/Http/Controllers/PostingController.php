@@ -136,7 +136,6 @@ class PostingController extends Controller
 				'hour' => $postSlot['hour-selector'],
 				'minute_at' => ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'],
 				'ampm' => $postSlot['am-pm-selector'],
-				'datetime' => $datetime,
 				'post_type' => $postSlot['make-promo']
 			];
 

@@ -5,18 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Schedule extends Model
+class Day extends Model
 {
     use HasFactory;
 
-    protected $table = 'schedule';
+    protected $table = 'days';
     protected $fillable = [
-        'user_id',
-        'slot_day',
-        'hour',
-        'minute_at',
-        'ampm',
-        'post_type'
+        'id',
+        'day'
     ];
     public $timestamps = true;
 }
