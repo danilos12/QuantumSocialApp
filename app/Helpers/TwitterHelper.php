@@ -111,5 +111,10 @@ class TwitterHelper
 
         return $utc;       
     }
+    
+    public static function timezone($id) {
+        $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
+        return $acctMeta->timezone;       
+    }
 
 }
