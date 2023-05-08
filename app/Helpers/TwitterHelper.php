@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\TwitterToken;
 use Carbon\Carbon;
+use App\Models\QuantumAcctMeta;
 
 class TwitterHelper
 {
@@ -102,6 +103,13 @@ class TwitterHelper
             // Execute the script here
             // ...
         }
+    }
+
+    public static function now($id) {
+        $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
+        $utc = Carbon::now($acctMeta->timezone);
+
+        return $utc;       
     }
 
 }
