@@ -12,9 +12,8 @@ use App\Models\CommandModule;
 use App\Models\Tag_groups;
 use App\Models\Tag_items;
 use App\Models\TwitterToken;
-use App\Models\QuantumAcctMeta;
 use DateTime;
-use DateTimeZone;
+use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
 
 
@@ -120,7 +119,9 @@ class CommandmoduleController extends Controller
 
 
             if ($postData['scheduling-options'] === 'custom-slot') {
-                $insertData['sched_time'] = urldecode($postData['custom-slot-datetime']);
+                $date = Carbon::parse('next ' . urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));
+
+                $insertData['sched_time'] = $date;
             }
 
             if ($postData['scheduling-options'] === 'rush-queue') {
@@ -319,8 +320,10 @@ class CommandmoduleController extends Controller
     public function customSlot() {
 
         $getCustomSlot = DB::table('schedule')
+                        ->join('days', 'days.day', '=', 'schedule.slot_day')
+                        ->select('schedule.*', 'days.*')
                         ->where('user_id', Auth::id())
-                        ->orderBy(DB::raw('DAYOFWEEK(`datetime`)'), 'ASC')
+                        ->orderBy('days.id', 'ASC')
                         ->get();
 
         return response()->json($getCustomSlot);

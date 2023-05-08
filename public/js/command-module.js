@@ -520,7 +520,7 @@ $(function($) {
                     var str = item.slot_day;
                     var day = str.charAt(0).toUpperCase() + str.substring(1);
                     var time = item.hour + ":" + item.minute_at + " " + item.ampm;
-                    var opt = $('<option>').val(item.datetime).text(day + " " + time);
+                    var opt = $('<option>').val(day + " " + time).text(day + " " + time);
                                        
                     $('select[name="custom-slot-datetime"]').append(opt)
                 })
