@@ -47,9 +47,8 @@ class CommandmoduleController extends Controller
             $postData = $request->all();
             $user_id = Auth::id();
             $main_twitter_id = $postData['twitter_id'];      
-            $acctMeta = QuantumAcctMeta::where('user_id' , Auth::id())->first();
             $twitter_meta = TwitterToken::where('twitter_id', $main_twitter_id)->first();
-            $utc = new DateTime("now", new DateTimeZone($acctMeta->timezone));
+            $utc = TwitterHelper::now($user_id);
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
             
             $post = null;
@@ -71,13 +70,20 @@ class CommandmoduleController extends Controller
             ];
 
             if ($postData['scheduling-options'] === 'add-queue') {
+                $count = DB::table('cmd_module')
+                    ->where('twitter_id', $main_twitter_id)
+                    ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                    ->orderBy('sched_time', 'DESC')
+                    ->count(); 
+                                    
                 $lastTweet = DB::table('cmd_module')
                     ->where('twitter_id', $main_twitter_id)
                     ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                     ->orderBy('sched_time', 'DESC')
                     ->first();                
+            
 
-                $insertData['sched_time'] = $lastTweet->sched_time;
+                $insertData['sched_time'] = ($count > 0) ? $lastTweet->sched_time : $datetime;
             }
 
             if ($postData['scheduling-options'] === 'set-countdown') {
@@ -118,13 +124,20 @@ class CommandmoduleController extends Controller
             }
 
             if ($postData['scheduling-options'] === 'rush-queue') {
+                $count = DB::table('cmd_module')
+                    ->where('twitter_id', $main_twitter_id)
+                    ->whereNotIn('sched_method', ['send-now', 'save-draft'])                    
+                    ->count(); 
+
                 $firstTweet = DB::table('cmd_module')
                     ->where('twitter_id', $main_twitter_id)
                     ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                    ->where('sched_time', '>', TwitterHelper::now($user_id))
                     ->orderBy('sched_time', 'ASC')
-                    ->first();                
+                    ->first();
+                                    
 
-                $insertData['sched_time'] = $firstTweet->sched_time;
+                $insertData['sched_time'] = ($count > 0) ? $firstTweet->sched_time : $datetime;
             }          
 
             if ($postData['post_type_tweets'] === "retweet-tweets") {
@@ -317,21 +330,26 @@ class CommandmoduleController extends Controller
         $tweets = null;        
 
         if ($post_type === "posted" ) {
-            $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => 'send-now' ])->get();
+            $tweets = DB::table('cmd_module')
+                    ->where('twitter_id', $id)
+                    ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
+                    // ->where('sched_method', 'send-now')
+                    ->get();
         }
         
         if($post_type === "save-draft") {
             $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type ])->get();
         } 
         
-        if ($post_type != 'posted' || $post_type != 'save-draft') {
+        if ($post_type === 'queue') {
             $tweets = DB::table('cmd_module')
                     ->where('twitter_id', $id)
-                    ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                    ->where('sched_time', '>', TwitterHElper::now(Auth::id()))
+                    // ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                     ->orderBy('sched_time', 'ASC')
-                    ->orderBy('created_at', 'DESC')
+                    ->orderBy('sched_method', 'DESC')
                     ->get();                         
-        }
+        }        
 
         return response()->json($tweets);
     }    
