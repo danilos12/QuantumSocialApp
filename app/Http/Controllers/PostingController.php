@@ -135,14 +135,25 @@ class PostingController extends Controller
 				'slot_day' => $postSlot['days-selector'],
 				'hour' => $postSlot['hour-selector'],
 				'minute_at' => ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'],
-				'ampm' => $postSlot['am-pm-selector'],
-				'post_type' => $postSlot['make-promo']
+				'ampm' => $postSlot['am-pm-selector'],				
 			];
 
-			$saved = Schedule::create($insertData);
+			if (isset($postSlot['make-promo'])) {
+				$categories = $postSlot['make-promo'];
+				foreach ($categories as $category) {
+					$insertData['post_type'] = $category;
+					$saved = Schedule::create($insertData);
+				}
+			} else {
+				$insertData['post_type'] = 'regular-tweets';
+				$saved = Schedule::create($insertData);
+			}
 
-			// Return success response
-			return response()->json(['status' => '201', 'message' => 'Data has been created.', 'info' => $saved]);
+			if ($saved) {
+				// Return success response
+				return response()->json(['status' => '201', 'message' => 'Data has been created.', 'info' => $saved]);
+			}
+
 		} catch (Exception $e) {
 			Log::error('Error creating data: ' . $e->getMessage());
 			return response()->json(['status' => '409', 'error' => 'Failed to create data.']);

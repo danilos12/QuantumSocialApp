@@ -118,8 +118,8 @@ class CommandmoduleController extends Controller
             }
 
 
-            if ($postData['scheduling-options'] === 'custom-slot') {
-                $date = Carbon::parse('next ' . urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));
+            if ($postData['scheduling-options'] === 'custom-slot') {               
+                $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));
 
                 $insertData['sched_time'] = $date;
             }
