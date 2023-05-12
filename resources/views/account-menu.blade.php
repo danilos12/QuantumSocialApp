@@ -177,7 +177,7 @@
                             <div class="menu-social-account-options">
                               <span class="menu-account-default" data-url="{{ route("save-settings") }}" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account." default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
                               <span class="menu-account-icons">
-                              <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" data-id="modal" id="sstwitter-settings"  title="Settings" data-toggle="tooltip" />
+                              <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
                               <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
                               </span>
                             </div>  <!-- END .menu-social-account-options -->
