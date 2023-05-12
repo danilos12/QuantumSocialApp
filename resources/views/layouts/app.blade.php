@@ -98,12 +98,14 @@
 
                       @foreach($twitter_accts as $twitter)
                       <div class="twitter-account-select-bar {{ $twitter->twitter_id === $twitter_id ? "active" : "" }}" data-url="{{ route("twitter.switchUser", ['twitter_id', $twitter->twitter_id ]) }}" data-id="twitter-{{ $twitter->twitter_id }}">
-                        <div class="twitter-account-item ">                                                                       
-                          <div class="twitter-bar-profile-info">
-                            <img src="{{ $twitter->twitter_photo }}" />
-                            @ {{ $twitter->twitter_username}}
-                          </div>
-                          <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" /></a>
+                        <div class="twitter-account-item ">      
+                          <div class="profile-twitter-account-item">
+                            <div class="twitter-bar-profile-info">
+                              <img src="{{ $twitter->twitter_photo }}" />
+                              @ {{ $twitter->twitter_username}}
+                            </div>
+                          </div>                                                                 
+                          <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" id="twitter-settings"/></a>
                         </div>  <!-- END .twitter-account-item -->                                            
                       </div>  <!-- END .twitter-account-select-bar -->                    
                       @endforeach

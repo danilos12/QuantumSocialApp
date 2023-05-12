@@ -415,7 +415,6 @@ $closeSlotOverlay.click( function() {
 
 // // when escape is clicked
 $(document).on("keydown", function(event) {
-  console.log(event)
   if (event.which === 27) {
     if ( $newSlotOverlay.first().is( ":not(:hidden)" ) ) {
       $newSlotOverlay.hide();
@@ -575,6 +574,7 @@ let currentModal = null;
 
 $('[data-id="modal"]').click(function(event) {
   $target = event.target.id;  
+  console.log($target)
   openModal($target);
 })
 
@@ -583,6 +583,19 @@ $('.modal-large-close').click(function(event) {
   $target = event.target.id;  
   closeModal($target)
 })
+
+$(document).ready(function() {
+  $('img.ui-icon[data-icon="twitter-settings"]').on('click', function(event) {
+    $target = event.target.id;  
+    openTwitterModal($target);
+  });
+  
+  $('img.twitter-bar-settings-icon').on('click', function(event) {
+    $target = event.target.id;  
+    console.log($target)
+    openTwitterModal($target);
+  });
+});
 
 // Open modal
 function openModal(modalId) {
@@ -609,8 +622,6 @@ function openModal(modalId) {
 
 // Close modal
 function closeModal(modalId) {
-  console.log(modalId)
-
   // const modal = document.getElementById(modalId);
   // modal.style.display = 'none';  
   $(`.${modalId}-outer`).toggle( "slide", { direction: "up"  }, 350 );
@@ -622,6 +633,25 @@ function closeModal(modalId) {
   currentModal = null;
 }
 
+// Open modal
+function openTwitterModal(modalId) {  
+  $(`.${currentModal}-outer`).toggle( "slide", { direction: "up"  }, 350 );
+
+  $modalLargeAnchor.show();
+  // Open the requested modal
+  const modal = document.getElementById(modalId);
+  modal.style.display = 'block';
+
+  setTimeout(function() {
+    $modalLargeBackdrop.fadeIn("slow");
+  }, 20);
+  setTimeout(function() {
+    $(`.${modalId}-outer`).toggle( "slide", { direction: "up"  }, 700 );
+  }, 225);
+  
+  // Keep track of the current modal
+  currentModal = modalId;
+}
 
 // Close modal when the user clicks outside the modal or presses the escape key
 window.onclick = function(event) {
