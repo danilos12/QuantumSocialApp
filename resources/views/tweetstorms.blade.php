@@ -103,7 +103,7 @@ Queue Types:
                                <img src="{{ asset('public/')}}/ui-images/icons/pg-view.svg"
                                   class="ui-icon queued-icon queued-view-icon" />
                                <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg"
-                                  class="ui-icon queued-icon queued-edit-icon" />
+                                  class="ui-icon queued-icon queued-edit-icon" title="Drafts" data-toggle="tooltip" />
                                <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg"
                                   class="ui-icon queued-icon queued-trash-icon" />
                               </div>  <!-- END .queued-single-end -->
