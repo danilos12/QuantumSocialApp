@@ -51,7 +51,7 @@ class GeneralSettingController extends Controller
 
                     return response()->json(['success' => true, 'data' => $lastSavedData]);
                 
-                case "twitter-settings":
+                case "twitter-settings":                    
                     $twitterId = $request->input('twitter_id');
                     $settings = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => $key])->update(['meta_value' => $value]);
 
@@ -153,11 +153,17 @@ class GeneralSettingController extends Controller
                     $frame = $request->input('frame');
                     $ite = $request->input('ite');
 
-                    $updateTime = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'rt_auto_time'])->update(['meta_value' => $time]);
-                    $updateFrame = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'rt_auto_retweets'])->update(['meta_value' =>  $frame]);
-                    $updateIte = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'rt_auto_like'])->update(['meta_value' => $ite]);
+                    $update = TwitterSettingsMeta::where('twitter_id', $twitterId)
+                        ->whereIn('meta_key', ['rt_auto_time', 'rt_auto_retweets', 'rt_auto_like'])
+                        ->update([
+                            'meta_value' => DB::raw("CASE meta_key
+                                                WHEN 'rt_auto_time' THEN '{$time}'
+                                                WHEN 'rt_auto_retweets' THEN '{$frame}'
+                                                WHEN 'rt_auto_like' THEN '{$ite}'
+                                            END")
+                        ]);
 
-                    if (!$updateTime || !$updateFrame || !$updateIte) {
+                    if (!$update) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
                     }
                     return response()->json(['success' => true, 'data' => 'Data is updated']);
@@ -167,22 +173,27 @@ class GeneralSettingController extends Controller
                     $time = $request->input('time');
                     $frame = $request->input('frame');
 
-                    $updateTime = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'rt_auto_rm_time'])->update(['meta_value' => $time]);
-                    $updateFrame = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'rt_auto_rm_frame'])->update(['meta_value' => $frame]);
-
-                    if (!$updateTime && !$updateFrame) {
+                    $update = TwitterSettingsMeta::where('twitter_id', $twitterId)
+                                ->whereIn('meta_key', ['rt-auto-remove-time', 'rt-auto-remove-frame'])
+                                ->update([
+                                    'meta_value' => DB::raw("CASE meta_key
+                                                WHEN 'rt-auto-remove-time' THEN '{$time}'
+                                                WHEN 'rt-auto-remove-frame' THEN '{$frame}'
+                                            END")
+                                ]);
+                    if (!$update) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
                     }
                     return response()->json(['success' => true, 'data' => 'Data is updated']);
 
                 case "save-viral-autocm":
                     $twitterId = $request->input('twitterId');
-                    $settings = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'text_comment_offer'])->update(['meta_value' => $request->input('value')]);
+                    $settings = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'text-comment-offer'])->update(['meta_value' => $request->input('value')]);
 
                     if (!$settings) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
                     }
-                    return response()->json(['success' => true, 'data' => $settings]);
+                    return response()->json(['success' => true, 'data' => 'Data is updated']);
 
                 case "save-autodm":
                     $twitterId = $request->input('twitterId');
