@@ -120,8 +120,8 @@
                                 <div class="menu-social-account-options">
                                 <span class="menu-account-default" tool-tip="Set default account." default="active"></span>
                                 <span class="menu-account-icons">
-                                <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip" />
-                                <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
+                                    <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip" />
+                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
                                 </span>
                                 </div>  <!-- END .menu-social-account-options -->
 

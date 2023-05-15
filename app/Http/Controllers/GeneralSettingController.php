@@ -126,12 +126,18 @@ class GeneralSettingController extends Controller
                     $retweet = $request->input('retweet');
                     $likes = $request->input('likes');
 
-                    $updateRT = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'eg_rt_retweets' ])->update(['meta_value' => $retweet  ]);
-                    $updateLikes = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'eg_rt_likes'])->update(['meta_value' => $likes ]);
+                    $update = TwitterSettingsMeta::where('twitter_id', $twitterId)
+                                ->whereIn('meta_key', ['eg_rt_retweets', 'eg_rt_likes'])
+                                ->update([
+                                    'meta_value' => DB::raw("CASE meta_key
+                                                            WHEN 'eg_rt_retweets' THEN '{$retweet}'
+                                                            WHEN 'eg_rt_likes' THEN '{$likes}'
+                                                        END")
+                                ]);
 
-                    if (!$updateRT && !$updateLikes) {
+                    if (!$update) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
-                    }
+                    }                   
                     return response()->json(['success' => true, 'data' => 'Data is updated']);
                     
                 case "save-evergreen-rtHeRetweets":
@@ -139,10 +145,16 @@ class GeneralSettingController extends Controller
                     $retweet = $request->input('retweet');
                     $likes = $request->input('likes');
 
-                    $updateRT = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'he_rt_retweets' ])->update(['meta_value' => $retweet  ]);
-                    $updateLikes = TwitterSettingsMeta::where(['twitter_id' => $twitterId, 'meta_key' => 'he_rt_likes'])->update(['meta_value' => $likes ]);
-
-                    if (!$updateRT && !$updateLikes) {
+                    $update = TwitterSettingsMeta::where('twitter_id', $twitterId)
+                                ->whereIn('meta_key', ['he_rt_retweets', 'he_rt_likes'])
+                                ->update([
+                                    'meta_value' => DB::raw("CASE meta_key
+                                                            WHEN 'he_rt_retweets' THEN '{$retweet}'
+                                                            WHEN 'he_rt_likes' THEN '{$likes}'
+                                                        END")
+                                ]);
+                
+                    if (!$update) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
                     }
                     return response()->json(['success' => true, 'data' => 'Data is updated']);
@@ -154,14 +166,14 @@ class GeneralSettingController extends Controller
                     $ite = $request->input('ite');
 
                     $update = TwitterSettingsMeta::where('twitter_id', $twitterId)
-                        ->whereIn('meta_key', ['rt_auto_time', 'rt_auto_retweets', 'rt_auto_like'])
-                        ->update([
-                            'meta_value' => DB::raw("CASE meta_key
-                                                WHEN 'rt_auto_time' THEN '{$time}'
-                                                WHEN 'rt_auto_retweets' THEN '{$frame}'
-                                                WHEN 'rt_auto_like' THEN '{$ite}'
-                                            END")
-                        ]);
+                                ->whereIn('meta_key', ['rt_auto_time', 'rt_auto_retweets', 'rt_auto_like'])
+                                ->update([
+                                    'meta_value' => DB::raw("CASE meta_key
+                                                        WHEN 'rt_auto_time' THEN '{$time}'
+                                                        WHEN 'rt_auto_retweets' THEN '{$frame}'
+                                                        WHEN 'rt_auto_like' THEN '{$ite}'
+                                                    END")
+                                ]);
 
                     if (!$update) {
                         return response()->json(['success' => false, 'message' => 'Failed to update settings']);
