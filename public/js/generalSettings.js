@@ -174,107 +174,95 @@ $(document).ready(function() {
     });
   })
   
-  // $('img.ui-icon[data-icon="twitter-settings"]').on('click',function(event) {
+  $('img.ui-icon[data-icon="twitter-settings"]').on('click',function(event) {
 
-  //   $('.general-settings-outer').hide();
-  //   // $('.general-settings-outer').toggle( "slide", { direction: "up"  }, 350 );
-  //   // setTimeout(function() {
-  //     //   $(".modal-large-anchor").fadeOut("slow");
-  //   // $('.general-settings-outer').parent(".modal-large-backdrop").fadeOut("slow");
-  //     // }, 175);
-  //   $('.twitter-settings-outer').show();
-  // })
+    $('.general-settings-outer').hide();
+    // $('.general-settings-outer').toggle( "slide", { direction: "up"  }, 350 );
+    // setTimeout(function() {
+      //   $(".modal-large-anchor").fadeOut("slow");
+    // $('.general-settings-outer').parent(".modal-large-backdrop").fadeOut("slow");
+      // }, 175);
+    $('.twitter-settings-outer').show();
+  })
   
   
-  // $('.profile-twitter-account-item').click(function() {
-  //   var url = $(this).data('url');
-  //   var hasClass= $(this).hasClass('active');
+  $('.profile-twitter-account-item').click(function() {
+    var url = $(this).data('url');
+    var hasClass= $(this).hasClass('active');
 
-  //   if (hasClass) {
-  //     $(this).attr('data-toggle', 'popover')
-  //       .attr('data-placement', 'top')
-  //       .attr('data-trigger', 'focus')
-  //       .popover({
-  //           html: true,
-  //           content: '<span class="selected-popover">Twitter account is selected</span>'
-  //       })
-  //       .popover('show');        
+    if (hasClass) {
+      $(this).attr('data-toggle', 'popover')
+        .attr('data-placement', 'top')
+        .attr('data-trigger', 'focus')
+        .popover({
+            html: true,
+            content: '<span class="selected-popover">Twitter account is selected</span>'
+        })
+        .popover('show');        
           
-  //   } else {
+    } else {
 
-  //     console.log(url);
+      console.log(url);
   
-  //     // Extract the last parameter from the URL
-  //     var twitter_id = url.substring(url.lastIndexOf('?') + 1);
+      // Extract the last parameter from the URL
+      var twitter_id = url.substring(url.lastIndexOf('?') + 1);
   
-  
-  //     $.ajax({
-  //       url: url,
-  //       method: 'POST',
-  //       data: {      
-  //         twitter_id: twitter_id,
-  //       },
-  //       headers: {
-  //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-  //       },
-  //       success: function(response) {
-  //         // Handle success
-  //         // console.log(response)
-  //         $('.twitter-account-select-bar').removeClass('active');
-  //         $('.twitter-account-select-bar[data-twitter="twitter-' + twitter_id + '"]').addClass('active');
-          
-  //         // sessionStorage.setItem('message', 'Your message here');
-  //         // Redirect to the profile page
-  //         // window.location.href = '/profile';
-  //         // check the URL if in profile
-  //         // if(window.location.pathname.split('/').pop() === 'profile') {
-  //         //   // last slug is "profile"
-  //         //   loadContent('tweets/'+twitter_id);
-  //         // }
+      $.ajax({
+        url: url,
+        method: 'POST',
+        data: twitter_id,
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(response) {
+          // Handle success
+          // console.log(response)
+          $('.twitter-account-select-bar').removeClass('active');
+          $('.twitter-account-select-bar[data-twitter="twitter-' + twitter_id + '"]').addClass('active');          
 
-  //         location.reload();
-  //       },
-  //       error: function(jqXHR, textStatus, errorThrown) {
-  //         // Handle error
-  //         console.log(jqXHR, textStatus, errorThrown)
-  //       },        
-  //     })
-  //   }
+          location.reload();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          // Handle error
+          console.log(jqXHR, textStatus, errorThrown)
+        },        
+      })
+    }
 
-  //   function loadContent(url) {
-  //     var spinner = `<div class="queued-single-post">                      
-  //                     <div class="queued-single-start">                        
-  //                       <span class="queued-post-data" style="color: white; text-weight: bold">
-  //                         Loading...
-  //                       </span>
-  //                     </div>  <!-- END .queue-single-start -->                      
+    function loadContent(url) {
+      var spinner = `<div class="queued-single-post">                      
+                      <div class="queued-single-start">                        
+                        <span class="queued-post-data" style="color: white; text-weight: bold">
+                          Loading...
+                        </span>
+                      </div>  <!-- END .queue-single-start -->                      
 
-  //                   </div>`;
-  //     $('.content-inner').html(spinner); // show a spinner while the content is loading
+                    </div>`;
+      $('.content-inner').html(spinner); // show a spinner while the content is loading
 
-  //     setTimeout(function(){
-  //       $('.queued-single-post').fadeOut('slow');
-  //     }, 3000);
+      setTimeout(function(){
+        $('.queued-single-post').fadeOut('slow');
+      }, 3000);
 
-  //     $.ajax({
-  //       url: url,
-  //       method: 'GET',
-  //       dataType: 'html',        
-  //       success: function(response) {
-  //         // $('.content-section').html(response); // update the content section with the loaded content
-  //         // console.log(response)
-  //         // $data = json_decode($response, true)
-  //         var parse = JSON.parse(response)          
-  //         $('.content-inner').html(parse.html);
-  //       },
-  //       error: function(jqXHR, textStatus, errorThrown) {
-  //         $('.content-section').html('<div class="error-message">Error loading content.</div>'); // show an error message if the content fails to load
-  //       }
-  //     });
-  //   }
+      $.ajax({
+        url: url,
+        method: 'GET',
+        dataType: 'html',        
+        success: function(response) {
+          // $('.content-section').html(response); // update the content section with the loaded content
+          // console.log(response)
+          // $data = json_decode($response, true)
+          var parse = JSON.parse(response)          
+          $('.content-inner').html(parse.html);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          $('.content-section').html('<div class="error-message">Error loading content.</div>'); // show an error message if the content fails to load
+        }
+      });
+    }
   
 
-  // })
+  })
   
   $.fn.hasAttr = function(name) {
     return this.attr(name) !== undefined;

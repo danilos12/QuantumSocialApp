@@ -73,6 +73,8 @@ Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
 Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
+Route::post('/cmd/post/tweet-now/{id}',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
+Route::post('/cmd/post/duplicate-now/{id}',[App\Http\Controllers\CommandmoduleController::class, 'duplicateFromQueue'])->name('post.duplicate');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
@@ -81,7 +83,13 @@ Route::get('/custom-slot',[App\Http\Controllers\CommandmoduleController::class, 
 
 Route::get('/promos/get/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getPromos'])->name('promos.get');
 
-
+Route::get('/post/sortbytype',[App\Http\Controllers\PostingController::class, 'sortPostbyType'])->name('sort.type');
+Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'getMonth'])->name('get.month');
+Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
+Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('get.edit');
+Route::post('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
+Route::post('/post/delete',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+Route::post('/post/filter/',[App\Http\Controllers\PostingController::class, 'deleteQueue'])->name('post.delete');
 
 
 Route::middleware(['web','guest', 'CheckSessionExpiration'])
