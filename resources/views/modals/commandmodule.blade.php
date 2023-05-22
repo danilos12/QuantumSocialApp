@@ -82,39 +82,7 @@ div[data-schedule="none"] {
                                             Add Tags
                                           </div>  <!-- END .tags-submit -->
                                         </div>  <!-- END .tag-group-modal-inner -->
-                                      </div>  <!-- END .tag-group-modal-outer -->
-
-
-                                      
-                                      {{-- <div class="post-tool-modal schedule-retweet-modal-outer frosted" >
-                                        <div class="schedule-retweet-modal-inner">
-                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close retweet-modal-close" />
-                                          Select A Post Time:
-                                          <div class="schedule-time-selectors">
-                                            <select id="post-time-hour" name="post-time-hour" class="post-time-hour">
-                                              <option disabled selected>Hour</option>
-                                              @for ($i = 1; $i <= 12; $i++)
-                                                <option value="{{  $i }}"> {{  $i }}</option>
-                                              @endfor
-                                            </select>
-                                            <select class="post-time-minute">
-                                              <option disabled selected>Minute</option>
-                                              @for ($i = 0; $i <= 59; $i++)
-                                                <option value="{{  $i }}"> {{  $i }}</option>
-                                              @endfor
-                                            </select>
-                                            <select id="post-time-am-pm" name="post-time-am-pm" class="post-time-am-pm">
-                                              <option disabled selected>AM / PM</option>
-                                              <option value="AM">AM</option>
-                                              <option value="PM">PM</option>
-                                            </select>
-                                          </div>  
-                                          <div class="date-picker-wrapper">
-                                            <input type="text" id="datepicker" autocomplete="off">
-                                          </div>  
-                                        </div>  
-                                      </div>   --}}
-                                    
+                                      </div>  <!-- END .tag-group-modal-outer -->                                                                          
                                     </div>  <!-- END .primary-post-bottom-buttons -->
                                   </div>  <!-- END .primary-post-left -->
 
@@ -139,7 +107,7 @@ div[data-schedule="none"] {
                               
 
                               <div class="posting-tool-col posting-tool-right-col right-section">
-								                <input type="hidden" name="post_type_tweets" value="regular_tweets" id="post_type_tweets" class="post_type_tweets">
+								                <input type="hidden" name="post_type_tweets" value="regular-tweets" id="post_type_tweets" class="post_type_tweets">
 
                                 <div id="post_evergreen" data-post="evergreen-tweets" class="post-alert evergreen-alert tweets-hide">
                                  <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
@@ -339,6 +307,8 @@ div[data-schedule="none"] {
                                   </div>  <!-- END .scheduling-details-custom-slot -->
                                 </div>  <!-- END .scheduling-details -->
                               </div>  <!-- END .post-tool-submit-left -->
+                              <input type="hidden" id="mode" name="mode" value="">
+                              <input type="hidden" id="item-id" name="id" value="">
                               <input type="submit" class="posting-tool-submit" value="Beam me up Scotty" id="beam-btn"{{ $twitter_id === 0 ? 'disabled' : "" }} />
                             </div>  <!-- END .posting-tool-submit-wrap -->
                           </form>  <!-- END .posting-tool-form -->

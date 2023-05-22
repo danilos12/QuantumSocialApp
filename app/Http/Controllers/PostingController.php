@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
+use App\Models\CommandModule;
 use Exception;
 
 
@@ -172,6 +173,60 @@ class PostingController extends Controller
         return view('bulk')->with('title', $title);
     }
 	
+	public function editPost(Request $request) {
+		$post_id = str_replace('edit-', '', $request->id);
+		$queuePosts = CommandModule::where('id', $post_id)->get();
+
+		return response()->json(['status' => 201, 'data' => $queuePosts]);
+	}
 	
+	public function deletePost(Request $request) {
+		$post_id = str_replace('delete-', '', $request->id);
+		$queueDelete = CommandModule::where('id', $post_id)->update(['deleted' => 1]);		
+
+		// Redirect back to the previous page or any desired location
+		return response()->json(['success' => true, 'data' => $queueDelete]);
+	}
+	
+	public function sortPostbyType(Request $request) {
+		$sort = null;
+
+		if ($request->type !== "all" ) {
+			$type = $request->type . '-tweets';
+			$sort = CommandModule::where(['twitter_id' => $request->id, 'post_type' => $type, 'deleted' => 0])->orderBy('sched_time', 'ASC')->get();
+		} else {
+			$sort = CommandModule::where(['twitter_id' => $request->id, 'deleted' => 0])->orderBy('sched_time', 'ASC')->get();
+		}
+
+		// Redirect back to the previous page or any desired location
+		return response()->json(['success' => true, 'data' => $sort]);
+	}	
+	
+	public function sortPostbyMonth(Request $request) {		
+		$convertDate = str_replace('-', ' ', $request->month);
+
+		$date = intval(Carbon::createFromFormat('F Y', $convertDate)->format('m'));
+		
+		// $sort = CommandModule::where(['twitter_id' => $request->id, 'sched_time' => $date, 'deleted' => 0])->orderBy('sched_time', 'ASC')->get();
+		$sort = DB::table('cmd_module')
+				->select('*')
+				->where('twitter_id', $request->id)
+				->whereMonth('sched_time', '=', $date)
+				->get();				
+
+		// Redirect back to the previous page or any desired location
+		return response()->json(['success' => true, 'data' => $sort]);
+	}	
+
+	public function getMonth() {
+		// get the scheduleld months in database 
+		$getMonth = DB::table('cmd_module')
+			->select(DB::raw('DISTINCT DATE_FORMAT(sched_time, "%M %Y") AS month'))
+			->pluck('month')
+			->toArray();
+
+		return response()->json(['success' => true, 'data' => $getMonth]);
+	}
+
 	
 }

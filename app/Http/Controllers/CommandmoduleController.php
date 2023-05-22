@@ -15,6 +15,7 @@ use App\Models\TwitterToken;
 use DateTime;
 use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
+use Illuminate\Support\Facades\Session;
 
 
 class CommandmoduleController extends Controller
@@ -44,7 +45,9 @@ class CommandmoduleController extends Controller
         try {                      
             $postData = $request->all();
             $user_id = Auth::id();
-            $main_twitter_id = $postData['twitter_id'];      
+            $main_twitter_id = $postData['twitter_id'];
+            $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
+            $tweet_id = basename(parse_url($url, PHP_URL_PATH));
             $twitter_meta = TwitterToken::where('twitter_id', $main_twitter_id)->first();
             $utc = TwitterHelper::now($user_id);
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially            
@@ -62,6 +65,7 @@ class CommandmoduleController extends Controller
                 'rt_ite' => $postData['iterations-custom-cm'] ?? null,
                 'promo_id' => $postData['retweet'] ?? null,                 
                 'post_type_code' => rand(10000, 99999),
+                'deleted' => 0
             ];
 
             // Determine the scheduling method and time based on the user's selected option
@@ -133,15 +137,7 @@ class CommandmoduleController extends Controller
             } else {
                 $sched_time = $datetime;
                 $sched_method = 'save-draft';
-            }                     
-            
-            if ($postData['post_type_tweets'] === "retweet-tweets") {
-                $url = urldecode($postData['retweet-link-input']);
-                $tweet_id = basename(parse_url($url, PHP_URL_PATH));
-                $retweet = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/". $main_twitter_id . "/retweets");
-
-                return $retweet;
-            }         
+            }     
 
             // Save data for main account
             $responses = array();
@@ -152,8 +148,12 @@ class CommandmoduleController extends Controller
                 CommandModule::create($insertData);
                 
                 // // Post tweet if scheduling option is "send-now"
-                if ($postData['scheduling-options'] === 'send-now') {
-                    $responses[] = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                if ($postData['scheduling-options'] === 'send-now') {                    
+                    if ($postData['post_type_tweets'] === "retweet-tweets") {                        
+                        $responses[] = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");                        
+                    }  else {
+                        $responses[] = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                    }
                 }
 
                 // Save crosstweet data
@@ -172,11 +172,16 @@ class CommandmoduleController extends Controller
 
                         // Post tweet if scheduling option is "send-now"
                         if ($postData['scheduling-options'] === 'send-now') {
-                            $responses[] = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                            if ($postData['post_type_tweets'] === "retweet-tweets") {
+                                $responses[] = $this->tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
+                            } else {
+                                $responses[] = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                            }
                         }
                     }
                 }
             }
+            
                                              
             // Return success response
             return response()->json(['status' => '201', 'message' => 'Data has been created.', 'tweet' => $responses]);
@@ -297,6 +302,8 @@ class CommandmoduleController extends Controller
                         ->orderBy('days.id', 'ASC')
                         ->get();
 
+                        dd($getCustomSlot);
+
         return response()->json($getCustomSlot);
     }
  
@@ -305,31 +312,97 @@ class CommandmoduleController extends Controller
 
         if ($post_type === "posted" ) {
             $tweets = DB::table('cmd_module')
-                    ->where('twitter_id', $id)
-                    ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
-                    // ->where('sched_method', 'send-now')
-                    ->get();
+                ->where('twitter_id', $id)
+                ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
+                ->where('deleted', 0)
+                ->get();
         }
-        
+                
         if($post_type === "save-draft") {
-            $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type ])->get();
+            $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type, 'deleted' => 0])->get();
         } 
-        
+                
         if ($post_type === 'queue') {
             $tweets = DB::table('cmd_module')
-                    ->where('twitter_id', $id)
-                    ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                    // ->whereNotIn('sched_method', ['send-now', 'save-draft'])
-                    ->orderBy('sched_time', 'ASC')
-                    ->orderBy('sched_method', 'DESC')
-                    ->get();
-            // dd($tweets);
-                    
+                ->where('twitter_id', $id)
+                ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                ->orderBy('sched_time', 'ASC')
+                ->orderBy('sched_method', 'DESC')
+                ->where('deleted', 0)
+                ->get();                    
         }        
 
         return response()->json($tweets);
     }    
 
+    public function postNowFromQueue(Request $request, $id)
+    {    
+        try {            
+            // Find the post based on the provided ID
+            $post_id = str_replace('post-now-', '', $id);
+            $post = CommandModule::findOrFail($post_id);
+            
+            if ($post) {
+                $get_meta = TwitterToken::where('twitter_id', $request->twitter_id)->first();
+
+                $this->postTweet($get_meta, $post->post_description);
+            }
+            
+            //get time now 
+            $utc = TwitterHelper::now(Auth::id());
+            $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially       
+
+            // Update the desired fields with the request data
+            $post->post_type = 'send-now';
+            $post->sched_time = $datetime;
+            // Add more fields to update as needed
+            
+            
+            // // Save the changes to the database
+            $post->save();            
+
+            // // Optionally, you can return a response or redirect to another page
+            
+            // Set the session message
+            Session::flash('message', 'Your message here');
+            
+            return response()->json(['success' => true, 'message' => 'Post tweeted successfully!']);
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+        }
+        
+    }
+
+    public function duplicateFromQueue(Request $request, $id)
+    {  
+        try {      
+            $post_id = str_replace('duplicate-now-', '', $id);
+            $post = CommandModule::findOrFail($post_id);
+
+            // Duplicate the data
+            $newRow = $post->replicate();
+            // $newRow->save();
+
+            // Optionally, you can modify any specific values before saving the new row
+            $newRow->save();
+
+            // Redirect or return a response
+            // ...
+            return response()->json(['success' => true, 'message' => 'Post duplicated successfully!']);
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+        }    
+    }
 
 
     // API to post and retweet to twitter
