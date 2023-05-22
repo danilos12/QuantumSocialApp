@@ -479,6 +479,7 @@ $(function($) {
 
             $("#scheduling-cdn").append(sopp);
         } 
+
         if (option === "custom-time") {
             div.attr("data-schedule", option);            
 
@@ -504,13 +505,21 @@ $(function($) {
         }
 
         if (option === "custom-slot") {
+            var post_type = [];
+
+            // check if special post types are active
+            if ($('.primary-post-type-buttons').hasClass('icon-ative')) {
+                var type = $('.icon-active').data('type');
+                console.log(type);
+            }
+
             div.attr("data-schedule", option);    
             console.log(div.attr("data-schedule", option)) 
 
             $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
             $('#scheduling-method-custom-slot .inner .new-slot-time-wrapper1').attr('style', 'margin-left: 0.3em');
 
-            $.get(APP_URL + '/custom-slot', function(data) {
+            $.get(APP_URL + '/custom-slot/' + post_type, function(data) {
                 // success code here
                 // var option = $('<option>').val(data.slot_day).text(data.slot_day.toUpperCase());
                 data.forEach(function(item) {
@@ -568,7 +577,7 @@ $(function($) {
                 $(this).attr("status", "active");
             }
         }
-    );
+    );    
 
 
     /** Retweet Timer Settings */ 

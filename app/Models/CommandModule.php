@@ -24,6 +24,7 @@ class CommandModule extends Model
         'sched_time',
         'crosstweet_accts',
         'post_type_code',
+        'deleted'
     ];
     public $timestamps = true;
 }
