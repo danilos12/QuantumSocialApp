@@ -45,13 +45,13 @@
             <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon" />
             Evergreen
           </li>
-          <li id="retweets">
+          <li id="retweet">
             <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon" />
             Retweets
           </li>
-          <li id="promo">
+          <li id="promos">
             <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
-            Promo Campaign 01
+            Promos
           </li>         
         </ul>
       </div>  <!-- END .filter-wrap -->
@@ -61,21 +61,28 @@
           Month:
           <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon drop-arrow" />
         </span>
-        <ul class="page-filters-dropdown profile-sort-dropdown queue-months-dropdown frosted">
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            December 2022</li>
-          <li><img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg" class="ui-icon" />
-            January 2023</li>          
+        <ul class="page-filters-dropdown profile-sort-dropdown queue-months-dropdown frosted">                            
         </ul>
       </div>  <!-- END .sort-wrap -->
     </div>  <!-- END .filter-controls -->
 
-
-    <div class="queued-posts-outer">
+    <div id="spinner" style="display: none;">
+      Loading
+    </div>
+    <div id="error" style="display: none;">      
+    </div>
+    @if(session()->has('message'))
+        <div class="alert alert-success">
+            {{ session('message') }}
+        </div>
+    @endif
+    <div class="queued-posts-outer" id="queuePage" >
       <div class="queued-posts-inner">
         <div class="queue-day-wrapper">
           <span class="queue-date-heading">Today</span>
           
+
+        </div>  <!-- END .queued-single-post-wrapper -->
         </div>  <!-- END .queue-day-wrapper" -->
       </div>  <!-- END .queue-posts-inner -->
     </div>  <!-- END .queue-posts-outer -->
