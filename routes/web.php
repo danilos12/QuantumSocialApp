@@ -20,6 +20,10 @@ Route::get('/', function () {
 */
 
 Auth::routes();
+Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
+
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
@@ -87,7 +91,7 @@ Route::get('/post/sortbytype',[App\Http\Controllers\PostingController::class, 's
 Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'getMonth'])->name('get.month');
 Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('get.edit');
-Route::post('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
+// Route::post('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/delete',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::post('/post/filter/',[App\Http\Controllers\PostingController::class, 'deleteQueue'])->name('post.delete');
 

@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">	
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
   {{-- <link rel="stylesheet" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css"> --}}
-  <link rel="stylesheet" href="{{ asset('public/js/emojionearea-master/dist/emojionearea.css') }}">
+  {{-- <link rel="stylesheet" href="{{ asset('public/js/emojionearea-master/dist/emojionearea.css') }}"> --}}
 
   
   <script> var APP_URL = `{{ url('/') }}`; </script>
@@ -219,7 +219,7 @@
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>  
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   {{-- <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script> --}}
-  <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>  
+  {{-- <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>   --}}
 
   @yield('scripts')
   <script>
