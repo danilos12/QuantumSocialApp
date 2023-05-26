@@ -294,16 +294,27 @@ class CommandmoduleController extends Controller
         return response()->json($getUnselectedTwitter);
     }
 
-    public function customSlot() {
+    public function customSlot(Request $request) {
+    $getCustomSlot = '';
 
+    if ($request->post_type === "undefined") {
         $getCustomSlot = DB::table('schedule')
                         ->join('days', 'days.day', '=', 'schedule.slot_day')
                         ->select('schedule.*', 'days.*')
                         ->where('user_id', Auth::id())
                         ->orderBy('days.id', 'ASC')
                         ->get();
+    } else {
+        $getCustomSlot = DB::table('schedule')
+                        ->join('days', 'days.day', '=', 'schedule.slot_day')
+                        ->select('schedule.*', 'days.*')
+                        ->where('user_id', Auth::id())
+                        ->where('schedule.post_type', $request->post_type)
+                        ->orderBy('days.id', 'ASC')
+                        ->get();
+    }
 
-                        dd($getCustomSlot);
+                        // dd($getCustomSlot);
 
         return response()->json($getCustomSlot);
     }
