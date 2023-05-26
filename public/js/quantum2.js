@@ -574,12 +574,12 @@ let currentModal = null;
 
 $('[data-id="modal"]').click(function(event) {
   $target = event.target.id;  
-  console.log($target)
+  // console.log($target)
   openModal($target);
 })
 
 $('.modal-large-close').click(function(event) {
-  console.log(event);
+  // console.log(event);
   $target = event.target.id;  
   closeModal($target)
 })
@@ -592,9 +592,15 @@ $(document).ready(function() {
   
   $('img.twitter-bar-settings-icon').on('click', function(event) {
     $target = event.target.id;  
-    console.log($target)
+    // console.log($target)
     openTwitterModal($target);
   });
+
+  // $('.queue-day-wrapper').on("click", 'img.queued-icon-imp', function(event) {
+  //   $target = event.target.id;  
+  //   console.log($target)
+  //   openTwitterModal($target);
+  // });
 });
 
 // Open modal
@@ -606,8 +612,8 @@ function openModal(modalId) {
 
   $modalLargeAnchor.show();
   // Open the requested modal
-  const modal = document.getElementById(modalId);
-  modal.style.display = 'block';
+  // const modal = document.getElementById(modalId);
+  // modal.style.display = 'block';
 
   setTimeout(function() {
     $modalLargeBackdrop.fadeIn("slow");
@@ -622,6 +628,8 @@ function openModal(modalId) {
 
 // Close modal
 function closeModal(modalId) {
+  console.log(modalId);
+
   // const modal = document.getElementById(modalId);
   // modal.style.display = 'none';  
   $(`.${modalId}-outer`).toggle( "slide", { direction: "up"  }, 350 );
