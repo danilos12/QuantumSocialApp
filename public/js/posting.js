@@ -99,8 +99,30 @@ $(document).ready(function() {
         console.log(rmId);
 
         if (rmId[0] === "edit" ) {
-            console.log('edit')
-            getCmdModule(rmId[1])           
+            $('#mode').val('edit');        
+            $('#item-id').val(id);
+            
+            $.get(APP_URL + '/post/edit/' + id, function(response) {
+                console.log(response)
+                $.each(response.data, function(index, data) {
+                    console.log(data.post_type),
+                    console.log(data);
+
+                    // watermark
+                    if (data.post_type === "regular-tweets") {
+                        $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="twitter-tweets"]`).addClass('indicator-active');
+                    } else {
+                        $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="${data.post_type}"]`).addClass('indicator-active');
+                    }
+
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 textarea`).text(data.post_description);
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${data.post_type}"]`).addClass('icon-active');
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${data.sched_method}"]`).attr('selected', true);
+
+                    openModal("edit-commandmodule");
+
+                })                 
+            });         
 
         } 
         else if (rmId[0] === "delete")
@@ -203,27 +225,6 @@ $(document).ready(function() {
         });        
     }
 
-    let currentModal = null; 
-    // Open modal
-    function openModal(modalId) {  
-        $(`.${currentModal}-outer`).toggle( "slide", { direction: "up"  }, 350 );
-
-        $modalLargeAnchor.show();
-        // Open the requested modal
-        const modal = document.getElementById(modalId);
-        modal.style.display = 'block';
-
-        setTimeout(function() {
-            $modalLargeBackdrop.fadeIn("slow");
-        }, 20);
-        setTimeout(function() {
-            $(`.${modalId}-outer`).toggle( "slide", { direction: "up"  }, 700 );
-        }, 225);
-        
-        // Keep track of the current modal
-        currentModal = modalId;
-    }
-
 
     function postWrapper(info, post_type, index) {        
         const dateTimeString = info.sched_time;
@@ -255,7 +256,7 @@ $(document).ready(function() {
                     <div class="queued-single-end">
                         <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon queued-icon-ee" id="more-${info.id}" title="More" data-toggle="tooltip" />
                         <img src="${APP_URL}/public/ui-images/icons/pg-view.svg" class="ui-icon queued-icon queued-view-icon queued-icon-ee" id="view-${info.id}" title="View" data-toggle="tooltip" />
-                        <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon queued-icon-imp" data-func="command-module" id="edit-${info.id}" title="Drafts" data-toggle="tooltip" />                        
+                        <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon queued-icon-imp" data-icon="edit-post" id="edit-modal-${info.id}" title="Drafts" data-toggle="tooltip" />                        
                         <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon queued-icon-imp" id="delete-${info.id}" title="Delete" data-toggle="tooltip" />
                     </div>  <!-- END .queued-single-end -->
 
@@ -306,7 +307,7 @@ $(document).ready(function() {
                     <!-- END Queued Preview Instance -->
 
                 </div>  <!-- END .queued-preview-wrapper -->
-
+                
                 <div class="queued-options-wrapper frosted view-more view-${info.id}">
                     <div class="queued-options-inner view-more-inner">
                         <span class="queued-option-item" id="post-now-${info.id}">Post Now</span>

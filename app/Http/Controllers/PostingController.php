@@ -173,11 +173,23 @@ class PostingController extends Controller
         return view('bulk')->with('title', $title);
     }
 	
-	public function editPost(Request $request) {
-		$post_id = str_replace('edit-', '', $request->id);
-		$queuePosts = CommandModule::where('id', $post_id)->get();
+	public function editPost(Request $request, $id) {
+		$post_id = str_replace('edit-modal-', '', $request->id);
+		$queuePosts = CommandModule::where('id', $post_id)->first();
+		$data = [];
 
-		return response()->json(['status' => 201, 'data' => $queuePosts]);
+		$countTweet =  CommandModule::where('post_type_code', $queuePosts->post_type_code)->count();
+		// dd($countTweet);
+
+		if ($countTweet > 1) {
+			$data['tweet_storm'] = 1;
+		}
+		
+		// Return the view with the retrieved data
+		$html = view('modals.edit-commandmodule')->with('id', 1)->render();
+		return response()->json(['status' => 201, 'data' => $html]);
+
+		// return response()->json(['html' => $html]);
 	}
 	
 	public function deletePost(Request $request) {

@@ -231,79 +231,10 @@ div[data-schedule="none"] {
                                     </select>
                                   </div>  <!-- END .scheduling-details-countdown -->
                                   <div class="scheduling-details-custom-time sop" id="scheduling-method-custom-time" data-schedule="none" data-name="custom-time" name="scheduling-method">
-                                    <div class="date-picker-wrapper"></div>
-                                    <select id="post-time-hour" name="ct-hour" class="post-time-hour scheduling-options-dd">
-                                      <option disabled selected>Hour</option>
-                                      @for ($i = 1; $i <= 12; $i++)
-                                        <option value="{{  $i }}"> {{  $i }}</option>
-                                      @endfor
-                                    </select>
-                                    <select class="post-time-minute scheduling-options-dd" name="ct-min">
-                                      <option disabled selected>Minute</option>
-                                      @for ($i = 0; $i <= 59; $i++)
-                                        <option value="{{  $i }}"> {{  $i }}</option>
-                                      @endfor
-                                    </select>
-                                    <select id="post-time-am-pm" name="ct-am-pm" class="post-time-am-pm scheduling-options-dd">
-                                      <option disabled selected>AM / PM</option>
-                                      <option value="AM">AM</option>
-                                      <option value="PM">PM</option>
-                                    </select>
-                                    <img src="{{ asset('public/')}}/ui-images/icons/calendar.svg" class="sched-custom-time">
                                     
                                     {{-- Select a post time: <img src="{{ asset('public/')}}/ui-images/icons/07-schedule.svg " class="sched-custom-time"> --}}
                                   </div>  <!-- END .scheduling-details-date-picker -->
-                                  <div class="scheduling-details-custom-slot sop" id="scheduling-method-custom-slot" data-schedule="none" data-name="custom-slot" name="scheduling-method">
-                                    <!-- CARLO - if Custom Slot, show available time slots -->
-                                    {{-- <div class="inner">
-                                      <select id="days-selector" name="days-selector" class="scheduling-options-dd">
-                                        <option value="">Choose days</option>
-                                        <option value="sunday">Sunday</option>
-                                        <option value="monday">Monday</option>
-                                        <option value="tuesday">Tuesday</option>
-                                        <option value="wednesday">Wednesday</option>
-                                        <option value="thursday">Thursday</option>
-                                        <option value="friday">Friday</option>
-                                        <option value="saturday">Saturday</option>
-                                        <option value="weekdays">Weekdays</option>
-                                        <option value="weekend">Weekend Days</option>
-                                        <option value="everyday">Every Day</option>
-                                      </select>  <!-- END .days-selector -->
-  
-                                      <div class="new-slot-time-wrapper1">
-  
-                                          <select id="hour-selector" name="hour-selector" class="hour-selector scheduling-options-dd">
-                                          <option value="">Hour</option>
-                                          @for ($i = 0; $i <= 12; $i++)
-                                              @if( $i < 10 ) 
-                                                  <option value="0{{  $i }}"> 0{{  $i }}</option>
-                                              @else
-                                                  <option value="{{  $i }}"> {{  $i }}</option>
-                                              @endif
-                                              
-                                          @endfor                                        
-                                          </select>  <!-- END .hour-selector -->
-                                          <select id="minute-selector" name="minute-selector" class="minute-selector scheduling-options-dd">
-                                              <option value="">Minute</option>
-                                              @for ($i = 0; $i <= 59; $i++)
-                                              @if( $i < 10 ) 
-                                                  <option value="0{{  $i }}"> 0{{  $i }}</option>
-                                              @else
-                                                  <option value="{{  $i }}"> {{  $i }}</option>
-                                              @endif
-                                              
-                                          @endfor
-                                          </select>  <!-- END .minute-selector -->
-                                          <select id="am-pm-selector" name="am-pm-selector" class="am-pm-selector scheduling-options-dd">
-                                            <option value="am">AM</option>
-                                            <option value="pm">PM</option>
-                                          </select>  <!-- END .am-pm-selector -->
-  
-                                      </div>  <!-- END .new-slot-time-wrapper -->
-                                    </div> --}}
-
-                                    <select name="custom-slot-datetime" class="scheduling-options-dd">                                      
-                                    </select>
+                                  <div class="scheduling-details-custom-slot sop" id="scheduling-method-custom-slot" data-schedule="none" data-name="custom-slot" name="scheduling-method">                                                                      
                                   </div>  <!-- END .scheduling-details-custom-slot -->
                                 </div>  <!-- END .scheduling-details -->
                               </div>  <!-- END .post-tool-submit-left -->
