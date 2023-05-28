@@ -460,108 +460,93 @@ $(function($) {
         // $("#scheduling-cdn").removeAttr("data-info name");
         // $("#scheduling-cdmins").removeAttr("data-check name");
 
-        if (option == "set-countdown") {            
-            div.attr("data-schedule", option);            
-            
-            $("#scheduling-cdn").attr({
-                "data-info": option,
-                name: "c-" + option
-            });
-            $("#scheduling-cdmins").attr({
-                "data-check": option,
-                name: "ct-" + option,
-            });       
-            $("#scheduling-cdn").html("");
-
-            for (let i = 1; i <= 59; i++) {
-                sopp += '<option value="' + i + '">' + i + "</option>";
-            }
-
-            $("#scheduling-cdn").append(sopp);
-        } 
-
-        if (option === "custom-time") {
-            div.attr("data-schedule", option);            
-
-            $("img.sched-custom-time").on('click', function(e) {
-
-                var datepicker = $("<input>").attr("type", "text").attr("id", "datepicker").attr('name', 'ct-time-date');
-
-                // Append the datepicker element to the container
-                $(".date-picker-wrapper").empty().append(datepicker);
-                $('#scheduling-method-custom-time').attr('style', 'display: flex');
-                $('#scheduling-method-custom-time .date-picker-wrapper input').attr('style', 'font-family: inherit;font-size: inherit;line-height: inherit;margin: 0;padding: 0.5em 1em; color: white');
-                $('#scheduling-method-custom-time select').attr('style', 'margin: 0 0.2em')
+        switch (option) {
+            case "set-countdown" : 
+                div.attr("data-schedule", option);            
                 
-                // Initialize the datepicker with the specified options
-                datepicker.datepicker({
-                    dateFormat: "dd-mm-yy",
-                    duration: "fast"
-                })
+                $("#scheduling-cdn").attr({
+                    "data-info": option,
+                    name: "c-" + option
+                });
+                $("#scheduling-cdmins").attr({
+                    "data-check": option,
+                    name: "ct-" + option,
+                });       
+                $("#scheduling-cdn").html("");
+
+                for (let i = 1; i <= 59; i++) {
+                    sopp += '<option value="' + i + '">' + i + "</option>";
+                }
+
+                $("#scheduling-cdn").append(sopp);
+                break;
+
+            case "custom-time":
+                div.attr("data-schedule", option);            
+                var dropdown = customTimedropdown()
+                $('.scheduling-details').html(dropdown)
     
-                // Show the datepicker
-                datepicker.datepicker("show");
-            });
-        }
-
-        if (option === "custom-slot") {
-            var post_type = [];
-
-            // check if special post types are active
-            if ($('.primary-post-type-buttons').hasClass('icon-ative')) {
-                var type = $('.icon-active').data('type');
-                console.log(type);
-            }
-
-            div.attr("data-schedule", option);    
-            console.log(div.attr("data-schedule", option)) 
-
-            $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
-            $('#scheduling-method-custom-slot .inner .new-slot-time-wrapper1').attr('style', 'margin-left: 0.3em');
-
-            $.get(APP_URL + '/custom-slot/' + post_type, function(data) {
-                // success code here
-                // var option = $('<option>').val(data.slot_day).text(data.slot_day.toUpperCase());
-                data.forEach(function(item) {
-                    console.log(item)
-                    var str = item.slot_day;
-                    var day = str.charAt(0).toUpperCase() + str.substring(1);
-                    var time = item.hour + ":" + item.minute_at + " " + item.ampm;
-                    var opt = $('<option>').val(day + " " + time).text(day + " " + time);
-                                       
-                    $('select[name="custom-slot-datetime"]').append(opt)
-                })
-            })
-            .fail(function(xhr, status, error) {
-            // error code here
-                console.log(xhr)
-            });
-        }
+                $("img.sched-custom-time").on('click', function(e) {
+    
+                    var datepicker = $("<input>").attr("type", "text").attr("id", "datepicker").attr('name', 'ct-time-date');
+    
+                    // Append the datepicker element to the container
+                    $(".date-picker-wrapper").empty().append(datepicker);
+                    $('#scheduling-method-custom-time').attr('style', 'display: flex');
+                    $('#scheduling-method-custom-time .date-picker-wrapper input').attr('style', 'font-family: inherit;font-size: inherit;line-height: inherit;margin: 0;padding: 0.5em 1em; color: white');
+                    $('#scheduling-method-custom-time select').attr('style', 'margin: 0 0.2em')
+                    
+                    // Initialize the datepicker with the specified options
+                    datepicker.datepicker({
+                        dateFormat: "dd-mm-yy",
+                        duration: "fast"
+                    })
         
-        // }
-        // if (svv == "custom-time") {
-        //     console.log(1);
-        //     fvv.attr("data-schedule", svv);
-        //     $("#scheduling-cdn").attr({
-        //         "data-info": svv,
-        //         name: "c-" + svv
-        //     });
-        //     $("#scheduling-cdmins").attr({
-        //         "data-check": svv,
-        //         name: "ct-" + svv,
-        //     });
+                    // Show the datepicker
+                    datepicker.datepicker("show");
+                });
+                break;
+            
+            case "custom-slot": 
+                div.attr("data-schedule", option);    
+                console.log(div.attr("data-schedule", option)) 
+                
+                var icon = $('.primary-post-type-buttons').find('.icon-active').data('type');
+                $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
+                $('#scheduling-method-custom-slot .inner .new-slot-time-wrapper1').attr('style', 'margin-left: 0.3em');
+                
+                getCustomSlot(icon);
+                break;
 
-        //     $("#scheduling-cdn").html("");
-
-        //     for (let i = 1; i <= 59; i++) {
-        //         sopp += '<option value="' + i + '">' + i + "</option>";
-        //     }
-
-        //     $("#scheduling-cdn").append(sopp);
-        // }
-
-        // console.log("scheduling");
+            default:
+                $('.scheduling-details').empty();
+                break;
+        }        
     });
+
+    /** check if buttons don't have class */
+    var element = $(".post-type-buttons img");
+    element.on('click', function(e) {      
+        console.log(e)
+        var cSlot = $('#scheduling-options option:selected').val(); 
+
+        if (cSlot === "custom-slot") {
+            if (element.hasClass("icon-active")) {
+                // The element has the specified class
+                console.log("Element has the class");
+                var type = e.target.dataset.type;
+                console.log(type)
+                getCustomSlot(type)
+            } else {
+                // The element does not have the specified class
+                console.log("Element does not have the class");
+                getCustomSlot("regular-tweets")
+            } 
+        } else {
+            console.log('do nothing');
+        }
+
+    })
 
 
     /** select tweet profiles cross tweet */ 
@@ -577,8 +562,69 @@ $(function($) {
                 $(this).attr("status", "active");
             }
         }
-    );    
+    );           
 
+    function getCustomSlot(post_type) {
+        $.get(APP_URL + '/custom-slot?post_type=' + post_type, function(data) {
+            // success code here
+            // var option = $('<option>').val(data.slot_day).text(data.slot_day.toUpperCase());
+            console.log(data)
+            if (data.length > 0) {
+                var dropdown = customSlotdropdown();
+                $('.scheduling-details').html(dropdown)
+
+                data.forEach(function(item) {
+                    var str = item.slot_day;
+                    var day = str.charAt(0).toUpperCase() + str.substring(1);
+                    var time = item.hour + ":" + item.minute_at + " " + item.ampm;
+                    var opt = $('<option>').val(day + " " + time).text(day + " " + time);
+                                       
+                    $('select[name="custom-slot-datetime"]').append(opt)
+                })
+            } else {
+                var p = $('<p>').text('Please add slot in the slot scheduler page.');
+                $('.scheduling-details').html(p);
+            }
+        })
+        .fail(function(xhr, status, error) {
+        // error code here
+            console.log(xhr)
+        });
+    }
+
+    function customSlotdropdown() {
+        var html = `<select name="custom-slot-datetime" class="scheduling-options-dd"></select>`
+        return html;
+    }
+
+    function customTimedropdown() {
+        var html = `<div class="date-picker-wrapper"></div>
+        <select id="post-time-hour" name="ct-hour" class="post-time-hour scheduling-options-dd">
+          <option disabled selected>Hour</option>`;
+        
+        for (var i = 1; i <= 12; i++) {
+            html += `<option value="${i}">${i}</option>`;
+        }
+        
+        html += `</select>
+        <select class="post-time-minute scheduling-options-dd" name="ct-min">
+          <option disabled selected>Minute</option>`;
+          
+        for (var i = 0; i <= 59; i++) {
+            html += `<option value="${i}">${i}</option>`;
+        }
+        
+        html += `</select>
+        <select id="post-time-am-pm" name="ct-am-pm" class="post-time-am-pm scheduling-options-dd">
+          <option disabled selected>AM / PM</option>
+          <option value="AM">AM</option>
+          <option value="PM">PM</option>
+        </select>
+        <img src="${APP_URL}/public/ui-images/icons/calendar.svg" class="sched-custom-time">`;
+        
+        return html;
+    }
+    
 
     /** Retweet Timer Settings */ 
     // $retweetTimerModalClose = $(".retweet-modal-close");
