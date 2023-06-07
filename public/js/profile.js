@@ -1,77 +1,150 @@
 // Fetch the existing tag groups when the page loads
 $(document).ready(function() {        
 
-    $.ajax({
-        type: "GET",
-        url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets",
-        beforeSend: function () {
-            $("#spinner").show();
-        },
-        success: function (response) {
-            // console.log(response.data);
-            $(".profileSection").show();
+    // $.ajax({
+    //     type: "GET",
+    //     url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets",
+    //     beforeSend: function () {
+    //         $("#spinner").show();
+    //         // $("#getting-tweets").show();
+    //     },
+    //     success: function (response) {
+    //         $(".profileSection").show();
             
+    //         if (response.status === 200) {
+    //             var cardSection = $(".profile-posts-inner");
+    //             var numItems = 0;
+                
+    //             if (response.data.length > 0) {
+    //                 $.each(response.data, function (index, value) {     
+    //                     renderProfileCards(cardSection, index, value, numItems);                                  
+    
+    //                     numItems++;
+    //                 });        
+    //             } else {
+    //                 $(".profile-posts-inner").text('No tweets found');
+    //             }
+    //         } else {
+    //             $(".profile-posts-inner").text('No tweets found');
+    //         }
+    //     },
+    //     error: function (xhr, status, error) {
+    //         console.log(
+    //             "An error occurred while fetching the tweets: " + error
+    //         );
+    //     },
+    //     complete: function () {
+    //         $("#spinner").hide();
+    //         // $("#getting-tweets").hide();
+    //     },
+    // });
+
+    async function fetchTweets() {
+        try {
+            const response = await $.ajax({
+                type: "GET",
+                url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets",
+                beforeSend: function () {
+                    $("#spinner").show();
+                    // $("#getting-tweets").show();
+                }
+            });
+    
+            $(".profileSection").show();
+    
             if (response.status === 200) {
                 var cardSection = $(".profile-posts-inner");
                 var numItems = 0;
-                
-                $.each(response.data, function (index, value) {     
-                    renderProfileCards(cardSection, index, value, numItems);                                  
-
-                    numItems++;
-                });        
+    
+                if (response.data.length > 0) {
+                    $.each(response.data, function (index, value) {
+                        renderProfileCards(cardSection, index, value, numItems);
+                        numItems++;
+                    });
+                } else {
+                    $(".profile-posts-inner").text('No tweets found');
+                }
             } else {
                 $(".profile-posts-inner").text('No tweets found');
             }
-        },
-        error: function (xhr, status, error) {
+        } catch (error) {
+            console.log("An error occurred while fetching the tweets: " + error);
+        } finally {
+            $("#spinner").hide();
+            // $("#getting-tweets").hide();
+        }
+    }
+    
+    // Call the async function
+    fetchTweets();
+
+   // Bind click event to li elements inside dropdown
+    $(".profile-page-dd li").on('click', async function(e) {
+        var type = $(this).attr('id');
+
+        try {
+            const response = await $.ajax({
+                url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/" + type,
+                method: "GET", 
+                beforeSend: function() {
+                    $(".profile-posts-inner").empty();
+                }
+            });
+
+            if (response.status === 200) {
+                var cardSection = $(".profile-posts-inner");
+                var numItems = 0;
+    
+                $.each(response.data, function (index, value) {
+                    renderProfileCards(cardSection, index, value, numItems);
+                    numItems++;
+                });
+            }
+        }catch (error) {
             console.log(
                 "An error occurred while fetching the tweets: " + error
             );
-        },
-        complete: function () {
-            $("#spinner").hide();
-        },
+        }
+      
     });
 
-   // Bind click event to li elements inside dropdown
-    $(".profile-page-dd li").click(function(e) {
-        // Get text inside li element
-        var type = $(this).attr('id');
+    $('#primaryPostTemplate').on('click', 'img.ui-icon', async function(e) {
+        var func = e.target.dataset;
+        var btnFnction = Object.keys(func).toString();
 
-        $.ajax({
-            url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/" + type,
-            method: "GET", 
-            beforeSend: function() {
-                $(".profile-posts-inner").empty();
-            },          
-            success: function (response) {
-                // Do something with the data    
-                
-                if (response.status === 200) {
-                    var cardSection = $(".profile-posts-inner");
-                    var numItems = 0;
-                    
-                    $.each(response.data, function (index, value) {     
-                        renderProfileCards(cardSection, index, value, numItems);                                  
-
-                        numItems++;
-                    });        
+        switch (btnFnction) {            
+            case 'now': 
+                $.ajaxSetup({
+                    headers: {
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+                    }
+                });
+                   
+                try {
+                    const response = await $.post(APP_URL + '/twitter/' + TWITTER_ID + '/tweet-now?tweet=' + func.now, function(response) {
+                    console.log(response)
+                    })
+                } catch(error) {
+                    console.log(
+                        "An error occurred while fetching the tweets: " + error
+                    );
                 }
-            },
-            error: function (xhr, status, error) {
-                console.log(
-                    "An error occurred while fetching the tweets: " + error
-                );
-            },
-        });
-    });
+                break;
+            case 'schedule': 
+                break;
+            case 'analytics':
+                break;        
+            case 'twitterlink': 
+                window.open(func.twitterlink, '_blank');
+                break;
+        }
+    })    
     
 });
 
 
 function renderProfileCards(cardSection, index, value, numItems) {
-    var $cloneTemplate = tweetInstance(numItems);
+    var $cloneTemplate = tweetInstance(value);
     $cloneTemplate = $($cloneTemplate);
     // $('.mosaic-posts-outer#template').remove();
     
@@ -99,17 +172,17 @@ function renderProfileCards(cardSection, index, value, numItems) {
     cardSection.append($cloneTemplate);
 }
 
-function tweetInstance() {
+function tweetInstance(value) {
     var profileImg = (TWITTER_PHOTO !== "") ? TWITTER_PHOTO : APP_URL + "/public/temp-images/imgpsh_fullsize_anim (1).png";    
     return ($template = `
          <div class="mosaic-posts-outer template">
-            <div class="mosaic-watermark-wrap frosted">
-            <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="mosaic-watermark" />
+            <div class="mosaic-watermark-wrap frosted">                
+                <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="mosaic-watermark"  />                
             <div class="mosaic-posts-inner">
 
                 <div class="mosaic-post-controls">
                 <span class="mosaic-control-icon">
-                    <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
+                    <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon" data-twitterlink="https://twitter.com/${TWITTER_USN}/status/${value.id}" /></span>
                 <span class="mosaic-control-icon">
                     <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
                 </div>  <!-- END .mosaic-post-controls -->
@@ -139,13 +212,12 @@ function tweetInstance() {
                     <div class="mosaic-scheduling mosaic-scheduling-now">
 
                         <span class="mosaic-label mosaic-now-label">
-                        <img src="${APP_URL}/public/ui-images/icons/pg-command.svg" class="ui-icon" />
-                        Now
+                            <img src="${APP_URL}/public/ui-images/icons/pg-command.svg" class="ui-icon" />Now
                         </span>
                         <span class="mosaic-sched-buttons mosaic-now-buttons">
-                        <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon comment-now-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
+                            <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" data-now="like-${value.id}"/>
+                            <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon comment-now-icon" data-now="comment-${value.id}"/>
+                            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" data-now="retweet-${value.id}"/>
                         </span>
 
                     </div>  <!-- END .mosaic-scheduling-now -->
@@ -153,13 +225,13 @@ function tweetInstance() {
                     <div class="mosaic-scheduling mosaic-scheduling-future">
 
                         <span class="mosaic-label mosaic-future-label">
-                        <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
-                        Schedule
+                            <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
+                            Schedule
                         </span>
                         <span class="mosaic-sched-buttons mosaic-future-buttons">
-                        <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
-                        <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon" />
+                            <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon" data-schedule="comment-${value.id}"/>
+                            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" data-schedule="retweet-${value.id}"/>
+                            <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon" data-schedule="evergreen-${value.id}"/>
                         </span>
 
                     </div>  <!-- END .mosaic-scheduling-future -->
@@ -167,14 +239,14 @@ function tweetInstance() {
                     <div class="mosaic-scheduling mosaic-post-analytics">
 
                         <span class="mosaic-label mosaic-analytics-label">
-                        <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
-                        Analytics
+                            <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
+                            Analytics
                         </span>
                         <span class="mosaic-sched-buttons mosaic-analytics-buttons">
-                        <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
-                        <span class="mosaic-stat stat-retweets">2.20</span>
-                        <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" />
-                        <span class="mosaic-stat stat-hearts">2010</span>
+                            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
+                        <span class="mosaic-stat stat-retweets">${value.public_metrics.retweet_count}</span>
+                            <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon"/>
+                            <span class="mosaic-stat stat-hearts">${value.public_metrics.like_count}</span>
                         </span>
 
                     </div>  <!-- END .mosaic-post-analytics -->
@@ -232,7 +304,6 @@ function tweetInstance() {
         // // Call the function again to fetch the next set of tweets
         // $("#load-more-btn").on("click", function() {
         // getTweets();
-        // });
-
+        // });        
 
 }

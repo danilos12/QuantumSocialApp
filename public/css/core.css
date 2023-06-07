@@ -4177,3 +4177,28 @@ input#file-upload-button {
   font-size: 14px;
   font-weight: bold;
 }
+
+.freeze-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+  z-index: 9999; /* Ensure the overlay appears on top of other elements */
+  display: none; /* Initially hidden */
+  pointer-events: auto; /* Enable pointer events on the overlay */
+  cursor: not-allowed; /* Show 'not-allowed' cursor when hovering over the overlay */
+}
+
+body.freeze {
+  overflow: hidden; /* Prevent scrolling on the page */
+}
+
+.slot-evergreen-tweets {
+  background: rgba(114,255,143,.4)
+}
+
+.slot-tweetstorms-tweets {
+  background: #FAFF9D
+}

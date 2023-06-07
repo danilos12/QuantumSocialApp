@@ -175,7 +175,7 @@
                             </div>  <!-- END .global-twitter-profile-header -->
                 
                             <div class="menu-social-account-options">
-                              <span class="menu-account-default" data-url="{{ route("save-settings") }}" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account." default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
+                              <span class="menu-account-default" data-twitter_id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account. Page will reload after select" default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
                               <span class="menu-account-icons">
                               <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
                               <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
@@ -340,6 +340,7 @@
       <!-- BEGIN COMMAND MODULE -->
 
       @include('modals.commandmodule')
+      {{-- @include('modals.edit-commandmodule') --}}
 
       <!-- END COMMAND MODULE -->
   </div>  <!-- END .main-settings-anchor -->
@@ -349,5 +350,5 @@
 </style>
 
 @section('scripts')
-<script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
+{{-- <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script> --}}
 @endsection

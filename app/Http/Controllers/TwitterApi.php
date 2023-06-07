@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Twitter;
+use App\Models\UT_AcctMngt;
+use App\Models\TwitterToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
+use App\Helpers\TwitterHelper;
+
 
 
 class TwitterApi extends Controller
@@ -88,7 +93,7 @@ class TwitterApi extends Controller
            
             switch ($type) {
                 case "retweet":
-                    $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=100";
+                    $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=30";
                     $request = $this->curlGetHttpRequest($url, $headers, $data);
 
                     if (!empty($request->data)) {      
@@ -103,23 +108,25 @@ class TwitterApi extends Controller
                             return false;
                         });      
                     }      
-
                     break;
+
                 case "quote":
                     $data = "";
                     break;
+                    
                 case "comments":
                     echo "hi";
                     break;
+
                 case "replies":
                     $data = "exclude=retweets&tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
                     $request = $this->curlGetHttpRequest($url, $headers, $data);
 
                     if (!empty($request->data)) {
                         $filteredData = $request->data;
-                    }
-                    
+                    }                    
                     break;
+
                 case "image" :
                     $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
                     $request = $this->curlGetHttpRequest($url, $headers, $data);
@@ -145,19 +152,20 @@ class TwitterApi extends Controller
                         }
                        
                     }
-
                     break;
+
                 case "links";
                     echo "hi";
                     break;
+
                 case "no-links";
                     echo "hi";
                     break;
+
                 default:
                     $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
                     $request = $this->curlGetHttpRequest($url, $headers, $data);
                     
-
                     if (!empty($request->data)) {
                         // get images of the tweet 
                         $filteredData = $request->data;
@@ -180,9 +188,7 @@ class TwitterApi extends Controller
                         }
                     }
                     break;
-            }
-
-            
+            }            
 
             if ($filteredData !== null) {                              
                 // return the modified data as a JSON response
@@ -196,44 +202,87 @@ class TwitterApi extends Controller
                     'message' => 'Tweets not found',
                 ]);
             }
+            
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
+            ]);       
+        }
+    }
 
+    public function tweetNow(Request $request, $id) {
 
+        try {
+            $like = explode('-', $request->tweet);
+            $getToken = TwitterHelper::getTwitterToken($id);
+            $twitterMeta = $getToken->toArray();
+
+            $twitter_meta = $twitterMeta[0];
+
+            // check access tokenW
+            $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);  
+            
+            // send tweet
+            $headers = array(
+                'Authorization: Bearer ' . $checkIfTokenExpired['token'],
+                'Content-Type: application/json'
+            );  
+            
+            $data = json_encode(array('tweet_id' => $like[1]));
+            
+            // $getLikes = $this->curlGetHttpRequest('https://api.twitter.com/2/users/' . $id . '/likes', $headers, array('tweet_id' => $like[1]));
+            $commandModule = new CommandmoduleController();
+            $getLikes = $commandModule->apiRequest('https://api.twitter.com/2/users/' . $id . '/likes', $headers, 'POST', $data);
+            dd($getLikes);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 500,
                 'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
             ]);
         }
+
     }
 
-    public function twitterDetails($twitterId) {
-        dd($twitterId);
+    public function tweetSchedule(Request $request) {
+        
     }
-
 
     public function switchedAccount(Request $request) {
-
-        $title = "Profile";
-        
+        $title = "Profile";        
         try {
-            $twitterId = $request->input('twitter_id');
+            $twitterId = str_replace('twitter-', '', $request->input('id'));
 
+            $updatedSelected = UT_AcctMngt::where('user_id', Auth::id())
+                ->where('twitter_id', $twitterId)
+                ->update(['selected' => 1]);
 
-            // Update the selected Twitter account
-            $updated = DB::table('ut_acct_mngt')
-                ->where('user_id', Auth::id())
-                ->update([
-                    'selected' => DB::raw("CASE WHEN twitter_id = $twitterId THEN 1 ELSE 0 END")
-                ]);
-           
-
-            // Check if update was successful
-            if ($updated) {
-                return response()->json(['success' => true, 'message' => 'Tweets are updated', 'get_tweets' => 'getTweets']);
-            } else {
-                return response()->json(['success' => false, 'message' => 'Tweets are not updated']);                
+            // check if the twitter linked is more than one
+            $countTwitterAcct = UT_AcctMngt::where('user_id', Auth::id())->count();
+            $updatedRow = '';
+            if ($countTwitterAcct > 1) {
+                // update the other twitter not equal to twitter id
+                $updatedSelected += UT_AcctMngt::where('user_id', Auth::id())
+                    ->where('twitter_id', '!=', $twitterId)                
+                    ->update(['selected' => 0]);
+                    
+                $updatedRow = $updatedSelected;
             }
-              
+            
+            if ($updatedSelected > 0 && $updatedRow > 0) {
+                $selectedUser = DB::table('twitter_accts')
+                    ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                    ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                    ->where('ut_acct_mngt.selected', "=", 1) // selected
+                    ->where('ut_acct_mngt.user_id', "=", Auth::id()) 
+                    ->where('twitter_accts.deleted', "=", 0)
+                    ->first();
+
+                return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
+            }
+
         } catch (\Exception $e) {
             
             return response()->json([
@@ -249,7 +298,6 @@ class TwitterApi extends Controller
 
     public function removeTwitterAccount(Request $request)
     {
-
         $id = $request->input('twitter_id');
         $delete = Twitter::where('twitter_id', $id)->update(['deleted' => 1]);
 
@@ -261,7 +309,6 @@ class TwitterApi extends Controller
         curl_setopt($curl, CURLOPT_URL, $url . "?" . $data);            
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-
 
         $response = curl_exec($curl);      
         $info = curl_getinfo($curl);     
