@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="page-outer promos-outer">
-                <div class="page-inner promos-inner">
+                <div class="page-inner promos-inner" data-sched-method="promo">
 
                   <div class="page-head-n-sort">
                     <div class="head-left-wrap">
@@ -201,5 +201,5 @@
 @endsection
 
 @section('scripts')
-<script type='text/javascript' src="{{asset('public/js/promo.js')}}"></script>
+<script type='text/javascript' src="{{asset('public/js/posting.js')}}"></script>
 @endsection
