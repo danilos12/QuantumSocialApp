@@ -99,6 +99,10 @@ class AppServiceProvider extends ServiceProvider
                 // membership 
                 $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
                 $view->with('membership', $membership);                       
+                
+                $toggle = DB::table('twitter_meta')->where('user_id', Auth::id())->where('twitter_id', $twitterID)->first();     
+                // dd($toggle);
+                $view->with('toggle', $toggle ? $toggle->queue_switch : null);                       
                            
                 // // api 
                 // $twitter_tkn = TwitterToken::where('twitter_id', $twitterID)->first();                
