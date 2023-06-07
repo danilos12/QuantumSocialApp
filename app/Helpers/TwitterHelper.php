@@ -5,6 +5,9 @@ namespace App\Helpers;
 use App\Models\TwitterToken;
 use Carbon\Carbon;
 use App\Models\QuantumAcctMeta;
+use App\Models\Twitter;
+use Illuminate\Support\Facades\Auth;
+
 
 class TwitterHelper
 {
@@ -70,7 +73,7 @@ class TwitterHelper
     }    
 
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
-        // dd($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id);
+
         if (($expires_in + $created_at) <= time()) {
             $d = TwitterHelper::refreshAccessToken($refresh_token);
             session()->put('token_details', $d);
@@ -89,6 +92,22 @@ class TwitterHelper
             return ['status' => 'token_valid', 'token' => $accessToken];
         }
     }
+
+    public static function getTwitterToken($twitter_id) {       
+
+        $findActiveTwitter = Twitter::join('twitter_meta', 'twitter_accts.twitter_id', '=', 'twitter_meta.twitter_id')
+            ->join('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
+            ->select('twitter_accts.*', 'twitter_meta.*', 'ut_acct_mngt.selected')
+            ->where('twitter_accts.twitter_id', '=', $twitter_id)
+            ->where('twitter_accts.deleted', '=', 0)
+            ->where('twitter_accts.user_id', '=', Auth::id())
+            ->where('ut_acct_mngt.selected', '=', 1)
+            ->where('twitter_meta.active', '=',   1)
+            ->get();
+
+        return $findActiveTwitter;
+    }
+    
 
     public static function executeAfterFiveHoursFromLastUpdate($lastUpdated)
     {

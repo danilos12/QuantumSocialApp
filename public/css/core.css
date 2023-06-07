@@ -4178,6 +4178,14 @@ input#file-upload-button {
   font-weight: bold;
 }
 
+
+.slot-evergreen-tweets {
+  background: rgba(114,255,143,.4)
+}
+
+.slot-tweetstorms-tweets {
+  background: #FAFF9D
+
 /* Reset Page */
 .card-header {
   color: var(--body-text);
@@ -4203,4 +4211,5 @@ input#file-upload-button {
 .btn-primary:hover {
   background: var(--frost-heavy);
   background: var(--color-nova-75);
+
 }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
@@ -42,4 +44,30 @@ class LoginController extends Controller
     {      
         return view('auth.login');
     }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        Session::flash('error', trans('auth.failed'));
+        $request->session()->flash('error', true);
+    
+        return redirect()->route('login')->withInput($request->only($this->username(), 'remember'));
+    }
+
+    // public function login(Request $request)
+    // {
+    //     $this->validateLogin($request);
+
+    //     if ($this->attemptLogin($request)) {
+    //         if ($request->hasSession()) {
+    //             $request->session()->put('auth.password_confirmed_at', time());
+    //         }
+    //         return $this->sendLoginResponse($request);
+    //     }
+
+    //     // If the login attempt was unsuccessful, flash the input data and error message to the session
+    //     Session::flashInput($request->input());
+    //     Session::flash('error', trans('auth.failed'));
+
+    //     return redirect()->route('login');
+    // }
 }

@@ -9,8 +9,9 @@
         <span class="profile-heading">
           The Queue</span>
         <div class="toggle-wrapper">
-          <label class="toggleSwitch large" onclick="">
-            <input type="checkbox" checked />
+          <label class="toggleSwitch large" onclick="">            
+            <input type="checkbox" id="queue-post-status" {{ $toggle > 0 ? 'checked' : '' }}/>
+            
             <span>
                 <span>INACTIVE</span>
                 <span>ACTIVE</span>
@@ -89,6 +90,7 @@
 
   </div>  <!-- END .profile-inner -->
 </div>  <!-- END .profile-outer -->
+<button id="openModalButton" style="display: none;" data-toggle="modal" data-target="#editModal"></button>
 
 @endsection
 @section('scripts')

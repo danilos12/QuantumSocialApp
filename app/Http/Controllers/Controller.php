@@ -12,6 +12,8 @@ use App\Models\Twitter;
 use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
 use App\Models\TwitterSettingsMeta;
+use App\Helpers\TwitterHelper;
+
 
 class Controller extends BaseController
 {
@@ -98,7 +100,9 @@ class Controller extends BaseController
                     'twitter_id' => $twitterId->id,
                     'access_token' => $response->access_token,
                     'refresh_token' => $response->refresh_token,
-                    'expires_in' => $response->expires_in
+                    'expires_in' => $response->expires_in,
+                    'active' => 1,
+                    'queue_switch' => 1
                 ]);
     
                 // save ut_user_mngt
