@@ -44,6 +44,52 @@ $(document).ready(function() {
     });
   });
   // });
+
+  // get general settings twitter
+  // $.get(APP_URL + '/twitter/accts', function(response) {
+  //   console.log(response);
+  //   if (response.length > 0) {
+  //     $.each(response, function(index, acct) {
+  //       console.log(acct)
+  //       twitterLongCard(acct)
+  //     })
+  //   }
+  // })
+
+  // function twitterLongCard(response) {
+  //   return $html = `
+  //   <div class="menu-social-account-outer">
+  //       <div class="menu-social-account-inner">
+
+  //       <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
+
+  //         <div class="global-twitter-profile-header">
+  //           <a href="#">
+  //           <img src="${response.twitter_photo}" lass="global-profile-image" /></a>
+  //           <div class="global-profile-details">
+  //             <div class="global-profile-name">
+  //               <a href="#"> ${response.twitter_name} </a>
+  //             </div>  <!-- END .global-author-name -->
+  //             <div class="global-profile-subdata">
+  //               <span class="global-profile-handle">@<a href="">${response.twitter_username}</a>
+  //               </span>
+  //             </div>  <!-- END .global-post-date-wrap -->
+  //           </div>  <!-- END .global-author-details -->
+  //         </div>  <!-- END .global-twitter-profile-header -->
+
+  //         <div class="menu-social-account-options">
+  //           <span class="menu-account-default" data-twitter_id="${response.twitter_id}" data-toggle="tooltip" title="Set default account." default="${response}"></span>
+  //           <span class="menu-account-icons">
+  //           <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
+  //           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitter_id="${response}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
+  //           </span>
+  //         </div>  <!-- END .menu-social-account-options -->
+
+  //       </div>  <!-- END .menu-social-account-inner -->
+  //     </div>  <!-- END .menu-social-account-outer -->
+  //     <!-- END .menu-social-account Instance -->     
+  //   `
+  // }
   
   $('#membership').change(function(event) {
     var selectedValue = $(this).val();
@@ -111,44 +157,16 @@ $(document).ready(function() {
   }
   
   
-  // $('.menu-account-default').click(function(event) {
-  //   console.log(event);  
-  //   var selectedValue = $(this).val();
-  //   console.log("Selected value changed to: " + selectedValue, $(this).data('url'));
-  
-      
-  //   $.ajax({
-  //     url: $(this).data('url'),
-  //     method: 'POST',
-  //     data: {
-  //       selected: 1,
-  //       twitter_id: $(this).data('twitterid'),
-  //       id: 'select-account'
-  //     },
-  //     headers: {
-  //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-  //     },
-  //     success: function(response) {
-  //       // Handle success
-  //       $('.menu-account-default').attr('default', '');
-  //       $('span#' + response.twitter_id).attr('default', 'active');
-  //       console.log(response.twitter_id);      
-  
-  //     },
-  //     error: function(jqXHR, textStatus, errorThrown) {
-  //       // Handle error
-  //       console.log(jqXHR, textStatus, errorThrown)
-  //     }, 
-  //     complete: function() {
-  //       location.reload();
-  //     }
-  //   });
-  // });
+  $('.menu-account-default').click(function(event) {
+    var twitterId = event.target.dataset.twitter_id;  
+    console.log(twitterId);
+    // console.log(twitterId);
+        
+    switchUser(APP_URL + '/twitter/switchUser?id=' + twitterId, twitterId)      
+  });
   
   
-  $('.delete-account').click(function(event) {
-    console.log($(this).data('twitterid'));
-  
+  $('.delete-account').click(function(event) {  
     $.ajax({
       url: $(this).data('url'),
       method: 'POST',
@@ -185,9 +203,46 @@ $(document).ready(function() {
     $('.twitter-settings-outer').show();
   })
   
+  function switchUser(url, twitterId) {
+    $('.freeze-overlay').show();
+    $('body').addClass('freeze');
+
+    $.ajax({
+      url,
+      method: 'POST',      
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      },
+      success: function(response) {
+        console.log(response)
+        // Handle success in general settings
+        $('.menu-account-default').attr('default', '');
+        $('span[data-twitter_id="'+ response.twitter_id + '"]').attr('default', 'active');
+
+        // in hamburger
+        $('.twitter-account-select-bar').removeClass('active');
+        $('.twitter-account-select-bar[data-twitter="twitter-' + response.twitter_id + '"]').addClass('active');          
+
+        setTimeout(function() {
+          location.reload();
+        }, 3000); // Reload after 5 seconds (adjust the delay as needed)
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        // Handle error
+        console.log(jqXHR, textStatus, errorThrown)
+      },
+      complete: function() {
+        // Hide the overlay and remove freeze class when the AJAX request is complete
+        $('.freeze-overlay').hide();
+        $('body').removeClass('freeze');
+      }      
+    });
+  }
+
   
-  $('.profile-twitter-account-item').click(function() {
-    var url = $(this).data('url');
+  $('.profile-twitter-account-item').click(function(e) {
+    var $this = $(this)
+    var twitterId = $this.parent().parent().data('id');
     var hasClass= $(this).hasClass('active');
 
     if (hasClass) {
@@ -200,35 +255,30 @@ $(document).ready(function() {
         })
         .popover('show');        
           
-    } else {
+    } else {  
+      // console.log(twitter_id)
+      // $.ajax({
+      //   url: APP_URL + '/twitter/switchUser?id=' + twitter_id,
+      //   method: 'POST',
+      //   headers: {
+      //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      //   },
+      //   success: function(response) {
+      //     // Handle success
+      //     // console.log(response)
+      //     $('.twitter-account-select-bar').removeClass('active');
+      //     $('.twitter-account-select-bar[data-twitter="twitter-' + twitter_id + '"]').addClass('active');          
 
-      console.log(url);
-  
-      // Extract the last parameter from the URL
-      var twitter_id = url.substring(url.lastIndexOf('?') + 1);
-  
-      $.ajax({
-        url: url,
-        method: 'POST',
-        data: twitter_id,
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-          // Handle success
-          // console.log(response)
-          $('.twitter-account-select-bar').removeClass('active');
-          $('.twitter-account-select-bar[data-twitter="twitter-' + twitter_id + '"]').addClass('active');          
-
-          location.reload();
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-          // Handle error
-          console.log(jqXHR, textStatus, errorThrown)
-        },        
-      })
+      //     location.reload();
+      //   },
+      //   error: function(jqXHR, textStatus, errorThrown) {
+      //     // Handle error
+      //     console.log(jqXHR, textStatus, errorThrown)
+      //   },        
+      // })
+      switchUser(APP_URL + '/twitter/switchUser?id=' + twitterId, twitterId)      
     }
-
+        
     function loadContent(url) {
       var spinner = `<div class="queued-single-post">                      
                       <div class="queued-single-start">                        

@@ -1,14 +1,16 @@
-$(document).ready(function() {
-    var method = $(".queue-inner").attr("data-sched-method");
+$(document).ready(function() {    
+    var method = $(".page-inner").attr("data-sched-method");
 
     $.ajax({
         type: "GET",
         url: APP_URL + "/cmd/" + TWITTER_ID + "/post-type/" + method, // Use the URL of your server-side script here        
         success: function (response) {
+            console.log(response);
             if (response.length > 0) {                
                 // var details = fetchTwitterDetails(TWITTER_ID);
 
                 $.each(response, function (index, k) {
+                    console.log(k)
                     var postType = getPostType(k.post_type);
                     var wrapper = postWrapper(k, postType, index);                    
 
@@ -42,161 +44,253 @@ $(document).ready(function() {
         );
     });   
 
-    $('.queue-months-dropdown').on('click', 'li', function(e) {
+    
+    $(document).on('click', 'img#edit-commandmodule', function(event) {
+        $target = event.target.dataset.id;  
+        closeModal($target);
+        $('.modal-large-anchor div.edit-commandmodule-outer').remove();
+        $('.ui-effects-placeholder').remove();
+    })
+      
+
+    $('.queue-months-dropdown').on('click', 'li', async function(e) {
         $month = e.target.id;
         var url = APP_URL + '/post/sortbymonth?id=' + TWITTER_ID + '&month=' + $month
 
-        // history.pushState(null, null, url);
-        
-        $.get(url, function(response) {
+        try {
+            const response = await fetch(url);
+            const responseData = await response.json();
+    
             $('.queue-day-wrapper').empty();
             if (response.data.length > 0) {                
                 // var details = fetchTwitterDetails(TWITTER_ID);
                 $.each(response.data, function (index, k) {
                     var postType = getPostType(k.post_type);
                     var wrapper = postWrapper(k, postType, index);                    
-
+    
                     $('.queue-day-wrapper').append(wrapper);
                 });
             } else {
                 $(".queue-day-wrapper").html("<div>No post found</div>");
             } 
-        }).fail(function(xhr, error) {
-            console.log(
-                "An error occurred while posts: " + error
-            );
-        }); 
+        } catch (error) {
+            console.log("Failed to fetch data:", error);
+        }         
     })
   
-    $('ul.queue-page-dd').on('click', 'li', function(e) {
+    $('ul.queue-page-dd').on('click', 'li', async function(e) {
         var type = this.id;
         var url = APP_URL + '/post/sortbytype?id=' + TWITTER_ID + '&type=' + type;
-
-        $.get(url, function(response) {
-            // console.log(response.data)
+    
+        try {
+            const response = await fetch(url);
+            const responseData = await response.json();
+    
             $('.queue-day-wrapper').empty();
-            if (response.data.length > 0) {                
-                // var details = fetchTwitterDetails(TWITTER_ID);
-
-                $.each(response.data, function (index, k) {
+            if (responseData.data.length > 0) {
+                // var details = await fetchTwitterDetails(TWITTER_ID);
+    
+                $.each(responseData.data, function (index, k) {
                     var postType = getPostType(k.post_type);
-                    var wrapper = postWrapper(k, postType, index);                    
-
+                    var wrapper = postWrapper(k, postType, index);
+    
                     $('.queue-day-wrapper').append(wrapper);
                 });
             } else {
                 $(".queue-day-wrapper").html("<div>No post found</div>");
             }
-
-        }).fail(function(xhr, status, error) {
-            console.log("Failed to delele data");
-        })
-    }) 
+        } catch (error) {
+            console.log("Failed to fetch data:", error);
+        }
+    });
 
     $('.queue-day-wrapper').on("click", 'img.queued-icon', async function(e) {
         var id = e.target.id;
         var rmId = id.split('-');
-        console.log(rmId);
-
-        if (rmId[0] === "edit" ) {
-            $('#mode').val('edit');        
-            $('#item-id').val(id);
-            
-            $.get(APP_URL + '/post/edit/' + id, function(response) {
-                console.log(response)
-                $.each(response.data, function(index, data) {
-                    console.log(data.post_type),
-                    console.log(data);
+    
+        switch (rmId[0]) {
+            case "edit":
+                $('#mode').val('edit');        
+                $('#item-id').val(id);
+                
+                try {
+                    const response = await fetch(APP_URL + '/post/edit/' + id);
+                    const data = await response.json();
 
                     // watermark
-                    if (data.post_type === "regular-tweets") {
+                    $('.modal-large-backdrop').append(data.html);
+                    
+                    $('.edit-commandmodule-outer').addClass('edit-commandmodule-' + data.data.id + '-outer')
+                    $('.edit-commandmodule-outer').find('.modal-large-close').attr('data-id','edit-commandmodule-' + data.data.id)
+                    // $('.edit-commandmodule-outer').find('.modal-large-close').attr('edit-commandmodule-')
+                    if (data.data.post_type === "regular-tweets") {
                         $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="twitter-tweets"]`).addClass('indicator-active');
                     } else {
-                        $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="${data.post_type}"]`).addClass('indicator-active');
+                        $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="${data.data.post_type}"]`).addClass('indicator-active');
                     }
-
-                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 textarea`).text(data.post_description);
-                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${data.post_type}"]`).addClass('icon-active');
-                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${data.sched_method}"]`).attr('selected', true);
-
-                    openModal("edit-commandmodule");
-
-                })                 
-            });         
-
-        } 
-        else if (rmId[0] === "delete")
-        {
-            $.post(APP_URL + '/post/delete', {id : id, _token : $('meta[name="csrf-token"]').attr("content")}, function(response) {
-                console.log(response)
-                // Handle the response
-                if (response.success) {
-                    // Display the flash message
-                    alert('Record deleted successfully!');
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 textarea`).text(data.data.post_description);
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${data.data.post_type}"]`).addClass('icon-active');
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${data.data.sched_method}"]`).attr('selected', true);
                     
-                    // Optionally, you can reload the page or perform any other action
-                    location.reload();
+                    openModal("edit-commandmodule-" + data.data.id);
+                } catch (error) {
+                    console.log(error);
                 }
-            }).fail(function() {
-                console.log("Failed to delele data");
-            })
-        } else if (rmId[0] === "more") {
-
-            $addTeamModal = $(".view-" + rmId[1]);           
-            openViewMore($addTeamModal);
-
-            $addTeamModal.on('click', 'span', function(e) {
-                $spanId = e.target.id; 
-                $spanIdsplit = $spanId.split('-');
-
-                if ($spanIdsplit[0] === 'post') {
-                    console.log($spanIdsplit);
-                    postTweetNow($spanId);
-                } else if ($spanIdsplit[0] === 'duplicate') {
-                    duplicatePostNow($spanId)
-                } else if ($spanIdsplit[0] === 'move') {
-                    console.log(1)
+                break;
+            
+            case "delete":
+                try {
+                    const response = await fetch(APP_URL + '/post/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+                        },
+                        body: JSON.stringify({ id: id }),
+                    });
+                    
+                    const data = await response.json();
+                    console.log(data);
+                    
+                    if (data.success) {
+                        alert('Record deleted successfully!');
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.log("Failed to delete data");
                 }
-            })
-        }
-
-        // var func = e.target.dataset.func;        
-        // openModal(func);
-        // getCmdModule(id);          
-    })
-   
-    function postTweetNow(id) {        
-        $.post({
-            url: APP_URL + '/cmd/post/tweet-now/' + id + '?twitter_id=' + TWITTER_ID, 
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-            },
-            success: function(response) {
-                console.log(response)
-                if (response.success === true) {
-                    alert(response.message);
-                    location.reload();
-                }
+                break;
+            
+            case "more":
+                $addTeamModal = $(".view-" + rmId[1]);           
+                openViewMore($addTeamModal);
                 
-            }        
-        });
+                $addTeamModal.on('click', 'span', function(e) {
+                    $spanId = e.target.id; 
+                    $spanIdsplit = $spanId.split('-');
+                    switch ($spanIdsplit[0]) {
+                        case 'post':
+                            console.log($spanIdsplit);
+                            postTweetNow($spanId);
+                            break;
+                        
+                        case 'duplicate':
+                            duplicatePostNow($spanId);
+                            break;
+                        
+                        case 'move':
+                            movePostToTop($spanId)
+                            break;                                                
+                    }
+                });
+                break;
+            
+            default:
+                break;
+        }
+    });
+    
+    $('#queue-post-status').on('click', async function(e) {
+        var isChecked = $(this).is(':checked');
+        var url = APP_URL + '/post/' + ((isChecked) ? 'active' : 'inactive') + '/' + TWITTER_ID;
+
+        try {                        
+            const response = await fetch(url,  {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+            });
+    
+            const responseData = await response.json();
+            console.log(responseData);
+
+            $('.queue-day-wrapper').empty();
+            if (responseData.data.length > 0) {
+                // var details = await fetchTwitterDetails(TWITTER_ID);
+    
+                $.each(responseData.data, function (index, k) {
+                    var postType = getPostType(k.post_type);
+                    var wrapper = postWrapper(k, postType, index);
+    
+                    $('.queue-day-wrapper').append(wrapper);
+                });
+            } else {
+                $(".queue-day-wrapper").html("<div>No post found</div>");
+            }
+            
+        } catch (error) {
+            console.log("Failed to fetch data:", error);
+        }
+    })
+
+    async function movePostToTop(id) {
+        try {
+            const response = await fetch(APP_URL + '/cmd/post/move-to-top/' + id + '?twitter_id=' + TWITTER_ID, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+            });
+    
+            const data = await response.json();
+            console.log(data);
+    
+            if (data.status === 200) {
+                alert(data.message);
+                location.reload();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+   
+    async function postTweetNow(id) {
+        try {
+            const response = await fetch(APP_URL + '/cmd/post/tweet-now/' + id + '?twitter_id=' + TWITTER_ID, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+            });
+    
+            const data = await response.json();
+            console.log(data);
+    
+            if (data.status === 200) {
+                alert(data.message);
+                location.reload();
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
     
-    function duplicatePostNow(id) {        
-        $.post({
-            url: APP_URL + '/cmd/post/duplicate-now/' + id + '?twitter_id=' + TWITTER_ID, 
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
-            },
-            success: function(response) {
-                console.log(response)
-                if (response.success === true) {
-                    alert(response.message);                    
-                    location.reload();
-                }
-                
-            }        
-        });
+    async function duplicatePostNow(id) {
+        try {
+            const response = await fetch(APP_URL + '/cmd/post/duplicate-now/' + id + '?twitter_id=' + TWITTER_ID, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+            });
+    
+            const data = await response.json();
+            console.log(data);
+            console.log(data.message);
+            console.log(1);
+    
+            if (data.status === 200) {
+                alert(data.message);
+                location.reload();
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
     
     function openViewMore(element) {
@@ -248,7 +342,7 @@ $(document).ready(function() {
                         ${fullDate + " " + timeString}
                         </span>
                         <span class="queued-post-data">
-                        ${info.sched_method + ": " + info.post_description}
+                        ${info.post_type_code + ": " +info.sched_method + ": " + info.post_description}
                         <!--info.post_description.substring(0, 17) + "..." -->
                         </span>
                     </div>  <!-- END .queue-single-start -->
