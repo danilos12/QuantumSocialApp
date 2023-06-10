@@ -32,8 +32,6 @@ $(function() {
         try {
             const response = await fetch(url);
             const responseData = await response.json();
-            console.log(responseData)
-            // $(".profileSection").show();
     
             if (responseData.data.length > 0) {                
                 
@@ -64,15 +62,25 @@ $(function() {
         }       
     }
 
+    
+    // Call the async function
+    fetchScheduledSlots();
+    
     $('div.slot-cards').on('click', 'img.ui-icon', async function(e) {
         var id = e.target.id;
         var btn = id.split('-');
-        
+        console.log(btn);
         try {
             switch (btn[0]) {
                 case "edit" :
                     editSlotScheduler(btn[1])
-
+                    break;
+                case "clone" :
+                    actionSchedule(btn[1], "clone");
+                    break;
+                case "delete" : 
+                    actionSchedule(btn[1], "delete");
+                    break;                        
             }            
             
         } catch (error) {
@@ -80,12 +88,8 @@ $(function() {
         }      
 
     })
-    
-    // Call the async function
-    fetchScheduledSlots();
-    function editSlotScheduler(id) {     
-        
-        console.log(id);
+
+    function editSlotScheduler(id) {             
         $(".new-slot-anchor").addClass('_active');
         $(".new-slot-anchor").show();           
         if ( $('.new-slot-anchor').css('display') == 'block') {
@@ -119,6 +123,30 @@ $(function() {
             $('.new-slot-form').prepend(actionElement);
             $('.new-slot-form').prepend(idElement);
         }        
+    }
+
+    async function actionSchedule(id, action) {
+        var url = APP_URL + "/schedule/action/" + action + "?slot_id=" + id;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                }
+            });
+            const responseData = await response.json();
+
+            if (responseData.status === 200) {
+                alert(responseData.message);
+                location.reload();
+            } else {
+                $(".errorMessage").text(responseData.message);
+            }
+        } catch (error) {
+            console.log("An error occurred while fetching the slots: " + error);
+        }   
     }
 
     function scheduledSlot(item) {
