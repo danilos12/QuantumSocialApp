@@ -40,7 +40,7 @@ Route::get('/drafts', [App\Http\Controllers\PostingController::class, 'drafts'])
 Route::get('/posted', [App\Http\Controllers\PostingController::class, 'posted'])->name('posted');
 Route::get('/schedule', [App\Http\Controllers\PostingController::class, 'slot_scheduler'])->name('slot-scheduler');
 Route::post('/schedule/save', [App\Http\Controllers\PostingController::class, 'schedule_save'])->name('schedule.save');
-Route::post('/schedule/action/{func_id}', [App\Http\Controllers\PostingController::class, 'schedule_action'])->name('schedule.action');
+Route::post('/schedule/action/{slot_id}', [App\Http\Controllers\PostingController::class, 'schedule_action'])->name('schedule.action');
 Route::match(['get', 'post'], '/add-new-slot', [App\Http\Controllers\PostingController::class, 'add_new_slot'])->name('add-new-slot');
 
 Route::get('/tweet-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('tweet-stormer');

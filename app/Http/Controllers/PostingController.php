@@ -323,10 +323,10 @@ class PostingController extends Controller
 
 	public function schedule_action(Request $request, $id) {
 		try {
-			$slot_id = explode('-', $id);
-			$originalDay = Schedule::find($slot_id[1]); // Assuming the original data is on a Sunday at 10 AM
+			// $slot_id = explode('-', $id);
+			$originalDay = Schedule::find($request->slot_id); // Assuming the original data is on a Sunday at 10 AM
 	
-			switch ($slot_id[0]) {
+			switch ($id) {
 				case 'clone':
 	
 					if ($originalDay) {
@@ -344,7 +344,7 @@ class PostingController extends Controller
 							}
 						}
 	
-						return response()->json(['status' => 200, 'action' => $slot_id[0], 'message' => 'Data is cloned successfully!']);
+						return response()->json(['status' => 200, 'action' => $id, 'message' => 'Data is cloned successfully!']);
 						
 					} else {
 						// Data entry not found
@@ -353,20 +353,14 @@ class PostingController extends Controller
 	
 					break;
 				
-				case 'edit':
-					
-					if ($originalDay) {
-						
-					}
-					break;
 				
 				case 'delete':
-					$originalDay = Schedule::find($slot_id[1]);
+					$originalDay = Schedule::find($request->slot_id);
 
 					if ($originalDay) {
 						$originalDay->delete();
 
-						return response()->json(['status' => 200, 'action' => $slot_id[0], 'message' => 'Data is deleted successfully!']);
+						return response()->json(['status' => 200, 'action' => $id, 'message' => 'Data is deleted successfully!']);
 					} else {
 						// Data entry not found
 						throw new \Exception('Data not found');
