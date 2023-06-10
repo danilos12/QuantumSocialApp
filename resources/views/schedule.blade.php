@@ -12,6 +12,10 @@
 			</div>  <!-- END .head-left-wrap -->
 		</div>  <!-- END .page-head-n-sort -->
 
+		<div id="errorMessage" class="alert alert-danger" style="display: none;">
+			<!-- Error message content goes here -->
+			This is an error message.
+		</div>
 
 		<div class="slot-board-outer">
 			<div class="slot-board-inner">
@@ -42,18 +46,19 @@
 				<!-- BEGIN Row #2 (12am) -->
 				@for($hour = 0; $hour < 24; $hour++)
 				<div class="slot-row slot-row-2">
-					<div class="slot-cell title-cell time-cell">
+					<div class="slot-cell title-cell time-cell">					
 						<div class="slot-cell-inner" >
 							{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }} {{ $hour === 0 ? 'AM' : (($hour >= 12) ? 'PM' : 'AM') }} 
 						</div>
 					</div> 	
 										
-					@for($i = 1; $i <=7; $i++)
-						<div  data-num="{{  $i }}" class="slot-cell weekend-{{ $days[$i] }}-12-am everyday-{{$days[$i]}}-12-am" id="{{$days[$i]}}-12-am">									
-							<div class="slot-cell-inner empty-slot" data-col="{{ $i }}" data-row="{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }}" data-time="{{ $hour === 0 ? 'AM' : (($hour >= 12) ? 'PM' : 'AM') }}">
-								<img src="{{ asset('public/')}}/ui-images/icons/pg-plus.svg" />
+					@for($i = 1; $i <=7; $i++)													
+						<div data-num="{{  $i }}" class="slot-cell slot-cards" data-fulltime="{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }} {{ $hour === 0 ? 'AM' : (($hour >= 12) ? 'PM' : 'AM') }}" data-day="{{ $days[$i]}}" data-time="{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }}" data-ampm="{{ $hour === 0 ? 'AM' : (($hour >= 12) ? 'PM' : 'AM') }}">														
+							<div class="c"></div>
+							<div class="slot-cell-inner empty-slot" data-col="{{ $i }}" data-row="{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }}" data-fulltime="{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }} {{ $hour === 0 ? 'AM' : (($hour >= 12) ? 'PM' : 'AM') }}" data-day="{{ $days[$i]}}" data-time="{{ $hour === 0 ? '12' :(($hour > 12) ? ($hour-12) : $hour) }}" data-ampm="{{ $hour === 0 ? 'AM' : (($hour >= 12) ? 'PM' : 'AM') }}">
+								<img src="{{ asset('public')}}/ui-images/icons/pg-plus.svg" />
 							</div>
-						</div>  											
+						</div>  <!-- END .slot-cell -->																				
 					@endfor																						
 				</div>  <!-- END .slot-row -->						
 				<!-- END Row #2 (12am) -->
@@ -68,7 +73,14 @@
 	</div>  <!-- END .scheduler-inner -->
 </div>  <!-- END .scheduler-outer -->
 
-
+<style>
+	.scheduled-slot {
+		justify-content: space-between;
+	}
+	.scheduled-slot-item > span {
+		margin: 0.50em;
+	}
+</style>
 @endsection
 @section('scripts')
 <script type='text/javascript' src="{{asset('public/js/schedule.js')}}"></script>
