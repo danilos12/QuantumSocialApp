@@ -337,7 +337,7 @@ class CommandmoduleController extends Controller
                     break;
                     
                 case 'save-draft': 
-                    $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type, 'deleted' => 0])->get();
+                    $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type])->get();
                     break;
                     
                 case 'queue':                   
