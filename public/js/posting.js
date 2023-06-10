@@ -62,7 +62,7 @@ $(document).ready(function() {
             const responseData = await response.json();
     
             $('.queue-day-wrapper').empty();
-            if (response.data.length > 0) {                
+            if (responseData.data.length > 0) {                
                 // var details = fetchTwitterDetails(TWITTER_ID);
                 $.each(response.data, function (index, k) {
                     var postType = getPostType(k.post_type);
