@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\TwitterHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
 use App\Models\CommandModule;
+use App\Models\TwitterSettingsMeta;
+use App\Models\TwitterToken;
 use Exception;
 
 
@@ -73,8 +76,10 @@ class PostingController extends Controller
 		// dd($r);
 		   
 		if(!isset($r['days-selector'])) {
+			dd(1);
 			return redirect('/schedule');
 		} else {
+			dd(12);
 			$userId = Auth::id();
 			$current_date_time = Carbon::now()->toDateTimeString(); // Produces something like "2019-03-11 12:25:00"
 
@@ -107,52 +112,86 @@ class PostingController extends Controller
 	}
 
 	public function schedule_save(Request $request) {
-		try {
+
+		try {			
 			$postSlot = $request->all();
-			$captureDate = null; 
+			$action = explode('-', $postSlot['action']);
 
-			if ($postSlot['days-selector'] !== 'weekdays' || $postSlot['days-selector'] !== 'weekend' || $postSlot['days-selector'] !== 'everyday') {
-				// Create the date string based on the user input
-				$parsed = ucfirst($postSlot['days-selector']) . " " . $postSlot['hour-selector'] . ":" . $postSlot['minute-selector'] . " " . $postSlot['am-pm-selector'];
-				$day = strtoupper($postSlot['days-selector']);
-				$captureDate = Carbon::parse($parsed);
+			if ($action[0] === "edit") {
+				$update = Schedule::find($action[1]);
+
+				if (isset($postSlot['make-promo'])) {
+					foreach ($postSlot['make-promo'] as $promo) {
+						$update->user_id = Auth::id();
+						$update->slot_day = $postSlot['days-selector'];
+						$update->hour = $postSlot['hour-selector'];
+						$update->minute_at = ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'];
+						$update->ampm = $postSlot['am-pm-selector'];
+						$update->post_type = $promo;
+					}
+				} else {
+					// foreach ($request->make_promo as $promo) {
+						$update->user_id = Auth::id();
+						$update->slot_day = $postSlot['days-selector'];
+						$update->hour = $postSlot['hour-selector'];
+						$update->minute_at = ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'];
+						$update->ampm = $postSlot['am-pm-selector'];
+						$update->post_type = 'regular-tweets';
+					// }
+				}
+				// dd($update);
+
+				$update->save();
+
+				// Return the JSON response
+				return response()->json(['status' => '200', 'message' => 'Schedule has been updated.', 'info' => $update]);
+
+			} else {				
+				$captureDate = null; 
+	
+				if ($postSlot['days-selector'] !== 'weekdays' || $postSlot['days-selector'] !== 'weekend' || $postSlot['days-selector'] !== 'everyday') {
+					// Create the date string based on the user input
+					$parsed = ucfirst($postSlot['days-selector']) . " " . $postSlot['hour-selector'] . ":" . $postSlot['minute-selector'] . " " . $postSlot['am-pm-selector'];
+					$day = strtoupper($postSlot['days-selector']);
+					$captureDate = Carbon::parse($parsed);
+					
+					// Get the current date
+					$currentDate = Carbon::now();
+					$isSameDay = $captureDate->isSameDay($currentDate);
+					$isEarlierTime = $captureDate->lt($currentDate);
+	
+					if ($isSameDay && $isEarlierTime) {					
+						$captureDate = Carbon::parse($parsed)->next($day);
+						$captureDate->hour($postSlot['hour-selector'])->minute($postSlot['minute-selector'])->second(0);
+					}		
+					
+				}
 				
-				// Get the current date
-				$currentDate = Carbon::now();
-				$isSameDay = $captureDate->isSameDay($currentDate);
-				$isEarlierTime = $captureDate->lt($currentDate);
-
-				if ($isSameDay && $isEarlierTime) {					
-					$captureDate = Carbon::parse($parsed)->next($day);
-					$captureDate->hour($postSlot['hour-selector'])->minute($postSlot['minute-selector'])->second(0);
-				}		
-				
-			}
-			
-			$datetime = $captureDate->format('Y-m-d H:i:s');
-
-			$insertData = [
-				'user_id' => Auth::id(),
-				'slot_day' => $postSlot['days-selector'],
-				'hour' => $postSlot['hour-selector'],
-				'minute_at' => ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'],
-				'ampm' => $postSlot['am-pm-selector'],				
-			];
-
-			if (isset($postSlot['make-promo'])) {
-				$categories = $postSlot['make-promo'];
-				foreach ($categories as $category) {
-					$insertData['post_type'] = $category;
+				// $datetime = $captureDate->format('Y-m-d H:i:s');
+	
+				$insertData = [
+					'user_id' => Auth::id(),
+					'slot_day' => $postSlot['days-selector'],
+					'hour' => $postSlot['hour-selector'],
+					'minute_at' => ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'],
+					'ampm' => $postSlot['am-pm-selector'],				
+				];
+	
+				if (isset($postSlot['make-promo'])) {
+					$categories = $postSlot['make-promo'];
+					foreach ($categories as $category) {
+						$insertData['post_type'] = $category;
+						$saved = Schedule::create($insertData);
+					}
+				} else {
+					$insertData['post_type'] = 'regular-tweets';
 					$saved = Schedule::create($insertData);
 				}
-			} else {
-				$insertData['post_type'] = 'regular-tweets';
-				$saved = Schedule::create($insertData);
-			}
-
-			if ($saved) {
-				// Return success response
-				return response()->json(['status' => '201', 'message' => 'Data has been created.', 'info' => $saved]);
+	
+				if ($saved) {
+					// Return success response
+					return response()->json(['status' => '200', 'message' => 'Schedule has been created.', 'info' => $saved]);
+				}
 			}
 
 		} catch (Exception $e) {
@@ -176,20 +215,18 @@ class PostingController extends Controller
 	public function editPost(Request $request, $id) {
 		$post_id = str_replace('edit-modal-', '', $request->id);
 		$queuePosts = CommandModule::where('id', $post_id)->first();
-		$data = [];
 
 		$countTweet =  CommandModule::where('post_type_code', $queuePosts->post_type_code)->count();
-		// dd($countTweet);
 
 		if ($countTweet > 1) {
-			$data['tweet_storm'] = 1;
-		}
+			$queuePosts['tweet_storm'] = $countTweet;
+		} else {
+			$queuePosts['tweet_storm'] = 1;
+		}		
 		
 		// Return the view with the retrieved data
-		$html = view('modals.edit-commandmodule')->with('id', 1)->render();
-		return response()->json(['status' => 201, 'data' => $html]);
-
-		// return response()->json(['html' => $html]);
+		$html = view('modals.edit-commandmodule')->render();
+		return response()->json(['status' => 201, 'data' => $queuePosts, 'html' => $html]);
 	}
 	
 	public function deletePost(Request $request) {
@@ -213,6 +250,45 @@ class PostingController extends Controller
 		// Redirect back to the previous page or any desired location
 		return response()->json(['success' => true, 'data' => $sort]);
 	}	
+
+	public function switchFromQueue($switch, $id) {		
+		try {
+			$k = ($switch === 'active') ? 1 : 0;
+			
+			//update first the switch
+			TwitterToken::where('twitter_id', $id)->where('active', 1)->update(['queue_switch' => $k]);
+			
+			$sort = DB::table('cmd_module')
+				// ->join('twitter_meta', 'cmd_module.twitter_id', '=', 'twitter_meta.twitter_id')
+				// ->join('ut_acct_mngt', 'qts_tweetmeta.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+				->select('*')
+				->where('twitter_id', $id)
+				->where('post_type', '!=', 'evergreen-tweets')
+				->where('post_type', '!=', 'promos-tweets')
+				->where('post_type', '!=', 'tweet-storm-tweets')
+				->where('active', '=', ($switch === 'active') ? 1: 0)
+				->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+				->get();
+
+			return response()->json(['status' => 200, 'data' => $sort]);
+		} catch (Exception $e) {
+			Log::error('Error creating data: ' . $e->getMessage());
+			return response()->json(['status' => '409', 'error' => 'Switched data']);
+		}
+	}
+
+	public function getScheduledSlots (Request $request) {
+		try {
+			// get all the shedule that is under user_id
+			$slot = Schedule::where('user_id', Auth::id())->get();
+			
+			return response()->json(['status' => 200, 'message' => 'Get schedule', 'data' => $slot]);
+		} catch (Exception $e) {
+			Log::error('Error creating data: ' . $e->getMessage());
+			return response()->json(['status' => '409', 'error' => 'Switched data']);
+		}
+
+	}
 	
 	public function sortPostbyMonth(Request $request) {		
 		$convertDate = str_replace('-', ' ', $request->month);
@@ -223,6 +299,9 @@ class PostingController extends Controller
 		$sort = DB::table('cmd_module')
 				->select('*')
 				->where('twitter_id', $request->id)
+				->where('post_type', '!=', 'evergreen-tweets')
+				->where('post_type', '!=', 'promos-tweets')
+				->where('post_type', '!=', 'tweet-storm-tweets')
 				->whereMonth('sched_time', '=', $date)
 				->get();				
 
@@ -234,11 +313,75 @@ class PostingController extends Controller
 		// get the scheduleld months in database 
 		$getMonth = DB::table('cmd_module')
 			->select(DB::raw('DISTINCT DATE_FORMAT(sched_time, "%M %Y") AS month'))
+			->where('post_type', '!=', 'evergreen-tweets')
+			->where('post_type', '!=', 'promos-tweets')
+			->where('post_type', '!=', 'tweet-storm-tweets')
 			->pluck('month')
 			->toArray();
-
+		
 		return response()->json(['success' => true, 'data' => $getMonth]);
 	}
 
+	public function schedule_action(Request $request, $id) {
+		try {
+			$slot_id = explode('-', $id);
+			$originalDay = Schedule::find($slot_id[1]); // Assuming the original data is on a Sunday at 10 AM
+	
+			switch ($slot_id[0]) {
+				case 'clone':
+	
+					if ($originalDay) {
+						$daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	
+						foreach ($daysOfWeek as $day) {
+							if ($day !== $originalDay->day) {
+								$newData = $originalDay->replicate();
+					
+								// Modify the 'day' column to the current day of the week
+								$newData->slot_day = strtolower($day);
+					
+								// Push the replicated data to the new variable
+								$newData->save();
+							}
+						}
+	
+						return response()->json(['status' => 200, 'action' => $slot_id[0], 'message' => 'Data is cloned successfully!']);
+						
+					} else {
+						// Data entry not found
+						throw new \Exception('Data not found');
+					}
+	
+					break;
+				
+				case 'edit':
+					
+					if ($originalDay) {
+						
+					}
+					break;
+				
+				case 'delete':
+					$originalDay = Schedule::find($slot_id[1]);
+
+					if ($originalDay) {
+						$originalDay->delete();
+
+						return response()->json(['status' => 200, 'action' => $slot_id[0], 'message' => 'Data is deleted successfully!']);
+					} else {
+						// Data entry not found
+						throw new \Exception('Data not found');
+					}
+					break;
+							
+			}
+		}  catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+        }
+	}	
 	
 }
