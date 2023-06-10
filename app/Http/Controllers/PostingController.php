@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
 use App\Models\CommandModule;
-use App\Models\TwitterSettingsMeta;
 use App\Models\TwitterToken;
+use App\Models\Day;
 use Exception;
 
 
@@ -328,16 +328,17 @@ class PostingController extends Controller
 	
 			switch ($id) {
 				case 'clone':
-	
+					
 					if ($originalDay) {
-						$daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-	
+						$daysOfWeek = Day::all();
+						$newData = [];
+						
 						foreach ($daysOfWeek as $day) {
-							if ($day !== $originalDay->day) {
+							if ($day['day'] !== $originalDay->slot_day) {
 								$newData = $originalDay->replicate();
 					
 								// Modify the 'day' column to the current day of the week
-								$newData->slot_day = strtolower($day);
+								$newData->slot_day = $day['day'];
 					
 								// Push the replicated data to the new variable
 								$newData->save();
