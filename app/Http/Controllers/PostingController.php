@@ -115,10 +115,9 @@ class PostingController extends Controller
         
 		try {			
 			$postSlot = $request->all();
-			$action = explode('-', $postSlot['action']);
 
-			if ($action[0] === "edit") {
-				$update = Schedule::find($action[1]);
+			if ($request->action === "edit") {
+				$update = Schedule::find($postSlot['id']);
 
 				if (isset($postSlot['make-promo'])) {
 					foreach ($postSlot['make-promo'] as $promo) {
