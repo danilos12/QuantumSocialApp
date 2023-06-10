@@ -4,7 +4,7 @@ $(function() {
 		event.preventDefault();
 		const form = $(this).serialize();
 
-        var action = ($('input[name="action"]').val() === "edit") ? "edit" : "add";
+        var action = $('input[name="action"]').val() === "edit" ? "edit" : "add";
         
 		$.ajax({			  
             url: APP_URL + "/schedule/save?action=" + action,
@@ -107,10 +107,17 @@ $(function() {
             var actionElement = $('<input/>', {
                 'name': 'action',
                 'type': 'hidden',
-                'value': 'edit-' + id
+                'value': 'edit', 
+            });
+  
+            var idElement = $('<input/>', {
+                'name': 'id',
+                'type': 'hidden',
+                'value': id, 
             });
   
             $('.new-slot-form').prepend(actionElement);
+            $('.new-slot-form').prepend(idElement);
         }        
     }
 
