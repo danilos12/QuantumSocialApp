@@ -112,7 +112,7 @@ class PostingController extends Controller
 	}
 
 	public function schedule_save(Request $request) {
-
+        dd($request);
 		try {			
 			$postSlot = $request->all();
 			$action = explode('-', $postSlot['action']);
