@@ -47,13 +47,12 @@ $(document).ready(function() {
     var isChecked = $(this).is(':checked');
 
     $.ajax({
-      url: $('div#twitter-settings').data('form-url'),
+      url: APP_URL + '/settings?id=twitter-settings',
       method: 'POST',
       data: {
         meta_key: event.target.id,
         meta_value: isChecked === true ? 1 : 0,
-        twitter_id: $('div#twitter-settings').data('twitterid'),
-        id: 'twitter-settings'
+        twitter_id: TWITTER_ID,        
       },
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -71,97 +70,83 @@ $(document).ready(function() {
   });
 
    // buttons saves
-  $('.subTwirl-button').on('click', function(e) {
+  $('.subTwirl-button').on('click', async function(e) {
     var id = e.target.id;
-    var twitterId = $('div#twitter-settings').data('twitterid');
-    var ajaxData = {};
+    // var ajaxData = {};
 
     if (id === 'auto-reply-button') {
-      ajaxData = {
-        value : $('#auto-reply-text').val(),
-        id : id,
-        twitterId : twitterId,
-      }
+      ajaxData = [
+        {key : 'auto_reply_text', value : $('#auto_reply_text').val()}
+      ]
       
     } else if ( id === "thread-ender-button" ) {
-      ajaxData = {
-        value : $('#text-dft-ender').val(),
-        id : id,
-        twitterId : twitterId,
-      }
+      ajaxData = [{
+        key : 'text_draft_ender',
+        value : $('#text_draft_ender').val(),        
+      }]
       
     } else if ( id === "save-evergreen-clHeRetweets" ) {
-      ajaxData = {        
-        retweet : $('#eg_rt_retweets').val(),
-        likes : $('#eg_rt_likes').val(),
-        id : id,
-        twitterId : twitterId,
-      }
+      ajaxData = [
+        { key : 'eg_rt_retweets', value : $('#eg_rt_retweets').val() },
+        { key: 'eg_rt_likes', value: $('#eg_rt_likes').val() }      
+      ];
       
     } else if ( id === "save-evergreen-rtHeRetweets" ) {
-      ajaxData = {        
-        retweet : $('#he_rt_retweets').val(),
-        likes : $('#he_rt_likes').val(),
-        id : id,
-        twitterId : twitterId,
-      }
-      
+      ajaxData = [
+        { key : 'he_rt_retweets', value : $('#he_rt_retweets').val() },
+        { key : 'he_rt_likes', value: $('#he_rt_likes').val() },          
+      ]
+
     } else if ( id === "save-autoRt" ) {
-      ajaxData = {        
-        time : $('#rt_auto_time').val(),
-        frame : $('#rt_auto_frame').val(),
-        ite : $('#rt_auto_ite').val(),
-        id : id,
-        twitterId : twitterId,
-      }
+      ajaxData = [
+        { key: 'rt_auto_time' , value : $('#rt_auto_time').val() },       
+        { key: 'rt_auto_frame' , value : $('#rt_auto_frame').val() },       
+        { key: 'rt_auto_ite' , value : $('#rt_auto_ite').val() }       
+      ]
       
     } else if ( id === "save-rtRm" ) {
-      ajaxData = {        
-        time : $('#rt_auto_rm_time').val(),
-        frame : $('#rt_auto_rm_frame').val(),        
-        id : id,
-        twitterId : twitterId,
-      }
+      ajaxData = [
+        { key : 'rt_auto_rm_time', value : $('#rt_auto_rm_time').val() },
+        { key : 'rt_auto_rm_frame', value : $('#rt_auto_rm_frame').val() }
+      ]
       
     } else if ( id === "save-viral-autocm" ) {
-      ajaxData = {
-        value : $('#text_comment_offer').val(),
-        id : id,
-        twitterId : twitterId,
-      }
+      ajaxData = [
+        { key: 'text_comment_offer', value : $('#text_comment_offer').val() }
+      ]
       
     } else if ( id === "save-autodm" ) {
-      ajaxData = {
-        value : $('#text_ender_dm').val(),
-        id : id,
-        twitterId : twitterId,
-      }      
+      ajaxData = [
+        { key : 'text_ender_dm', value : $('#text_ender_dm').val() }      
+      ]
     }
-    
-    console.log(ajaxData);
-    // make AJAX request with dynamic data
-    $.ajax({
-        url: $('div#twitter-settings').data('form-url'),
-        method: 'POST',
-        data: ajaxData,
-        headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-          // handle response
-          var successDiv = $(`<div> ${response.data} </div>`);
-          $('#' + id).after(successDiv);
 
-          // remove the div after 3 seconds
-          setTimeout(function() {
-            successDiv.remove();
-          }, 3000);
+    try {
+      const response = await fetch(APP_URL + '/settings/twitter_meta/' + TWITTER_ID + '?id=' + id, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
         },
-        error: function(xhr, status, error) {
-            // handle error
-            console.log(xhr, status, error)
-        }
-    });
+        body: JSON.stringify(ajaxData), // Use "body" instead of "data" to send the data    
+      })
+
+      const responseData = await response.json();
+      
+      var successDiv = $(`<div class="alert-${responseData.stat}"> ${responseData.message} </div>`);
+      if (responseData.status === 200) {
+        $(this).after(successDiv);        
+      } else {
+        $(this).after(successDiv);
+      }      
+
+       // remove the div after 3 seconds
+       setTimeout(function() {
+        successDiv.remove();
+      }, 3000);
+    } catch (error) {
+      console.log(error);
+    }    
   })
  
 });

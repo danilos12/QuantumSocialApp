@@ -79,6 +79,10 @@ Route::post('/twitter/{id}/tweet-now', [App\Http\Controllers\TwitterApi::class, 
 Route::post('/twitter/{id}/tweet-schedule', [App\Http\Controllers\TwitterApi::class, 'tweetSchedule'])->name('tweet.filter');
 
 Route::post('/settings', [App\Http\Controllers\GeneralSettingController::class, 'saveSettings'])->name('save-settings');
+Route::post('/settings/twitter_api_creds/{user_id}', [App\Http\Controllers\GeneralSettingController::class, 'twitterApiCredentials'])->name('api_settings');
+Route::post('/settings/timezone/{user_id}', [App\Http\Controllers\GeneralSettingController::class, 'timezoneSettings'])->name('timezone');
+Route::post('/settings/membership/{user_id}', [App\Http\Controllers\GeneralSettingController::class, 'membershipSettings'])->name('membership');
+Route::post('/settings/twitter_meta/{twitter_id}', [App\Http\Controllers\GeneralSettingController::class, 'twitterSettingsMeta'])->name('twitter_settings_meta');
 
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
@@ -100,12 +104,9 @@ Route::get('/post/sortbytype',[App\Http\Controllers\PostingController::class, 's
 Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'getMonth'])->name('get.month');
 Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('get.edit');
-Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('get.edit');
-// Route::post('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
-Route::post('/post/delete',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::post('/post/filter/',[App\Http\Controllers\PostingController::class, 'deleteQueue'])->name('post.delete');
 
-Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('get.edit');
 
 Route::middleware(['web','guest', 'CheckSessionExpiration'])
     ->group(function () {

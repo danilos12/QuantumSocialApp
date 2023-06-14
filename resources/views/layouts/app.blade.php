@@ -41,6 +41,7 @@
   <script> var TWITTER_NAME = `{{ $twitter_name }}`; </script>
   <script> var TWITTER_PHOTO = `{{ $twitter_photo }}`; </script>
   <script> var TWITTER_USN = `{{ $twitter_usn }}`; </script>
+  <script> var QUANTUM_ID = `{{ $user_id }}`; </script>
   @endauth
   @endif
 </head>

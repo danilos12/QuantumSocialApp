@@ -1,6 +1,5 @@
 $(document).ready(function() {
   
-  
   // add team member modal
   $addTeamIcon = $(".add-team");
   $addTeamModal = $(".add-team-member-inner");
@@ -22,13 +21,12 @@ $(document).ready(function() {
     console.log(isChecked)
   
     $.ajax({
-      url: $('div#general-settings').data('form-url'),
+      url: APP_URL + '/settings?id=general-settings',
       method: 'POST',
       data: {
         meta_key: event.target.id,
         meta_value: isChecked === true ? 1 : 0,
-        user_id: $('div#general-settings').data('userid'),
-        id: $('div#general-settings')[0].id
+        user_id: QUANTUM_ID,        
       },
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -90,78 +88,132 @@ $(document).ready(function() {
   //     <!-- END .menu-social-account Instance -->     
   //   `
   // }
+
+  $('#twitter_api_saving').on("click", async function(e) {
+    e.preventDefault(); // Prevent form submission
+
+    var creds = {
+      'api_key' : $('#api_key').val(),
+      'api_secret' : $('#api_secret').val(),
+      'bearer_token' : $('#bearer_token').val(),
+      'oauth_id' : $('#oauth_id').val(),
+      'oauth_secret' : $('#oauth_secret').val(),
+    }
+    
+    try {
+      const response = await fetch(APP_URL + '/settings/twitter_api_creds/' + QUANTUM_ID, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+          },
+          body: JSON.stringify(creds), // Use "body" instead of "data" to send the data
+      });
+      
+      const responseData = await response.json();
+      console.log(responseData);
+
+      if (responseData.status) {
+        var successDiv = $(`<div class="alert-success"> ${responseData.message} </div>`);
+        $(this).after(successDiv);
+
+        // remove the div after 3 seconds
+        setTimeout(function() {
+          successDiv.remove();
+        }, 3000);
+      } else {
+        var successDiv = $(`<div class="alert-error"> ${responseData.message} </div>`);
+        $(this).after(successDiv);
+
+        // remove the div after 3 seconds
+        setTimeout(function() {
+          successDiv.remove();
+        }, 3000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  })
   
-  $('#membership').change(function(event) {
+  $('#membership').change(async function(event) {
     var selectedValue = $(this).val();
     console.log("Selected value changed to: " + selectedValue);
-  
-    $.ajax({
-      url: $('div#quantum-general-settings').data('form-url'),
-      method: 'POST',
-      data: {
-        subscription: selectedValue,
-        user_id: $('div#quantum-general-settings').data('userid'),
-        id: "quantum-general-settings"
-      },
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function(response) {
-        // Handle success
-        console.log(response);         
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        // Handle error
-        console.log(jqXHR, textStatus, errorThrown)
-      }, 
-      complete: function() {
-          var str = response.data[0];
-          var capitalized = str.charAt(0).toUpperCase() + str.slice(1);
-          $('.subscription-text').text(capitalized + ' Plan');
+
+    try {
+      const response = await fetch(APP_URL + '/settings/membership/' + QUANTUM_ID, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+        },
+        body: JSON.stringify({ subscription: selectedValue }), // Use "body" instead of "data" to send the data      
+      });
+
+      const responseData = await response.json();
+      console.log(responseData);
+
+      var successDiv = $(`<div class="alert-${responseData.stat}"> ${responseData.message} </div>`);
+      if (responseData.status === 200) {
+        var str = responseData.data;
+        var capitalized = str.charAt(0).toUpperCase() + str.slice(1);
+        $('.subscription-text').text(capitalized + ' Plan');
+
+        $('#quantum_acct').append(successDiv);        
+      } else {
+        $('#quatum_acct').after(successDiv);
       }
-    });
+    
+      // remove the div after 3 seconds
+      setTimeout(function() {
+        successDiv.remove();
+      }, 3000);
+    } catch(error) {
+      console.log(error)
+    }
   });
   
-  $('#timezone-offset').change(function(event) {
+  $('#timezone-offset').change(async function(event) {
     var selectedValue = $(this).val();
     console.log("Selected value changed to: " + selectedValue);
-  
-    $.ajax({
-      url: $('div#quantum-general-settings').data('form-url'),
-      method: 'POST',
-      data: {
-        timezone: selectedValue,
-        user_id: $('div#quantum-general-settings').data('userid'),
-        id: 'timezone'
-      },
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function(response) {
-        // Handle success
-        console.log(response);
-  
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        // Handle error
-        console.log(jqXHR, textStatus, errorThrown)
+    
+    try {
+      const response = await fetch(APP_URL + '/settings/timezone/' + QUANTUM_ID, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+        },
+        body: JSON.stringify({ timezone: selectedValue }), // Use "body" instead of "data" to send the data      
+      });
+
+      const responseData = await response.json();
+      console.log(responseData);
+      
+      var successDiv = $(`<div class="alert-${responseData.stat}"> ${responseData.message} </div>`);
+      if (responseData.status === 200) {
+        $('#quantum_acct').append(successDiv);        
+      } else {
+        $('#quantum_acct').append(successDiv);
       }
-    });
+
+      // remove the div after 3 seconds
+      setTimeout(function() {
+        successDiv.remove();
+      }, 3000);
+    } catch(error) {
+      console.log(error)
+    }    
   });
-  
   // Check if there's a stored active button in local storage
-  var activeButtonId = localStorage.getItem('activeButtonId');
-  if (activeButtonId) {
-    // Activate the stored button
-    $('.my-button[data-id="' + activeButtonId + '"]').addClass('active');
-  }
+  // var activeButtonId = localStorage.getItem('activeButtonId');
+  // if (activeButtonId) {
+  //   // Activate the stored button
+  //   $('.my-button[data-id="' + activeButtonId + '"]').addClass('active');
+  // }
   
   
   $('.menu-account-default').click(function(event) {
-    var twitterId = event.target.dataset.twitter_id;  
-    console.log(twitterId);
-    // console.log(twitterId);
-        
+    var twitterId = event.target.dataset.twitter_id;          
     switchUser(APP_URL + '/twitter/switchUser?id=' + twitterId, twitterId)      
   });
   
@@ -194,12 +246,7 @@ $(document).ready(function() {
   
   $('img.ui-icon[data-icon="twitter-settings"]').on('click',function(event) {
 
-    $('.general-settings-outer').hide();
-    // $('.general-settings-outer').toggle( "slide", { direction: "up"  }, 350 );
-    // setTimeout(function() {
-      //   $(".modal-large-anchor").fadeOut("slow");
-    // $('.general-settings-outer').parent(".modal-large-backdrop").fadeOut("slow");
-      // }, 175);
+    $('.general-settings-outer').hide();    
     $('.twitter-settings-outer').show();
   })
   
@@ -255,27 +302,7 @@ $(document).ready(function() {
         })
         .popover('show');        
           
-    } else {  
-      // console.log(twitter_id)
-      // $.ajax({
-      //   url: APP_URL + '/twitter/switchUser?id=' + twitter_id,
-      //   method: 'POST',
-      //   headers: {
-      //     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      //   },
-      //   success: function(response) {
-      //     // Handle success
-      //     // console.log(response)
-      //     $('.twitter-account-select-bar').removeClass('active');
-      //     $('.twitter-account-select-bar[data-twitter="twitter-' + twitter_id + '"]').addClass('active');          
-
-      //     location.reload();
-      //   },
-      //   error: function(jqXHR, textStatus, errorThrown) {
-      //     // Handle error
-      //     console.log(jqXHR, textStatus, errorThrown)
-      //   },        
-      // })
+    } else {        
       switchUser(APP_URL + '/twitter/switchUser?id=' + twitterId, twitterId)      
     }
         

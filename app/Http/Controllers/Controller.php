@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
+use App\Models\TwitterSettings;
 use App\Models\TwitterSettingsMeta;
-use App\Helpers\TwitterHelper;
+use Exception;
 
 
 class Controller extends BaseController
@@ -41,114 +42,130 @@ class Controller extends BaseController
     // STEP 2
     public function twitterOAuthCallback(Request $request) {
 
+        try {
 
-        if (isset($_GET['error'])) {
-            // return redirect('/');
-            // If there was an error saving data, redirect back to the previous page with an error message
-            return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
-
-        } else {
-
-            $title = 'Profile ';
+            if (isset($_GET['error'])) {
+                // return redirect('/');
+                // If there was an error saving data, redirect back to the previous page with an error message
+                return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
     
-            $checkToken = TwitterToken::where('user_id', Auth::user()->id)->first();
+            } else {
     
-            
-            $codeVerifier = session()->get('code_verifier');
-            
-            $url = 'https://api.twitter.com/2/oauth2/token';
-            $data = array(
-                'code' => $request->input('code'),
-                'grant_type' => 'authorization_code',
-                'client_id' => env('TWITTER_CLIENT_ID'),
-                'redirect_uri' => env('TWITTER_CALLBACK_URL'),
-                'code_verifier' => $codeVerifier
-            );
+                $title = 'Profile ';
+        
+                $checkToken = TwitterToken::where('user_id', Auth::user()->id)->first();
+        
+                
+                $codeVerifier = session()->get('code_verifier');
+                
+                $url = 'https://api.twitter.com/2/oauth2/token';
+                $data = array(
+                    'code' => $request->input('code'),
+                    'grant_type' => 'authorization_code',
+                    'client_id' => env('TWITTER_CLIENT_ID'),
+                    'redirect_uri' => env('TWITTER_CALLBACK_URL'),
+                    'code_verifier' => $codeVerifier
+                );
+        
+                
+                $headers = array(
+                    'Content-Type: application/x-www-form-urlencoded'
+                );
+        
+                $response = $this->curlHttpRequest($url, $headers, $data);                       
+                $twitterId = $this->getTwitterdetails($response->access_token);
     
-            
-            $headers = array(
-                'Content-Type: application/x-www-form-urlencoded'
-            );
-    
-            $response = $this->curlHttpRequest($url, $headers, $data);                       
-            $twitterId = $this->getTwitterdetails($response->access_token);
-
-            // implement error when twitter is already saved before
-            // if ($twitterId)
-    
-            // save the twitter details to database
-            $saveTwitterInfo = Twitter::updateOrCreate([
-                'twitter_id' => $twitterId->id,
-                'twitter_username' => $twitterId->username,
-                'twitter_name' => $twitterId->name,
-                'twitter_photo' => $twitterId->profile_image_url,
-                'twitter_description' => "This is description",
-                'twitter_followersCount' => $twitterId->public_metrics->followers_count,
-                'twitter_followingCount' => $twitterId->public_metrics->following_count,
-                'twitter_tweetCount' => $twitterId->public_metrics->tweet_count,
-                'user_id' => Auth::user()->id,
-                'deleted' => 0
-            ]);
-            
-            $saveTwitterInfo->save();        
-    
-            // Check if save was successful
-            if ($saveTwitterInfo) {
-                // Save token to database
-                $saveToken = TwitterToken::firstOrCreate([
-                    'user_id' => Auth::user()->id,
+                // implement error when twitter is already saved before
+                // if ($twitterId)
+        
+                // save the twitter details to database
+                $saveTwitterInfo = Twitter::updateOrCreate([
                     'twitter_id' => $twitterId->id,
-                    'access_token' => $response->access_token,
-                    'refresh_token' => $response->refresh_token,
-                    'expires_in' => $response->expires_in,
-                    'active' => 1,
-                    'queue_switch' => 1
-                ]);
-    
-                // save ut_user_mngt
-                $selectedAcct = UT_AcctMngt::firstOrCreate([
+                    'twitter_username' => $twitterId->username,
+                    'twitter_name' => $twitterId->name,
+                    'twitter_photo' => $twitterId->profile_image_url,
+                    'twitter_description' => "This is description",
+                    'twitter_followersCount' => $twitterId->public_metrics->followers_count,
+                    'twitter_followingCount' => $twitterId->public_metrics->following_count,
+                    'twitter_tweetCount' => $twitterId->public_metrics->tweet_count,
                     'user_id' => Auth::user()->id,
-                    'twitter_id' => $twitterId->id,
-                    'selected' => Twitter::where('user_id', Auth::id())->count() === 1 ? 1 : 0
+                    'deleted' => 0
                 ]);
+                
+                $saveTwitterInfo->save();        
+        
+                // Check if save was successful
+                if ($saveTwitterInfo) {
 
-                // save twitter settings meta
-                $twitterSettingsMeta = [
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'mentions', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'threads', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'clone-engagement-to-evergreen', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'retweet-high-engagement-tweets', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'set-default-auto-retweet', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'retweet-after-time-elapse', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'remove-retweets', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'comment-offer-viral', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'send-direct-msg-new', 'meta_value' => 0],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'auto-reply-text', 'meta_value' => 'Hey thank you for following (@' . $twitterId->id . ')! <br /><br />1'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'text-dft-ender', 'meta_value' => 'If you liked this thread then please follow me (@' . $twitterId->id . ') and share this thread by retweeting the first tweet: <br /><br />1'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'eg_rt_retweets', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'eg_rt_likes', 'meta_value' => '7'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'he_rt_likes', 'meta_value' => '7'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'he_rt_retweets', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_time', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_frame', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_ite', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt-auto-remove-time', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'rt-auto-remove-frame', 'meta_value' => '3'],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'text-comment-offer', 'meta_value' => 'For more great content please follow me @' . $twitterId->id],
-                    ['user_id' => Auth::id() ,'twitter_id' => $twitterId->id, 'meta_key' => 'text_ender_dm', 'meta_value' => 'For more great content please follow me @' . $twitterId->id],
-                ];
-
-                TwitterSettingsMeta::insert($twitterSettingsMeta);
+                    // Save token to database
+                    $saveToken = TwitterToken::firstOrCreate([
+                        'user_id' => Auth::user()->id,
+                        'twitter_id' => $twitterId->id,
+                        'access_token' => $response->access_token,
+                        'refresh_token' => $response->refresh_token,
+                        'expires_in' => $response->expires_in,
+                        'active' => 1,
+                        'queue_switch' => 1
+                    ]);
+        
+                    // save ut_user_mngt
+                    $selectedAcct = UT_AcctMngt::firstOrCreate([
+                        'user_id' => Auth::user()->id,
+                        'twitter_id' => $twitterId->id,
+                        'selected' => Twitter::where('user_id', Auth::id())->count() === 1 ? 1 : 0
+                    ]);               
     
-                session()->put('id', Auth::id());
+                    TwitterSettings::create([
+                        'twitter_id' => $twitterId->id,
+                        'toggle_1' => 0, 
+                        'toggle_2' => 0, 
+                        'toggle_3' => 0, 
+                        'toggle_4' => 0, 
+                        'toggle_5' => 0, 
+                        'toggle_6' => 0, 
+                        'toggle_7' => 0, 
+                        'toggle_8' => 0, 
+                        'toggle_9' => 0
+                    ]);
     
-                // Check if token save was successful
-                if ($saveToken && $selectedAcct) {
-                    // Redirect user to a new page with a success message
-                    return redirect('profile')->with('success', 'Twitter info and access token saved successfully!');
-                } 
+                    TwitterSettingsMeta::create([
+                        'twitter_id' => $twitterId->id,
+                        'auto_reply_text' => 'Hey thank you for following (@' . $twitterId->id . ')! <br /><br />1' , 
+                        'text_draft_ender' => 'If you liked this thread then please follow me (@' . $twitterId->id . ') and share this thread by retweeting the first tweet: <br /><br />1', 
+                        'eg_rt_retweets' => 3, 
+                        'eg_rt_likes' => 7, 
+                        'he_rt_likes' => 7, 
+                        'he_rt_retweets' => 3,
+                        'rt_auto_time' => 3, 
+                        'rt_auto_frame' => 3, 
+                        'rt_auto_ite' => 3, 
+                        'rt_auto_rm_time' => 3, 
+                        'rt_auto_rm_frame' => 3, 
+                        'text_comment_offer' => 'For more great content please follow me @' . $twitterId->id, 
+                        'text_ender_dm' => 'For more great content please follow me @' . $twitterId->id, 
+                    ]);
+             
+                    session()->put('id', Auth::id());
+        
+                    if ($saveToken && $selectedAcct) {
+                        return redirect('profile')->with('success', 'Twitter info and access token saved successfully!');
+                    } else {
+                        // Error saving token, selected account, Twitter settings, or metadata
+                        return response()->json([
+                            'message' => 'Failed to save token, selected account, Twitter settings, or metadata.',
+                        ], 500);
+                    }
+                                    
+                }
             }
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
         }
+        
 
         
     }    

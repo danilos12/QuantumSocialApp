@@ -10,7 +10,6 @@ $(document).ready(function() {
                 // var details = fetchTwitterDetails(TWITTER_ID);
 
                 $.each(response, function (index, k) {
-                    console.log(k)
                     var postType = getPostType(k.post_type);
                     var wrapper = postWrapper(k, postType, index);                    
 
@@ -115,24 +114,29 @@ $(document).ready(function() {
                 
                 try {
                     const response = await fetch(APP_URL + '/post/edit/' + id);
-                    const data = await response.json();
-
-                    // watermark
-                    $('.modal-large-backdrop').append(data.html);
+                    const responseData = await response.json();              
                     
-                    $('.edit-commandmodule-outer').addClass('edit-commandmodule-' + data.data.id + '-outer')
-                    $('.edit-commandmodule-outer').find('.modal-large-close').attr('data-id','edit-commandmodule-' + data.data.id)
+                    console.log(responseData.data[0]['id'])
+                    // render the modal
+                    $('.modal-large-backdrop').append(responseData.html);
+                                        
+                    $('.edit-commandmodule-outer').addClass('edit-commandmodule-' + responseData.data[0]['id'] + '-outer')
+                    $('.edit-commandmodule-outer').find('.modal-large-close').attr('data-id','edit-commandmodule-' + responseData.data[0]['id'])
                     // $('.edit-commandmodule-outer').find('.modal-large-close').attr('edit-commandmodule-')
-                    if (data.data.post_type === "regular-tweets") {
+                    if (responseData.data[0]['post_type'] === "regular-tweets") {
                         $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="twitter-tweets"]`).addClass('indicator-active');
                     } else {
-                        $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="${data.data.post_type}"]`).addClass('indicator-active');
-                    }
-                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 textarea`).text(data.data.post_description);
-                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${data.data.post_type}"]`).addClass('icon-active');
-                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${data.data.sched_method}"]`).attr('selected', true);
+                        $('.edit-commandmodule-outer').find(`#posting-tool-form-002 img.ui-icon[data-src="${responseData.data[0]['post_type']}"]`).addClass('indicator-active');
+                    }    
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 textarea`).text(responseData.data[0]['post_description']);
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${responseData.data[0]['post_type']}"]`).addClass('icon-active');
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${responseData.data[0]['sched_method']}"]`).attr('selected', true);
                     
-                    openModal("edit-commandmodule-" + data.data.id);
+                    if (responseData.data.length > 1) {
+                        addTweetTextArea("tweet-storm-tweets", combo);   
+                    }
+                    
+                    openModal("edit-commandmodule-" + responseData.data[0]['id']);
                 } catch (error) {
                     console.log(error);
                 }
@@ -152,7 +156,7 @@ $(document).ready(function() {
                     const data = await response.json();
                     console.log(data);
                     
-                    if (data.success) {
+                    if (data.status) {
                         alert('Record deleted successfully!');
                         location.reload();
                     }
@@ -223,7 +227,8 @@ $(document).ready(function() {
         } catch (error) {
             console.log("Failed to fetch data:", error);
         }
-    })
+    })   
+
 
     async function movePostToTop(id) {
         try {
@@ -441,6 +446,93 @@ $(document).ready(function() {
         }
 
         return postType;
+    }
+
+    function postWrapperEvergreen() {
+        var $template = `
+        <div class="mosaic-posts-outer evergreen-mosaic" status="active">
+          <div class="mosaic-watermark-wrap frosted">
+            <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="mosaic-watermark evergreen-watermark" />
+            <div class="mosaic-posts-inner">
+
+              <div class="mosaic-post-controls">
+                <span class="mosaic-control-icon">
+                  <img src="${APP_URL}/public/ui-images/icons/pg-add.svg"
+                  class="ui-icon"/></span>
+
+                      <!-- This one gets deleted after JS toggle & status is working. -->
+                      <span class="mosaic-control-icon">
+                        <img src="${APP_URL}/public/ui-images/icons/pg-remove.svg" class="ui-icon"/></span>
+
+                <span class="mosaic-control-icon">
+                  <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
+                <span class="mosaic-control-icon">
+                  <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
+              </div>  <!-- END .mosaic-post-controls -->
+
+              <div class="global-twitter-profile-header">
+                <a href="#">
+                  <img src="${APP_URL}/public/temp-images/imgpsh_fullsize_anim (1).png"
+                    class="global-profile-image" /></a>
+                <div class="global-profile-details">
+                  <div class="global-profile-name">
+                    <a href="#">
+                      William Wallace</a>
+                  </div>  <!-- END .global-author-name -->
+                  <div class="global-profile-subdata">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
+                    <span class="global-post-date">
+                      <a href="">
+                        Dec. 16, 2022 @ 5:20 p.m.</a></span>
+                  </div>  <!-- END .global-post-date-wrap -->
+                </div>  <!-- END .global-author-details -->
+              </div>  <!-- END .global-post-author -->
+
+              <div class="mosaic-post-data">
+                <div class="mosaic-post-text">
+                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu. #pretium quis #sem #Nulla con
+                </div>  <!-- END .mosaic-post-text -->
+                <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
+                  class="mosaic-post-image" />
+              </div>  <!-- END .mosaic-post-data -->
+
+              <div class="mosaic-post-scheduling">
+
+                <div class="mosaic-scheduling mosaic-scheduling-future">
+
+                  <span class="mosaic-label mosaic-future-label">
+                    <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
+                    Schedule
+                  </span>
+                  <span class="mosaic-sched-buttons mosaic-future-buttons">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon" />
+                    <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
+                    <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon" />
+                  </span>
+
+                </div>  <!-- END .mosaic-scheduling-future -->
+
+                <div class="mosaic-scheduling mosaic-post-analytics">
+
+                  <span class="mosaic-label mosaic-analytics-label">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
+                    Analytics
+                  </span>
+                  <span class="mosaic-sched-buttons mosaic-analytics-buttons">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
+                    <span class="mosaic-stat stat-retweets">2.20</span>
+                    <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" />
+                    <span class="mosaic-stat stat-hearts">2010</span>
+                  </span>
+
+                </div>  <!-- END .mosaic-post-analytics -->
+
+              </div>  <!-- END .mosaic-post-scheduling -->
+
+            </div>  <!-- END .mosaic-posts-inner -->
+          </div>  <!-- END .mosaic-watermark-wrap -->
+        </div>  <!-- END .mosaic-posts-outer -->
+        `
     }
 
 })
