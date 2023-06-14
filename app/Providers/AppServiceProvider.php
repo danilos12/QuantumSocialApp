@@ -70,15 +70,24 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('twitter_name', $selectedUser->twitter_name ?? "");       
                 $view->with('twitter_usn', $selectedUser->twitter_username ?? "");       
                 $view->with('twitter_photo', $selectedUser->twitter_photo ?? "");       
-    
+                $view->with('user_id', Auth::id());       
+                    
                 // twitter settings DB 
-                $twitterSettings = DB::table('qts_tweetmeta')
-                                ->join('ut_acct_mngt', 'qts_tweetmeta.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                                ->select('qts_tweetmeta.*', 'ut_acct_mngt.selected')
-                                ->where('qts_tweetmeta.twitter_id', '=', $twitterID)
-                                ->get();
-                $view->with('twitter_settings', $twitterSettings);
-                
+                $twitterSettings = DB::table('settings_twitter')
+                                ->join('settings_twitter_meta', 'settings_twitter.twitter_id', '=', 'settings_twitter_meta.twitter_id')
+                                ->join('ut_acct_mngt', 'settings_twitter.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                                ->select('settings_twitter.*', 'ut_acct_mngt.selected', 'settings_twitter_meta.*')
+                                ->where('settings_twitter.twitter_id', '=', $twitterID)
+                                ->first();                                
+                $view->with('twitterSetting', $twitterSettings);
+                                
+                $twitterApiCredentials = DB::table('settings_general_twapi')
+                        ->join('users', 'users.id', 'settings_general_twapi.user_id')
+                        ->select('*')
+                        ->where('users.id', Auth::id())
+                        ->first();
+                $view->with('twitterApi', $twitterApiCredentials);
+
                 // main quantum user 
                 $main_user = User::find(Auth::id());
                 $view->with('main_user', $main_user);
@@ -92,16 +101,15 @@ class AppServiceProvider extends ServiceProvider
                 // dd($getTimezone);
                 $view->with('getTimezone', $getTimezone);
                 
-                // general settings sliders
-                $generalSettings = DB::table('qgs_settingsmeta')->where('user_id', Auth::id())->get();
-                $view->with('generalSettings', $generalSettings);
+                // general settings sliders                
+                $generalSettings = DB::table('settings_general')->where('user_id', Auth::id())->first();
+                $view->with('generalSetting', $generalSettings);              
                 
                 // membership 
                 $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
                 $view->with('membership', $membership);                       
                 
                 $toggle = DB::table('twitter_meta')->where('user_id', Auth::id())->where('twitter_id', $twitterID)->first();     
-                // dd($toggle);
                 $view->with('toggle', $toggle ? $toggle->queue_switch : null);                       
                            
                 // // api 

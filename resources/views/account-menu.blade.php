@@ -9,9 +9,8 @@
 
           <div class="modal-large-inner main-settings-inner general-settings-inner">
 
-            <div data-form-url="{{ route('save-settings') }}" data-userid="{{ Auth::id() }}" id="quantum-general-settings"></div>
             <div class="menu-section-outer quantum-settings-outer">
-              <div class="menu-section-inner quantum-settings-inner">
+              <div class="menu-section-inner quantum-settings-inner" id="quantum_acct">
                 <span class="menu-section-header">
                   Quantum Account</span>
 
@@ -66,85 +65,143 @@
             </div>  <!-- END .quantum-settings-outer -->
             
             <!--     BEGIN TEAM MEMBERS   -->
-              <div class="menu-section-outer team-account-outer">
+            <div class="menu-section-outer team-account-outer">
 
-                <div class="menu-section-inner team-account-inner">
-                  <span class="menu-section-header">Team Members </span>
+              <div class="menu-section-inner team-account-inner">
+                <span class="menu-section-header">Team Members </span>
 
-                    <!-- BEGIN .menu-team-account Instance -->
-                    <div class="menu-team-account-outer"> 
-                      <div class="menu-team-account-inner"> 
+                  <!-- BEGIN .menu-team-account Instance -->
+                  <div class="menu-team-account-outer"> 
+                    <div class="menu-team-account-inner"> 
 
-                          <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
+                        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
 
-                          <div class="global-team-profile-header"> 
-                          <div class="global-profile-details">
-                              <div class="global-profile-name">
-                              <a href="#">
-                                  {{ $main_user->name }}</a>
-                              </div>  <!-- END .global-profile-name -->
-                              <div class="global-profile-subdata">
-                              <span class="global-profile-email"> 
-                                  <a href="">
-                                  {{ $main_user->email }}</a></span>
-                              </div>  <!-- END .global-post-date-wrap -->
-                          </div>  <!-- END .global-team-profile-details -->
-                          </div>  <!-- END .global-team-profile-header -->
+                        <div class="global-team-profile-header"> 
+                        <div class="global-profile-details">
+                            <div class="global-profile-name">
+                            <a href="#">
+                                {{ $main_user->name }}</a>
+                            </div>  <!-- END .global-profile-name -->
+                            <div class="global-profile-subdata">
+                            <span class="global-profile-email"> 
+                                <a href="">
+                                {{ $main_user->email }}</a></span>
+                            </div>  <!-- END .global-post-date-wrap -->
+                        </div>  <!-- END .global-team-profile-details -->
+                        </div>  <!-- END .global-team-profile-header -->
 
-                          <div class="menu-social-account-options">
-                          <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
-                          <span class="menu-account-icons">
-                              <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip"/>
-                              <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
-                          </span>
-                          </div>  <!-- END .menu-social-account-options -->
+                        <div class="menu-social-account-options">
+                        <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+                        <span class="menu-account-icons">
+                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip"/>
+                            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
+                        </span>
+                        </div>  <!-- END .menu-social-account-options -->
 
-                      </div>  <!-- END .menu-social-account-inner -->
-                    </div>  <!-- END .menu-social-account-outer -->
-                    <!-- END .menu-social-account Instance -->
-
-
-
-                    <div class="menu-team-members-add-accounts-section"> 
-                    <div class="add-account add-team">
-                        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
-                        + Add New Member
-                    </div>  <!-- END .add-twitter-account -->
-                    </div>  <!-- END .menu-social-add-accounts-section -->
-
-                </div>  <!-- END .social-accounts-inner -->
+                    </div>  <!-- END .menu-social-account-inner -->
+                  </div>  <!-- END .menu-social-account-outer -->
+                  <!-- END .menu-social-account Instance -->
 
 
-                <!-- BEGIN ADD TEAM MEMBER MODAL -->
 
-                <div class="add-team-member-modal"> 
-                  <div class="add-team-member-inner frosted"> 
+                  <div class="menu-team-members-add-accounts-section"> 
+                  <div class="add-account add-team">
+                      <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
+                      + Add New Member
+                  </div>  <!-- END .add-twitter-account -->
+                  </div>  <!-- END .menu-social-add-accounts-section -->
 
-                      <!-- BEGIN input copied from engage.html -->
-                      <div class="global-input-email"> 
-                      <form>
-                          <div class="global-input-text input-text">  
-                          <input type="text" placeholder="Name" />
-                          </div>
-
-                          <div class="global-input-text input-text">  
-                          <input type="text" placeholder="Email address" />
-                          </div>
-
-                      </form>
-                      <span class="add-team-button"> 
-                          Add<span>
-                      </div>
-                      <!-- END copied from engage.html -->
-
-                  </div>  <!-- END .add-team-member-inner -->
-                </div>  <!-- END .add-team-member-modal -->
+              </div>  <!-- END .social-accounts-inner -->
 
 
-                                      <!-- END ADD TEAM MEMBER MODAL -->
-              </div>  <!-- END .team-account-outer -->
+              <!-- BEGIN ADD TEAM MEMBER MODAL -->
 
-              <!--     END TEAM MEMBERS    -->
+              <div class="add-team-member-modal"> 
+                <div class="add-team-member-inner frosted"> 
+
+                    <!-- BEGIN input copied from engage.html -->
+                    <div class="global-input-email"> 
+                    <form>
+                        <div class="global-input-text input-text">  
+                        <input type="text" placeholder="Name" />
+                        </div>
+
+                        <div class="global-input-text input-text">  
+                        <input type="text" placeholder="Email address" />
+                        </div>
+
+                    </form>
+                    <span class="add-team-button"> 
+                        Add<span>
+                    </div>
+                    <!-- END copied from engage.html -->
+
+                </div>  <!-- END .add-team-member-inner -->
+              </div>  <!-- END .add-team-member-modal -->
+
+
+                                    <!-- END ADD TEAM MEMBER MODAL -->
+            </div>  <!-- END .team-account-outer -->
+            <!--     END TEAM MEMBERS    -->
+
+            <div class="menu-section-outer social-accounts-outer">
+              <div class="menu-section-inner social-accounts-inner">
+                <span class="menu-section-header">Twitter API Crential</span>
+                
+                <div class="menu-twirl-option-outer">
+                  <div class="menu-twirl-option-inner">
+                    <div class="menu-twirl-left">
+                        <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
+                        <span class="menu-twirl-option-text">
+                          Use this Master API for every Twitter account.</span> 
+                    </div>  <!-- END .menu-twirl-left -->
+                    <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_1" {{ isset($generalSetting) ? ($generalSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
+                    </div>  <!-- END .menu-twirl-right -->
+                  </div>  <!-- END .menu-twirl-option-inner -->
+
+                  <!-- START auto-reply -->
+                  <div class="menu-subTwirl-outer">
+                    <div class="subTwirl-header-wrap">
+                        <span class="subTwirl-header">API Key:</span>
+                    </div> 
+                    <div class="menu-subTwirl-inner">
+                      <input type="text" class="input-field" id="api_key" value="{{ isset($twitterApi) ? $twitterApi->api_key : ''  }}"/>                      
+                    </div>
+                    <div class="subTwirl-header-wrap">
+                        <span class="subTwirl-header">API Secret:</span>
+                    </div> 
+                    <div class="menu-subTwirl-inner">
+                      <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApi) ? $twitterApi->api_secret : ''  }}"/>                     
+                    </div> 
+                    <div class="subTwirl-header-wrap">
+                      <span class="subTwirl-header">Bearer Token:</span>
+                    </div> 
+                    <div class="menu-subTwirl-inner">
+                      <input type="text" class="input-field" id="bearer_token" value="{{ isset($twitterApi) ? $twitterApi->bearer_token : ''  }}"/>                      
+                    </div>
+                    <div class="subTwirl-header-wrap">
+                      <span class="subTwirl-header">OAuth 2.0 ID:</span>
+                    </div> 
+                    <div class="menu-subTwirl-inner">
+                      <input type="text" class="input-field" id="oauth_id" value="{{ isset($twitterApi) ? $twitterApi->oauth_id : ''  }}"/>                      
+                    </div>
+                    <div class="subTwirl-header-wrap">
+                      <span class="subTwirl-header">OAuth 2.0 Secret:</span>
+                    </div> 
+                    <div class="menu-subTwirl-inner">
+                      <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApi) ? $twitterApi->oauth_secret : ''  }}"/>                      
+                    </div>
+                    <div class="menu-subTwirl-inner">
+                      <button class="subTwirl-buttons" id="twitter_api_saving" style="margin-top: 0.5em; border: transparent" >
+                            Save API credentials
+                      </button>
+                    </div> 
+                  </div>  
+                </div>  <!-- END .menu-twirl-option-outer -->
+                              
+              </div>  <!-- END .social-accounts-inner -->
+            </div>  <!-- END .social-accounts-outer -->
+
 
             <div class="menu-section-outer social-accounts-outer">
               <div class="menu-section-inner social-accounts-inner">
@@ -204,7 +261,6 @@
             </div>  <!-- END .social-accounts-outer -->
 
 
-            <div data-form-url="{{ route('save-settings') }}" data-userid="{{ Auth::id() }}" id="general-settings"></div>
             <div class="menu-section-outer command-module-outer">
               <div class="menu-section-inner command-module-inner">
 
@@ -231,7 +287,7 @@
                               When copying text into a new post, break long text into individual posts.</span>
                           </div>  <!-- END .menu-twirl-left -->
                           <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="copy-text-break"  {{ $generalSettings && count($generalSettings) > 0 && $generalSettings[0]->meta_value > 0 ? "checked" : "" }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_2"  {{ isset($generalSetting) ? ($generalSetting->toggle_2 === 1) ? 'checked' : '' : '' }}>
                           </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
                       </div>  <!-- END .menu-twirl-option-outer -->
@@ -244,7 +300,7 @@
                               Pressing Enter 3 times will add a new thread.</span>
                           </div>  <!-- END .menu-twirl-left -->
                           <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="press-enter-3-times"  {{ $generalSettings && count($generalSettings) > 0 && $generalSettings[1]->meta_value > 0 ? "checked" : "" }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_3"  {{ isset($generalSetting) ? ($generalSetting->toggle_3 === 1) ? 'checked' : '' : ''}}>
                           </div>  <!-- END .menu-twirl-right -->
                         </div>  <!-- END .menu-twirl-option-inner -->
                       </div>  <!-- END .menu-twirl-option-outer -->
@@ -281,7 +337,7 @@
                               Email me when an account queue is nearly empty.</span>
                           </div>  <!-- END .menu-twirl-left -->
                           <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="email-when-queue-empty"  {{ $generalSettings && count($generalSettings) > 0 && $generalSettings[2]->meta_value > 0 ? "checked" : "" }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_4"  {{ isset($generalSetting) ? ($generalSetting->toggle_4 === 1) ? 'checked' : '' : ''}}>
                           </div>  <!-- END .menu-twirl-right -->
 
                         </div>  <!-- END .menu-twirl-option-inner -->
@@ -295,7 +351,7 @@
                               Automatically refresh the Command Module after adding to the queue.</span>
                           </div>  <!-- END .menu-twirl-left -->
                           <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="refresh-cmd-add-queue"  {{ $generalSettings && count($generalSettings) > 0 && $generalSettings[3]->meta_value > 0 ? "checked" : "" }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_5"  {{ isset($generalSetting) ? ($generalSetting->toggle_5 === 1) ? 'checked' : '' : ''}}>
                           </div>  <!-- END .menu-twirl-right -->
 
                         </div>  <!-- END .menu-twirl-option-inner -->
@@ -309,7 +365,7 @@
                               Randomize post times, to make things appear more natural (up or down by 7 minutes).</span>
                           </div>  <!-- END .menu-twirl-left -->
                           <div class="menu-twirl-right">
-                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="random-post-times"  {{ $generalSettings && count($generalSettings) > 0 && $generalSettings[4]->meta_value > 0 ? "checked" : "" }}>
+                            <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_6"  {{ isset($generalSetting) ? ($generalSetting->toggle_6 === 1) ? 'checked' : '' : ''}}>
                           </div>  <!-- END .menu-twirl-right -->
 
                         </div>  <!-- END .menu-twirl-option-inner -->
@@ -347,6 +403,29 @@
 
 <style>
 .general-settings-outer, .twitter-settings-outer, .help-page-outer {display: none;}
+
+.input-field {
+  background: rgba(255,255,255, .3);
+  color: #ffffff;
+  padding: 0.5em 1em;
+  /* margin: 0 0.5em; */
+  border: none;
+  border-radius: 5px;
+}
+
+.subTwirl-buttons {
+  display: flex;
+  align-self: flex-start;
+  background: #43EBf1;
+  font-size: .9em;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0.5em 1em;
+  border-radius: 5px;
+  opacity: .75;
+  cursor: pointer;
+}
+
 </style>
 
 @section('scripts')

@@ -9,11 +9,22 @@ class TwitterSettingsMeta extends Model
 {
     use HasFactory;
 
-    protected $table = 'qts_tweetmeta';
+    protected $table = 'settings_twitter_meta';
     protected $fillable = [
-        'user_id',
-        'twitter_id',
-        'meta_key', 
-        'meta_value'
+        'twitter_id', 
+        'auto_reply_text', 
+        'text_draft_ender', 
+        'eg_rt_retweets', 
+        'eg_rt_likes', 
+        'he_rt_likes', 
+        'he_rt_retweets',
+        'rt_auto_time', 
+        'rt_auto_frame', 
+        'rt_auto_ite', 
+        'rt_auto_rm_time', 
+        'rt_auto_rm_frame', 
+        'text_comment_offer', 
+        'text_ender_dm', 
     ];
+    public $timestamps = true;
 }
