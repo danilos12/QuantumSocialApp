@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\GeneralSettingsMeta;
+use App\Models\GeneralSettings;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use App\Models\QuantumAcctMeta;
@@ -87,17 +87,20 @@ class RegisterController extends Controller
             'subscription' => 'free',
             'timezone' => $timezoneOffsetFormatted
         ]);
+   
 
-        // 
-        $generalSettingsMeta = [
-            ['user_id' => $user->id, 'meta_key' => 'copy-text-break', 'meta_value' => '0' ],
-            ['user_id' => $user->id, 'meta_key' => 'press-enter-3-times', 'meta_value' => '0' ],
-            ['user_id' => $user->id, 'meta_key' => 'email-when-queue-empty', 'meta_value' => '0' ],
-            ['user_id' => $user->id, 'meta_key' => 'refresh-cmd-add-queue', 'meta_value' => '0' ],
-            ['user_id' => $user->id, 'meta_key' => 'random-post-times', 'meta_value' => '0' ]
+        $generalSettings = [
+            'user_id' => $user->id,
+            'toggle_1' => 0,
+            'toggle_2' => 0,
+            'toggle_3' => 0,
+            'toggle_4' => 0,
+            'toggle_5' => 0,
+            'toggle_6' => 0,
         ];
 
-        GeneralSettingsMeta::insert($generalSettingsMeta);
+
+        GeneralSettings::create($generalSettings);
         
         return $user;
     }
