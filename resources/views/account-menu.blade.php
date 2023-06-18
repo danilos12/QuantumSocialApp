@@ -165,31 +165,31 @@
                         <span class="subTwirl-header">API Key:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="api_key" value="{{ isset($twitterApi) ? $twitterApi->api_key : ''  }}"/>                      
+                      <input type="text" class="input-field" id="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key : ''  }}"/>                      
                     </div>
                     <div class="subTwirl-header-wrap">
                         <span class="subTwirl-header">API Secret:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApi) ? str_repeat('*', strlen($twitterApi->api_secret)) : ''  }}"/>                     
+                      <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApiMaster) ? str_repeat('*', strlen($twitterApiMaster->api_secret)) : ''  }}"/>                     
                     </div> 
                     <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">Bearer Token:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="bearer_token" value="{{ isset($twitterApi) ? $twitterApi->bearer_token : ''  }}"/>                      
+                      <input type="text" class="input-field" id="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>                      
                     </div>
                     <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">OAuth 2.0 ID:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="oauth_id" value="{{ isset($twitterApi) ? $twitterApi->oauth_id : ''  }}"/>                      
+                      <input type="text" class="input-field" id="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>                      
                     </div>
                     <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">OAuth 2.0 Secret:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApi) ? str_repeat('*', strlen($twitterApi->oauth_secret)) : ''  }}"/>                      
+                      <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApiMaster) ? str_repeat('*', strlen($twitterApiMaster->oauth_secret)) : ''  }}"/>                      
                     </div>
                     <div class="menu-subTwirl-inner">
                       <button class="subTwirl-buttons" id="twitter_api_saving" style="margin-top: 0.5em; border: transparent" >

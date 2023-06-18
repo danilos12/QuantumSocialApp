@@ -20,7 +20,8 @@ class TwitterSettings extends Model
         'toggle_6', 
         'toggle_7', 
         'toggle_8', 
-        'toggle_9'
+        'toggle_9',
+        'toggle_10'
     ];
     public $timestamps = true;
 
