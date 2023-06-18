@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TwitterApiCredentials extends Model
+class MasterTwitterApiCredentials extends Model
 {
     use HasFactory;
 
@@ -14,15 +14,14 @@ class TwitterApiCredentials extends Model
      *
      * @var array<int, string>
      */
-    protected $table = 'settings_twitter_twapi';
+    protected $table = 'settings_general_twapi';
     protected $fillable = [
         'user_id',
-        'twitter_id',
         'api_key',
         'api_secret',
         'bearer_token', 
-        'access_token',
-        'token_secret',
+        'oauth_id',
+        'oauth_secret',
     ];
     public $timestamps = true;
 }

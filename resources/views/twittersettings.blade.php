@@ -20,8 +20,7 @@
             </div>  <!-- END .global-author-details -->
         </div>  <!-- END .global-twitter-profile-header -->
 
-    </div>  <!-- END .account-settings-header-wrap -->
-    <div data-form-url="{{ route('save-settings') }}" data-twitterid="{{ isset($selected_user) ? $selected_user->twitter_id : " " }}" id="twitter-settings"></div>
+    </div>  <!-- END .account-settings-header-wrap -->            
     
     <div class="modal-large-inner main-settings-inner twitter-settings-inner">
 
@@ -29,29 +28,30 @@
             <div class="menu-section-inner command-module-account-inner">
                 <div class="menu-section-twirl-header-outer">
                     <div class="menu-section-twirl-header-inner">
-
+    
                         <span class="menu-section-header">
                         Account Level - Command Module Settings</span>
-
+    
                         <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon menu-section-twirl-icon menu-section-command-twirl" data-toggle="collapse" data-target="#acct-menu-section-command-twirl" />
-
+    
                     </div>  <!-- END .menu-section-twirl-header-inner -->
                 </div>  <!-- END .menu-section-twirl-header-outer -->
-
+    
                 <div class="menu-section-twirl-section-outer collapse" id="acct-menu-section-command-twirl">
                     <div class="menu-section-twirl-section-inner">
-
+    
                         <div class="menu-twirl-option-outer">
                             <div class="menu-twirl-option-inner">
-                            <div class="menu-twirl-left">
-                                <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
-                                <span class="menu-twirl-option-text">
-                                Automatically reply to mentions on all scheduled posts.</span> 
-                            </div>  <!-- END .menu-twirl-left -->
-                            <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_1" {{ isset($twitterSetting) ? ($twitterSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
-                            </div>  <!-- END .menu-twirl-right -->
+                                <div class="menu-twirl-left">
+                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
+                                    <span class="menu-twirl-option-text">
+                                    Automatically reply to mentions on all scheduled posts.</span> 
+                                </div>  <!-- END .menu-twirl-left -->
+                                <div class="menu-twirl-right">
+                                    <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_1" {{ isset($twitterSetting) ? ($twitterSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
+                                </div>  <!-- END .menu-twirl-right -->
                             </div>  <!-- END .menu-twirl-option-inner -->
-
+    
                             <!-- START auto-reply -->
                             <div class="menu-subTwirl-outer">
                                 <div class="subTwirl-header-wrap">
@@ -67,11 +67,11 @@
                                 </div>  <!-- END .auto-reply-button -->
                             </div>  <!-- END .menu-subTwirl-inner -->
                             <!-- END auto-reply -->
-
+    
                         </div>  <!-- END .menu-twirl-option-outer -->
                         
                         <div class="menu-twirl-option-outer">
-
+    
                             <div class="menu-twirl-option-inner">
                                 <div class="menu-twirl-left">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-dots.svg" class="ui-icon menu-twirl-option-icon" />
@@ -82,14 +82,14 @@
                                     <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_2" {{ isset($twitterSetting) ? ($twitterSetting->toggle_2 === 1) ? 'checked' : '' : ''}}>
                                 </div>  <!-- END .menu-twirl-right -->
                             </div>  <!-- END .menu-twirl-option-inner -->
-
+    
                             <div class="menu-subTwirl-outer">
                                 <div class="subTwirl-header-wrap">
-                                <span class="subTwirl-header">
-                                    Modify your default Thread Ender below:</span>
+                                    <span class="subTwirl-header">
+                                        Modify your default Thread Ender below:</span>
                                 </div>  <!-- END .subTwirl-header-wrap -->
                                 <div class="menu-subTwirl-inner">
-                                <textarea class="thread-ender-text" id="text_draft_ender">{{ isset($twitterSetting) ? $twitterSetting->text_draft_ender : "" }}</textarea>
+                                    <textarea class="thread-ender-text" id="text_draft_ender">{{ isset($twitterSetting) ? $twitterSetting->text_draft_ender : "" }}</textarea>
                                 <div class="thread-ender-counter">
                                     <span class="thread-ender-count">154</span>/280 remaining
                                 </div>  <!-- END .thread-ender-count -->
@@ -98,15 +98,15 @@
                                 </div>  <!-- END .thread-ender-button -->
                                 </div>  <!-- END .menu-subTwirl-inner -->
                             </div>  <!-- END .menu-subTwirl-outer -->
-
+    
                         </div>  <!-- END .menu-twirl-option-outer -->
-
+    
                     </div>  <!-- END .menu-section-twirl-section-inner -->
                 </div>  <!-- END .menu-section-twirl-section-outer -->
             </div>  <!-- END .command-module-inner -->
         </div>  <!-- END .command-module-outer -->
-    </div>  <!-- END .twitter-settings-inner -->
-
+    </div>  <!-- END .twitter-settings-inner -->    
+ 
 
     <div class="menu-section-outer automated-retweet-settings-outer">
         <div class="menu-section-inner automated-retweet-settings-inner">
@@ -359,7 +359,6 @@
             </div>  <!-- END .menu-section-twirl-section-outer -->
         </div>  <!-- END .automated-retweet-settings-inner -->
     </div>  <!-- END .automated-retweet-settings-outer -->
-
 
 
     <div class="menu-section-outer command-module-account-outer">

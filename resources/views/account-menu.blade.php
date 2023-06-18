@@ -146,7 +146,7 @@
 
             <div class="menu-section-outer social-accounts-outer">
               <div class="menu-section-inner social-accounts-inner">
-                <span class="menu-section-header">Twitter API Crential</span>
+                <span class="menu-section-header">Twitter API Credential</span>
                 
                 <div class="menu-twirl-option-outer">
                   <div class="menu-twirl-option-inner">
@@ -171,7 +171,7 @@
                         <span class="subTwirl-header">API Secret:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApi) ? $twitterApi->api_secret : ''  }}"/>                     
+                      <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApi) ? str_repeat('*', strlen($twitterApi->api_secret)) : ''  }}"/>                     
                     </div> 
                     <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">Bearer Token:</span>
@@ -189,7 +189,7 @@
                       <span class="subTwirl-header">OAuth 2.0 Secret:</span>
                     </div> 
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApi) ? $twitterApi->oauth_secret : ''  }}"/>                      
+                      <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApi) ? str_repeat('*', strlen($twitterApi->oauth_secret)) : ''  }}"/>                      
                     </div>
                     <div class="menu-subTwirl-inner">
                       <button class="subTwirl-buttons" id="twitter_api_saving" style="margin-top: 0.5em; border: transparent" >
@@ -197,6 +197,18 @@
                       </button>
                     </div> 
                   </div>  
+
+                  <div class="menu-twirl-option-inner">
+                    <div class="menu-twirl-left">
+                        <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
+                        <span class="menu-twirl-option-text">
+                          Allow each Twitter account to have its own API <br>                          
+                          <span style="font-weight: 200; font-style: italic;">(Keeping this off forces all accounts to use the Master API, but activating it will give the choice on the account level in each Twitter account's settings.)</span>
+                        </span>
+                    </div>  <!-- END .menu-twirl-left -->
+                    <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_7" {{ isset($generalSetting) ? ($generalSetting->toggle_7 === 1) ? 'checked' : '' : ''}}>
+                    </div>  <!-- END .menu-twirl-right -->
+                  </div>  <!-- END .menu-twirl-option-inner -->
                 </div>  <!-- END .menu-twirl-option-outer -->
                               
               </div>  <!-- END .social-accounts-inner -->
@@ -249,11 +261,9 @@
                   @endif
 
                   <div class="menu-social-add-accounts-section">
-                    <div class="add-account add-twitter-account">                                   
-                      <a href="{{ url('twitter/redirect') }}">
-                        <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon vertical-middle" />
+                    <div class="add-account add-twitter-account" id="link-twitter">                                   
+                      <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon vertical-middle" />
                           <span>+ Twitter</span>
-                      </a>
                     </div>  <!-- END .add-twitter-account -->
                   </div>  <!-- END .menu-social-add-accounts-section -->
 

@@ -14,6 +14,98 @@ $(document).ready(function() {
     }
   });
 
+  async function getTwitterApiAccordion() {
+    try {     
+      const response = await fetch(APP_URL + '/settings/twitter_toggle');
+      const responseData = await response.json(); 
+
+      if (responseData.status === 200) {
+        $('.twitter-settings-inner').prepend(responseData.html);
+      } else {
+        console.log('Twitter API form not fetch');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // Event delegation for dynamically appended toggle
+  $('.twitter-settings-inner').on('change', '#toggle_10', function(e) {    
+    var isChecked = $(this).is(':checked');
+    // Perform your actions here
+    var op = (isChecked === true) ? 1 : 0; 
+    twitterAPIForm(op);
+      
+  });
+
+  $('.twitter-settings-inner').on('click', '#acct_level_creds', async function(e) {
+    var data = {
+      api_key: $('#tapi_key').val(),
+      api_secret: $('#tapi_secret').val(),
+      bearer_token: $('#tbearer_token').val(),
+      access_token: $('#taccess_token').val(),
+      token_secret: $('#ttoken_secret').val(),
+    };
+    console.log(data);
+
+    try {
+      const response = await fetch(APP_URL + '/settings/twitter_api/save/' + TWITTER_ID, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+        },
+        body: JSON.stringify(data), // Use "body" instead of "data" to send the data    
+      });
+
+      const responseData = await response.json(); 
+
+      if (responseData.status) {
+        var successDiv = $(`<div class="alert-success"> ${responseData.message} </div>`);
+        $('.twitter-settings-inner').find('#acct_level_creds').after(successDiv);
+        
+        // remove the div after 3 seconds
+        setTimeout(function() {
+          successDiv.remove();
+        }, 3000);
+      } else {
+        var successDiv = $(`<div class="alert-error"> ${responseData.message} </div>`);
+        // $(this).after(successDiv);
+        $('.twitter-settings-inner').find('#acct_level_creds').after(successDiv);
+
+        // remove the div after 3 seconds
+        setTimeout(function() {
+          successDiv.remove();
+        }, 3000);
+      }
+
+    } catch (error) {
+      console.log(error);
+    }   
+  })
+
+  
+  async function twitterAPIForm(isChecked) {    
+    try {     
+      const response = await fetch(APP_URL + '/settings/twitter_form?toggle=' + isChecked);
+      const responseData = await response.json(); 
+
+      console.log(responseData);
+
+      if (responseData.toggle === 1) {
+        $('.twitterapi-account-inner').find('.menu-twirl-option-outer').append(responseData.html);
+        $('.twitterapi-account-inner').find('.menu-twirl-option-text').text(responseData.message);
+      } else {
+        $('.twitterapi-account-inner').find('.menu-subTwirl-outer').remove();
+        $('.twitterapi-account-inner').find('.menu-twirl-option-text').html(responseData.html);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  getTwitterApiAccordion();
+
 
   // $('.auto-reply-button').on('click', function(event) {
 
@@ -45,6 +137,7 @@ $(document).ready(function() {
 
   $('input[name="twitter-settings[]"]').change(function(event) {
     var isChecked = $(this).is(':checked');
+    console.log(1)
 
     $.ajax({
       url: APP_URL + '/settings?id=twitter-settings',
@@ -148,5 +241,51 @@ $(document).ready(function() {
       console.log(error);
     }    
   })
+
+  function individualApiForm() {
+    var template = `
+      
+    <!-- START auto-reply -->
+    <div class="menu-subTwirl-outer">
+        <div class="subTwirl-header-wrap">
+            <span class="subTwirl-header">API Key:</span>
+        </div>  <!-- END .subTwirl-header-wrap -->
+        <div class="menu-subTwirl-inner">
+            <input type="text" class="input-field" id="api_key" value="{{ isset($twitterApi) ? $twitterApi->api_key : ''  }}"/>                                                                                     
+        </div>  <!-- END .menu-subTwirl-inner -->
+        <div class="subTwirl-header-wrap">
+            <span class="subTwirl-header">API Secret:</span>
+        </div>  <!-- END .subTwirl-header-wrap -->
+        <div class="menu-subTwirl-inner">
+            <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApi) ? $twitterApi->api_secret : ''  }}"/>                                                                                      
+        </div>  <!-- END .auto-reply-button -->
+        <div class="subTwirl-header-wrap">
+            <span class="subTwirl-header">Bearer Token:</span>
+        </div>  <!-- END .subTwirl-header-wrap -->
+        <div class="menu-subTwirl-inner">
+            <input type="text" class="input-field" id="bearer_token" value="{{ isset($twitterApi) ? $twitterApi->bearer_token : ''  }}"/> 
+        </div>                     
+        <div class="subTwirl-header-wrap">
+            <span class="subTwirl-header">OAuth 2.0 Client ID</span>
+        </div>  <!-- END .subTwirl-header-wrap -->
+        <div class="menu-subTwirl-inner">
+            <input type="text" class="input-field" id="oauth_id" value="{{ isset($twitterApi) ? $twitterApi->oauth_id : ''  }}"/>                      
+        </div>
+        <div class="subTwirl-header-wrap">
+            <span class="subTwirl-header">OAuth 2.0 Client Secret</span>
+        </div>  <!-- END .subTwirl-header-wrap -->
+        <div class="menu-subTwirl-inner">
+            <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApi) ? $twitterApi->oauth_secret : ''  }}"/>                      
+        
+        <div class="subTwirl-button" id="auto-reply-button" style="margin-top: 0.5em; border: transparent">
+            Save Auto-reply
+        </div>  <!-- END .auto-reply-button -->
+    </div>  <!-- END .menu-subTwirl-inner -->
+    <!-- END auto-reply -->
+    `;
+
+    return template;
+
+  }
  
 });
