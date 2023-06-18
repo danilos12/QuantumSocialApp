@@ -18,6 +18,7 @@ class GeneralSettings extends Model
         'toggle_4', 
         'toggle_5', 
         'toggle_6', 
+        'toggle_7', 
     ];
     public $timestamps = true;
 }

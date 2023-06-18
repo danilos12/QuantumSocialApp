@@ -44,21 +44,24 @@ class GeneralSettingController extends Controller
             switch ($id) {
                 case "general-settings":
                     $userId = $request->input('user_id');
-                    $settings = GeneralSettings::where('user_id', $userId)->update([$key => $value]);
+                    $settings = GeneralSettings::where('user_id', $userId)->update([$key => $value]);                    
+                    
+                    $html = $this->renderTwitterAPiAccordion();
 
-                    $lastSavedData = GeneralSettings::where(['user_id' => $userId, $key => $value])->pluck($key)->first();
                     break;
                 
                 case "twitter-settings":                    
                     $twitterId = $request->input('twitter_id');
                     $settings = TwitterSettings::where('twitter_id' , $twitterId)->update([$key => $value]);
                     
-                    $lastSavedData = TwitterSettings::where(['twitter_id' => $twitterId, $key => $value])->pluck($key)->first();
+                    $html = TwitterSettings::where(['twitter_id' => $twitterId, $key => $value])->pluck($key)->first();
                     break;
             } 
               
             if ($settings) {
-                return response()->json(['status' => 200, 'message' => "Data has been updated"]);                                                                       
+                return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);                                                                       
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update your membership.']);
             }
 
         } catch(Exception $e) {
@@ -70,7 +73,104 @@ class GeneralSettingController extends Controller
         }
         
     }    
+
+    public function generalAndTwitterSettings() {
+        $html = $this->renderTwitterAPiAccordion();
+        return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);   
+    }
     
+    public function getTwitterForm(Request $request) {
+        try { 
+            TwitterSettings::join('ut_acct_mngt', 'ut_acct_mngt.twitter_id', 'settings_twitter.twitter_id')
+                ->where('ut_acct_mngt.user_id', Auth::id())
+                ->update(['toggle_10' => $request->toggle]);
+        
+            // Retrieve the updated toggle_10 value
+            $settings = TwitterSettings::join('ut_acct_mngt', 'ut_acct_mngt.twitter_id', 'settings_twitter.twitter_id')
+                ->where('ut_acct_mngt.user_id', Auth::id())
+                ->first();            
+            
+            $toggle_10 = $settings->toggle_10;                    
+            
+            if ($toggle_10 === 1) {
+                // Find the existing record or create a new one
+                $credentials = TwitterApiCredentials::updateOrCreate(
+                    ['user_id' => Auth::id()],
+                    [
+                        'twitter_id' => null,
+                        'api_key' => null,
+                        'api_secret' => null,
+                        'bearer_token' => null,
+                        'access_token' => null,
+                        'token_secret' => null,
+                    ]
+                );
+
+                $html = view('twitterapi-form')->render();
+                return response()->json(['status' => 200, 'toggle' => 1, 'stat' => 'success', 'html' => $html, 'message' => "Enter your API credentials for this Twitter Account."]);   
+            } else {
+                $html = 'You are currently using Master API Credentials.<br> <span style="font-weight: 200; font-style=italic">(Turn this on to add account level credentials form).</span>';
+                return response()->json(['status' => 200, 'toggle' => 0, 'stat' => 'success', 'html' => $html]);   
+            }
+            
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+        }
+    }
+
+    public function renderTwitterAPiAccordion() {
+        $lastSavedData = GeneralSettings::where('user_id', Auth::id())->first();
+        $html= '';
+        
+        if ($lastSavedData->toggle_1 === 1 && $lastSavedData->toggle_7 === 1) 
+        {
+            $html = view('master-api-and-twapi')->render();
+        }
+        else if ($lastSavedData->toggle_1 === 0 && $lastSavedData->toggle_7 === 1) 
+        {
+            $html = view('master-api-or-twapi')->render();
+        }
+        else 
+        {
+            $html = null;
+        }
+
+        return $html;
+    }
+    
+    public function saveTwitterApi(Request $request, $twitter_id) {
+        
+        try {
+            // dd($request, $twitter_id);
+            $saveTwitterApi = TwitterApiCredentials::where('user_id', Auth::id())->first();
+            $saveTwitterApi->twitter_id = $twitter_id;
+            $saveTwitterApi->api_key = $request->input('api_key');
+            $saveTwitterApi->api_secret = $request->input('api_secret');
+            $saveTwitterApi->bearer_token = $request->input('bearer_token');
+            $saveTwitterApi->access_token = $request->input('access_token');
+            $saveTwitterApi->token_secret = $request->input('token_secret');
+            $saveTwitterApi->save();
+
+            if ($saveTwitterApi) {
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Credentials are updated']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update credentials']);
+            }
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+        }
+
+    }
 
     public function twitterApiCredentials(Request $request, $id) {
         try {
@@ -114,13 +214,18 @@ class GeneralSettingController extends Controller
             // Retrieve the recently saved data
             $updatedSubscription = $tw->subscription;
             
-            return response()->json(['status' => 200, 'data' => $updatedSubscription,  'stat' => 'success', 'message' => 'Membership updated successfully']);
+            if ($updatedSubscription) {
+                return response()->json(['status' => 200, 'data' => $updatedSubscription,  'stat' => 'success', 'message' => 'Membership updated successfully']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update your membership.']);
+            }
+
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace,  'stat' => 'error', 'message' => $message]);
+            return response()->json(['status' => '409', 'error' => $trace,  'stat' => 'danger', 'message' => $message]);
         }
     }
     
@@ -131,15 +236,20 @@ class GeneralSettingController extends Controller
             $tw->save();
 
             // Retrieve the recently saved data
-            $updatedTimezone = $tw->timezone;            
-            return response()->json(['status' => 200, 'data' => $updatedTimezone, 'stat' => 'success' ,'message' => 'Timezone updated successfully']);
+            $updatedTimezone = $tw->timezone;  
+            
+            if ($updatedTimezone) {
+                return response()->json(['status' => 200, 'data' => $updatedTimezone, 'stat' => 'success' ,'message' => 'Timezone updated successfully']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update your timezone.']);
+            }
           
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'stat' => 'error' , 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '409', 'stat' => 'danger' , 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -184,15 +294,16 @@ class GeneralSettingController extends Controller
             
             if ($settings) {
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Data is updated']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update.']);
             }
-
             
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'stat' => 'success', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '409', 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
         }
     }
 }
