@@ -64,7 +64,7 @@ Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->
 Route::get('/trending', [App\Http\Controllers\TrendingtopicsController::class, 'index'])->name('trending-topics');
 
 // twitter API
-Route::get('/twitter/redirect', [App\Http\Controllers\Controller::class, 'twitterOAuth']);
+Route::get('/twitter/redirect/{id}', [App\Http\Controllers\Controller::class, 'checkTwitterCreds']);
 Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOAuthCallback']);
 
 // get Tweets
@@ -83,6 +83,9 @@ Route::post('/settings/twitter_api_creds/{user_id}', [App\Http\Controllers\Gener
 Route::post('/settings/timezone/{user_id}', [App\Http\Controllers\GeneralSettingController::class, 'timezoneSettings'])->name('timezone');
 Route::post('/settings/membership/{user_id}', [App\Http\Controllers\GeneralSettingController::class, 'membershipSettings'])->name('membership');
 Route::post('/settings/twitter_meta/{twitter_id}', [App\Http\Controllers\GeneralSettingController::class, 'twitterSettingsMeta'])->name('twitter_settings_meta');
+Route::get('/settings/twitter_toggle', [App\Http\Controllers\GeneralSettingController::class, 'generalAndTwitterSettings'])->name('twitter_toggle');
+Route::get('/settings/twitter_form', [App\Http\Controllers\GeneralSettingController::class, 'getTwitterForm'])->name('twitter_form');
+Route::post('/settings/twitter_api/save/{twitter_id}', [App\Http\Controllers\GeneralSettingController::class, 'saveTwitterApi'])->name('twitter_api.save');
 
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');

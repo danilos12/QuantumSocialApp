@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Twitter;
+use App\Models\TwitterApiCredentials;
 use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
 use App\Models\TwitterSettings;
@@ -20,23 +21,38 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    public function checkTwitterCreds(Request $request, $id) {
+        try {
+            $findCred = TwitterApiCredentials::where('user_id', $id)->first();
+
+            if ($findCred) {
+                $url = $this->twitterOAuth($findCred->oauth_id);
+
+                return response()->json(['status' => 200, 'redirect' => $url, 'stat' => 'success', 'message' => 'Redirecting to Twitter']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Please add your Master API above.']);
+            }
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 409, 'stat' => 'warning' ,'error' => $trace, 'message' => $message]);
+        }
+    }
+
      // STEP 1
-    public function twitterOAuth() {
-        
+    public function twitterOAuth($twitterClientId) {
         // create an authorized URL 
         $url = $this->buildAuthorizedURL("https://twitter.com/i/oauth2/authorize", [
             'response_type' => 'code',
-            'client_id' => env('TWITTER_CLIENT_ID'),
+            'client_id' => $twitterClientId,
             'redirect_uri' => env('TWITTER_CALLBACK_URL'),
             'scope' => 'tweet.read users.read follows.read follows.write tweet.write offline.access'           
         ]);
 
-        if ($url) {
-            return redirect()->away($url);
-        } else {
-            return redirect('/');
-        }
-        
+        return $url;
     }
 
     // STEP 2
