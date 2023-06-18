@@ -8,6 +8,7 @@ use App\Models\TwitterToken;
 use App\Models\TwitterSettings;
 use App\Models\TwitterSettingsMeta;
 use App\Models\GeneralSettings;
+use App\Models\MasterTwitterApiCredentials;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterApiCredentials;
 use App\Models\UT_AcctMngt;
@@ -174,7 +175,7 @@ class GeneralSettingController extends Controller
 
     public function twitterApiCredentials(Request $request, $id) {
         try {
-            $api = TwitterApiCredentials::firstOrNew(['user_id' => Auth::user()->id]);
+            $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => Auth::user()->id]);
             
             if ($api->exists) {
                 $api->user_id = Auth::id();

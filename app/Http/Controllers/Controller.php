@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Twitter;
-use App\Models\TwitterApiCredentials;
+use App\Models\MasterTwitterApiCredentials;
 use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
 use App\Models\TwitterSettings;
@@ -23,7 +23,7 @@ class Controller extends BaseController
 
     public function checkTwitterCreds(Request $request, $id) {
         try {
-            $findCred = TwitterApiCredentials::where('user_id', $id)->first();
+            $findCred = MasterTwitterApiCredentials::where('user_id', $id)->first();
 
             if ($findCred) {
                 $url = $this->twitterOAuth($findCred->oauth_id);
@@ -141,7 +141,8 @@ class Controller extends BaseController
                         'toggle_6' => 0, 
                         'toggle_7' => 0, 
                         'toggle_8' => 0, 
-                        'toggle_9' => 0
+                        'toggle_9' => 0,
+                        'toggle_10' => 0
                     ]);
     
                     TwitterSettingsMeta::create([
