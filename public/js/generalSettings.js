@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  
+    
   // add team member modal
   $addTeamIcon = $(".add-team");
   $addTeamModal = $(".add-team-member-inner");
@@ -12,34 +12,69 @@ $(document).ready(function() {
     }
   });
   
+  $('div#link-twitter').on('click', async function(e) {
+    
+    try {
+      const response = await fetch(APP_URL + '/twitter/redirect/' + QUANTUM_ID);
+      const responseData = await response.json();
+
+      console.log(responseData);
+
+      var successDiv = $(`<div class="alert-${responseData.stat}" style="margin-top:0.2em"> ${responseData.message} </div>`);
+      if (responseData.status === 200) {
+        window.location.href = responseData.redirect;
+      } else {
+        $(this).parent().after(successDiv);        
+        console.log(1);
+      } 
+    
+      // remove the div after 3 seconds
+      setTimeout(function() {
+        successDiv.remove();
+      }, 3000);
+    } catch (error) {
+      console.log(error);
+    }
+  })
   
   // modal slider
   // $(document).ready(function() {
-  $('input[name="general-settings[]"]').change(function(event) {
+  $('input[name="general-settings[]"]').change(async function(event) {
     console.log(event.target.id)
     var isChecked = $(this).is(':checked');
-    console.log(isChecked)
-  
-    $.ajax({
-      url: APP_URL + '/settings?id=general-settings',
-      method: 'POST',
-      data: {
-        meta_key: event.target.id,
-        meta_value: isChecked === true ? 1 : 0,
-        user_id: QUANTUM_ID,        
-      },
-      headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      },
-      success: function(response) {
-        // Handle success
-        console.log(response)
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        // Handle error
-        console.log(textStatus)
+     
+    var data = {
+      meta_key: event.target.id,
+      meta_value: isChecked === true ? 1 : 0,
+      user_id: QUANTUM_ID,        
+    };
+
+    try {
+      const response = await fetch(APP_URL + '/settings?id=general-settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+        },
+        body: JSON.stringify(data), // Use "body" instead of "data" to send the data
+      });
+
+      const responseData = await response.json();
+      console.log(responseData);
+      if (responseData.status === 200) {
+
+        if (responseData.html === null) {
+          $('.twitterapi-account-outer').remove();
+        } else {
+          $('.twitter-settings-inner').prepend(responseData.html);
+        }
+        console.log(responseData.message)
+      } else {
+        console.log(responseData.message)        
       }
-    });
+    } catch (error) {
+      console.log(error)
+    }
   });
   // });
 
@@ -54,40 +89,6 @@ $(document).ready(function() {
   //   }
   // })
 
-  // function twitterLongCard(response) {
-  //   return $html = `
-  //   <div class="menu-social-account-outer">
-  //       <div class="menu-social-account-inner">
-
-  //       <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
-
-  //         <div class="global-twitter-profile-header">
-  //           <a href="#">
-  //           <img src="${response.twitter_photo}" lass="global-profile-image" /></a>
-  //           <div class="global-profile-details">
-  //             <div class="global-profile-name">
-  //               <a href="#"> ${response.twitter_name} </a>
-  //             </div>  <!-- END .global-author-name -->
-  //             <div class="global-profile-subdata">
-  //               <span class="global-profile-handle">@<a href="">${response.twitter_username}</a>
-  //               </span>
-  //             </div>  <!-- END .global-post-date-wrap -->
-  //           </div>  <!-- END .global-author-details -->
-  //         </div>  <!-- END .global-twitter-profile-header -->
-
-  //         <div class="menu-social-account-options">
-  //           <span class="menu-account-default" data-twitter_id="${response.twitter_id}" data-toggle="tooltip" title="Set default account." default="${response}"></span>
-  //           <span class="menu-account-icons">
-  //           <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
-  //           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitter_id="${response}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
-  //           </span>
-  //         </div>  <!-- END .menu-social-account-options -->
-
-  //       </div>  <!-- END .menu-social-account-inner -->
-  //     </div>  <!-- END .menu-social-account-outer -->
-  //     <!-- END .menu-social-account Instance -->     
-  //   `
-  // }
 
   $('#twitter_api_saving').on("click", async function(e) {
     e.preventDefault(); // Prevent form submission
@@ -336,10 +337,43 @@ $(document).ready(function() {
           $('.content-section').html('<div class="error-message">Error loading content.</div>'); // show an error message if the content fails to load
         }
       });
-    }
-  
-
+    }  
   })
+
+   // function twitterLongCard(response) {
+  //   return $html = `
+  //   <div class="menu-social-account-outer">
+  //       <div class="menu-social-account-inner">
+
+  //       <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
+
+  //         <div class="global-twitter-profile-header">
+  //           <a href="#">
+  //           <img src="${response.twitter_photo}" lass="global-profile-image" /></a>
+  //           <div class="global-profile-details">
+  //             <div class="global-profile-name">
+  //               <a href="#"> ${response.twitter_name} </a>
+  //             </div>  <!-- END .global-author-name -->
+  //             <div class="global-profile-subdata">
+  //               <span class="global-profile-handle">@<a href="">${response.twitter_username}</a>
+  //               </span>
+  //             </div>  <!-- END .global-post-date-wrap -->
+  //           </div>  <!-- END .global-author-details -->
+  //         </div>  <!-- END .global-twitter-profile-header -->
+
+  //         <div class="menu-social-account-options">
+  //           <span class="menu-account-default" data-twitter_id="${response.twitter_id}" data-toggle="tooltip" title="Set default account." default="${response}"></span>
+  //           <span class="menu-account-icons">
+  //           <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
+  //           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitter_id="${response}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
+  //           </span>
+  //         </div>  <!-- END .menu-social-account-options -->
+
+  //       </div>  <!-- END .menu-social-account-inner -->
+  //     </div>  <!-- END .menu-social-account-outer -->
+  //     <!-- END .menu-social-account Instance -->     
+  //   `
+  // }
   
   $.fn.hasAttr = function(name) {
     return this.attr(name) !== undefined;
