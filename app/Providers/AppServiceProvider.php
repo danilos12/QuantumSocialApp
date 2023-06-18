@@ -87,6 +87,19 @@ class AppServiceProvider extends ServiceProvider
                         ->where('users.id', Auth::id())
                         ->first();
                 $view->with('twitterApi', $twitterApiCredentials);
+                
+                $twitterApiCredentials = DB::table('settings_general_twapi')
+                        ->join('users', 'users.id', 'settings_general_twapi.user_id')
+                        ->select('*')
+                        ->where('users.id', Auth::id())
+                        ->first();
+                $view->with('twitterApi', $twitterApiCredentials);
+
+                $twitterApiInsideForm = DB::table('settings_twitter_twapi')
+                            ->select('*')
+                            ->where('user_id', Auth::id())
+                            ->first();
+                $view->with('individualTwitterApi', $twitterApiInsideForm);
 
                 // main quantum user 
                 $main_user = User::find(Auth::id());
@@ -98,13 +111,19 @@ class AppServiceProvider extends ServiceProvider
     
                 // retrieve timezone
                 $getTimezone = DB::table('users_meta')->where('user_id', Auth::id())->first();
-                // dd($getTimezone);
                 $view->with('getTimezone', $getTimezone);
                 
                 // general settings sliders                
                 $generalSettings = DB::table('settings_general')->where('user_id', Auth::id())->first();
-                $view->with('generalSetting', $generalSettings);              
+                $view->with('generalSetting', $generalSettings);         
                 
+                $masterApiwithIndividual = DB::table('settings_general')
+                                ->join('ut_acct_mngt', 'settings_general.user_id', 'ut_acct_mngt.user_id')
+                                ->where('settings_general.user_id', Auth::id())
+                                ->where('ut_acct_mngt.twitter_id', $twitterID)
+                                ->first();                                                               
+                $view->with('masterApiwithIndividual', $masterApiwithIndividual);     
+                                                
                 // membership 
                 $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
                 $view->with('membership', $membership);                       
