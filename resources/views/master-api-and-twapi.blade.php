@@ -27,9 +27,11 @@
                         </div>  <!-- END .menu-twirl-right -->
                     </div>  <!-- END .menu-twirl-option-inner -->
 
-                    @if ($twitterSetting->toggle_10 === 1) 
-                        @include('twitterapi-form')
-                    @endif 
+                    @if (isset($twitterSetting))
+                        @if ($twitterSetting->toggle_10 === 1) 
+                            @include('twitterapi-form')
+                        @endif 
+                    @endif
                 </div>  <!-- END .menu-twirl-option-outer -->
                                         
  
