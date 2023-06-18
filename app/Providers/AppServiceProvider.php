@@ -12,9 +12,7 @@ use App\Models\User;
 use DateTime;
 use DateTimeZone;
 use App\Helpers\TwitterHelper;
-
-
-
+use App\Models\TwitterSettings;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -70,36 +68,13 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('twitter_name', $selectedUser->twitter_name ?? "");       
                 $view->with('twitter_usn', $selectedUser->twitter_username ?? "");       
                 $view->with('twitter_photo', $selectedUser->twitter_photo ?? "");       
-                $view->with('user_id', Auth::id());       
-                    
-                // twitter settings DB 
-                $twitterSettings = DB::table('settings_twitter')
-                                ->join('settings_twitter_meta', 'settings_twitter.twitter_id', '=', 'settings_twitter_meta.twitter_id')
-                                ->join('ut_acct_mngt', 'settings_twitter.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                                ->select('settings_twitter.*', 'ut_acct_mngt.selected', 'settings_twitter_meta.*')
-                                ->where('settings_twitter.twitter_id', '=', $twitterID)
-                                ->first();                                
-                $view->with('twitterSetting', $twitterSettings);
-                                
-                $twitterApiCredentials = DB::table('settings_general_twapi')
-                        ->join('users', 'users.id', 'settings_general_twapi.user_id')
-                        ->select('*')
-                        ->where('users.id', Auth::id())
-                        ->first();
-                $view->with('twitterApi', $twitterApiCredentials);
-                
-                $twitterApiCredentials = DB::table('settings_general_twapi')
-                        ->join('users', 'users.id', 'settings_general_twapi.user_id')
-                        ->select('*')
-                        ->where('users.id', Auth::id())
-                        ->first();
-                $view->with('twitterApi', $twitterApiCredentials);
+                $view->with('user_id', Auth::id());                              
 
-                $twitterApiInsideForm = DB::table('settings_twitter_twapi')
+                $individualTwitterApi = DB::table('settings_twitter_twapi')
                             ->select('*')
                             ->where('user_id', Auth::id())
                             ->first();
-                $view->with('individualTwitterApi', $twitterApiInsideForm);
+                $view->with('individualTwitterApi', $individualTwitterApi);
 
                 // main quantum user 
                 $main_user = User::find(Auth::id());
@@ -115,14 +90,32 @@ class AppServiceProvider extends ServiceProvider
                 
                 // general settings sliders                
                 $generalSettings = DB::table('settings_general')->where('user_id', Auth::id())->first();
-                $view->with('generalSetting', $generalSettings);         
+                $view->with('generalSetting', $generalSettings);       
                 
-                $masterApiwithIndividual = DB::table('settings_general')
-                                ->join('ut_acct_mngt', 'settings_general.user_id', 'ut_acct_mngt.user_id')
-                                ->where('settings_general.user_id', Auth::id())
-                                ->where('ut_acct_mngt.twitter_id', $twitterID)
-                                ->first();                                                               
-                $view->with('masterApiwithIndividual', $masterApiwithIndividual);     
+                // twitter settings DB 
+                $twitterSettings = DB::table('settings_twitter')
+                                ->join('settings_twitter_meta', 'settings_twitter.twitter_id', '=', 'settings_twitter_meta.twitter_id')
+                                ->join('ut_acct_mngt', 'settings_twitter.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                                ->select('settings_twitter.*', 'ut_acct_mngt.selected', 'settings_twitter_meta.*')
+                                ->where('settings_twitter.twitter_id', '=', $twitterID)
+                                ->first();                
+                $view->with('twitterSetting', $twitterSettings);            
+                              
+                // API inside General settings
+                $twitterApiMaster = DB::table('settings_general_twapi')
+                        ->join('users', 'users.id', 'settings_general_twapi.user_id')
+                        ->select('*')
+                        ->where('users.id', Auth::id())
+                        ->first();
+                $view->with('twitterApiMaster', $twitterApiMaster);
+                        
+                // API inside General settings
+                $twitterApiIndiv = DB::table('settings_twitter_twapi')
+                        ->join('users', 'users.id', 'settings_twitter_twapi.user_id')
+                        ->select('*')
+                        ->where('users.id', Auth::id())
+                        ->first();
+                $view->with('twitterApiIndiv', $twitterApiIndiv);
                                                 
                 // membership 
                 $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
