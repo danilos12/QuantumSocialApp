@@ -16,6 +16,7 @@ use DateTime;
 use Date;
 use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
+use App\Models\Schedule;
 use Illuminate\Support\Facades\Session;
 
 
@@ -42,7 +43,7 @@ class CommandmoduleController extends Controller
         return view('commandmodule')->with('title', $title);
     }
 
-    public function create(Request $request) {
+    public function create(Request $request) {        
         try {                      
             $postData = $request->all();
             $user_id = Auth::id();
@@ -149,6 +150,7 @@ class CommandmoduleController extends Controller
                 $insertData['post_description'] = $textarea;
                 $insertData['sched_method'] = $sched_method;
                 $insertData['sched_time'] = $sched_time;
+                // $insertData['post_type'] = 'tweet-storm-tweets';
                 CommandModule::create($insertData);
                 
                 // // Post tweet if scheduling option is "send-now"
@@ -341,24 +343,61 @@ class CommandmoduleController extends Controller
                     break;
                     
                 case 'queue':                   
-                    $checkToggle = TwitterToken::where('twitter_id', $id)->where('active', 1)->first();
-                    // dd($checkToggle->queue_switch);
-                    $tweets = DB::table('cmd_module')
-                        ->select('*')
-                        ->whereIn('id', function ($query) {
-                            $query->select(DB::raw('MIN(id)'))
-                            ->from('cmd_module')
-                            ->groupBy('post_type_code');
-                        })
-                        ->where('twitter_id', $id)
-                        ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                        ->where('post_type', '!=','evergreen-tweets')
-                        ->where('post_type', '!=','promo-tweets')
-                        ->where('post_type', '!=','tweet-storm-tweets')
-                        ->where('active', $checkToggle->queue_switch)
-                        ->orderBy('sched_time', 'ASC')
-                        ->orderBy('sched_method', 'DESC')
-                        ->get();
+                    $checkToggle = TwitterToken::where('twitter_id', $id)->where('active', 1)->first();                    
+                    
+
+                    $posts = DB::table('cmd_module')                                         
+                            ->select('*')
+                            ->whereIn('id', function ($query) {
+                                $query->select(DB::raw('MIN(id)'))
+                                ->from('cmd_module')
+                                ->groupBy('post_type_code');
+                            })
+                            ->where('twitter_id', $id)
+                            ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                            ->where('cmd_module.post_type', '!=','evergreen-tweets')
+                            // ->where('cmd_module.post_type', '!=','promo-tweets')
+                            // ->where('cmd_module.post_type', '!=','tweet-storm-tweets')
+                            ->where('active', $checkToggle->queue_switch)
+                            ->orderBy('sched_time', 'ASC')
+                            ->orderBy('sched_method', 'DESC')
+                            ->get();               
+
+                    $schedules = Schedule::all();                                  
+
+                    $recurringDates = [];
+                    $r = [];
+                    $currentMonth = now()->month;
+                    $currentYear = now()->year;
+
+                    foreach ($schedules as $schedule) {
+                        $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
+                        $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
+                        
+                        $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth();
+                        $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+                        $currentDate = $startDate->copy();
+                        
+                        while ($currentDate->lte($endDate)) {
+                            if ($currentDate->dayOfWeek === $dayOfWeek) {
+                                $recurringDates[] = [
+                                    'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
+                                    'post_type' => $schedule->post_type,
+                                    'sched_method' => 'slot_sched' 
+                                ];
+                            }
+                            
+                            $currentDate->addDay();
+                        }                        
+                    }
+
+                    $objects = collect($recurringDates)->map(function ($item) {
+                        return (object) $item;
+                    });
+                   
+                    $mergedData = $objects->merge($posts);
+                    $tweets = $mergedData->sortBy('sched_time')->toArray();                
+
                     break;
 
                 case 'evergreen': 
@@ -375,6 +414,8 @@ class CommandmoduleController extends Controller
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->get();
+
+                        // dd($tweets);
                         break;    
 
                 case 'promo': 
@@ -391,6 +432,8 @@ class CommandmoduleController extends Controller
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->get();
+
+                        // dd($tweets);
                         break;    
 
                 case 'tweet-storms': 
@@ -418,7 +461,23 @@ class CommandmoduleController extends Controller
             return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
         }
         
-    }    
+    }   
+    
+    public function getDatesByDayOfWeek($dayOfWeek, $month, $year)
+    {
+        $dates = [];
+
+        $date = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+
+        while ($date->month == $month) {
+            if ($date->isoFormat('dddd') == $dayOfWeek) {
+                $dates[] = $date->copy();
+            }
+            $date->addDay();
+        }
+
+        return $dates;
+    }
 
     public function postNowFromQueue(Request $request, $id)
     {    
@@ -573,6 +632,34 @@ class CommandmoduleController extends Controller
             return curl_error($curl);
         }
     }    
+
+    private function generateRecurringDates($schedule)
+    {
+        $recurringDates = [];
+
+        // Get the current month and year
+        $currentMonth = Carbon::now()->format('F');
+        $currentYear = Carbon::now()->year;
+        $scheduleTime = $schedule->hour . ":" . $schedule->minute_at . " " . $schedule->ampm;
+        
+        // Get the schedule day and time
+        $dayOfWeek = strtolower($schedule->slot_day); // Assuming 'day' field stores the day of the week in lowercase
+        $timeCarbon = Carbon::parse($scheduleTime);
+        // $time = Carbon::parse($schedule->hour); // Assuming 'time' field stores the time in a format parsable by Carbon
+
+        // Calculate the start date for the recurring dates
+        $startDate = Carbon::parse("first {$dayOfWeek} of {$currentMonth} {$currentYear} {$timeCarbon}");
+        dd($startDate);
+
+        // Generate the recurring dates for the month
+        while ($startDate->month == Carbon::now()->month) {
+            $recurringDates[] = $startDate->toDateString();
+            $startDate->addWeek();
+        }
+
+
+        return $recurringDates;
+    }
 
 }
 
