@@ -1,48 +1,60 @@
 $(document).ready(function() {    
     var method = $(".page-inner").attr("data-sched-method");
 
-    $.ajax({
-        type: "GET",
-        url: APP_URL + "/cmd/" + TWITTER_ID + "/post-type/" + method, // Use the URL of your server-side script here        
-        success: function (response) {
-            console.log(response);
-            if (response.length > 0) {                
-                // var details = fetchTwitterDetails(TWITTER_ID);
+    async function fetchData() {
+        try {
+            const response = await fetch(`${APP_URL}/cmd/${TWITTER_ID}/post-type/${method}`);
+            const responseData = await response.json();     
 
-                $.each(response, function (index, k) {
-                    var postType = getPostType(k.post_type);
-                    var wrapper = postWrapper(k, postType, index);                    
-
-                    $('.queue-day-wrapper').append(wrapper);
-                });
-            } else {
-                $(".queue-day-wrapper").html("<div>No post found</div>");
+            if (method === 'queue') {
+                $.each(responseData, (index, k) => {
+                    // var wrapper = '';                
+                    var currentDate = new Date();
+                    var dataDate = new Date(k.sched_time);
+                    
+                    if (dataDate > currentDate) {
+                        if (k.sched_method === "slot_sched") { 
+                            if ( k.post_type === "evergreen-tweets") {
+                                const wrapper = postWrapperReserve(k)
+                                $('.queue-day-wrapper').append(wrapper);
+                            }
+                        } 
+                        else {
+                            const postType = getPostType(k.post_type);
+                            const wrapper = postWrapper(k, postType, index);
+                            console.log(k)
+                            $('.queue-day-wrapper').append(wrapper);
+                        }
+                    } 
+                })           
             }
-        },
-        error: function (xhr, status, error) {
-            console.log(
-                "An error occurred while fetching the existing tag groups: " + error
-            );
-        },
-    });
+        } catch (error) {
+        console.log("An error occurred while fetching the data: " + error);
+        }
+    }      
+    fetchData();
 
-    $.get(APP_URL + '/post/getmonth?id=' + TWITTER_ID, function(response) {               
-        $.each(response.data, function(index, month) {
-            var li = $('<li>');                
-            
-            if (month !== null) {                
-                var updatedId = month.toLowerCase().replace(' ', '-');
-                li.attr('id', updatedId);
-                li.html(`<img src="${APP_URL}/public/ui-images/icons/07-schedule.svg" class="ui-icon" />${month}`)
-                $('.queue-months-dropdown').append(li);
-            }            
-        })         
-    }).fail(function(xhr, error) {
-        console.log(
-            "An error occurred while fetching the existing tag groups: " + error
-        );
-    });   
+    async function fetchDataByMonth() {
+        try {
+          const response = await fetch(APP_URL + '/post/getmonth?id=' + TWITTER_ID);
+          const responseData = await response.json();
+          console.log(responseData);
 
+            $.each(responseData.data, function (i, month) {
+            var li = $('<li>');       
+        
+                if (month !== null) {                
+                    var updatedId = month.toLowerCase().replace(' ', '-');
+                    li.attr('id', updatedId);
+                    li.html(`<img src="${APP_URL}/public/ui-images/icons/07-schedule.svg" class="ui-icon" />${month}`)
+                    $('.queue-months-dropdown').append(li);
+                }   
+            })                     
+        } catch (error) {
+          console.log("An error occurred while fetching the data: " + error);
+        }
+    }
+    fetchDataByMonth();
     
     $(document).on('click', 'img#edit-commandmodule', function(event) {
         $target = event.target.dataset.id;  
@@ -194,7 +206,7 @@ $(document).ready(function() {
         }
     });
     
-    $('#queue-post-status').on('click', async function(e) {
+    $('#post-status').on('click', async function(e) {
         var isChecked = $(this).is(':checked');
         var url = APP_URL + '/post/' + ((isChecked) ? 'active' : 'inactive') + '/' + TWITTER_ID;
 
@@ -448,9 +460,44 @@ $(document).ready(function() {
         return postType;
     }
 
-    function postWrapperEvergreen() {
+    function postWrapperReserve(info) {
+        const dateTimeString = info.sched_time;
+        const dateTime = new Date(dateTimeString);
+        const month = dateTime.toLocaleString('default', { month: 'short' });
+        const day = dateTime.getDate();
+        const year = dateTime.getFullYear();
+        const timeString = dateTime.toLocaleTimeString();
+        const fullDate = month + " " + day + ", " + year;
+
+        var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
+        var $template  = `
+        <div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
+            <div class="queued-single-post">
+
+            <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="queued-watermark">
+
+            <div class="queued-single-start">
+                <span class="queued-post-time">${fullDate + " " + timeString}</span>
+                <span class="queued-post-data">
+                Reserved for ${post_type.toUpperCase()}
+                </span>
+            </div>  <!-- END .queue-single-start -->
+
+            <div class="queued-single-end">
+
+            </div>  <!-- END .queued-single-end -->
+
+            </div>  <!-- END .queued-single-post -->
+        </div>
+        `;
+
+        return $template;
+    }
+
+    function postWrapperEvergreen(info, index) {
+        console.log(index, info);
         var $template = `
-        <div class="mosaic-posts-outer evergreen-mosaic" status="active">
+        <div class="mosaic-posts-outer evergreen-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
           <div class="mosaic-watermark-wrap frosted">
             <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="mosaic-watermark evergreen-watermark" />
             <div class="mosaic-posts-inner">
@@ -490,10 +537,10 @@ $(document).ready(function() {
 
               <div class="mosaic-post-data">
                 <div class="mosaic-post-text">
-                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu. #pretium quis #sem #Nulla con
+                  ${info.post_description}
                 </div>  <!-- END .mosaic-post-text -->
-                <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
-                  class="mosaic-post-image" />
+                <!-- <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
+                  class="mosaic-post-image" /> -->
               </div>  <!-- END .mosaic-post-data -->
 
               <div class="mosaic-post-scheduling">
@@ -532,7 +579,9 @@ $(document).ready(function() {
             </div>  <!-- END .mosaic-posts-inner -->
           </div>  <!-- END .mosaic-watermark-wrap -->
         </div>  <!-- END .mosaic-posts-outer -->
-        `
+        `;
+
+        return $template;
     }
 
 })
