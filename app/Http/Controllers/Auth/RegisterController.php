@@ -97,6 +97,7 @@ class RegisterController extends Controller
             'toggle_4' => 0,
             'toggle_5' => 0,
             'toggle_6' => 0,
+            'toggle_7' => 0,
         ];
 
 
