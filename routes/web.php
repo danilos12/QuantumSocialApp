@@ -102,13 +102,12 @@ Route::get('/schedule/slots',[App\Http\Controllers\PostingController::class, 'ge
 
 Route::get('/promos/get/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getPromos'])->name('promos.get');
 
-Route::post('/post/{switch}/{id}',[App\Http\Controllers\PostingController::class, 'switchFromQueue'])->name('post.switch');
+Route::post('/post/status/{switch}/{id}',[App\Http\Controllers\PostingController::class, 'switchFromQueue'])->name('post.switch');
 Route::get('/post/sortbytype',[App\Http\Controllers\PostingController::class, 'sortPostbyType'])->name('sort.type');
 Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'getMonth'])->name('get.month');
 Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
-Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('get.edit');
+Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
-Route::post('/post/filter/',[App\Http\Controllers\PostingController::class, 'deleteQueue'])->name('post.delete');
 
 
 Route::middleware(['web','guest', 'CheckSessionExpiration'])

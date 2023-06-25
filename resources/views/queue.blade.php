@@ -9,8 +9,8 @@
         <span class="profile-heading">
           The Queue</span>
         <div class="toggle-wrapper">
-          <label class="toggleSwitch large" onclick="">            
-            <input type="checkbox" id="queue-post-status" {{ $toggle > 0 ? 'checked' : '' }}/>
+          <label class="toggleSwitch large">            
+            <input type="checkbox" id="post-status" {{ $toggle > 0 ? 'checked' : '' }}/>
             
             <span>
                 <span>INACTIVE</span>
@@ -79,7 +79,7 @@
     @endif
     <div class="queued-posts-outer" id="queuePage" >
       <div class="queued-posts-inner">
-        <div class="queue-day-wrapper">
+        <div class="queue-day-wrapper page-wrapper">
           <span class="queue-date-heading">Today</span>
           
 
