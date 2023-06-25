@@ -4183,8 +4183,10 @@ input#file-upload-button {
   background: rgba(114,255,143,.4)
 }
 
-.slot-tweetstorms-tweets {
-  background: #FAFF9D
+.slot-promos-tweets {
+  /* background: #FAFF9D */
+  background: rgb(250, 255, 157, .1)
+}
 
 /* Reset Page */
 .card-header {

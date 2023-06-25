@@ -121,11 +121,11 @@ div[data-schedule="none"] {
                                   <span>
                                     Adding to Promo Tweets
                                   </span>
-                                  <select class="promo-campaign-select">
+                                  <select class="promo-campaign-select" name="promo-tweets-cmp">
                                     <option disabled selected>Select a Promo Campaign...</option>
-                                    <option>Promo Campaign #1</option>
-                                    <option>Promo Campaign #2</option>
-                                    <option>Promo Campaign #3</option>
+                                    <option value="cmp1">Promo Campaign #1</option>
+                                    <option value="cmp2">Promo Campaign #2</option>
+                                    <option value="cmp3">Promo Campaign #3</option>
                                   </select>
                                 </div>  <!-- END .promo-alert -->
 
@@ -201,7 +201,7 @@ div[data-schedule="none"] {
                             <div class="posting-tool-submit-wrap">
                               <div class="post-tool-submit-left">
                                 <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
-                                  <option disabled selected value="save-draft">Select a scheduling method...</option>
+                                  <option disabled selected value="save-draft" id="mainselect">Select a scheduling method...</option>
                                   <option value="add-queue">Add to Queue (default)</option>
                                   <option value="send-now">Tweet Now</option>
                                   <option value="set-countdown">Set Countdown</option>

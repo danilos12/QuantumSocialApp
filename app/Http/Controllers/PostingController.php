@@ -194,8 +194,7 @@ class PostingController extends Controller
 			}
 
 		} catch (Exception $e) {
-			Log::error('Error creating data: ' . $e->getMessage());
-			return response()->json(['status' => '409', 'error' => 'Failed to create data.']);
+			return response()->json(['status' => '409', 'error' => 'Failed to create data:' . $e->getMessage()]);
 		}
 	}
 	
@@ -213,27 +212,41 @@ class PostingController extends Controller
 	
 	public function editPost(Request $request, $id) {
 		$post_id = str_replace('edit-modal-', '', $request->id);
-		$queuePosts = CommandModule::find($post_id);
-		
-		// query to get all post with post_type_code
-		$getPosts = CommandModule::where('post_type_code', $queuePosts->post_type_code)->get();
-		
-		// Return the view with the retrieved data
-		$html = view('modals.edit-commandmodule')->render();
-		return response()->json(['status' => 200, 'data' => $getPosts ,'html' => $html]);
+		try {
+			$queuePosts = CommandModule::find($post_id);
+			
+			// query to get all post with post_type_code
+			$getPosts = CommandModule::where('post_type_code', $queuePosts->post_type_code)->get();
+			
+			// Return the view with the retrieved data
+			$html = view('modals.edit-commandmodule')->render();
+			return response()->json(['status' => 200, 'data' => $getPosts ,'html' => $html]);
+		} catch (Exception $e) {
+			return response()->json(['status' => 409, 'stat' => 'danger', 'message' => 'Error updating the post']);
+		}
 	}
 	
-	public function deletePost(Request $request) {
-		$post_id = str_replace('delete-', '', $request->id);
-		$queueDelete = CommandModule::where('id', $post_id)->update(['deleted' => 1]);		
+	public function deletePost($id) {
+		$post_id = str_replace('delete-', '', $id);
+		
+		try {
+			// Find the data record by its ID
+			$queueDelete = CommandModule::findOrFail($post_id);
 
-		// Redirect back to the previous page or any desired location
-		return response()->json(['success' => true, 'data' => $queueDelete]);
+			// Delete the data
+			$queueDelete->delete();
+			
+			// Success response
+			return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Post deleted successfully']);
+		} catch (\Exception $e) {
+			// Error response
+			return response()->json(['status' => 409, 'stat' => 'danger', 'message' => 'Error deleting post']);
+		}
 	}
 	
 	public function sortPostbyType(Request $request) {
-		$sort = null;
-
+		$sort = null;		
+		
 		if ($request->type !== "all" ) {
 			$type = $request->type . '-tweets';
 			$sort = CommandModule::where(['twitter_id' => $request->id, 'post_type' => $type, 'deleted' => 0])->orderBy('sched_time', 'ASC')->get();

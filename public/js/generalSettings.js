@@ -20,17 +20,17 @@ $(document).ready(function() {
 
       console.log(responseData);
 
-      var successDiv = $(`<div class="alert-${responseData.stat}" style="margin-top:0.2em"> ${responseData.message} </div>`);
+      var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
         window.location.href = responseData.redirect;
       } else {
-        $(this).parent().after(successDiv);        
+        $(this).parent().after(div);        
         console.log(1);
       } 
     
       // remove the div after 3 seconds
       setTimeout(function() {
-        successDiv.remove();
+        div.remove();
       }, 3000);
     } catch (error) {
       console.log(error);
@@ -76,18 +76,6 @@ $(document).ready(function() {
       console.log(error)
     }
   });
-  // });
-
-  // get general settings twitter
-  // $.get(APP_URL + '/twitter/accts', function(response) {
-  //   console.log(response);
-  //   if (response.length > 0) {
-  //     $.each(response, function(index, acct) {
-  //       console.log(acct)
-  //       twitterLongCard(acct)
-  //     })
-  //   }
-  // })
 
 
   $('#twitter_api_saving').on("click", async function(e) {
@@ -114,23 +102,17 @@ $(document).ready(function() {
       const responseData = await response.json();
       console.log(responseData);
 
-      if (responseData.status) {
-        var successDiv = $(`<div class="alert-success"> ${responseData.message} </div>`);
-        $(this).after(successDiv);
-
-        // remove the div after 3 seconds
-        setTimeout(function() {
-          successDiv.remove();
-        }, 3000);
+      var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
+      if (responseData.status === 200) {
+        $(this).after(div);
       } else {
-        var successDiv = $(`<div class="alert-error"> ${responseData.message} </div>`);
-        $(this).after(successDiv);
-
-        // remove the div after 3 seconds
-        setTimeout(function() {
-          successDiv.remove();
-        }, 3000);
+        $(this).after(div);
       }
+      
+      // remove the div after 3 seconds
+      setTimeout(function() {
+        div.remove();
+      }, 3000);
     } catch (error) {
       console.log(error);
     }
