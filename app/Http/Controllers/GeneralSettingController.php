@@ -168,7 +168,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '409', 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
         }
 
     }
@@ -185,7 +185,7 @@ class GeneralSettingController extends Controller
                 $api->oauth_id = $request->input('oauth_id');
                 $api->oauth_secret = $request->input('oauth_secret');
                 $api->save();
-                return response()->json(['status' => 200, 'message' => 'Master API Credentials are succesfully updated']);
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are succesfully updated']);
             } else {
                 $api->user_id = Auth::id();
                 $api->api_key = $request->input('api_key');
@@ -194,7 +194,7 @@ class GeneralSettingController extends Controller
                 $api->oauth_id = $request->input('oauth_id');
                 $api->oauth_secret = $request->input('oauth_secret');
                 $api->save();
-                return response()->json(['status' => 200, 'message' => 'Master API Credentials are succesfully saved']);
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are succesfully saved']);
             }
             
         } catch (Exception $e) {

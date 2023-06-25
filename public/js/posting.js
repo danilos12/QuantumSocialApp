@@ -3,31 +3,95 @@ $(document).ready(function() {
 
     async function fetchData() {
         try {
-            const response = await fetch(`${APP_URL}/cmd/${TWITTER_ID}/post-type/${method}`);
+            const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method);
             const responseData = await response.json();     
+            console.log(method)
 
-            if (method === 'queue') {
-                $.each(responseData, (index, k) => {
-                    // var wrapper = '';                
-                    var currentDate = new Date();
-                    var dataDate = new Date(k.sched_time);
-                    
-                    if (dataDate > currentDate) {
-                        if (k.sched_method === "slot_sched") { 
-                            if ( k.post_type === "evergreen-tweets") {
-                                const wrapper = postWrapperReserve(k)
+            switch (method) {
+                case 'queue': 
+                    $.each(responseData, (index, k) => {
+                        // var wrapper = '';                
+                        var currentDate = new Date();
+                        var dataDate = new Date(k.sched_time);
+                        
+                        if (dataDate > currentDate) {
+                            if (k.sched_method === "slot_sched") { 
+                                if ( k.post_type === "evergreen-tweets") {
+                                    const wrapper = postWrapperReserve(k)
+
+                                    $('.queue-day-wrapper').append(wrapper);
+                                }
+                            } 
+                            else {
+                                const postType = getPostType(k.post_type);
+                                const wrapper = postWrapper(k, postType, index);
                                 $('.queue-day-wrapper').append(wrapper);
                             }
                         } 
-                        else {
-                            const postType = getPostType(k.post_type);
-                            const wrapper = postWrapper(k, postType, index);
-                            console.log(k)
-                            $('.queue-day-wrapper').append(wrapper);
-                        }
-                    } 
-                })           
-            }
+                    })           
+                    break
+                case 'evergreen': 
+                    if (responseData.length > 0) {
+                        $.each(responseData, (index, k) => {
+                            console.log(k);
+                            const wrapper = postWrapperEvergreen(k);
+    
+                            $('.profile-posts-inner').append(wrapper)
+                            // var wrapper = '';                
+                            // var currentDate = new Date();
+                            // var dataDate = new Date(k.sched_time);
+                            
+                            // if (dataDate > currentDate) {
+                            //     if (k.sched_method === "slot_sched") { 
+                            //         if ( k.post_type === "evergreen-tweets") {
+                            //             const wrapper = postWrapperReserve(k)
+    
+                            //             $('.queue-day-wrapper').append(wrapper);
+                            //         }
+                            //     } 
+                            //     else {
+                            //         const postType = getPostType(k.post_type);
+                            //         const wrapper = postWrapper(k, postType, index);
+                            //         $('.queue-day-wrapper').append(wrapper);
+                            //     }
+                            // } 
+                        })   
+                    } else {
+                        $('.profile-posts-inner').append("<div> No evergreen posts found.</div>")
+                    }
+                    break
+
+                case 'promo': 
+                if (responseData.length > 0) {
+                    $.each(responseData, (index, k) => {
+                        console.log(k);
+                        const wrapper = postWrapperPromo(k);
+
+                        $('.profile-posts-inner').append(wrapper)
+                        // var wrapper = '';                
+                        // var currentDate = new Date();
+                        // var dataDate = new Date(k.sched_time);
+                        
+                        // if (dataDate > currentDate) {
+                        //     if (k.sched_method === "slot_sched") { 
+                        //         if ( k.post_type === "evergreen-tweets") {
+                        //             const wrapper = postWrapperReserve(k)
+
+                        //             $('.queue-day-wrapper').append(wrapper);
+                        //         }
+                        //     } 
+                        //     else {
+                        //         const postType = getPostType(k.post_type);
+                        //         const wrapper = postWrapper(k, postType, index);
+                        //         $('.queue-day-wrapper').append(wrapper);
+                        //     }
+                        // } 
+                    })   
+                } else {
+                    $('.profile-posts-inner').append("<div> No promo posts found.</div>")
+                }
+                break    
+            }            
         } catch (error) {
         console.log("An error occurred while fetching the data: " + error);
         }
@@ -38,7 +102,6 @@ $(document).ready(function() {
         try {
           const response = await fetch(APP_URL + '/post/getmonth?id=' + TWITTER_ID);
           const responseData = await response.json();
-          console.log(responseData);
 
             $.each(responseData.data, function (i, month) {
             var li = $('<li>');       
@@ -128,7 +191,9 @@ $(document).ready(function() {
                     const response = await fetch(APP_URL + '/post/edit/' + id);
                     const responseData = await response.json();              
                     
-                    console.log(responseData.data[0]['id'])
+                    console.log(responseData.data[0]);
+
+
                     // render the modal
                     $('.modal-large-backdrop').append(responseData.html);
                                         
@@ -143,9 +208,20 @@ $(document).ready(function() {
                     $('.edit-commandmodule-outer').find(`#posting-tool-form-002 textarea`).text(responseData.data[0]['post_description']);
                     $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${responseData.data[0]['post_type']}"]`).addClass('icon-active');
                     $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${responseData.data[0]['sched_method']}"]`).attr('selected', true);
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002 div[data-post="${responseData.data[0]['post_type']}"]`).removeClass('tweets-hide')
                     
                     if (responseData.data.length > 1) {
-                        addTweetTextArea("tweet-storm-tweets", combo);   
+                        addTweetTextArea("tweet-storm-tweets", 'regular-tweets', 'posting-tool-form-002');   
+                    }
+
+                    // crosstweets
+                    if (responseData.data[0]['crosstweets_accts'] === null) {
+                        $('.edit-commandmodule-outer').find('.cross-tweet-profiles-outer').append('<div>No other twitter accounts are cross linked to this post</div>');                    
+                    }
+
+                    // postpanels
+                    if (responseData.data[0]['post_type'] === "retweet-tweets") {
+                        $('.edit-commandmodule-outer').find('.retweet-link-input').val(responseData.data[0].tweetlink);                    
                     }
                     
                     openModal("edit-commandmodule-" + responseData.data[0]['id']);
@@ -155,8 +231,9 @@ $(document).ready(function() {
                 break;
             
             case "delete":
+                console.log(rmId);
                 try {
-                    const response = await fetch(APP_URL + '/post/delete', {
+                    const response = await fetch(APP_URL + '/post/delete/' + id , {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -165,13 +242,21 @@ $(document).ready(function() {
                         body: JSON.stringify({ id: id }),
                     });
                     
-                    const data = await response.json();
-                    console.log(data);
+                    const responseData = await response.json();
+                    var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
                     
-                    if (data.status) {
-                        alert('Record deleted successfully!');
+                    if (responseData.status === 200) {
+                        alert(responseData.message);
                         location.reload();
-                    }
+                    } else {
+                        $('.queued-posts-outer').before(div);        
+                        console.log(1);
+                    } 
+                    
+                    // remove the div after 3 seconds
+                    setTimeout(function() {
+                        div.remove();
+                    }, 3000);
                 } catch (error) {
                     console.log("Failed to delete data");
                 }
@@ -206,9 +291,11 @@ $(document).ready(function() {
         }
     });
     
+    // switch
     $('#post-status').on('click', async function(e) {
+        console.log(e);
         var isChecked = $(this).is(':checked');
-        var url = APP_URL + '/post/' + ((isChecked) ? 'active' : 'inactive') + '/' + TWITTER_ID;
+        var url = APP_URL + '/post/status/' + ((isChecked) ? 'active' : 'inactive') + '/' + TWITTER_ID;
 
         try {                        
             const response = await fetch(url,  {
@@ -347,7 +434,7 @@ $(document).ready(function() {
         const fullDate = month + " " + day + ", " + year;
 
         // var data = fetchTwitterDetails(info.twitter_id);        
-        return $wrapper = `                          
+        return $template = `                          
                 <!-- BEGIN Custom Queued Post Instance (CUSTOM) --> 
                 <div class="queued-single-post-wrapper queue-type-${post_type}" status="active" queue-type="${post_type}">
                     <div class="queued-single-post"> 
@@ -470,7 +557,7 @@ $(document).ready(function() {
         const fullDate = month + " " + day + ", " + year;
 
         var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
-        var $template  = `
+        return $template  = `
         <div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
             <div class="queued-single-post">
 
@@ -491,12 +578,18 @@ $(document).ready(function() {
         </div>
         `;
 
-        return $template;
     }
 
     function postWrapperEvergreen(info, index) {
-        console.log(index, info);
-        var $template = `
+        const dateTimeString = info.sched_time;
+        const dateTime = new Date(dateTimeString);
+        const month = dateTime.toLocaleString('default', { month: 'short' });
+        const day = dateTime.getDate();
+        const year = dateTime.getFullYear();
+        const timeString = dateTime.toLocaleTimeString();
+        const fullDate = month + " " + day + ", " + year;
+        
+        return $template = `
         <div class="mosaic-posts-outer evergreen-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
           <div class="mosaic-watermark-wrap frosted">
             <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="mosaic-watermark evergreen-watermark" />
@@ -580,8 +673,63 @@ $(document).ready(function() {
           </div>  <!-- END .mosaic-watermark-wrap -->
         </div>  <!-- END .mosaic-posts-outer -->
         `;
+    }
+    
+    function postWrapperPromo(info, index) {
+        const dateTimeString = info.sched_time;
+        const dateTime = new Date(dateTimeString);
+        const month = dateTime.toLocaleString('default', { month: 'short' });
+        const day = dateTime.getDate();
+        const year = dateTime.getFullYear();
+        const timeString = dateTime.toLocaleTimeString();
+        const fullDate = month + " " + day + ", " + year;
+        
+        return $template = `
+        <div class="mosaic-posts-outer promo-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
+            <div class="mosaic-watermark-wrap frosted">
+                <img src="${APP_URL}/public/ui-images/icons/17-promos.svg" class="mosaic-watermark promo-watermark" />
+                <div class="mosaic-posts-inner">
 
-        return $template;
+                <div class="mosaic-post-controls">
+                    <span class="mosaic-control-icon">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-add.svg"
+                    class="ui-icon"/></span>                                   
+
+                    <span class="mosaic-control-icon">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
+                </div>  <!-- END .mosaic-post-controls -->
+
+                <div class="global-twitter-profile-header">
+                    <a href="#">
+                    <img src="${APP_URL}/public/temp-images/imgpsh_fullsize_anim (1).png"
+                        class="global-profile-image" /></a>
+                    <div class="global-profile-details">
+                    <div class="global-profile-name">
+                        <a href="#">
+                        ${TWITTER_NAME}</a>
+                    </div>  <!-- END .global-author-name -->
+                    <div class="global-profile-subdata">
+                        <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
+                        <span class="global-post-date">
+                        <a href="">
+                            ${ fullDate + " " + timeString }</a></span>
+                    </div>  <!-- END .global-post-date-wrap -->
+                    </div>  <!-- END .global-author-details -->
+                </div>  <!-- END .global-post-author -->
+
+                <div class="mosaic-post-data">
+                    <div class="mosaic-post-text">
+                    ${info.post_description}
+                    </div>  <!-- END .mosaic-post-text -->
+                    <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
+                    class="mosaic-post-image" />
+                </div>  <!-- END .mosaic-post-data -->
+
+                </div>  <!-- END .mosaic-posts-inner -->
+            </div>  <!-- END .mosaic-watermark-wrap -->
+            </div>  <!-- END .mosaic-posts-outer -->
+            <!-- END Single Post Instance -->
+        `;
     }
 
 })

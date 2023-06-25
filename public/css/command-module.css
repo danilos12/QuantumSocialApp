@@ -110,3 +110,9 @@ select option {
     width: 5em;
     height: 5em;
 }
+
+#scheduling-options option:disabled {
+    pointer-events: none;
+    cursor: default;
+    color: #999999; /* Optional: Change the color of disabled options */
+}
