@@ -581,7 +581,6 @@ $('[data-id="modal"]').click(function(event) {
 })
 
 $('.modal-large-close').click(function(event) {
-  // console.log(event);
   $target = event.target.id;  
   closeModal($target)
 })
@@ -594,7 +593,6 @@ $(document).ready(function() {
   
   $('img.twitter-bar-settings-icon').on('click', function(event) {
     $target = event.target.id;  
-    // console.log($target)
     openTwitterModal($target);
   });
 
@@ -672,6 +670,7 @@ window.onclick = function(event) {
 
 window.onkeyup = function(event) {
   if (event.key === 'Escape') {
+    console.log(currentModal);
     closeModal(currentModal);
   }
 }

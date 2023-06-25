@@ -92,7 +92,8 @@ $(function($) {
     const $postPanels = $("div[data-post]");
     const $postIcon = $("img[data-type]");
     let $lastButtonClicked = null;
-    $(".post-type-buttons img").on("click", function() {
+    $(".post-type-buttons img").on("click", function(e) {
+        console.log(e.currentTarget)
         var type = $(this).data("type");
 
         $('#post_type_tweets').val(type);
@@ -135,7 +136,7 @@ $(function($) {
                     $postPanels.filter(`div[data-post=${type}]`).removeClass('tweets-hide')
 
                     if (type === "comments-tweets") {
-                        console.log(12)
+                       
                         // originalState();
                         $postIcon.filter("img.post-tool-icon").removeClass("icon-active"); // d
                         $(this).data('select', 1).addClass('icon-active')
@@ -220,7 +221,7 @@ $(function($) {
                 confirmation("tweet-storm-tweets");
             } else {
                 var combod = $("img[data-type!='tweet-storm-tweets'].icon-active").attr("data-type")
-                addTweetTextArea(type, ($("img[data-type!='tweet-storm-tweets'].icon-active").length > 0) ? combod : "")
+                addTweetTextArea(type, ($("img[data-type!='tweet-storm-tweets'].icon-active").length > 0) ? combod : "", 'posting-tool-form-001')
             }
         }
 
@@ -357,7 +358,9 @@ $(function($) {
     }
 
     /** add new text area instance */
-    $(".posting-tool-col").on("click", ".add-tweet-initial", function() {
+    $(".posting-tool-col").on("click", ".add-tweet-initial", function(event) {
+        parentForm = $(this).parent().parent().parent().attr('id');
+        $('input[id="post_type_tweets"]').val('tweet-storm-tweets')
 
         var type = null;
         var combo = null;
@@ -369,7 +372,7 @@ $(function($) {
             type = "tweet-storm-tweets";
         }
 
-        addTweetTextArea(type, combo);
+        addTweetTextArea(type, combo, parentForm);
         $postIcon.filter('img[data-type="tweet-storm-tweets"]').addClass('icon-active');
         $postPanels.filter('div[data-post="tweet-storm-tweets"]').removeClass('tweets-hide');
     });
@@ -527,7 +530,25 @@ $(function($) {
     /** check if buttons don't have class */
     var element = $(".post-type-buttons img");
     element.on('click', function(e) {      
-        console.log(e)
+        if ($(e.currentTarget).hasClass('icon-active')) {
+        // The current target has the class 'icon-active'
+        console.log('Current target has the class "icon-active"', e.currentTarget.dataset.type);        
+            if (e.currentTarget.dataset.type === "evergreen-tweets" || e.currentTarget.dataset.type === "promos-tweets") {
+                $('#scheduling-options option[value="send-now"]').prop('disabled', true);
+                $('#scheduling-options option[value="set-countdown"]').prop('disabled', true);
+                $('#scheduling-options option[value="custom-time"]').prop('disabled', true);
+                $('#scheduling-options option[value="custom-slot"]').prop('disabled', true);                
+            } else {
+                $('#scheduling-options option').removeAttr('disabled');
+                $('#scheduling-options option[id="mainselect"]').prop('disable', true)
+            }
+        } else {
+            $('#scheduling-options option').removeAttr('disabled');
+            $('#scheduling-options option[id="mainselect"]').prop('disable', true)
+        // The current target does not have the class 'icon-active'
+            console.log('Current target does not have the class "icon-active"');
+        }
+        
         var cSlot = $('#scheduling-options option:selected').val(); 
 
         if (cSlot === "custom-slot") {
@@ -781,10 +802,10 @@ function disableWatermark(src, combo = null) {
 /** add new etxtInstance and update existing */
 var itemsPerPage = 10;
 var $items = 1;       
-function addTweetTextArea(entryPoint, combo) {                      
-    console.log(entryPoint)
+function addTweetTextArea(entryPoint, combo, action) {                      
+    console.log(action)
     var newTextbox = tweetInstance($items + 1);
-    newTextbox = $(newTextbox);
+    // newTextbox = $(newTextbox);
 
     // Increment the ID and name attributes of the input element
     // var newId = "textbox-" + $items;
@@ -794,19 +815,19 @@ function addTweetTextArea(entryPoint, combo) {
     //     .attr("name", newId);
 
     // Append the new textbox to the container
-    $(".more-tweets-roster").append(newTextbox);
+    $('#' + action).find('.more-tweets-roster').append(newTextbox);
 
     // Increment the number of items and pages
     $items++;
     numPages = Math.ceil($items / itemsPerPage);
 
-    disableWatermark(entryPoint, combo);
+    disableWatermark(entryPoint, combo, action);
 
     // Update page info
-    updateItemInfo();
+    updateItemInfo(action);
 }
 
-function updateItemInfo() {
+function updateItemInfo(action) {
     // Update current page based on current item count and items per page
     var currentPage = Math.ceil(
         $(".add-tweet-outer").length / itemsPerPage
@@ -816,10 +837,10 @@ function updateItemInfo() {
     var endIndex = Math.min(currentPage * itemsPerPage, totalItems);
     // console.log(currentPage, totalItems, startIndex, endIndex);
 
-    $(".add-tweet-outer").each(function(index) {
+    $("#" + action +  " .add-tweet-outer").each(function(index) {
         // get the textbox element
         var textbox = $(this);
-        console.log(textbox, index);
+        // console.log(textbox, index);
 
         // update the page info for this textbox
         var newId = "textbox-" + (index + 1);
@@ -836,7 +857,7 @@ function updateItemInfo() {
 
 /** new tweet instance template */ 
 function tweetInstance(items) {
-    console.log(items)
+    // console.log(items)
     var times = ["seconds", "mins", "hours", "days"];
     var option = "";
     for (var i = 0; i < 59; i++) {
@@ -884,7 +905,7 @@ function tweetInstance(items) {
                     </div>  <!-- END .post-area-right -->
                 </div>  <!-- END .new-post-wrap -->
             </div>  <!-- END .add-tweet-inner -->
-            <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon add-tweet-icon add-tweet-again-button" />
+            <img src="${APP_URL}/public/ui-images/icons/add-post.svg" class="ui-icon add-tweet-icon add-tweet-again-button" />
         </div> 
             `;
 

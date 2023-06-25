@@ -43,7 +43,7 @@ class CommandmoduleController extends Controller
         return view('commandmodule')->with('title', $title);
     }
 
-    public function create(Request $request) {        
+    public function create(Request $request) {               
         try {                      
             $postData = $request->all();
             $user_id = Auth::id();
@@ -68,7 +68,7 @@ class CommandmoduleController extends Controller
                 'rt_time' => $postData['num-custom-cm'] ?? null,
                 'rt_frame' => $postData['time-custom-cm'] ?? null,
                 'rt_ite' => $postData['iterations-custom-cm'] ?? null,
-                'promo_id' => $postData['retweet'] ?? null,                 
+                'promo_id' => $postData['promo-tweets-cmp'] ?? null,                 
                 'post_type_code' => rand(10000, 99999),
                 'active' => $checkToggle->queue_switch
             ];
@@ -415,7 +415,6 @@ class CommandmoduleController extends Controller
                         ->orderBy('sched_method', 'DESC')
                         ->get();
 
-                        // dd($tweets);
                         break;    
 
                 case 'promo': 
@@ -428,12 +427,11 @@ class CommandmoduleController extends Controller
                         })
                         ->where('twitter_id', $id)
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                        ->where('post_type', '=','promo-tweets')
+                        ->where('post_type', '=','promos-tweets')
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->get();
 
-                        // dd($tweets);
                         break;    
 
                 case 'tweet-storms': 
@@ -452,7 +450,13 @@ class CommandmoduleController extends Controller
                     ->get();
                     break;    
             }       
+
             return response()->json($tweets);
+            // if ($tweets) {
+            //     return response()->json(['status' => 200, 'message' => 'No tweets found', 'data' => $tweets]);
+            // } else {
+            //     return response()->json(['status' => 200, 'message' => 'No tweets found']);
+            // }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
@@ -632,34 +636,6 @@ class CommandmoduleController extends Controller
             return curl_error($curl);
         }
     }    
-
-    private function generateRecurringDates($schedule)
-    {
-        $recurringDates = [];
-
-        // Get the current month and year
-        $currentMonth = Carbon::now()->format('F');
-        $currentYear = Carbon::now()->year;
-        $scheduleTime = $schedule->hour . ":" . $schedule->minute_at . " " . $schedule->ampm;
-        
-        // Get the schedule day and time
-        $dayOfWeek = strtolower($schedule->slot_day); // Assuming 'day' field stores the day of the week in lowercase
-        $timeCarbon = Carbon::parse($scheduleTime);
-        // $time = Carbon::parse($schedule->hour); // Assuming 'time' field stores the time in a format parsable by Carbon
-
-        // Calculate the start date for the recurring dates
-        $startDate = Carbon::parse("first {$dayOfWeek} of {$currentMonth} {$currentYear} {$timeCarbon}");
-        dd($startDate);
-
-        // Generate the recurring dates for the month
-        while ($startDate->month == Carbon::now()->month) {
-            $recurringDates[] = $startDate->toDateString();
-            $startDate->addWeek();
-        }
-
-
-        return $recurringDates;
-    }
 
 }
 
