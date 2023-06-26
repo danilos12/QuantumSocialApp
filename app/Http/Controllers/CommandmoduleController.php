@@ -145,7 +145,8 @@ class CommandmoduleController extends Controller
             }     
 
             // Save data for main account
-            $responses = array();
+            // $responses = array();
+            $responses = [];
             foreach ($postData['textarea'] as $textarea) {
                 $insertData['post_description'] = $textarea;
                 $insertData['sched_method'] = $sched_method;
@@ -187,17 +188,19 @@ class CommandmoduleController extends Controller
                     }
                 }
             }
-            
+
+            // Retrieve the last saved data
+            $lastSavedData = CommandModule::latest()->first();
                                              
             // Return success response
-            return response()->json(['status' => '201', 'message' => 'Data has been created.', 'tweet' => $responses]);
+            return response()->json(['status' => 200, 'message' => 'Data has been created.', 'tweet' => $lastSavedData]);
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 409, 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -326,7 +329,8 @@ class CommandmoduleController extends Controller
  
     public function getTweetsUsingPostTypes($id, $post_type) {
         try {
-            $tweets = null;    
+            $tweets = null;   
+            $checkToggle = TwitterToken::where('twitter_id', $id)->first();           
             
             switch ($post_type) {
                 case 'posted': 
@@ -342,9 +346,7 @@ class CommandmoduleController extends Controller
                     $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type])->get();
                     break;
                     
-                case 'queue':                   
-                    $checkToggle = TwitterToken::where('twitter_id', $id)->where('active', 1)->first();                    
-                    
+                case 'queue':                                                             
 
                     $posts = DB::table('cmd_module')                                         
                             ->select('*')
@@ -354,9 +356,9 @@ class CommandmoduleController extends Controller
                                 ->groupBy('post_type_code');
                             })
                             ->where('twitter_id', $id)
-                            ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                            ->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
                             ->where('cmd_module.post_type', '!=','evergreen-tweets')
-                            // ->where('cmd_module.post_type', '!=','promo-tweets')
+                            ->where('cmd_module.post_type', '!=','promos-tweets')
                             // ->where('cmd_module.post_type', '!=','tweet-storm-tweets')
                             ->where('active', $checkToggle->queue_switch)
                             ->orderBy('sched_time', 'ASC')
@@ -391,13 +393,19 @@ class CommandmoduleController extends Controller
                         }                        
                     }
 
-                    $objects = collect($recurringDates)->map(function ($item) {
+                    $object = collect($recurringDates)->map(function ($item) {
                         return (object) $item;
                     });
-                   
+
+                    $objects = $object->sortBy('sched_time');
+
+                    $objects->transform(function ($item) {
+                        $item->sched_time = (string) $item->sched_time; // Convert specific property to string
+                        return $item;
+                    });
+
                     $mergedData = $objects->merge($posts);
                     $tweets = $mergedData->sortBy('sched_time')->toArray();                
-
                     break;
 
                 case 'evergreen': 
@@ -411,10 +419,10 @@ class CommandmoduleController extends Controller
                         ->where('twitter_id', $id)
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','evergreen-tweets')
+                        ->where('active', $checkToggle->queue_switch)
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->get();
-
                         break;    
 
                 case 'promo': 
@@ -428,6 +436,7 @@ class CommandmoduleController extends Controller
                         ->where('twitter_id', $id)
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','promos-tweets')
+                        ->where('active', $checkToggle->queue_switch)
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->get();
