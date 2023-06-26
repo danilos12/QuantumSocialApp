@@ -11,7 +11,7 @@
                         Promo Tweets</span>
                       <div class="toggle-wrapper">
                         <label class="toggleSwitch large" onclick="">
-                          <input type="checkbox" checked />
+                          <input type="checkbox" id="post-status" {{ $toggle > 0 ? 'checked' : '' }} />
                           <span>
                               <span>INACTIVE</span>
                               <span>ACTIVE</span>

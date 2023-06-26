@@ -258,24 +258,94 @@ class PostingController extends Controller
 		return response()->json(['success' => true, 'data' => $sort]);
 	}	
 
-	public function switchFromQueue($switch, $id) {		
+	public function switchFromQueue(Request $request, $switch, $id) {		
 		try {
 			$k = ($switch === 'active') ? 1 : 0;
 			
 			//update first the switch
 			TwitterToken::where('twitter_id', $id)->where('active', 1)->update(['queue_switch' => $k]);
-			
-			$sort = DB::table('cmd_module')
-				// ->join('twitter_meta', 'cmd_module.twitter_id', '=', 'twitter_meta.twitter_id')
-				// ->join('ut_acct_mngt', 'qts_tweetmeta.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-				->select('*')
-				->where('twitter_id', $id)
-				->where('post_type', '!=', 'evergreen-tweets')
-				->where('post_type', '!=', 'promos-tweets')
-				->where('post_type', '!=', 'tweet-storm-tweets')
-				->where('active', '=', ($switch === 'active') ? 1: 0)
-				->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-				->get();
+						
+			$sort = '';
+			switch ($request->method) {
+				case "queue" : 
+					$posts = DB::table('cmd_module')                                         
+					->select('*')
+					->whereIn('id', function ($query) {
+						$query->select(DB::raw('MIN(id)'))
+						->from('cmd_module')
+						->groupBy('post_type_code');
+					})
+					->where('twitter_id', $id)
+					->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
+					->where('cmd_module.post_type', '!=','evergreen-tweets')
+					->where('cmd_module.post_type', '!=','promos-tweets')
+					->where('active', $k)
+					->orderBy('sched_time', 'ASC')
+					->orderBy('sched_method', 'DESC')
+					->get();          
+
+					$schedules = Schedule::all();                                  
+
+					$recurringDates = [];
+					$currentMonth = now()->month;
+					$currentYear = now()->year;
+
+					foreach ($schedules as $schedule) {
+						$dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
+						$time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
+						
+						$startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth();
+						$endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+						$currentDate = $startDate->copy();
+						
+						while ($currentDate->lte($endDate)) {
+							if ($currentDate->dayOfWeek === $dayOfWeek) {
+								$recurringDates[] = [
+									'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
+									'post_type' => $schedule->post_type,
+									'sched_method' => 'slot_sched' 
+								];
+							}
+							
+							$currentDate->addDay();
+						}                        
+					}
+
+					$object = collect($recurringDates)->map(function ($item) {
+						return (object) $item;
+					});
+
+					$objects = $object->sortBy('sched_time');
+
+					$objects->transform(function ($item) {
+						$item->sched_time = (string) $item->sched_time; // Convert specific property to string
+						return $item;
+					});
+
+					$mergedData = $objects->merge($posts);
+					$sort = $mergedData->sortBy('sched_time')->toArray();      
+					break;
+				case 'evergreen' : 
+					$sort = DB::table('cmd_module')						
+						->select('*')
+						->where('twitter_id', $id)
+						->where('post_type', '=', 'evergreen-tweets')
+						->where('active', '=', ($switch === 'active') ? 1: 0)
+						->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+						->get();
+
+						break;
+				case 'promo':
+					$sort = DB::table('cmd_module')						
+						->select('*')
+						->where('twitter_id', $id)
+						->where('post_type', '=', 'promos-tweets')
+						->where('active', '=', ($switch === 'active') ? 1: 0)
+						->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+						->get();
+
+					break;
+			}			
 
 			return response()->json(['status' => 200, 'data' => $sort]);
 		} catch (Exception $e) {
