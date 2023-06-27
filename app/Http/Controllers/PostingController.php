@@ -367,7 +367,7 @@ class PostingController extends Controller
 
 	}
 
-	public function retrieveSpecialPost(Request $request, $post_type, $id) {
+	public function retrieveSpecialPost($id) {
 
         try {
 			$findPostwithPostType = CommandModule::findOrFail($id);			
