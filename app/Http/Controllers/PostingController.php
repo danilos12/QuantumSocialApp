@@ -366,6 +366,18 @@ class PostingController extends Controller
 		}
 
 	}
+
+	public function retrieveSpecialPost(Request $request, $post_type, $id) {
+
+        try {
+			$findPostwithPostType = CommandModule::findOrFail($id);			
+
+			return response()->json(['status' => 200, 'data' => $findPostwithPostType]);
+        } catch (Exception $e) {
+
+        }
+
+    }
 	
 	public function sortPostbyMonth(Request $request) {		
 		$convertDate = str_replace('-', ' ', $request->month);

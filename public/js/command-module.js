@@ -712,8 +712,11 @@ $(function($) {
 
                 console.log(response);
 
-                var wrapper = postWrapper(1, response.tweet, response.tweet.post_type_tweets);
-                $('.queue-day-wrapper').append(wrapper);
+                var wrapper = postWrapper(1, response.tweet, response.tweet.post_type);
+                // console.log(response.tweet.post_type)
+                if (response.tweet.post_type === 'regular-tweets') {
+                    $('.queue-day-wrapper').append(wrapper);
+                } 
     
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -935,7 +938,7 @@ function postWrapper(index, info, post_type) {
             <div class="queued-single-post-wrapper queue-type-${post_type}" status="active" queue-type="${post_type}">
                 <div class="queued-single-post"> 
   
-                <img src="${APP_URL}/public/ui-images/icon2/pg-${post_type}.svg" class="queued-watermark" />
+                <img src="${APP_URL}/public/ui-images/icon2/pg-${ post_type === 'regular-tweets' ? 'custom' : post_type }.svg" class="queued-watermark" />
   
                 <div class="queued-single-start">
                     <span class="queued-post-time">
