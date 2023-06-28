@@ -376,8 +376,10 @@ class CommandmoduleController extends Controller
                         $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
                         $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
                         
-                        $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth();
-                        $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+                        // $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth()->subMonths(2);
+                        // $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+                        $startDate = Carbon::now()->startOfMonth();
+                        $endDate = Carbon::now()->addMonths(2)->endOfMonth();
                         $currentDate = $startDate->copy();
                         
                         while ($currentDate->lte($endDate)) {
@@ -420,8 +422,10 @@ class CommandmoduleController extends Controller
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','evergreen-tweets')
                         ->where('active', $checkToggle->queue_switch)
+                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
+                        ->orderBy('updated_at', 'ASC')
                         ->get();
                         break;    
 
@@ -437,8 +441,10 @@ class CommandmoduleController extends Controller
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','promos-tweets')
                         ->where('active', $checkToggle->queue_switch)
+                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
+                        ->orderBy('updated_at', 'ASC')
                         ->get();
 
                         break;    
