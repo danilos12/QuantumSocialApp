@@ -11,6 +11,7 @@ $(document).ready(function() {
                 case 'queue': 
                     $.each(responseData, (index, k) => {
                         // var wrapper = '';                
+                        console.log(k)
                         var currentDate = new Date();
                         var dataDate = new Date(k.sched_time);
                         
