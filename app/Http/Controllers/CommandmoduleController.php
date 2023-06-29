@@ -329,7 +329,7 @@ class CommandmoduleController extends Controller
  
     public function getTweetsUsingPostTypes($id, $post_type) {
         try {
-            $tweets = null;   
+            $tweets = '';   
             $checkToggle = TwitterToken::where('twitter_id', $id)->first();           
             
             switch ($post_type) {
@@ -407,7 +407,8 @@ class CommandmoduleController extends Controller
                     });
 
                     $mergedData = $objects->merge($posts);
-                    $tweets = $mergedData->sortBy('sched_time')->toArray();                
+                    $tweets = $mergedData->sortBy('sched_time')->values()->toArray();                
+
                     break;
 
                 case 'evergreen': 
@@ -465,7 +466,7 @@ class CommandmoduleController extends Controller
                     ->get();
                     break;    
             }       
-
+            // dd($tweets);
             return response()->json($tweets);
             // if ($tweets) {
             //     return response()->json(['status' => 200, 'message' => 'No tweets found', 'data' => $tweets]);
