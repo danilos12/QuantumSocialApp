@@ -367,7 +367,7 @@ class CommandmoduleController extends Controller
                             ->get();               
 
                             
-                    $schedules = Schedule::where('user_id', Auth::id());                                  
+                    $schedules = Schedule::where('user_id', Auth::id())->get();     
 
                     $recurringDates = [];
                     $r = [];
