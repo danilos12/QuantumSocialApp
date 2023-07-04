@@ -29,7 +29,7 @@
         </div>  <!-- END .global-twitter-profile-header -->
       </div>  <!-- END .posting-tool-banner -->
 
-      <form id="posting-tool-form-002" class="posting-tool-form" enctype="multipart/form-data" method="post">
+      <form id="posting-tool-form-002" class="posting-tool-form" enctype="multipart/form-data">
         <div class="posting-tool-columns">
           <div class="posting-tool-col posting-tool-left-col">
 
@@ -261,7 +261,7 @@
           </div>  <!-- END .post-tool-submit-left -->
           <input type="hidden" id="mode" name="mode" value="">
           <input type="hidden" id="item-id" name="id" value="">
-          <input type="submit" class="posting-tool-submit" value="Beam me up Scotty" id="beam-btn"{{ $twitter_id === 0 ? 'disabled' : "" }} />
+          <input type="submit" class="posting-tool-submit" value="Beam me up Scotty" {{ $twitter_id === 0 ? 'disabled' : "" }} />
         </div>  <!-- END .posting-tool-submit-wrap -->
       </form>  <!-- END .posting-tool-form -->
 
