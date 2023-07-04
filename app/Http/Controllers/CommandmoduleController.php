@@ -366,9 +366,8 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
 
-                            // dd($posts);
-
-                    $schedules = Schedule::all();                                  
+                            
+                    $schedules = Schedule::where('user_id', Auth::id());                                  
 
                     $recurringDates = [];
                     $r = [];
