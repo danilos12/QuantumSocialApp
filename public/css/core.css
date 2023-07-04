@@ -907,7 +907,7 @@ canvas {
   display: flex;
   flex-direction: column;
   position: relative;
-  max-height: calc("100vh - 85px") !important;
+  max-height: calc(100vh - 85px) !important;
   /*min-height: 85vh;  Consider removing this...*/
   padding: 0 1.5em 0 0;
 }
@@ -1751,6 +1751,7 @@ img.mosaic-watermark.evergreen-watermark {
 .queued-post-time {
   font-weight: 600;
   margin-right: 7.5em;
+  width: 15em;
 }
 
 .queued-post-data {}
@@ -4184,10 +4185,15 @@ input#file-upload-button {
 }
 
 
-.slot-promos-tweets {
+.slot-tweetstorm-tweets {
   /* background: #FAFF9D */
   background: rgb(250, 255, 157, .4)
 
+}
+
+.slot-promos-tweets {
+  /* background: #FAFF9D */
+  background: rgba(244, 0, 196, .4)
 }
 
 /* Reset Page */
@@ -4216,4 +4222,21 @@ input#file-upload-button {
   background: var(--frost-heavy);
   background: var(--color-nova-75);
 
+}
+
+
+/* Hide the scrollbar track */
+::-webkit-scrollbar {
+  width: 0.5em;
+  background-color: transparent;
+}
+
+/* Hide the scrollbar thumb */
+::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+
+/* Hide the scrollbar on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: transparent;
 }

@@ -360,7 +360,7 @@ class CommandmoduleController extends Controller
                             ->where('cmd_module.post_type', '!=','evergreen-tweets')
                             ->where('cmd_module.post_type', '!=','promos-tweets')
                             // ->where('cmd_module.post_type', '!=','tweet-storm-tweets')
-                            ->where('active', $checkToggle->queue_switch)
+                            // ->where('active', $checkToggle->queue_switch)
                             ->orderBy('sched_time', 'ASC')
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
@@ -407,7 +407,16 @@ class CommandmoduleController extends Controller
                     });
 
                     $mergedData = $objects->merge($posts);
-                    $tweets = $mergedData->sortBy('sched_time')->values()->toArray();                
+
+                    $currentDateTime = Carbon::now();
+                    $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
+                        $tweetDateTime = Carbon::parse($tweet->sched_time);
+                        return $tweetDateTime->greaterThan($currentDateTime);
+                    });
+
+                    // dd($tweetSorted);
+
+                    $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();               
 
                     break;
 
@@ -422,7 +431,7 @@ class CommandmoduleController extends Controller
                         ->where('twitter_id', $id)
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','evergreen-tweets')
-                        ->where('active', $checkToggle->queue_switch)
+                        // ->where('active', $checkToggle->queue_switch)
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -441,7 +450,7 @@ class CommandmoduleController extends Controller
                         ->where('twitter_id', $id)
                         ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','promos-tweets')
-                        ->where('active', $checkToggle->queue_switch)
+                        // ->where('active', $checkToggle->queue_switch)
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')

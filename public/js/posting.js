@@ -1,36 +1,29 @@
 $(document).ready(function() {    
     var method = $(".page-inner").attr("data-sched-method");
+      
+    
+    var data = []; // Initialize an empty array to store all the posts
+    var currentPage = 1; // Start with the first page
+    var postsPerPage = 40; // Number of posts to retrieve per scroll event
+    var initialDataLoaded = false; // Flag to track if the initial data has been loaded
 
     async function fetchData() {
         try {
             const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method);
             const responseData = await response.json();     
-            console.log(method)
 
             switch (method) {
-                case 'queue': 
-                    $.each(responseData, (index, k) => {
-                        // var wrapper = '';                
-                        console.log(k)
-                        var currentDate = new Date();
-                        var dataDate = new Date(k.sched_time);
-                        
-                        if (dataDate > currentDate) {
-                            if (k.sched_method === "slot_sched") { 
-                                console.log(k.post_type)
-                                if ( k.post_type === "evergreen-tweets" || k.post_type === "promos-tweets" ) {
-                                    const wrapper = postWrapperReserve(k)
+                case 'queue':                             
+                    // Assuming the response data is an array of posts
+                    data = responseData; // Add the new posts to the existing array
 
-                                    $('.queue-day-wrapper').append(wrapper);
-                                }
-                            } 
-                            else {
-                                const postType = getPostType(k.post_type);
-                                const wrapper = postWrapper(k, postType, index);
-                                $('.queue-day-wrapper').append(wrapper);
-                            }
-                        } 
-                    })           
+                    // Check if the initial data has been loaded
+                    if (!initialDataLoaded) {
+                        // Call the function to append the initial set of posts
+                        appendPosts(0, postsPerPage);
+                        initialDataLoaded = true; // Set the flag to indicate initial data is loaded
+                    }
+
                     break
                 case 'evergreen': 
                     if (responseData.length > 0) {
@@ -60,7 +53,59 @@ $(document).ready(function() {
         console.log("An error occurred while fetching the data: " + error);
         }
     }      
-    fetchData();
+    fetchData(currentPage);
+    
+
+    // Function to append new posts to the container
+    function appendPosts(startIndex, endIndex) {
+        for (var i = startIndex; i < endIndex; i++) {
+        if (i < data.length) {
+            var k = data[i];
+            var currentDate = new Date();
+            var dataDate = new Date(k.sched_time);
+            // Create the post element and append it to the container
+            // ...
+            if (dataDate > currentDate) {
+
+                if (k.sched_method === 'slot_sched') {
+                    if (k.post_type === 'evergreen-tweets' || k.post_type === 'promos-tweets') {
+                        const wrapper = postWrapperReserve(k);
+                        $('.queue-day-wrapper').append(wrapper);
+                    }
+                } else {
+                    const postType = getPostType(k.post_type);
+                    const wrapper = postWrapper(k, postType, i);
+                    $('.queue-day-wrapper').append(wrapper);
+                }
+            }
+        }
+        }
+    }
+
+    
+
+    // Attach scroll event listener to the window
+    $('.lower-area-inner').scroll(function() {
+        // Check if the user has reached the bottom of the page
+        if ($(window).scrollTop() + $(window).height() >= $(document).height()) {
+            // Increment the current page variable
+            currentPage++;
+
+            // Calculate the start and end index of the next set of posts to retrieve
+            var startIndex = (currentPage - 1) * postsPerPage;
+            var endIndex = currentPage * postsPerPage;
+
+            // Call the function to append the next set of posts
+            appendPosts(startIndex, endIndex);
+
+            // If there are no more posts to retrieve, you can remove the scroll event listener
+            // to prevent unnecessary AJAX requests
+            if (endIndex >= data.length) {
+                $(window).off('scroll');
+            }
+        }
+    });
+      
 
     async function fetchDataByMonth() {
         try {
@@ -155,7 +200,7 @@ $(document).ready(function() {
                     const response = await fetch(APP_URL + '/post/edit/' + id);
                     const responseData = await response.json();              
                     
-                    console.log(responseData.data[0]);
+                    console.log(responseData.data[0]['id']);
 
 
                     // render the modal
@@ -173,7 +218,8 @@ $(document).ready(function() {
                     $('.edit-commandmodule-outer').find(`#posting-tool-form-002 span>img.ui-icon[data-type="${responseData.data[0]['post_type']}"]`).addClass('icon-active');
                     $('.edit-commandmodule-outer').find(`#posting-tool-form-002 select#scheduling-options option[value="${responseData.data[0]['sched_method']}"]`).attr('selected', true);
                     $('.edit-commandmodule-outer').find(`#posting-tool-form-002 div[data-post="${responseData.data[0]['post_type']}"]`).removeClass('tweets-hide')
-                    
+                    $('.edit-commandmodule-outer').find(`#posting-tool-form-002`).attr('data-id', responseData.data[0]['id'])
+
                     if (responseData.data.length > 1) {
                         addTweetTextArea("tweet-storm-tweets", 'regular-tweets', 'posting-tool-form-002');   
                     }
@@ -254,7 +300,46 @@ $(document).ready(function() {
                 break;
         }
     });
-    
+
+    var initialFormData = {};
+    $(document).on('submit', '#posting-tool-form-002', async function(e) {
+        e.preventDefault();
+        const form = $(this);
+        console.log(form.find('.post-textarea'));
+        var id = e.currentTarget.dataset.id;
+        const $form = $(form).serializeArray();
+
+        var textArea = [];
+        $('#posting-tool-form-002').find(".post-textarea").each(function() {
+            textArea.push(this.value)
+        });
+
+        var formData = {};
+        $.each($form, function(index, field){
+            formData[field.name] = field.value;         
+        });
+
+        formData['textarea'] = textArea
+       
+
+        try {
+            const response = await fetch(APP_URL + '/post/update/' + id, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify({ form: formData }) // Convert the object to JSON string           
+            });
+            console.log(response);
+            // const responseData = await response.json();
+
+        } catch(err) {
+            console.log('Error fetching the data' + err)
+        }
+      });
+
+      
     // switch
     $('#post-status').on('click', async function(e) {
         var isChecked = $(this).is(':checked');
@@ -270,64 +355,64 @@ $(document).ready(function() {
             });
     
             const responseData = await response.json();
-
-            $('.queue-day-wrapper').empty();
-            $('.profile-posts-inner').empty();
+            console.log(responseData)
+            // $('.queue-day-wrapper').empty();
+            // $('.profile-posts-inner').empty();
     
-            switch (method ){
-                case "queue" :
-                    if (responseData.data.length > 0) {
-                        $.each(responseData.data, (index, k) => {
-                            // var wrapper = '';                
-                            var currentDate = new Date();
-                            var dataDate = new Date(k.sched_time);
+            // switch (method ){
+            //     case "queue" :
+            //         if (responseData.data.length > 0) {
+            //             $.each(responseData.data, (index, k) => {
+            //                 // var wrapper = '';                
+            //                 var currentDate = new Date();
+            //                 var dataDate = new Date(k.sched_time);
                             
-                            if (dataDate > currentDate) {
-                                if (k.sched_method === "slot_sched") { 
-                                    console.log(k.post_type)
-                                    if ( k.post_type === "evergreen-tweets" || k.post_type === "promos-tweets" ) {
-                                        const wrapper = postWrapperReserve(k)
+            //                 if (dataDate > currentDate) {
+            //                     if (k.sched_method === "slot_sched") { 
+            //                         console.log(k.post_type)
+            //                         if ( k.post_type === "evergreen-tweets" || k.post_type === "promos-tweets" ) {
+            //                             const wrapper = postWrapperReserve(k)
         
-                                        $('.queue-day-wrapper').append(wrapper);
-                                    }
-                                } 
-                                else {
-                                    const postType = getPostType(k.post_type);
-                                    const wrapper = postWrapper(k, postType, index);
-                                    $('.queue-day-wrapper').append(wrapper);
-                                }
-                            } 
-                        }) 
-                    } else {
-                        $(".queue-day-wrapper").html("<div>No post found</div>");
-                    } 
-                break; 
+            //                             $('.queue-day-wrapper').append(wrapper);
+            //                         }
+            //                     } 
+            //                     else {
+            //                         const postType = getPostType(k.post_type);
+            //                         const wrapper = postWrapper(k, postType, index);
+            //                         $('.queue-day-wrapper').append(wrapper);
+            //                     }
+            //                 } 
+            //             }) 
+            //         } else {
+            //             $(".queue-day-wrapper").html("<div>No post found</div>");
+            //         } 
+            //     break; 
                 
-                case "evergreen" :
-                    if (responseData.data.length > 0) {
-                        $.each(responseData.data, (index, k) => {
-                            const wrapper = postWrapperEvergreen(k);
+            //     case "evergreen" :
+            //         if (responseData.data.length > 0) {
+            //             $.each(responseData.data, (index, k) => {
+            //                 const wrapper = postWrapperEvergreen(k);
     
-                            $('.profile-posts-inner').append(wrapper)                       
-                        })
-                    } else {
-                        $(".queue-day-wrapper").html("<div>No post found</div>");
-                    }                        
-                    break;
-                case "promo" :
-                    if (responseData.data.length > 0) {
-                        $.each(responseData.data, (index, k) => {
-                            const wrapper = postWrapperPromo(index, k);
-                            console.log(k)
+            //                 $('.profile-posts-inner').append(wrapper)                       
+            //             })
+            //         } else {
+            //             $(".queue-day-wrapper").html("<div>No post found</div>");
+            //         }                        
+            //         break;
+            //     case "promo" :
+            //         if (responseData.data.length > 0) {
+            //             $.each(responseData.data, (index, k) => {
+            //                 const wrapper = postWrapperPromo(index, k);
+            //                 console.log(k)
     
-                            $('.profile-posts-inner').append(wrapper)                       
-                        })
-                    } else {
-                        $(".queue-day-wrapper").html("<div>No post found</div>");
-                    }                        
-                    break;
+            //                 $('.profile-posts-inner').append(wrapper)                       
+            //             })
+            //         } else {
+            //             $(".queue-day-wrapper").html("<div>No post found</div>");
+            //         }                        
+            //         break;
                 
-            }            
+            // }            
             
         } catch (error) {
             console.log("Failed to fetch data:", error);
@@ -534,7 +619,7 @@ $(document).ready(function() {
     }
     
     
-    function postWrapper(info, post_type, index) {        
+    function postWrapper(info, post_type, index) {                
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString('default', { month: 'short' });
@@ -546,7 +631,7 @@ $(document).ready(function() {
     // var data = fetchTwitterDetails(info.twitter_id);        
     return $template = `                          
             <!-- BEGIN Custom Queued Post Instance (CUSTOM) --> 
-            <div class="queued-single-post-wrapper queue-type-${post_type}" status="active" queue-type="${post_type}">
+            <div class="queued-single-post-wrapper queue-type-${post_type}" status="${info.active > 0 ? 'active' : 'inactive'}" queue-type="${post_type}">
                 <div class="queued-single-post"> 
 
                 <img src="${APP_URL}/public/ui-images/icon2/pg-${post_type}.svg" class="queued-watermark" />
@@ -628,7 +713,6 @@ $(document).ready(function() {
     }       
 
     function postWrapperReserve(info) {
-    console.log(info);
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString('default', { month: 'short' });
@@ -719,7 +803,7 @@ $(document).ready(function() {
 
             <div class="mosaic-post-scheduling">
 
-            <div class="mosaic-scheduling mosaic-scheduling-future">
+            <!-- <div class="mosaic-scheduling mosaic-scheduling-future">
 
                 <span class="mosaic-label mosaic-future-label">
                 <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
@@ -731,7 +815,7 @@ $(document).ready(function() {
                 <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon evergreen-icon" id="ev-evergreen-${info.id}"/>
                 </span>
 
-            </div>  <!-- END .mosaic-scheduling-future -->
+            </div>  END .mosaic-scheduling-future -->
 
             <div class="mosaic-scheduling mosaic-post-analytics">
 
@@ -766,7 +850,7 @@ $(document).ready(function() {
     const fullDate = month + " " + day + ", " + year;
 
     return $template = `
-    <div class="mosaic-posts-outer promos-mosaic" status="${info.active === 1 ? 'active' : 'inactive' }">
+    <div class="mosaic-posts-outer promos-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
         <div class="mosaic-watermark-wrap frosted">
             <img src="${APP_URL}/public/ui-images/icons/17-promos.svg" class="mosaic-watermark promo-watermark" />
             <div class="mosaic-posts-inner">
