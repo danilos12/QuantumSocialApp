@@ -83,8 +83,9 @@
           <span class="queue-date-heading">Today</span>
           
 
-        </div>  <!-- END .queued-single-post-wrapper -->
+        {{-- </div>  <!-- END .queued-single-post-wrapper --> --}}
         </div>  <!-- END .queue-day-wrapper" -->
+        <div id="load-more">Load More</div>
       </div>  <!-- END .queue-posts-inner -->
     </div>  <!-- END .queue-posts-outer -->
 
@@ -92,6 +93,19 @@
 </div>  <!-- END .profile-outer -->
 <button id="openModalButton" style="display: none;" data-toggle="modal" data-target="#editModal"></button>
 
+<style>
+  #container {
+  height: 300px; /* Set a fixed height for the container */
+  overflow-y: scroll; /* Enable vertical scrolling */
+}
+
+.div-item {
+  /* Styling for the div items */
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #f0f0f0;
+}
+</style>
 @endsection
 @section('scripts')
 <script type='text/javascript' src="{{asset('public/js/posting.js')}}"></script>

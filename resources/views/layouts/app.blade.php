@@ -15,13 +15,19 @@
 	@endif	
 	
     <!-- Scripts -->
-  <script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script>
+  {{-- <script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script> --}}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   {{-- <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> --}}
   <script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
 
     <!-- Fonts -->
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+
 	
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
@@ -225,7 +231,7 @@
   @yield('scripts')
   <script>
      $(document).ready(function() {
-      // Alert
+            // Alert
       var alert = $('.alert ');
 
       if(alert.length == 1) {
