@@ -85,7 +85,6 @@
 
         {{-- </div>  <!-- END .queued-single-post-wrapper --> --}}
         </div>  <!-- END .queue-day-wrapper" -->
-        <div id="load-more">Load More</div>
       </div>  <!-- END .queue-posts-inner -->
     </div>  <!-- END .queue-posts-outer -->
 
