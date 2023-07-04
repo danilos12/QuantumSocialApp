@@ -107,6 +107,7 @@ Route::get('/post/sortbytype',[App\Http\Controllers\PostingController::class, 's
 Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'getMonth'])->name('get.month');
 Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
+Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
 Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');
 

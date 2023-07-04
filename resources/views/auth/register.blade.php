@@ -10,77 +10,82 @@
             <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-horiz-white-app@2x.png" class="image-placeholder" width="300" />
         </div>
 
+        <form method="POST" action="{{ route('register') }}">
+            @csrf
+           
+            <div class="row mb-3">
+
+                <div class="col-md-12 m1em" >
+                    <input id="firstname" placeholder="First name" type="text" class="form-control @error('firstname') is-invalid @enderror" name="firstname" value="{{ old('name') }}" required autocomplete="name">
+
+                    @error('name')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
+           
+            <div class="row mb-3">
+
+                <div class="col-md-12 m1em" >
+                    <input id="lastname" placeholder="Last name" type="text" class="form-control @error('lastname') is-invalid @enderror" name="lastname" value="{{ old('name') }}" required autocomplete="name">
+
+                    @error('name')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
+           
+            <div class="row mb-3">
+
+                <div class="col-md-12 m1em">
+                    <input id="email" placeholder="Email Address" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+
+                    @error('email')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-12 m1em">
+                    <input id="password" placeholder="Password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-md-12 m1em">
+                    <input id="password-confirm" placeholder="Confirm password" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                </div>
+            </div>
+
+            <div class="col-md-12 m1em" style="text-align: center">
+                <button type="submit" class="btn btn-primary register">
+                    {{ __('Register') }}
+                </button>
+            </div>
+            <div class="col-md-12 m1em" style="text-align: center">
+                @if (Route::has('login'))
+                <a class="btn btn-link p-0 loginacct" href="{{ route('login') }}">
+                    {{ __('Login to your account') }}
+                </a>
+            @endif
+            </div>
+        </form>
         <div class="form p-135">
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
-               
-                <div class="row mb-3">
-                    <label for="name" class="col-md-6 col-form-label text-md-end">{{ __('Name') }}</label>
-
-                    <div class="col-md-6" style="padding: 0 0 10px 0;">
-                        <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name">
-
-                        @error('name')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                </div>
-               
-                <div class="row mb-3">
-                    <label for="email" class="col-md-6 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                    <div class="col-md-6 p-0">
-                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
-
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <label for="password" class="col-md-6 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                    <div class="col-md-6 p-0">
-                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <label for="password-confirm" class="col-md-6 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
-                    <div class="col-md-6 p-0">
-                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                    </div>
-                </div>
-
-                <div>
-                    <div class="d-flex justify-space-between">
-                        <div class="p-2">
-                            @if (Route::has('login'))
-                                <a class="btn btn-link p-0" href="{{ route('login') }}">
-                                    {{ __('Login to your account') }}
-                                </a>
-                            @endif
-                        </div>
-                        <div class="ml-auto p-2">                            
-                            <button type="submit" class="btn btn-primary">
-                                {{ __('Register') }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -95,6 +100,7 @@
 
     justify-content: center;
     display: flex;
+    margin-bottom: 20em;
 
 }
 
@@ -107,6 +113,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    align-items: center
 
 }
 
@@ -116,38 +123,31 @@
 }
 
 .login-inner {
-    width: 100%;
-    max-width: 500px;
-    padding: 2em;
-    background: rgba(255,255,255,.5);
-    border-radius: 10px;
+    padding: 3.5em;
+    width: 613px;
+height: 530px;
+flex-shrink: 0;
+border-radius: 25px;
+background: rgba(143, 116, 188, 0.40);
 }
 
 
 
-.login-inner input[type="email"], .login-inner input[type="password"] {
-	padding-top: 10px;
-	padding-left: 10px;
-	padding-bottom: 10px;
-	padding-right: 0px;
-    margin-bottom: .75em;
-    border-radius: 5px;
-    font-size: .9em;
-    border: none;
-    color: #8843db;
-	width: 100%;
-
+.login-inner .form-control {
+	width: 338px;
+height: 41px;
+flex-shrink: 0;
+border-radius: 5px;
+background: #FFF;
 }
 
-.login-inner button {
-	padding: 10px;
-    background: #8843db;
-    color: #fff;
-	margin-bottom: .75em;
-    border-radius: 5px;
-    font-size: .9em;
-    border: none;;
-	width: 100%;
+.login-inner .form-control::placeholder {
+    color: #929292;
+    font-size: 14px;
+    font-family: Montserrat;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .content-outer { 
@@ -189,5 +189,26 @@
     align-items: center;
     display: flex;
     padding: 12px 0;
+}
+
+.m1em {
+    margin-top: 1em
+}
+
+.loginacct {
+    color: #fff!important;
+    text-align: center;
+    font-size: 14px;
+    font-family: Montserrat;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.register {
+    width: 338px;
+    height: 41px;
+    flex-shrink: 0;
+    font-family: Montserrat;
 }
 </style>

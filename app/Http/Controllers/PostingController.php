@@ -398,6 +398,19 @@ class PostingController extends Controller
 		return response()->json(['success' => true, 'data' => $sort]);
 	}	
 
+	public function editPostData(Request $request, $id) {
+		try {
+			$posts = CommandModule::find($id);
+			
+			// $posts->update([
+				
+			// ]);
+
+		} catch (Exception $e) {
+
+		}
+	}
+
 	public function getMonth() {
 		// get the scheduleld months in database 
 		$getMonth = DB::table('cmd_module')
