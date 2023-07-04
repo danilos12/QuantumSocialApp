@@ -356,6 +356,7 @@ class CommandmoduleController extends Controller
                                 ->groupBy('post_type_code');
                             })
                             ->where('twitter_id', $id)
+                            ->where('user_id', Auth::id())
                             ->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
                             ->where('cmd_module.post_type', '!=','evergreen-tweets')
                             ->where('cmd_module.post_type', '!=','promos-tweets')
@@ -364,6 +365,8 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_time', 'ASC')
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
+
+                            // dd($posts);
 
                     $schedules = Schedule::all();                                  
 
