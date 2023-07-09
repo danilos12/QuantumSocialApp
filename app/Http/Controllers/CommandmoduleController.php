@@ -200,7 +200,7 @@ class CommandmoduleController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => 409, 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -321,7 +321,7 @@ class CommandmoduleController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }
 
         return response()->json($getCustomSlot);
@@ -413,10 +413,12 @@ class CommandmoduleController extends Controller
                     $currentDateTime = Carbon::now();
                     $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
                         $tweetDateTime = Carbon::parse($tweet->sched_time);
+
+                        // dd($tweet->sched_time);
                         return $tweetDateTime->greaterThan($currentDateTime);
                     });
 
-                    // dd($tweetSorted);
+                    // // dd($tweetSorted);
 
                     $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();               
 
@@ -489,7 +491,7 @@ class CommandmoduleController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }
         
     }   
@@ -544,7 +546,7 @@ class CommandmoduleController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }
         
     }
@@ -572,7 +574,7 @@ class CommandmoduleController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }    
     }
 
@@ -603,7 +605,7 @@ class CommandmoduleController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }    
     }
 

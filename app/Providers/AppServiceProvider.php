@@ -107,6 +107,11 @@ class AppServiceProvider extends ServiceProvider
                         ->select('*')
                         ->where('users.id', Auth::id())
                         ->first();
+              
+
+                // Update the API data with the encrypted values
+                // $twitterApiMaster->api_key = $encryptedApiKey;
+                // $twitterApiMaster->api_secret = $encryptedApiSecret;
                 $view->with('twitterApiMaster', $twitterApiMaster);
                         
                 // API inside General settings

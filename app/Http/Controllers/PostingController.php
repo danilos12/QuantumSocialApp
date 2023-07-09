@@ -143,7 +143,7 @@ class PostingController extends Controller
 				$update->save();
 
 				// Return the JSON response
-				return response()->json(['status' => '200', 'message' => 'Schedule has been updated.', 'info' => $update]);
+				return response()->json(['status' => 200, 'message' => 'Schedule has been updated.', 'info' => $update]);
 
 			} else {				
 				$captureDate = null; 
@@ -189,12 +189,12 @@ class PostingController extends Controller
 	
 				if ($saved) {
 					// Return success response
-					return response()->json(['status' => '200', 'message' => 'Schedule has been created.', 'info' => $saved]);
+					return response()->json(['status' => 200, 'message' => 'Schedule has been created.', 'info' => $saved]);
 				}
 			}
 
 		} catch (Exception $e) {
-			return response()->json(['status' => '409', 'error' => 'Failed to create data:' . $e->getMessage()]);
+			return response()->json(['status' => 500, 'error' => 'Failed to create data:' . $e->getMessage()]);
 		}
 	}
 	
@@ -222,7 +222,7 @@ class PostingController extends Controller
 			$html = view('modals.edit-commandmodule')->render();
 			return response()->json(['status' => 200, 'data' => $getPosts ,'html' => $html]);
 		} catch (Exception $e) {
-			return response()->json(['status' => 409, 'stat' => 'danger', 'message' => 'Error updating the post']);
+			return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error updating the post']);
 		}
 	}
 	
@@ -240,7 +240,7 @@ class PostingController extends Controller
 			return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Post deleted successfully']);
 		} catch (\Exception $e) {
 			// Error response
-			return response()->json(['status' => 409, 'stat' => 'danger', 'message' => 'Error deleting post']);
+			return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error deleting post']);
 		}
 	}
 	
@@ -350,7 +350,7 @@ class PostingController extends Controller
 			return response()->json(['status' => 200, 'data' => $sort]);
 		} catch (Exception $e) {
 			Log::error('Error creating data: ' . $e->getMessage());
-			return response()->json(['status' => '409', 'error' => 'Switched data']);
+			return response()->json(['status' => '500', 'error' => 'Switched data']);
 		}
 	}
 
@@ -362,7 +362,7 @@ class PostingController extends Controller
 			return response()->json(['status' => 200, 'message' => 'Get schedule', 'data' => $slot]);
 		} catch (Exception $e) {
 			Log::error('Error creating data: ' . $e->getMessage());
-			return response()->json(['status' => '409', 'error' => 'Switched data']);
+			return response()->json(['status' => '500', 'error' => 'Switched data']);
 		}
 
 	}
@@ -399,15 +399,38 @@ class PostingController extends Controller
 	}	
 
 	public function editPostData(Request $request, $id) {
+		dd($request);
 		try {
+			$postData = $request->all();
 			$posts = CommandModule::find($id);
+			$posts->update([
+				'post_type' => $postData['post_type_tweets'],
+                'tweetlink' => $postData['retweet-link-input'] ?? null,
+                'rt_time' => $postData['num-custom-cm'] ?? null,
+                'rt_frame' => $postData['time-custom-cm'] ?? null,
+                'rt_ite' => $postData['iterations-custom-cm'] ?? null,
+                'promo_id' => $postData['promo-tweets-cmp'] ?? null,                 
+                'post_type_code' => rand(10000, 99999),
+				'sched_method' => $postData['scheduling-options'],
+				// 'sched_time' => Carbon::now()
+			]);
+
+			foreach ($postData['textarea'] as $textarea) {
+                $posts->post_description = $textarea;
+			};
 			
-			// $posts->update([
-				
-			// ]);
+			// // Save the changes
+			$posts->save();
+
+			// // Return a success response
+			return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
 
 		} catch (Exception $e) {
-
+			$trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
 		}
 	}
 
@@ -477,7 +500,7 @@ class PostingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }
 	}	
 	

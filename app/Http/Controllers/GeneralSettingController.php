@@ -12,6 +12,7 @@ use App\Models\MasterTwitterApiCredentials;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterApiCredentials;
 use App\Models\UT_AcctMngt;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -70,7 +71,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
         
     }    
@@ -120,7 +121,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -168,7 +169,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
         }
 
     }
@@ -202,7 +203,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -226,7 +227,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace,  'stat' => 'danger', 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace,  'stat' => 'danger', 'message' => $message]);
         }
     }
     
@@ -250,7 +251,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'stat' => 'danger' , 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'stat' => 'danger' , 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -279,7 +280,7 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 
@@ -304,7 +305,114 @@ class GeneralSettingController extends Controller
             $message = $e->getMessage();            
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '409', 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
+        }
+    }
+
+    public function addNewMember(Request $request) {
+        try {
+            $findParentUser = User::find(Auth::id())->first(); 
+
+            $insertNewMember = [
+                'firstname' => $request->input('fname'),
+                'lastname' => $request->input('lname'),
+                'email' => $request->input('email'),
+                'password' => $findParentUser->password,
+            ];
+            $saveMember = User::create($insertNewMember);
+
+            $relational = [
+                'main_id' => Auth::id(),
+                'main_acct' => 0,
+                'sub_acct'  => 1,
+                'user_id' => $saveMember->id
+            ];
+            $userMngt = DB::table('user_mngt')->insert($relational);
+
+            if ($saveMember && $userMngt) {
+                return response()->json(['status' => 200, 'message' => 'New member added successfully']);
+            }
+
+        } catch(Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+    }
+    
+    public function fetchMembers(Request $request) {
+        try {
+            $getMembers =  DB::table('user_mngt')
+                ->join('users', 'user_mngt.user_id', '=', 'users.id')
+                ->select('users.*', 'user_mngt.*')
+                ->where('user_mngt.main_id', Auth::id())
+                ->get();
+
+
+            return response()->json(['status' => 200, 'message' => 'Fetching the data', 'data' => $getMembers]);
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);            
+        }
+    }
+
+    public function _editMember($id) {
+        try {                        
+            $getMember = User::find($id);           
+                
+            if ($getMember) {
+                return response()->json(['status' => 200, 'data' => $getMember]);
+            }
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);         
+        }
+    }
+    
+    public function _updateMember(Request $request, $id) {
+        try {
+            $editUser = User::where('id', $id)->update([
+                'firstname' => $request->input('firstname'),
+                'lastname' => $request->input('lastname'),
+                'email' => $request->input('email'),
+            ]);
+            
+    
+            if ($editUser) {
+                return response()->json(['status' => 200, 'message' => 'User updated successfully']);
+            }
+    
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);         
+        }    
+    }
+    
+    public function _deleteMember($id) {        
+        try {
+            $deleteUser = User::where('id', $id)->delete();
+
+            if ($deleteUser) {
+                return response()->json(['status' => 200, 'message' => 'User deleted successfully.']);
+            }
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);         
         }
     }
 }
