@@ -436,6 +436,21 @@
     resize: none;
 }
 
+.edit-team-button {
+  display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-end;
+    width: 150px;
+    background: var(--frost-background);
+    border-radius: 5px;
+    font-weight: 400;
+    text-transform: uppercase;
+    padding: 0.5em 0.75em;
+    cursor: pointer;
+}
+
 
 
 .add-team-member-inner {
