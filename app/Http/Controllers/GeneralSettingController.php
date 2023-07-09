@@ -314,8 +314,8 @@ class GeneralSettingController extends Controller
             $findParentUser = User::find(Auth::id())->first(); 
 
             $insertNewMember = [
-                'firstname' => $request->input('fname'),
-                'lastname' => $request->input('lname'),
+                'firstname' => $request->input('firstname'),
+                'lastname' => $request->input('lastname'),
                 'email' => $request->input('email'),
                 'password' => $findParentUser->password,
             ];

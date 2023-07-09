@@ -349,11 +349,11 @@ $(document).ready(function() {
   $(document).on('click', '.add-team-button', async function(e) {
     e.preventDefault();
     var data = {
-      fname : $('#newuser_fname').val(),
-      lname : $('#newuser_lname').val(),
-      email : $('#newuser_email').val()
+      firstname : $('.add-team-member-inner').find('#newuser_fname').val(),
+      lastname : $('.add-team-member-inner').find('#newuser_lname').val(),
+      email : $('.add-team-member-inner').find('#newuser_email').val()
     }
-
+    // console.log(data);
     try {
       
       const response = await fetch(APP_URL + '/settings/_add_new', {
@@ -374,7 +374,7 @@ $(document).ready(function() {
 
       setTimeout(function() {
         location.reload();
-      }, 3000); // Reload after 5 seconds (adjust the delay as needed)
+      }, 1000); // Reload after 5 seconds (adjust the delay as needed)
 
     } catch(err) {
         console.log('Error fetching the data' + err)
@@ -432,8 +432,8 @@ $(document).ready(function() {
               </div>
 
           </form>
-          <span class="add-team-button"> 
-              Add<span>
+          <span class="edit-team-button"> 
+              Edit<span>
           </div>
           <!-- END copied from engage.html -->
 
@@ -443,6 +443,43 @@ $(document).ready(function() {
 
     return template;
   }
+
+  $(document).on('click', '.edit-team-button', async function(e) {
+    var id = $(this).parent().parent();
+    var edit_id = id[0].id;
+    var data = {
+      'firstname' : $('#' + edit_id).find('#newuser_fname').val(),
+      'lastname' : $('#' +  edit_id).find('#newuser_lname').val(),
+      'email' : $('#' +  edit_id).find('#newuser_email').val()
+    }
+
+    var targetId = edit_id.split('_');
+
+    try { 
+      const response = await fetch(APP_URL + '/settings/members/_update/' + targetId[1], {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+        },
+        body: JSON.stringify(data) // Convert the object to JSON string           
+    });
+    const responseData = await response.json();
+
+    if (responseData.status === 200) {
+      alert(responseData.message);
+    } else {
+      alert(responseData.message);
+    }
+
+    setTimeout(function() {
+      location.reload();
+    }, 1000); // Reload after 5 seconds (adjust the delay as needed)
+
+  } catch (err) {
+      console.log("Error updating member data", err)
+    }
+  })
 
   $(document).on('click', '.menu-account-icons-img', async function(e) {
     var targetId = e.target.id;
