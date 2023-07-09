@@ -89,6 +89,7 @@ Route::post('/settings/twitter_api/save/{twitter_id}', [App\Http\Controllers\Gen
 Route::get('/settings/members', [App\Http\Controllers\GeneralSettingController::class, 'fetchMembers']);
 Route::post('/settings/_add_new', [App\Http\Controllers\GeneralSettingController::class, 'addNewMember'])->name('member.add');
 Route::get('/settings/members/_edit/{id}', [App\Http\Controllers\GeneralSettingController::class, '_editMember'])->name('member.edit');
+Route::post('/settings/members/_update/{id}', [App\Http\Controllers\GeneralSettingController::class, '_updateMember'])->name('member.edit');
 Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\GeneralSettingController::class, '_deleteMember'])->name('member.delete');
 
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
