@@ -6,6 +6,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 trait RegistersUsers
 {
@@ -29,7 +30,15 @@ trait RegistersUsers
      */
     public function register(Request $request)
     {
-        $this->validator($request->all())->validate();
+        $validator = $this->validator($request->all());      
+        
+        if ($validator->fails()) {
+            // $errors = $validator->errors()->all();
+            // dd($validator);
+            Session::flash('errors', $validator->errors());
+            // return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back()->withInput();
+        }
 
         event(new Registered($user = $this->create($request->all())));
 
