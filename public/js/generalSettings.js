@@ -10,10 +10,9 @@ $(document).ready(function() {
     } else {
         $addTeamModal.toggle( "slide", { direction: "up"  }, 400 );
     }
-  });
+  });  
   
-  $('div#link-twitter').on('click', async function(e) {
-    
+  $('div#link-twitter').on('click', async function(e) {    
     try {
       const response = await fetch(APP_URL + '/twitter/redirect/' + QUANTUM_ID);
       const responseData = await response.json();
@@ -193,6 +192,31 @@ $(document).ready(function() {
   //   // Activate the stored button
   //   $('.my-button[data-id="' + activeButtonId + '"]').addClass('active');
   // }
+
+  async function fetchTeamMembers() {
+    
+    try {
+      const response = await fetch(APP_URL + '/settings/members');
+      const responseData = await response.json(); 
+        
+      if (responseData.status === 200) {
+        if (responseData.data.length > 0) {
+          $.each(responseData.data, function(i, k) {            
+            var template = teamMembers(k);
+            $('.menu-team-account-inner').find('.add-new-member').append(template);
+            $('.add-new-member').append(template);
+          })
+        }
+      } else {
+        console.log(responseData.message)
+      }      
+      
+    } catch (err) {
+      console.log('Error in fetching members:' + err)
+    }
+  }
+
+  fetchTeamMembers();
   
   
   $('.menu-account-default').click(function(event) {
@@ -322,6 +346,156 @@ $(document).ready(function() {
     }  
   })
 
+  $(document).on('click', '.add-team-button', async function(e) {
+    e.preventDefault();
+    var data = {
+      fname : $('#newuser_fname').val(),
+      lname : $('#newuser_lname').val(),
+      email : $('#newuser_email').val()
+    }
+
+    try {
+      
+      const response = await fetch(APP_URL + '/settings/_add_new', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+          },
+          body: JSON.stringify(data) // Convert the object to JSON string           
+      });
+      const responseData = await response.json();
+
+      if (responseData.status === 200) {
+          alert(responseData.message);                
+      } else {
+          alert(responseData.message)
+      }
+
+      setTimeout(function() {
+        location.reload();
+      }, 3000); // Reload after 5 seconds (adjust the delay as needed)
+
+    } catch(err) {
+        console.log('Error fetching the data' + err)
+    }
+  })
+
+  function teamMembers(info) {
+    var template = `
+    <div class="menu-team-account-outer"> 
+      <div class="menu-team-account-inner"> 
+
+          <img src="${APP_URL}/public/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
+
+          <div class="global-team-profile-header"> 
+          <div class="global-profile-details">
+              <div class="global-profile-name">
+              <a href="#">
+              ${info.firstname}</a>
+              </div>  <!-- END .global-profile-name -->
+              <div class="global-profile-subdata">
+              <span class="global-profile-email"> 
+                  <a href="">
+                  ${info.email}</a></span>
+              </div>  <!-- END .global-post-date-wrap -->
+          </div>  <!-- END .global-team-profile-details -->
+          </div>  <!-- END .global-team-profile-header -->
+
+          <div class="menu-social-account-options">
+          <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+          <span class="menu-account-icons">
+              <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-${info.user_id}"/>
+              <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img" title="Delete" data-toggle="tooltip" id="_delete-${info.user_id}"/>
+          </span>
+          </div>  <!-- END .menu-social-account-options -->
+
+      </div>  <!-- END .menu-social-account-inner -->
+    </div>  <!-- END .menu-social-account-outer -->    
+
+    <div class="edit-team-member-modal" > 
+      <div class="edit-team-member-inner frosted" id="edit_${info.user_id}"> 
+
+          <!-- BEGIN input copied from engage.html -->
+          <div class="global-input-email"> 
+          <form>
+              <div class="global-input-text input-text">  
+              <input type="text" placeholder="First Name" id="newuser_fname"/>
+              </div>
+              
+              <div class="global-input-text input-text">  
+              <input type="text" placeholder="Last Name" id="newuser_lname" />
+              </div>
+
+              <div class="global-input-text input-text">  
+              <input type="text" placeholder="Email address" id="newuser_email" />
+              </div>
+
+          </form>
+          <span class="add-team-button"> 
+              Add<span>
+          </div>
+          <!-- END copied from engage.html -->
+
+      </div>  <!-- END .add-team-member-inner -->
+    </div>  <!-- END .add-team-member-modal -->
+    `;
+
+    return template;
+  }
+
+  $(document).on('click', '.menu-account-icons-img', async function(e) {
+    var targetId = e.target.id;
+    var id = targetId.split('-');
+
+    
+    try {
+      if (id[0] === '_edit') {                
+
+        const response = await fetch(APP_URL + '/settings/members/_edit/' + id[1]);
+        const responseData = await response.json();
+
+        console.log(responseData);
+
+
+        if ($('#edit_' + id[1]).first().is( ":hidden" ) ) {
+          $('#edit_' + id[1]).toggle( "slide", { direction: "up"  }, 800 );
+          $('#edit_' + id[1]).find('#newuser_fname').val(responseData.data.firstname);
+          $('#edit_' + id[1]).find('#newuser_lname').val(responseData.data.lastname);
+          $('#edit_' + id[1]).find('#newuser_email').val(responseData.data.email);
+        } else {
+          $('#edit_' + id[1]).toggle( "slide", { direction: "up"  }, 400 );
+        }
+
+      } else {
+        const response = await fetch(APP_URL + '/settings/members/' + id[0] + '/' +  id[1], {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+          },
+          body: JSON.stringify(data)
+        });
+
+        const responseData = await response.json();
+
+        if (responseData.status === 200) {
+          alert(responseData.message);
+        } else {          
+          alert(responseData.message);
+        }
+
+        setTimeout(function() {
+          location.reload();
+        }, 1000); // Reload after 5 seconds (adjust the delay as needed)
+      }
+    } catch (err) {
+      console.log('Error in handling action', err)
+    }
+
+  })
+
+     
    // function twitterLongCard(response) {
   //   return $html = `
   //   <div class="menu-social-account-outer">

@@ -70,38 +70,8 @@
               <div class="menu-section-inner team-account-inner">
                 <span class="menu-section-header">Team Members </span>
 
-                  <!-- BEGIN .menu-team-account Instance -->
-                  <div class="menu-team-account-outer"> 
-                    <div class="menu-team-account-inner"> 
-
-                        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
-
-                        <div class="global-team-profile-header"> 
-                        <div class="global-profile-details">
-                            <div class="global-profile-name">
-                            <a href="#">
-                                {{ $main_user->name }}</a>
-                            </div>  <!-- END .global-profile-name -->
-                            <div class="global-profile-subdata">
-                            <span class="global-profile-email"> 
-                                <a href="">
-                                {{ $main_user->email }}</a></span>
-                            </div>  <!-- END .global-post-date-wrap -->
-                        </div>  <!-- END .global-team-profile-details -->
-                        </div>  <!-- END .global-team-profile-header -->
-
-                        <div class="menu-social-account-options">
-                        <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
-                        <span class="menu-account-icons">
-                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon" title="Drafts" data-toggle="tooltip"/>
-                            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" title="Delete" data-toggle="tooltip" />
-                        </span>
-                        </div>  <!-- END .menu-social-account-options -->
-
-                    </div>  <!-- END .menu-social-account-inner -->
-                  </div>  <!-- END .menu-social-account-outer -->
-                  <!-- END .menu-social-account Instance -->
-
+                 <div class="add-new-member">                  
+                 </div>
 
 
                   <div class="menu-team-members-add-accounts-section"> 
@@ -123,11 +93,15 @@
                     <div class="global-input-email"> 
                     <form>
                         <div class="global-input-text input-text">  
-                        <input type="text" placeholder="Name" />
+                        <input type="text" placeholder="First Name" id="newuser_fname"/>
+                        </div>
+                        
+                        <div class="global-input-text input-text">  
+                        <input type="text" placeholder="Last Name" id="newuser_lname" />
                         </div>
 
                         <div class="global-input-text input-text">  
-                        <input type="text" placeholder="Email address" />
+                        <input type="text" placeholder="Email address" id="newuser_email" />
                         </div>
 
                     </form>
@@ -434,6 +408,38 @@
   border-radius: 5px;
   opacity: .75;
   cursor: pointer;
+}
+.edit-team-member-inner {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    padding: 2em 2em 1em;
+    border-radius: 10px;
+    backdrop-filter: blur(7px);
+    display: none;
+    background: rgba(143, 116, 188, 0.8);
+    z-index: 999999;
+    right: 35px;
+}
+
+
+.edit-team-member-inner form input {
+  display: flex;
+    flex-direction: column;
+    width: 300px;
+    background: var(--frost-background);
+    color: var(--body-text);
+    padding: 0.75em;
+    margin-bottom: 1em;
+    border: none;
+    border-radius: 7px;
+    resize: none;
+}
+
+
+
+.add-team-member-inner {
+   background: rgba(143, 116, 188, 0.8);
 }
 
 </style>

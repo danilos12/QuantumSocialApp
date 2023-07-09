@@ -329,11 +329,20 @@ $(document).ready(function() {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
                 },
-                body: JSON.stringify({ form: formData }) // Convert the object to JSON string           
+                body: JSON.stringify(formData) // Convert the object to JSON string           
             });
-            console.log(response);
-            // const responseData = await response.json();
+            // console.log(response);
+            const responseData = await response.json();
 
+            if (responseData.status === 200) {
+                alert(responseData.message);                
+            } else {
+                alert(responseData.message)
+            }
+
+            setTimeout(function() {
+            location.reload();
+            }, 3000); // Reload after 5 seconds (adjust the delay as needed)
         } catch(err) {
             console.log('Error fetching the data' + err)
         }
