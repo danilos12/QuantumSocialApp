@@ -433,7 +433,7 @@ class CommandmoduleController extends Controller
                             ->groupBy('post_type_code');
                         })
                         ->where('twitter_id', $id)
-                        ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                        // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','evergreen-tweets')
                         // ->where('active', $checkToggle->queue_switch)
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
@@ -452,7 +452,7 @@ class CommandmoduleController extends Controller
                             ->groupBy('post_type_code');
                         })
                         ->where('twitter_id', $id)
-                        ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                        // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','promos-tweets')
                         // ->where('active', $checkToggle->queue_switch)
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
