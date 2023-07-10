@@ -216,7 +216,7 @@ $(document).ready(function() {
     }
   }
 
-  fetchTeamMembers();
+  // fetchTeamMembers();
   
   
   $('.menu-account-default').click(function(event) {
@@ -381,69 +381,6 @@ $(document).ready(function() {
     }
   })
 
-  function teamMembers(info) {
-    var template = `
-    <div class="menu-team-account-outer"> 
-      <div class="menu-team-account-inner"> 
-
-          <img src="${APP_URL}/public/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
-
-          <div class="global-team-profile-header"> 
-          <div class="global-profile-details">
-              <div class="global-profile-name">
-              <a href="#">
-              ${info.firstname}</a>
-              </div>  <!-- END .global-profile-name -->
-              <div class="global-profile-subdata">
-              <span class="global-profile-email"> 
-                  <a href="">
-                  ${info.email}</a></span>
-              </div>  <!-- END .global-post-date-wrap -->
-          </div>  <!-- END .global-team-profile-details -->
-          </div>  <!-- END .global-team-profile-header -->
-
-          <div class="menu-social-account-options">
-          <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
-          <span class="menu-account-icons">
-              <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-${info.user_id}"/>
-              <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img" title="Delete" data-toggle="tooltip" id="_delete-${info.user_id}"/>
-          </span>
-          </div>  <!-- END .menu-social-account-options -->
-
-      </div>  <!-- END .menu-social-account-inner -->
-    </div>  <!-- END .menu-social-account-outer -->    
-
-    <div class="edit-team-member-modal" > 
-      <div class="edit-team-member-inner frosted" id="edit_${info.user_id}"> 
-
-          <!-- BEGIN input copied from engage.html -->
-          <div class="global-input-email"> 
-          <form>
-              <div class="global-input-text input-text">  
-              <input type="text" placeholder="First Name" id="newuser_fname"/>
-              </div>
-              
-              <div class="global-input-text input-text">  
-              <input type="text" placeholder="Last Name" id="newuser_lname" />
-              </div>
-
-              <div class="global-input-text input-text">  
-              <input type="text" placeholder="Email address" id="newuser_email" />
-              </div>
-
-          </form>
-          <span class="edit-team-button"> 
-              Edit<span>
-          </div>
-          <!-- END copied from engage.html -->
-
-      </div>  <!-- END .add-team-member-inner -->
-    </div>  <!-- END .add-team-member-modal -->
-    `;
-
-    return template;
-  }
-
   $(document).on('click', '.edit-team-button', async function(e) {
     var id = $(this).parent().parent();
     var edit_id = id[0].id;
@@ -490,11 +427,9 @@ $(document).ready(function() {
       if (id[0] === '_edit') {                
 
         const response = await fetch(APP_URL + '/settings/members/_edit/' + id[1]);
-        const responseData = await response.json();
+        const responseData = await response.json();       
 
-        console.log(responseData);
-
-
+        $(document).find('.edit-team-member-inner').attr('id', 'edit_' + id[1])
         if ($('#edit_' + id[1]).first().is( ":hidden" ) ) {
           $('#edit_' + id[1]).toggle( "slide", { direction: "up"  }, 800 );
           $('#edit_' + id[1]).find('#newuser_fname').val(responseData.data.firstname);

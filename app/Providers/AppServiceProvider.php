@@ -128,7 +128,21 @@ class AppServiceProvider extends ServiceProvider
                 
                 $toggle = DB::table('twitter_meta')->where('user_id', Auth::id())->where('twitter_id', $twitterID)->first();     
                 $view->with('toggle', $toggle ? $toggle->queue_switch : null);                       
-                           
+
+                $getMembers = DB::table('user_mngt')
+                    ->join('users', 'user_mngt.user_id', '=', 'users.id')
+                    ->select('users.*', 'user_mngt.*')
+                    ->where('user_mngt.main_id', Auth::id())
+                    ->get();
+                $view->with('members', $getMembers);
+                
+                $cntMembers = DB::table('user_mngt')
+                    ->join('users', 'user_mngt.user_id', '=', 'users.id')
+                    ->select('users.*', 'user_mngt.*')
+                    ->where('user_mngt.main_id', Auth::id())
+                    ->count();
+                $view->with('cntmembers', $cntMembers);
+
                 // // api 
                 // $twitter_tkn = TwitterToken::where('twitter_id', $twitterID)->first();                
                 // $twitterDetails = TwitterHelper::getTwitterdetails($twitter_tkn);
