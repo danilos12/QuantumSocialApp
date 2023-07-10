@@ -70,17 +70,74 @@
               <div class="menu-section-inner team-account-inner">
                 <span class="menu-section-header">Team Members </span>
 
-                 <div class="add-new-member">                  
-                 </div>
+                  @if ($cntmembers > 0) 
+                    @foreach($members as $member)
+                      <div class="menu-team-account-outer"> 
+                        <div class="menu-team-account-inner"> 
+                  
+                            <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
+                  
+                            <div class="global-team-profile-header"> 
+                            <div class="global-profile-details">
+                                <div class="global-profile-name">
+                                <a href="#">
+                                {{$member->firstname}}</a>
+                                </div>  <!-- END .global-profile-name -->
+                                <div class="global-profile-subdata">
+                                <span class="global-profile-email"> 
+                                    <a href="">{{$member->email}}</a>
+                                  </span>
+                                </div>  <!-- END .global-post-date-wrap -->
+                            </div>  <!-- END .global-team-profile-details -->
+                            </div>  <!-- END .global-team-profile-header -->
+                  
+                            <div class="menu-social-account-options">
+                            <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+                            <span class="menu-account-icons">
+                                <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/>
+                                <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}"/>
+                            </span>
+                            </div>  <!-- END .menu-social-account-options -->
+                  
+                        </div>  <!-- END .menu-social-account-inner -->
+                      </div>  <!-- END .menu-social-account-outer -->   
+                    @endforeach
+                  @enderror
 
+                  <div class="edit-team-member-modal" > 
+                    <div class="edit-team-member-inner frosted" > 
+              
+                        <!-- BEGIN input copied from engage.html -->
+                        <div class="global-input-email"> 
+                        <form>
+                            <div class="global-input-text input-text">  
+                            <input type="text" placeholder="First Name" id="newuser_fname"/>
+                            </div>
+                            
+                            <div class="global-input-text input-text">  
+                            <input type="text" placeholder="Last Name" id="newuser_lname" />
+                            </div>
+              
+                            <div class="global-input-text input-text">  
+                            <input type="text" placeholder="Email address" id="newuser_email" />
+                            </div>
+              
+                        </form>
+                        <span class="edit-team-button"> 
+                            Edit<span>
+                        </div>
+                        <!-- END copied from engage.html -->
+              
+                    </div>  <!-- END .add-team-member-inner -->
+                  </div>  <!-- END .add-team-member-modal -->
 
                   <div class="menu-team-members-add-accounts-section"> 
-                  <div class="add-account add-team">
-                      <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
-                      + Add New Member
-                  </div>  <!-- END .add-twitter-account -->
+                    <div class="add-account add-team">
+                        <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
+                        + Add New Member
+                    </div>  <!-- END .add-twitter-account -->
                   </div>  <!-- END .menu-social-add-accounts-section -->
-
+                
               </div>  <!-- END .social-accounts-inner -->
 
 
@@ -387,75 +444,6 @@
 
 <style>
 .general-settings-outer, .twitter-settings-outer, .help-page-outer {display: none;}
-
-.input-field {
-  background: rgba(255,255,255, .3);
-  color: #ffffff;
-  padding: 0.5em 1em;
-  /* margin: 0 0.5em; */
-  border: none;
-  border-radius: 5px;
-}
-
-.subTwirl-buttons {
-  display: flex;
-  align-self: flex-start;
-  background: #43EBf1;
-  font-size: .9em;
-  font-weight: 600;
-  text-transform: uppercase;
-  padding: 0.5em 1em;
-  border-radius: 5px;
-  opacity: .75;
-  cursor: pointer;
-}
-.edit-team-member-inner {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    padding: 2em 2em 1em;
-    border-radius: 10px;
-    backdrop-filter: blur(7px);
-    display: none;
-    background: rgba(143, 116, 188, 0.8);
-    z-index: 999999;
-    right: 35px;
-}
-
-
-.edit-team-member-inner form input {
-  display: flex;
-    flex-direction: column;
-    width: 300px;
-    background: var(--frost-background);
-    color: var(--body-text);
-    padding: 0.75em;
-    margin-bottom: 1em;
-    border: none;
-    border-radius: 7px;
-    resize: none;
-}
-
-.edit-team-button {
-  display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-self: flex-end;
-    width: 150px;
-    background: var(--frost-background);
-    border-radius: 5px;
-    font-weight: 400;
-    text-transform: uppercase;
-    padding: 0.5em 0.75em;
-    cursor: pointer;
-}
-
-
-
-.add-team-member-inner {
-   background: rgba(143, 116, 188, 0.8);
-}
 
 </style>
 
