@@ -638,6 +638,10 @@ function closeModal(modalId) {
     $modalLargeBackdrop.fadeOut("slow");
   }, 175);
 
+  $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
+  $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
+  $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+
   currentModal = null;
 }
 

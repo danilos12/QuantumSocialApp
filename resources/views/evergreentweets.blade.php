@@ -19,7 +19,8 @@
           </label>
         </div>  <!-- END .toggle-wrapper -->
       </div>  <!-- END .head-left-wrap -->
-      <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon paste-evergreen-tweet" />
+      {{-- <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon paste-evergreen-tweet" /> --}}
+      <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon new-evergreen-cmdmod" />
     </div>  <!-- END .page-head-n-sort -->
 
     <div class="paste-evergreen-tweet-modal-wrap">
