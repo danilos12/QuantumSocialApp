@@ -21,7 +21,8 @@
                       </div>  <!-- END .toggle-wrapper -->
                     </div>  <!-- END .head-left-wrap -->
                     <div class="head-right-wrap">
-                      <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon new-promo-tweet" />
+                      {{-- <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon new-promo-tweet" /> --}}
+                      <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon new-promos-cmdmod" />
                       <img src="{{ asset('public/')}}/ui-images/icons/pg-controls.svg" class="ui-icon filter-controls-toggle" />
                     </div>  <!-- END .head-icon-wrap -->
                   </div>  <!-- END .page-head-n-sort -->
