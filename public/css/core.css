@@ -4271,7 +4271,7 @@ input#file-upload-button {
     border-radius: 10px;
     backdrop-filter: blur(7px);
     display: none;
-    background: rgba(143, 116, 188, 0.8);
+    background: rgba(143, 116, 188, 1);
     z-index: 999999;
     right: 35px;
 }
@@ -4308,5 +4308,5 @@ input#file-upload-button {
 
 
 .add-team-member-inner {
-   background: rgba(143, 116, 188, 0.8);
+   background: rgba(143, 116, 188, 1);
 }
