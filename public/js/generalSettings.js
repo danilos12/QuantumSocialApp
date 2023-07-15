@@ -193,28 +193,28 @@ $(document).ready(function() {
   //   $('.my-button[data-id="' + activeButtonId + '"]').addClass('active');
   // }
 
-  async function fetchTeamMembers() {
+  // async function fetchTeamMembers() {
     
-    try {
-      const response = await fetch(APP_URL + '/settings/members');
-      const responseData = await response.json(); 
+  //   try {
+  //     const response = await fetch(APP_URL + '/settings/members');
+  //     const responseData = await response.json(); 
         
-      if (responseData.status === 200) {
-        if (responseData.data.length > 0) {
-          $.each(responseData.data, function(i, k) {            
-            var template = teamMembers(k);
-            $('.menu-team-account-inner').find('.add-new-member').append(template);
-            $('.add-new-member').append(template);
-          })
-        }
-      } else {
-        console.log(responseData.message)
-      }      
+  //     if (responseData.status === 200) {
+  //       if (responseData.data.length > 0) {
+  //         $.each(responseData.data, function(i, k) {            
+  //           var template = teamMembers(k);
+  //           $('.menu-team-account-inner').find('.add-new-member').append(template);
+  //           $('.add-new-member').append(template);
+  //         })
+  //       }
+  //     } else {
+  //       console.log(responseData.message)
+  //     }      
       
-    } catch (err) {
-      console.log('Error in fetching members:' + err)
-    }
-  }
+  //   } catch (err) {
+  //     console.log('Error in fetching members:' + err)
+  //   }
+  // }
 
   // fetchTeamMembers();
   
