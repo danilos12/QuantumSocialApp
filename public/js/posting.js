@@ -596,6 +596,64 @@ $(document).ready(function() {
         // $('.primary-post-area').text();
     }
 
+    async function openCmdModalwithQueue() {
+        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
+        $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
+        $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+        $(".cross-tweet-profiles-outer").removeClass("tweets-hide");
+            
+        // $('span.post-type-buttons img[data-type="evergreen-tweets"]').addClass('icon-active');                
+        // // $(".cross-tweet-profiles-outer").addClass("tweets-hide");
+        // $("div[data-post]").filter(`[data-post="evergreen-tweets"]`).removeClass("tweets-hide");        
+
+        openModal('command-module');
+    }
+
+    async function openCmdModalwithEvergreen() {
+        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
+        $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
+        $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+        $(".cross-tweet-profiles-outer").removeClass("tweets-hide");
+            
+        $('span.post-type-buttons img[data-type="evergreen-tweets"]').addClass('icon-active');                
+        $("div[data-post]").filter(`[data-post="evergreen-tweets"]`).removeClass("tweets-hide");
+              
+        openModal('command-module');
+    }
+
+    async function openCmdModalwithPromo() {
+        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
+        $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
+        $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+            
+        $('span.post-type-buttons img[data-type="promos-tweets"]').addClass('icon-active');                
+        $(".cross-tweet-profiles-outer").addClass("tweets-hide");
+        $("div[data-post]").filter(`[data-post="promos-tweets"]`).removeClass("tweets-hide");
+        
+        // try {
+        //     const response = await fetch(APP_URL + '/post/evergreen/retrieve/' + id + '?post_action=retweet');
+        //     const responseData = await response.json(); 
+
+        //     $('#posting-tool-form-001').find('.primary-post-area').text(responseData.data.post_description);
+
+        // } catch(err) {
+        //     console.log('error in fetching data', err)
+        // }
+
+        openModal('command-module');
+    }
+
+    $('.new-evergreen-cmdmod').on('click', function() {
+        openCmdModalwithEvergreen();
+    })
+    
+    $('.new-promos-cmdmod').on('click', function() {
+        openCmdModalwithPromo();
+    })
+    
+    $('.new-queue-cmdmod').on('click', function() {
+        openCmdModalwithQueue();
+    })
 
     function getPostType(type) {
         var postType;
@@ -895,8 +953,8 @@ $(document).ready(function() {
                 <div class="mosaic-post-text">
                 ${info.post_description}
                 </div>  <!-- END .mosaic-post-text -->
-                <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
-                class="mosaic-post-image" />
+                <!-- <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
+                class="mosaic-post-image" /> -->
             </div>  <!-- END .mosaic-post-data -->
 
             </div>  <!-- END .mosaic-posts-inner -->
