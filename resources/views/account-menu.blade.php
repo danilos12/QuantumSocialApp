@@ -53,7 +53,7 @@
                       <select name="timezone_offset" id="timezone-offset" class="time-zone-data">
                         @if ($timezones)
                         @foreach ($timezones as $timezone)
-                        <option value='{{ isset($timezone) ? $timezone->value : "" }}' {{ isset($timezone) ? ($getTimezone->timezone ?? "") === $timezone->value ? "selected" : "" : "" }}>{{ isset($timezone) ? $timezone->label : "" }}</option>                       
+                        <option value='{{ isset($timezone) ? $timezone->value : "" }}' {{ isset($timezone) ? ($mainUser->timezone ?? "") === $timezone->value ? "selected" : "" : "" }}>{{ isset($timezone) ? $timezone->label : "" }}</option>                       
                         @endforeach
                         @endif
                       </select>
@@ -92,11 +92,11 @@
                             </div>  <!-- END .global-team-profile-header -->
                   
                             <div class="menu-social-account-options">
-                            <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
-                            <span class="menu-account-icons">
-                                <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/>
-                                <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}"/>
-                            </span>
+                              <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+                              <span class="menu-account-icons">
+                                  <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/>
+                                  <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}" /> 
+                              </span>
                             </div>  <!-- END .menu-social-account-options -->
                   
                         </div>  <!-- END .menu-social-account-inner -->
@@ -445,6 +445,7 @@
 <style>
 .general-settings-outer, .twitter-settings-outer, .help-page-outer {display: none;}
 
+.mt-2 { margin-top: 0.5em;}
 </style>
 
 @section('scripts')

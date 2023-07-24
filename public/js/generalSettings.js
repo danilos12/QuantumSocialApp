@@ -19,7 +19,7 @@ $(document).ready(function() {
 
       console.log(responseData);
 
-      var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
+      var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
         window.location.href = responseData.redirect;
       } else {
@@ -101,7 +101,7 @@ $(document).ready(function() {
       const responseData = await response.json();
       console.log(responseData);
 
-      var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
+      var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
         $(this).after(div);
       } else {
@@ -171,7 +171,7 @@ $(document).ready(function() {
       const responseData = await response.json();
       console.log(responseData);
       
-      var successDiv = $(`<div class="alert-${responseData.stat}"> ${responseData.message} </div>`);
+      var successDiv = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
         $('#quantum_acct').append(successDiv);        
       } else {
@@ -185,38 +185,7 @@ $(document).ready(function() {
     } catch(error) {
       console.log(error)
     }    
-  });
-  // Check if there's a stored active button in local storage
-  // var activeButtonId = localStorage.getItem('activeButtonId');
-  // if (activeButtonId) {
-  //   // Activate the stored button
-  //   $('.my-button[data-id="' + activeButtonId + '"]').addClass('active');
-  // }
-
-  // async function fetchTeamMembers() {
-    
-  //   try {
-  //     const response = await fetch(APP_URL + '/settings/members');
-  //     const responseData = await response.json(); 
-        
-  //     if (responseData.status === 200) {
-  //       if (responseData.data.length > 0) {
-  //         $.each(responseData.data, function(i, k) {            
-  //           var template = teamMembers(k);
-  //           $('.menu-team-account-inner').find('.add-new-member').append(template);
-  //           $('.add-new-member').append(template);
-  //         })
-  //       }
-  //     } else {
-  //       console.log(responseData.message)
-  //     }      
-      
-  //   } catch (err) {
-  //     console.log('Error in fetching members:' + err)
-  //   }
-  // }
-
-  // fetchTeamMembers();
+  }); 
   
   
   $('.menu-account-default').click(function(event) {
@@ -224,7 +193,7 @@ $(document).ready(function() {
     switchUser(APP_URL + '/twitter/switchUser?id=' + twitterId, twitterId)      
   });
   
-  
+  // delete twitter
   $('.delete-account').click(function(event) {  
     $.ajax({
       url: $(this).data('url'),
@@ -366,15 +335,16 @@ $(document).ready(function() {
       });
       const responseData = await response.json();
 
+      var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
-          alert(responseData.message);                
+        $(this).after(div);
       } else {
-          alert(responseData.message)
+        $(this).after(div);
       }
 
-      setTimeout(function() {
-        location.reload();
-      }, 1000); // Reload after 5 seconds (adjust the delay as needed)
+      // setTimeout(function() {
+      //   location.reload();
+      // }, 1000); // Reload after 5 seconds (adjust the delay as needed)
 
     } catch(err) {
         console.log('Error fetching the data' + err)
@@ -403,11 +373,13 @@ $(document).ready(function() {
     });
     const responseData = await response.json();
 
-    if (responseData.status === 200) {
-      alert(responseData.message);
-    } else {
-      alert(responseData.message);
-    }
+    var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
+      if (responseData.status === 200) {
+        $(this).after(div);
+      } else {
+        $(this).after(div);
+      }
+
 
     setTimeout(function() {
       location.reload();
@@ -421,7 +393,6 @@ $(document).ready(function() {
   $(document).on('click', '.menu-account-icons-img', async function(e) {
     var targetId = e.target.id;
     var id = targetId.split('-');
-
     
     try {
       if (id[0] === '_edit') {                
@@ -440,21 +411,23 @@ $(document).ready(function() {
         }
 
       } else {
-        const response = await fetch(APP_URL + '/settings/members/' + id[0] + '/' +  id[1], {
+        console.log($(this).hasClass('disabled'))
+        const response = await fetch(APP_URL + '/settings/members/_delete/' +  id[1], {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
           },
-          body: JSON.stringify(data)
+          body: JSON.stringify({ delete : 1})
         });
 
-        const responseData = await response.json();
+        const responseData = await response.json();        
 
+        var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
         if (responseData.status === 200) {
-          alert(responseData.message);
-        } else {          
-          alert(responseData.message);
+          $('.menu-team-members-add-accounts-section').after(div);
+        } else {
+          $('.menu-team-members-add-accounts-section').after(div);
         }
 
         setTimeout(function() {
@@ -465,43 +438,7 @@ $(document).ready(function() {
       console.log('Error in handling action', err)
     }
 
-  })
-
-     
-   // function twitterLongCard(response) {
-  //   return $html = `
-  //   <div class="menu-social-account-outer">
-  //       <div class="menu-social-account-inner">
-
-  //       <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
-
-  //         <div class="global-twitter-profile-header">
-  //           <a href="#">
-  //           <img src="${response.twitter_photo}" lass="global-profile-image" /></a>
-  //           <div class="global-profile-details">
-  //             <div class="global-profile-name">
-  //               <a href="#"> ${response.twitter_name} </a>
-  //             </div>  <!-- END .global-author-name -->
-  //             <div class="global-profile-subdata">
-  //               <span class="global-profile-handle">@<a href="">${response.twitter_username}</a>
-  //               </span>
-  //             </div>  <!-- END .global-post-date-wrap -->
-  //           </div>  <!-- END .global-author-details -->
-  //         </div>  <!-- END .global-twitter-profile-header -->
-
-  //         <div class="menu-social-account-options">
-  //           <span class="menu-account-default" data-twitter_id="${response.twitter_id}" data-toggle="tooltip" title="Set default account." default="${response}"></span>
-  //           <span class="menu-account-icons">
-  //           <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
-  //           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitter_id="${response}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
-  //           </span>
-  //         </div>  <!-- END .menu-social-account-options -->
-
-  //       </div>  <!-- END .menu-social-account-inner -->
-  //     </div>  <!-- END .menu-social-account-outer -->
-  //     <!-- END .menu-social-account Instance -->     
-  //   `
-  // }
+  }) 
   
   $.fn.hasAttr = function(name) {
     return this.attr(name) !== undefined;
