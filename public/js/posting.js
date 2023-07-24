@@ -61,7 +61,8 @@ $(document).ready(function() {
                     console.log(responseData)
                     if (responseData.length > 0) {
                         $.each(responseData, (index, k) => {
-                            const wrapper = postWrapper(index, 'posted', k);
+                            const postType = getPostType(k.post_type);
+                            const wrapper = postWrapper(k, postType);
 
                             $('.queue-day-wrapper').append(wrapper);                  
                         })   
@@ -95,7 +96,8 @@ $(document).ready(function() {
                         }
                     } else {
                         const postType = getPostType(k.post_type);
-                        const wrapper = postWrapper(k, postType, i);
+                        console.log(k)
+                        const wrapper = postWrapper(k, postType);
                         $('.queue-day-wrapper').append(wrapper);
                     }
                 }
@@ -643,8 +645,8 @@ $(document).ready(function() {
     }
     
     
-    function postWrapper(index, post_type, info) {     
-        console.log(info, post_type)           
+    function postWrapper(info, post_type) {     
+        console.log(info, post_type, info)           
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString('default', { month: 'short' });
