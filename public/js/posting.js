@@ -1,7 +1,11 @@
 $(document).ready(function() {    
-    var method = $(".page-inner").attr("data-sched-method");
-      
+    var currentUrl = window.location.href;
     
+    // Extract the slug from the URL using regular expression
+    var slug = currentUrl.match(/\/([^\/]+)\/?$/)[1];
+
+
+    var method = $(".page-inner").attr("data-sched-method");          
     var data = []; // Initialize an empty array to store all the posts
     var currentPage = 1; // Start with the first page
     var postsPerPage = 40; // Number of posts to retrieve per scroll event
@@ -16,13 +20,18 @@ $(document).ready(function() {
                 case 'queue':                             
                     // Assuming the response data is an array of posts
                     data = responseData; // Add the new posts to the existing array
-
-                    // Check if the initial data has been loaded
-                    if (!initialDataLoaded) {
-                        // Call the function to append the initial set of posts
-                        appendPosts(0, postsPerPage);
-                        initialDataLoaded = true; // Set the flag to indicate initial data is loaded
+                     
+                    if (data.length > 0) {
+                        // Check if the initial data has been loaded
+                        if (!initialDataLoaded) {
+                            // Call the function to append the initial set of posts
+                            appendPosts(0, postsPerPage);
+                            initialDataLoaded = true; // Set the flag to indicate initial data is loaded
+                        }
+                    } else {
+                        $(".queue-day-wrapper").html("<div>No post found</div>");
                     }
+
 
                     break
                 case 'evergreen': 
@@ -38,15 +47,27 @@ $(document).ready(function() {
                     break
 
                 case 'promo': 
-                if (responseData.length > 0) {
-                    $.each(responseData, (index, k) => {
-                        const wrapper = postWrapperPromo(1, k);
+                    if (responseData.length > 0) {
+                        $.each(responseData, (index, k) => {
+                            const wrapper = postWrapperPromo(1, k);
 
-                        $('.profile-posts-inner').append(wrapper)                       
-                    })   
-                } else {
-                    $('.profile-posts-inner').append("<div> No promo posts found.</div>")
-                }
+                            $('.profile-posts-inner').append(wrapper)                       
+                        })   
+                    } else {
+                        $('.profile-posts-inner').append("<div> No promo posts found.</div>")
+                    }
+                
+                case 'posted' :
+                    console.log(responseData)
+                    if (responseData.length > 0) {
+                        $.each(responseData, (index, k) => {
+                            const wrapper = postWrapper(index, 'posted', k);
+
+                            $('.queue-day-wrapper').append(wrapper);                  
+                        })   
+                    } else {
+                        $(".queue-day-wrapper").html("<div>No post were posted yet</div>");
+                    }
                 break    
             }            
         } catch (error) {
@@ -59,26 +80,26 @@ $(document).ready(function() {
     // Function to append new posts to the container
     function appendPosts(startIndex, endIndex) {
         for (var i = startIndex; i < endIndex; i++) {
-        if (i < data.length) {
-            var k = data[i];
-            var currentDate = new Date();
-            var dataDate = new Date(k.sched_time);
-            // Create the post element and append it to the container
-            // ...
-            if (dataDate > currentDate) {
+            if (i < data.length) {
+                var k = data[i];
+                var currentDate = new Date();
+                var dataDate = new Date(k.sched_time);
+                // Create the post element and append it to the container
+                // ...
+                if (dataDate > currentDate) {
 
-                if (k.sched_method === 'slot_sched') {
-                    if (k.post_type === 'evergreen-tweets' || k.post_type === 'promos-tweets') {
-                        const wrapper = postWrapperReserve(k);
+                    if (k.sched_method === 'slot_sched') {
+                        if (k.post_type === 'evergreen-tweets' || k.post_type === 'promos-tweets') {
+                            const wrapper = postWrapperReserve(k);
+                            $('.queue-day-wrapper').append(wrapper);
+                        }
+                    } else {
+                        const postType = getPostType(k.post_type);
+                        const wrapper = postWrapper(k, postType, i);
                         $('.queue-day-wrapper').append(wrapper);
                     }
-                } else {
-                    const postType = getPostType(k.post_type);
-                    const wrapper = postWrapper(k, postType, i);
-                    $('.queue-day-wrapper').append(wrapper);
                 }
             }
-        }
         }
     }
 
@@ -364,65 +385,12 @@ $(document).ready(function() {
             });
     
             const responseData = await response.json();
-            console.log(responseData)
-            // $('.queue-day-wrapper').empty();
-            // $('.profile-posts-inner').empty();
-    
-            // switch (method ){
-            //     case "queue" :
-            //         if (responseData.data.length > 0) {
-            //             $.each(responseData.data, (index, k) => {
-            //                 // var wrapper = '';                
-            //                 var currentDate = new Date();
-            //                 var dataDate = new Date(k.sched_time);
-                            
-            //                 if (dataDate > currentDate) {
-            //                     if (k.sched_method === "slot_sched") { 
-            //                         console.log(k.post_type)
-            //                         if ( k.post_type === "evergreen-tweets" || k.post_type === "promos-tweets" ) {
-            //                             const wrapper = postWrapperReserve(k)
-        
-            //                             $('.queue-day-wrapper').append(wrapper);
-            //                         }
-            //                     } 
-            //                     else {
-            //                         const postType = getPostType(k.post_type);
-            //                         const wrapper = postWrapper(k, postType, index);
-            //                         $('.queue-day-wrapper').append(wrapper);
-            //                     }
-            //                 } 
-            //             }) 
-            //         } else {
-            //             $(".queue-day-wrapper").html("<div>No post found</div>");
-            //         } 
-            //     break; 
-                
-            //     case "evergreen" :
-            //         if (responseData.data.length > 0) {
-            //             $.each(responseData.data, (index, k) => {
-            //                 const wrapper = postWrapperEvergreen(k);
-    
-            //                 $('.profile-posts-inner').append(wrapper)                       
-            //             })
-            //         } else {
-            //             $(".queue-day-wrapper").html("<div>No post found</div>");
-            //         }                        
-            //         break;
-            //     case "promo" :
-            //         if (responseData.data.length > 0) {
-            //             $.each(responseData.data, (index, k) => {
-            //                 const wrapper = postWrapperPromo(index, k);
-            //                 console.log(k)
-    
-            //                 $('.profile-posts-inner').append(wrapper)                       
-            //             })
-            //         } else {
-            //             $(".queue-day-wrapper").html("<div>No post found</div>");
-            //         }                        
-            //         break;
-                
-            // }            
+            console.log(responseData)     
             
+            if (responseData.status === 200) {
+                console.log('Post status is now switched')
+            } 
+
         } catch (error) {
             console.log("Failed to fetch data:", error);
         }
@@ -568,8 +536,6 @@ $(document).ready(function() {
         }
         
         openModal('command-module');
-
-        // $('.primary-post-area').text();
     }
 
     async function openCmdModalwithRetweet(id) {        
@@ -591,70 +557,61 @@ $(document).ready(function() {
             console.log('error in fetching data', err)
         }
 
-        openModal('command-module');
-
-        // $('.primary-post-area').text();
+        openModal('command-module');        
     }
 
-    async function openCmdModalwithQueue() {
+    $('.new-queue-cmdmod').on('click', function() {
         $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
         $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
-        $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
-        $(".cross-tweet-profiles-outer").removeClass("tweets-hide");
-            
-        // $('span.post-type-buttons img[data-type="evergreen-tweets"]').addClass('icon-active');                
-        // // $(".cross-tweet-profiles-outer").addClass("tweets-hide");
-        // $("div[data-post]").filter(`[data-post="evergreen-tweets"]`).removeClass("tweets-hide");        
+        $('div[data-post]').filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+        $('.cross-tweet-profiles-outer').removeClass("tweets-hide");
+        $('#post_type_tweets').val("regular-tweets");             
 
         openModal('command-module');
-    }
-
-    async function openCmdModalwithEvergreen() {
-        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
-        $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
-        $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
-        $(".cross-tweet-profiles-outer").removeClass("tweets-hide");
-            
-        $('span.post-type-buttons img[data-type="evergreen-tweets"]').addClass('icon-active');                
-        $("div[data-post]").filter(`[data-post="evergreen-tweets"]`).removeClass("tweets-hide");
-              
-        openModal('command-module');
-    }
-
-    async function openCmdModalwithPromo() {
-        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
-        $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
-        $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
-            
-        $('span.post-type-buttons img[data-type="promos-tweets"]').addClass('icon-active');                
-        $(".cross-tweet-profiles-outer").addClass("tweets-hide");
-        $("div[data-post]").filter(`[data-post="promos-tweets"]`).removeClass("tweets-hide");
-        
-        // try {
-        //     const response = await fetch(APP_URL + '/post/evergreen/retrieve/' + id + '?post_action=retweet');
-        //     const responseData = await response.json(); 
-
-        //     $('#posting-tool-form-001').find('.primary-post-area').text(responseData.data.post_description);
-
-        // } catch(err) {
-        //     console.log('error in fetching data', err)
-        // }
-
-        openModal('command-module');
-    }
+    });
 
     $('.new-evergreen-cmdmod').on('click', function() {
-        openCmdModalwithEvergreen();
-    })
+        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
+        $('span.post-type-buttons img').addClass('disabled');  // remove disabled 
+        $('div[data-post]').filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+        $('.cross-tweet-profiles-outer').removeClass("tweets-hide");
+        $('#posting-tool-form-001 img.post-type-indicator').removeClass('indicator-active')
+            
+        $('span.post-type-buttons img[data-type="evergreen-tweets"]').removeClass('disabled');  // remove disabled 
+        $('span.post-type-buttons img[data-type="evergreen-tweets"]').addClass('icon-active');                
+        $('div[data-post]').filter(`[data-post="evergreen-tweets"]`).removeClass("tweets-hide");
+        $('#posting-tool-form-001').find('img.post-type-indicator[data-src="evergreen-tweets"]').addClass('indicator-active')
+        $('#post_type_tweets').val("evergreen-tweets");
+
+        $('#scheduling-options option[value="send-now"]').prop('disabled', true);
+        $('#scheduling-options option[value="set-countdown"]').prop('disabled', true);
+        $('#scheduling-options option[value="custom-time"]').prop('disabled', true);
+        $('#scheduling-options option[value="custom-slot"]').prop('disabled', true);        
+              
+        openModal('command-module');
+    });
     
     $('.new-promos-cmdmod').on('click', function() {
-        openCmdModalwithPromo();
-    })
-    
-    $('.new-queue-cmdmod').on('click', function() {
-        openCmdModalwithQueue();
-    })
+        $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
+        $('span.post-type-buttons img').addClass('disabled');  // remove disabled 
+        $('div[data-post]').filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
+        $('#posting-tool-form-001 img.post-type-indicator').removeClass('indicator-active')
+        
+        $('span.post-type-buttons img[data-type="promos-tweets"]').removeClass('disabled');  // remove disabled 
+        $('span.post-type-buttons img[data-type="promos-tweets"]').addClass('icon-active');                
+        $('.cross-tweet-profiles-outer').addClass("tweets-hide");
+        $('div[data-post]').filter(`[data-post="promos-tweets"]`).removeClass("tweets-hide");
+        $('#posting-tool-form-001').find('img.post-type-indicator[data-src="promos-tweets"]').addClass('indicator-active')
+        $('#post_type_tweets').val("promos-tweets");
 
+        $('#scheduling-options option[value="send-now"]').prop('disabled', true);
+        $('#scheduling-options option[value="set-countdown"]').prop('disabled', true);
+        $('#scheduling-options option[value="custom-time"]').prop('disabled', true);
+        $('#scheduling-options option[value="custom-slot"]').prop('disabled', true);        
+              
+        openModal('command-module');
+    });
+    
     function getPostType(type) {
         var postType;
 
@@ -686,7 +643,8 @@ $(document).ready(function() {
     }
     
     
-    function postWrapper(info, post_type, index) {                
+    function postWrapper(index, post_type, info) {     
+        console.log(info, post_type)           
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString('default', { month: 'short' });
@@ -852,10 +810,11 @@ $(document).ready(function() {
                 ${TWITTER_NAME}</a>
                 </div>  <!-- END .global-author-name -->
                 <div class="global-profile-subdata">
-                <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
-                <span class="global-post-date">
+                    <!-- <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
+                    <span class="global-post-date">
                     <a href="">
-                    ${ fullDate + ' ' + timeString }</a></span>
+                    ${ fullDate + ' ' + timeString }</a>
+                    </span> -->
                 </div>  <!-- END .global-post-date-wrap -->
             </div>  <!-- END .global-author-details -->
             </div>  <!-- END .global-post-author -->
@@ -941,10 +900,11 @@ $(document).ready(function() {
                     ${TWITTER_NAME}</a>
                 </div>  <!-- END .global-author-name -->
                 <div class="global-profile-subdata">
-                    <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
-                    <span class="global-post-date">
-                    <a href="">
-                        ${ fullDate + " " + timeString }</a></span>
+                    <!--  <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
+                        <span class="global-post-date">
+                        <a href="">
+                        ${ fullDate + " " + timeString }</a>
+                        </span> -->
                 </div>  <!-- END .global-post-date-wrap -->
                 </div>  <!-- END .global-author-details -->
             </div>  <!-- END .global-post-author -->

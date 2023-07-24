@@ -334,12 +334,12 @@ class CommandmoduleController extends Controller
             
             switch ($post_type) {
                 case 'posted': 
+                    // dd(TwitterHelper::now(Auth::id()));
                     $tweets = DB::table('cmd_module')
-                    ->where('twitter_id', $id)
-                    // ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
-                    ->where('sched_method', 'posted')
-                    // ->where('active', )
-                    ->get();
+                        ->where('twitter_id', $id)
+                        ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
+                        // ->where('sched_method', 'posted')
+                        ->get();
                     break;
                     
                 case 'save-draft': 
@@ -366,7 +366,7 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
 
-                            
+                    // dd($posts)        ;
                     $schedules = Schedule::where('user_id', Auth::id())->get();     
 
                     $recurringDates = [];
@@ -418,9 +418,9 @@ class CommandmoduleController extends Controller
                         return $tweetDateTime->greaterThan($currentDateTime);
                     });
 
-                    // // dd($tweetSorted);
-
+                    
                     $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();               
+                    // dd($tweets);
 
                     break;
 

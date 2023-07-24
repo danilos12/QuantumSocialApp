@@ -60,8 +60,7 @@ class AppServiceProvider extends ServiceProvider
                 $token = TwitterToken::where(['user_id' => Auth::id(), 'twitter_id' => $selectedUser->twitter_id ?? 0 ])->first();
                 if ($token) {
                     $view->with('refresh_token', $token->refresh_token ?? "");       
-                }
-                        
+                }                        
                 
                 $twitterID = $selectedUser->twitter_id ?? 0;
                 $view->with('twitter_id', $twitterID);       
@@ -74,19 +73,18 @@ class AppServiceProvider extends ServiceProvider
                             ->select('*')
                             ->where('user_id', Auth::id())
                             ->first();
-                $view->with('individualTwitterApi', $individualTwitterApi);
-
-                // main quantum user 
-                $main_user = User::find(Auth::id());
-                $view->with('main_user', $main_user);
+                $view->with('individualTwitterApi', $individualTwitterApi);            
     
                 // timezone 
                 $timezones = DB::table('timezones')->get();
                 $view->with('timezones', $timezones);
     
                 // retrieve timezone
-                $getTimezone = DB::table('users_meta')->where('user_id', Auth::id())->first();
-                $view->with('getTimezone', $getTimezone);
+                $mainUser = DB::table('users')
+                            ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
+                            ->where('users.id', Auth::id())->first();
+                $view->with('mainUser', $mainUser);
+                
                 
                 // general settings sliders                
                 $generalSettings = DB::table('settings_general')->where('user_id', Auth::id())->first();
@@ -131,8 +129,10 @@ class AppServiceProvider extends ServiceProvider
 
                 $getMembers = DB::table('user_mngt')
                     ->join('users', 'user_mngt.user_id', '=', 'users.id')
+                    // ->join('users_meta', 'users_meta.user_id', '=', 'users.id')
                     ->select('users.*', 'user_mngt.*')
                     ->where('user_mngt.main_id', Auth::id())
+                    ->where('user_mngt.deleted', 0)
                     ->get();
                 $view->with('members', $getMembers);
                 
