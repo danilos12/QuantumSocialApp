@@ -265,89 +265,89 @@ class PostingController extends Controller
 			//update first the switch
 			TwitterToken::where('twitter_id', $id)->where('active', 1)->update(['queue_switch' => $k]);
 						
-			$sort = '';
-			switch ($request->method) {
-				case "queue" : 
-					$posts = DB::table('cmd_module')                                         
-					->select('*')
-					->whereIn('id', function ($query) {
-						$query->select(DB::raw('MIN(id)'))
-						->from('cmd_module')
-						->groupBy('post_type_code');
-					})
-					->where('twitter_id', $id)
-					->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
-					->where('cmd_module.post_type', '!=','evergreen-tweets')
-					->where('cmd_module.post_type', '!=','promos-tweets')
-					->where('active', $k)
-					->orderBy('sched_time', 'ASC')
-					->orderBy('sched_method', 'DESC')
-					->get();          
+			// $sort = '';
+			// switch ($request->method) {
+			// 	case "queue" : 
+			// 		$posts = DB::table('cmd_module')                                         
+			// 		->select('*')
+			// 		->whereIn('id', function ($query) {
+			// 			$query->select(DB::raw('MIN(id)'))
+			// 			->from('cmd_module')
+			// 			->groupBy('post_type_code');
+			// 		})
+			// 		->where('twitter_id', $id)
+			// 		->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
+			// 		->where('cmd_module.post_type', '!=','evergreen-tweets')
+			// 		->where('cmd_module.post_type', '!=','promos-tweets')
+			// 		->where('active', $k)
+			// 		->orderBy('sched_time', 'ASC')
+			// 		->orderBy('sched_method', 'DESC')
+			// 		->get();          
 
-					$schedules = Schedule::all();                                  
+			// 		$schedules = Schedule::all();                                  
 
-					$recurringDates = [];
-					$currentMonth = now()->month;
-					$currentYear = now()->year;
+			// 		$recurringDates = [];
+			// 		$currentMonth = now()->month;
+			// 		$currentYear = now()->year;
 
-					foreach ($schedules as $schedule) {
-						$dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
-						$time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
+			// 		foreach ($schedules as $schedule) {
+			// 			$dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
+			// 			$time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
 						
-						$startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth();
-						$endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
-						$currentDate = $startDate->copy();
+			// 			$startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth();
+			// 			$endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+			// 			$currentDate = $startDate->copy();
 						
-						while ($currentDate->lte($endDate)) {
-							if ($currentDate->dayOfWeek === $dayOfWeek) {
-								$recurringDates[] = [
-									'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
-									'post_type' => $schedule->post_type,
-									'sched_method' => 'slot_sched' 
-								];
-							}
+			// 			while ($currentDate->lte($endDate)) {
+			// 				if ($currentDate->dayOfWeek === $dayOfWeek) {
+			// 					$recurringDates[] = [
+			// 						'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
+			// 						'post_type' => $schedule->post_type,
+			// 						'sched_method' => 'slot_sched' 
+			// 					];
+			// 				}
 							
-							$currentDate->addDay();
-						}                        
-					}
+			// 				$currentDate->addDay();
+			// 			}                        
+			// 		}
 
-					$object = collect($recurringDates)->map(function ($item) {
-						return (object) $item;
-					});
+			// 		$object = collect($recurringDates)->map(function ($item) {
+			// 			return (object) $item;
+			// 		});
 
-					$objects = $object->sortBy('sched_time');
+			// 		$objects = $object->sortBy('sched_time');
 
-					$objects->transform(function ($item) {
-						$item->sched_time = (string) $item->sched_time; // Convert specific property to string
-						return $item;
-					});
+			// 		$objects->transform(function ($item) {
+			// 			$item->sched_time = (string) $item->sched_time; // Convert specific property to string
+			// 			return $item;
+			// 		});
 
-					$mergedData = $objects->merge($posts);
-					$sort = $mergedData->sortBy('sched_time')->toArray();      
-					break;
-				case 'evergreen' : 
-					$sort = DB::table('cmd_module')						
-						->select('*')
-						->where('twitter_id', $id)
-						->where('post_type', '=', 'evergreen-tweets')
-						->where('active', '=', ($switch === 'active') ? 1: 0)
-						->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-						->get();
+			// 		$mergedData = $objects->merge($posts);
+			// 		$sort = $mergedData->sortBy('sched_time')->toArray();      
+			// 		break;
+			// 	case 'evergreen' : 
+			// 		$sort = DB::table('cmd_module')						
+			// 			->select('*')
+			// 			->where('twitter_id', $id)
+			// 			->where('post_type', '=', 'evergreen-tweets')
+			// 			->where('active', '=', ($switch === 'active') ? 1: 0)
+			// 			->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+			// 			->get();
 
-						break;
-				case 'promo':
-					$sort = DB::table('cmd_module')						
-						->select('*')
-						->where('twitter_id', $id)
-						->where('post_type', '=', 'promos-tweets')
-						->where('active', '=', ($switch === 'active') ? 1: 0)
-						->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-						->get();
+			// 			break;
+			// 	case 'promo':
+			// 		$sort = DB::table('cmd_module')						
+			// 			->select('*')
+			// 			->where('twitter_id', $id)
+			// 			->where('post_type', '=', 'promos-tweets')
+			// 			->where('active', '=', ($switch === 'active') ? 1: 0)
+			// 			->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+			// 			->get();
 
-					break;
-			}			
+			// 		break;
+			// }			
 
-			return response()->json(['status' => 200, 'data' => $sort]);
+			return response()->json(['status' => 200, 'data' => $k]);
 		} catch (Exception $e) {
 			Log::error('Error creating data: ' . $e->getMessage());
 			return response()->json(['status' => '500', 'error' => 'Switched data']);

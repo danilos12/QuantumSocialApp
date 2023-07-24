@@ -321,16 +321,24 @@ class GeneralSettingController extends Controller
             ];
             $saveMember = User::create($insertNewMember);
 
+            // $users_meta = [
+            //     'subscription' 
+            // ]
+
             $relational = [
                 'main_id' => Auth::id(),
                 'main_acct' => 0,
                 'sub_acct'  => 1,
-                'user_id' => $saveMember->id
+                'user_id' => $saveMember->id,
+                'deleted' => 0
             ];
+            
             $userMngt = DB::table('user_mngt')->insert($relational);
 
             if ($saveMember && $userMngt) {
-                return response()->json(['status' => 200, 'message' => 'New member added successfully']);
+                return response()->json(['status' => 200, 'stat'=> 'success', 'message' => 'New member added successfully']);
+            } else {            
+                return response()->json(['status' => 500, 'stat' => 'danger' , 'message' => "There's an error saving your data."]);
             }
 
         } catch(Exception $e) {
@@ -388,7 +396,9 @@ class GeneralSettingController extends Controller
             
     
             if ($editUser) {
-                return response()->json(['status' => 200, 'message' => 'User updated successfully']);
+                return response()->json(['status' => 200, 'stat'=> 'success', 'message' => 'User updated successfully']);
+            } else {
+                return response()->json(['status' => 500, 'stat'=> 'danger', 'message' => 'Error in updating the data']);
             }
     
         } catch (Exception $e) {
@@ -400,13 +410,16 @@ class GeneralSettingController extends Controller
         }    
     }
     
-    public function _deleteMember($id) {        
+    public function _deleteMember($id) {                
         try {
-            $deleteUser = User::where('id', $id)->delete();
+            $deleteUser = DB::table('user_mngt')->where('user_id', $id)->update(['deleted' => 1]);
 
             if ($deleteUser) {
-                return response()->json(['status' => 200, 'message' => 'User deleted successfully.']);
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'User deleted successfully.']);
+            } else {
+                return response()->json(['status' => 200, 'stat' => 'danger', 'message' => 'User deleted successfully.']);
             }
+
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
