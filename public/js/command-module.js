@@ -668,6 +668,7 @@ $(function($) {
     /** Form submit */ 
     $("#posting-tool-form-001").on("submit", function(e) {
         const form = $(this);
+        console.log(form)
         e.preventDefault();
         
         var crossTweet = [];
@@ -732,7 +733,7 @@ $(function($) {
 
                     // check if the element is an input field      
                     if (
-                        element.nodeName === "INPUT" ||
+                        // element.nodeName === "INPUT" ||
                         element.nodeName === "SELECT" ||
                         element.nodeName === "TEXTAREA"
                     ) {
