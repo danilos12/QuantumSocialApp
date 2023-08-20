@@ -99,8 +99,8 @@ class CommandmoduleController extends Controller
                         $sched_time = ($count > 0) ? $lastTweet->sched_time : $datetime;
                         break;
 
-                    case 'count-down':
-                        $countDown = ($postData['c-set-countdown'] === '1') ? rtrim($postData['ct-set-countdown'], 's') : $postData['ct-set-countdown'];
+                    case 'set-countdown':
+                        $countDown = ($postData['c-set-countdown'] === '1') ? rtrim($postData['ct-set-countdown'], '/s') : $postData['ct-set-countdown'];
                         
                         $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
 
