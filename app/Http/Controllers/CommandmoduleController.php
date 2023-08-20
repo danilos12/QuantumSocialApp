@@ -79,7 +79,7 @@ class CommandmoduleController extends Controller
                 'active' => $checkToggle->queue_switch
             ];
 
-            dd($postData);
+            // dd($postData);
 
             // Determine the scheduling method and time based on the user's selected option
             if (isset($postData['scheduling-options'])) {
