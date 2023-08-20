@@ -456,16 +456,19 @@ $(function($) {
         var div = $("#scheduling-method-" + option);
         var sopp = "";
         console.log(option)
+        $('.scheduling-details').html()     
         
-        $('div[name="scheduling-method"]').filter('div[data-name!="' + option + '"]').attr("data-schedule", "none");
-        $(".date-picker-wrapper").empty()
+        // $('div[name="scheduling-method"]').filter('div[data-name!="' + option + '"]').attr("data-schedule", "none");
+        // $(".date-picker-wrapper").empty()
 
         // $("#scheduling-cdn").removeAttr("data-info name");
         // $("#scheduling-cdmins").removeAttr("data-check name");
 
         switch (option) {
             case "set-countdown" : 
-                div.attr("data-schedule", option);            
+                div.attr("data-schedule", option);   
+                var dropdown = customSetCountdown()
+                $('.scheduling-details').html(dropdown)         
                 
                 $("#scheduling-cdn").attr({
                     "data-info": option,
@@ -512,7 +515,8 @@ $(function($) {
             
             case "custom-slot": 
                 div.attr("data-schedule", option);    
-                console.log(div.attr("data-schedule", option)) 
+                var dropdown = customSlotdropdown();
+                $('.scheduling-details').html(dropdown)
                 
                 var icon = $('.primary-post-type-buttons').find('img.icon-active').data('type');
                 $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
@@ -623,6 +627,22 @@ $(function($) {
         // // error code here
         //     console.log(xhr)
         // });
+    }
+
+    function customSetCountdown() {
+        var measure = ['minute/s', 'hour/s', 'day/s'];
+        var html =  `<select id="scheduling-cdn" class="scheduling-options-dd scheduling-countdown-number">`
+        for (var i = 1; i <= 12; i++) {
+            html += `<option value="${i}">${i}</option>`;
+        }
+        html += `</select> <select id="scheduling-cdmins" name="scheduling-cdmins" class="custom-dhms scheduling-countdown-minutes scheduling-options-dd">`;
+        
+        for (const value of measure) {
+            html += `<option value="${value}">${value}</option>`;            
+        }
+        html += `</select>`;
+
+        return html;
     }
 
     function customSlotdropdown() {
@@ -948,7 +968,7 @@ function postWrapper(index, info, post_type) {
     // var data = fetchTwitterDetails(info.twitter_id);        
     return $template = `                          
             <!-- BEGIN Custom Queued Post Instance (CUSTOM) --> 
-            <div class="queued-single-post-wrapper queue-type-${post_type}" status="active" queue-type="${post_type}">
+            <div class="queued-single-post-wrapper queue-type-${post_type}" status="${info.active === 0 ? 'inactive' : 'active'}" queue-type="${post_type}">
                 <div class="queued-single-post"> 
   
                 <img src="${APP_URL}/public/ui-images/icon2/pg-${ post_type === 'regular-tweets' ? 'custom' : post_type }.svg" class="queued-watermark" />
