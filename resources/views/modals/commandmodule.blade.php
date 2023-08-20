@@ -1,20 +1,20 @@
 <style>
 .tweets-hide {
-	display: none;
+  display: none;
 }
 div[data-schedule="none"] {
-	display: none;
+  display: none;
 }
 </style>
 <div class="modal-large-outer posting-tool-outer command-module-outer">
                         <div class="modal-large-inner posting-tool-inner">
 
-                         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close posting-tool-close" id="command-module"/>
+                          <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close posting-tool-close" id="command-module"/>
 
                           <div class="posting-tool-banner">
                             <div class="global-twitter-profile-header">
                               <a href="#">
-                               <img src="{{ $twitter_photo ?: asset('public//temp-images/imgpsh_fullsize_anim (1).png') }}"
+                                <img src="{{ $twitter_photo ?: asset('public//temp-images/imgpsh_fullsize_anim (1).png') }}"
                                   class="global-profile-image" /></a>
                               <div class="global-profile-details">
                                 <div class="global-profile-name">
@@ -37,30 +37,30 @@ div[data-schedule="none"] {
 
                                   <div class="post-area-left primary-post-left">
                                     <div class="post-area-wrap primary-post-area-wrap">
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="twitter-tweets"/>
-                                     <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon post-type-indicator" data-src="evergreen-tweets"/>
-                                     <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" data-src="promos-tweets" />
-                                     <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-tweets"/>
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-tweets"/>
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comments-tweets"/>
-                                     <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
-                                     <img src="{{ asset('public/')}}/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
-                                     {{-- <div>
-                                       <div  class="post-textarea primary-post-area" name="tweet_text_area" id="emojionearea"  contentEditable="true">
-                                         <span>
-                                           <img id="image-preview" src="#" alt="Image Preview" style="display:none" />  
+                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="twitter-tweets"/>
+                                      <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon post-type-indicator" data-src="evergreen-tweets"/>
+                                      <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" data-src="promos-tweets" />
+                                      <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-tweets"/>
+                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-tweets"/>
+                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comments-tweets"/>
+                                      <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen-storm.svg" class="ui-icon post-type-indicator" data-src="evergreen-storm-tweets"/>
+                                      <img src="{{ asset('public/')}}/ui-images/icons/17-promos-storm.svg" class="ui-icon post-type-indicator" data-src="promos-storm-tweets" />
+                                      {{-- <div>
+                                        <div  class="post-textarea primary-post-area" name="tweet_text_area" id="emojionearea"  contentEditable="true">
+                                          <span>
+                                            <img id="image-preview" src="#" alt="Image Preview" style="display:none" />  
                                           </span>                              
-                                       </div>
-                                     </div> --}}
-                                     <textarea class="post-textarea primary-post-area" id="emojionearea"></textarea>  <!-- END .primary-post-area -->      
+                                        </div>
+                                      </div> --}}
+                                      <textarea class="post-textarea primary-post-area" id="emojionearea"></textarea>  <!-- END .primary-post-area -->      
                                     </div>  <!-- END .primary-post-area-wrap -->
                                     <div class="post-bottom-buttons primary-post-bottom-buttons">
                                       <span class="post-type-buttons primary-post-type-buttons">
-                                       <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-retweet-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
-                                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-retweet-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
+                                        <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
                                       </span>  <!-- END .primary-post-type-buttons -->
                                       <span class="post-option-buttons primary-post-option-buttons">
                                         <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
@@ -72,7 +72,7 @@ div[data-schedule="none"] {
 
                                       <div class="post-tool-modal tag-group-modal-outer frosted">
                                         <div class="tag-group-modal-inner">
-                                         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close tag-group-modal-close" />
+                                          <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon post-tool-modal-close tag-group-modal-close" />
                                           <select id="tag-groups">
                                             <option disabled selected class="modal-select-tag-group">Select a Tag Group:</option>                                            
                                           </select>
@@ -89,16 +89,16 @@ div[data-schedule="none"] {
 
                                   <div class="post-area-right primary-post-right">
                                     <div class="post-right-buttons primary-post-right-buttons">
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" data-clicked="0" class="ui-icon post-tool-icon add-image-icon" /><br />
-                                     {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br /> --}}
-                                     {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon emojionearea-button" data-emoji-open="0" /><br /> --}}
+                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" data-clicked="0" class="ui-icon post-tool-icon add-image-icon" /><br />
+                                      {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br /> --}}
+                                      {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon emojionearea-button" data-emoji-open="0" /><br /> --}}
                                     </div>  <!-- END .primary-post-right-buttons -->
                                     <input id="image-upload-input" type="file" accept="image/*" style="display: none;">
                                   </div>  <!-- END .primary-post-right -->
 
                                 </div>  <!-- END .primary-post-wrap -->
 
-                               <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" data-select="0" class="ui-icon add-tweet-icon add-tweet-initial" />
+                                <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" data-select="0" class="ui-icon add-tweet-icon add-tweet-initial" />
 
                                 <div class="more-tweets-roster">     
                                                               
@@ -107,17 +107,17 @@ div[data-schedule="none"] {
                               
 
                               <div class="posting-tool-col posting-tool-right-col right-section">
-								                <input type="hidden" name="post_type_tweets" value="regular-tweets" id="post_type_tweets" class="post_type_tweets">
+                                <input type="hidden" name="post_type_tweets" value="regular-tweets" id="post_type_tweets" class="post_type_tweets">
 
                                 <div id="post_evergreen" data-post="evergreen-tweets" class="post-alert evergreen-alert tweets-hide">
-                                 <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
+                                  <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Adding to Evergreen Tweets
                                   </span>
                                 </div>  <!-- END .evergreen-alert -->
 
                                 <div id="post_promo" data-post="promos-tweets" class="post-alert promo-alert tweets-hide">
-                                 <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon alert-icon" />
+                                  <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Adding to Promo Tweets
                                   </span>
@@ -130,14 +130,14 @@ div[data-schedule="none"] {
                                 </div>  <!-- END .promo-alert -->
 
                                 <div id="post_tweet_storms" data-post="tweet-storm-tweets" class="post-alert tweet-storm-alert tweets-hide">
-                                 <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon alert-icon" />
+                                  <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Adding to Tweet Storms
                                   </span>
                                 </div>  <!-- END .promo-alert -->
 
                                 <div id="post_regular_retweet" data-post="retweet-tweets" class="post-alert retweet-alert tweets-hide">
-                                 <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon alert-icon" />
+                                  <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Tweet to Retweet:
                                   </span>
@@ -146,7 +146,7 @@ div[data-schedule="none"] {
                                 </div>  <!-- END .comment-alert -->
 
                                 <div id="post_comment" data-post="comments-tweets" class="post-alert comment-alert tweets-hide">
-                                 <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon alert-icon" />
+                                  <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon alert-icon" />
                                   <span>
                                     Tweet to Comment On:
                                   </span>
@@ -157,7 +157,7 @@ div[data-schedule="none"] {
 
                                 <div id="post_retweet_timer" data-post="retweet-timer-tweets" data-retweet="post_regular_retweet" class="post-alert retweet-timer-alert tweets-hide">
                                   <div class="retweet-timer-alert-heading">
-                                   <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon alert-icon" />
+                                    <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" class="ui-icon alert-icon" />
                                     <span>
                                       Retweet every:
                                     </span>
@@ -200,23 +200,30 @@ div[data-schedule="none"] {
 
                             <div class="posting-tool-submit-wrap">
                               <div class="post-tool-submit-left">
-                                <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
+                              <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
                                   <option disabled selected value="save-draft" id="mainselect">Select a scheduling method...</option>
+                                  <!-- <option value="add-queue">Add to Queue (default)</option> -->
+                                  @if ($hasRegularTweetsInQueue)
                                   <option value="add-queue">Add to Queue (default)</option>
+                                  @endif
                                   <option value="send-now">Tweet Now</option>
                                   <option value="set-countdown">Set Countdown</option>
                                   <option value="custom-time">Custom Time</option>
-                                  <option value="custom-slot">Custom Slot</option>
+                                  @if ($hasCustomSlot)
+                                    <option value="custom-slot">Custom Slot</option>
+                                  @endif
                                   <option value="save-draft">Save As Draft</option>
-                                  <option value="rush-queue">Rush In Queue</option>
-                                </select>
+                                  @if ($hasRegularTweetsInQueue)
+                                      <option value="rush-queue">Rush In Queue</option>
+                                  @endif
+                              </select>
                                 <div class="scheduling-details">
 
 
                                 <!-- INGRID - Please finish these, based on the UI of the rest of the page -->
 
                                   <!-- CARLO - These options only show up if certain options are selected in the scheduling method options -->
- 
+  
                                   <div class="scheduling-details-countdown sop" id="scheduling-method-set-countdown" data-schedule="none" data-name="set-countdown" name="scheduling-method">
                                     <!-- CARLO - if Countdown -->
                                     <select id="scheduling-cdn" class="scheduling-options-dd scheduling-countdown-number">                                      

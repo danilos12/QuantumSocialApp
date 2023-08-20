@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\GeneralSettings;
 use App\Providers\RouteServiceProvider;
-use App\Models\User;
-use App\Models\QuantumAcctMeta;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\DB; 
+use App\Models\User;
+use App\Models\GeneralSettings;
+use App\Models\QuantumAcctMeta;
+use Illuminate\Support\Facades\Hash;
 
 
 class RegisterController extends Controller
@@ -56,21 +56,14 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'firstname' => ['required', 'string', 'max:255'],
-            'lastname' => ['required', 'string', 'max:255'],
+            // 'firstname' => ['required', 'string', 'max:255'],
+            // 'lastname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ], 
-        [
-            'firstname.required' => 'The First name field is required.',
-            'lastname.required' => 'The Last name field is required.',
-            'email.required' => 'The email field is required.',
-            'email.email' => 'Please enter a valid email address.',
-            'password.required' => 'The password field is required.',
-            'password.min' => 'The password must be at least 8 characters long.',
-            'password.confirmed' => 'The password confirmation does not match.',
-        ]);
+        ]);                       
+      
     }
+    
 
     /**
      * Create a new user instance after a valid registration.
@@ -79,7 +72,7 @@ class RegisterController extends Controller
      * @return \App\Models\User
      */
     protected function create(array $data)
-    {
+    {        
         $user = User::create([
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
@@ -103,7 +96,10 @@ class RegisterController extends Controller
         QuantumAcctMeta::create([
             'user_id' => $user->id,
             'subscription' => 'free',
-            'timezone' => $timezoneOffsetFormatted
+            'timezone' => $timezoneOffsetFormatted,
+            'subscription_free_counter' => 0,
+            'member_count' => 0,
+            'status' => 0
         ]);
    
 

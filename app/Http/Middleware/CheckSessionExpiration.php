@@ -16,6 +16,7 @@ class CheckSessionExpiration
             // Redirect to login page if session has expired
             session()->flash('error', 'Session expired');
             return redirect()->route('session-login');
+            // return redirect()->route('login');
         }
         
         $lastActivity = $request->session()->get('last_activity');

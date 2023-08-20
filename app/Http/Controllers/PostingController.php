@@ -33,28 +33,48 @@ class PostingController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+	
     public function index()
     {
 		$title = 'Queue';
         return view('queue')->with('title', $title);
     }
 	
-	 public function queue()
-    {
+	public function queue()
+	{
 		$title = 'Queue';
-        return view('queue')->with('title', $title);
-    }
+		$userId = Auth::id(); //To check current user loggedin User ID dria
+        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+        ->where('sched_method', 'add-queue')
+        ->where('post_type', 'regular-tweets')
+        ->exists();
+		return view('queue', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+	}
+	
 	
 	 public function drafts()
     {
 		$title = 'Drafts page';
-        return view('drafts')->with('title', $title);
+		$userId = Auth::id(); //To check current user loggedin User ID dria
+        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+        ->where('sched_method', 'add-queue')
+        ->where('post_type', 'regular-tweets')
+        ->exists();
+		return view('drafts', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+		// return view('drafts')->with('title', $title);
+
     }
 	
 	 public function posted()
     {
 		$title = 'Posted';   
-        return view('posted')->with('title', $title);
+		$userId = Auth::id(); //To check current user loggedin User ID dria
+        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+        ->where('sched_method', 'add-queue')
+        ->where('post_type', 'regular-tweets')
+        ->exists();
+		return view('posted', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        // return view('posted')->with('title', $title);
     }
 	
 	public function slot_scheduler()
@@ -66,6 +86,8 @@ class PostingController extends Controller
 		
 		$my_schedule = DB::table('schedule')->select('*')->where('user_id', '=', $userId)->orderBy('minute_at', 'asc')->get();
 		
+		// return view('schedule', compact('title', 'days', 'my_schedule', 'hasRegularTweetsInQueue'));
+
         return view('schedule', compact('title', 'days', 'my_schedule'));
 		
     }
@@ -201,13 +223,21 @@ class PostingController extends Controller
 	public function tweet_stormer()
     {
 		$title = 'Tweet Stormer page';
-        return view('posting')->with('title', $title);
+		$hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
+		->where('post_type', 'regular-tweets')
+		->exists();
+		return view('posting', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        // return view('posting')->with('title', $title);
     }
 	
 	public function bulk_uploader()
     {
 		$title = 'Bulk Uploader';
-        return view('bulk')->with('title', $title);
+		$hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
+		->where('post_type', 'regular-tweets')
+		->exists();
+		return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        // return view('bulk')->with('title', $title);
     }
 	
 	public function editPost(Request $request, $id) {
@@ -268,17 +298,17 @@ class PostingController extends Controller
 			// $sort = '';
 			// switch ($request->method) {
 			// 	case "queue" : 
-			// 		$posts = DB::table('cmd_module')                                         
+			// 		$posts = DB::table('posts')                                         
 			// 		->select('*')
 			// 		->whereIn('id', function ($query) {
 			// 			$query->select(DB::raw('MIN(id)'))
-			// 			->from('cmd_module')
+			// 			->from('posts')
 			// 			->groupBy('post_type_code');
 			// 		})
 			// 		->where('twitter_id', $id)
 			// 		->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
-			// 		->where('cmd_module.post_type', '!=','evergreen-tweets')
-			// 		->where('cmd_module.post_type', '!=','promos-tweets')
+			// 		->where('posts.post_type', '!=','evergreen-tweets')
+			// 		->where('posts.post_type', '!=','promos-tweets')
 			// 		->where('active', $k)
 			// 		->orderBy('sched_time', 'ASC')
 			// 		->orderBy('sched_method', 'DESC')
@@ -326,7 +356,7 @@ class PostingController extends Controller
 			// 		$sort = $mergedData->sortBy('sched_time')->toArray();      
 			// 		break;
 			// 	case 'evergreen' : 
-			// 		$sort = DB::table('cmd_module')						
+			// 		$sort = DB::table('posts')						
 			// 			->select('*')
 			// 			->where('twitter_id', $id)
 			// 			->where('post_type', '=', 'evergreen-tweets')
@@ -336,7 +366,7 @@ class PostingController extends Controller
 
 			// 			break;
 			// 	case 'promo':
-			// 		$sort = DB::table('cmd_module')						
+			// 		$sort = DB::table('posts')						
 			// 			->select('*')
 			// 			->where('twitter_id', $id)
 			// 			->where('post_type', '=', 'promos-tweets')
@@ -385,7 +415,7 @@ class PostingController extends Controller
 		$date = intval(Carbon::createFromFormat('F Y', $convertDate)->format('m'));
 		
 		// $sort = CommandModule::where(['twitter_id' => $request->id, 'sched_time' => $date, 'deleted' => 0])->orderBy('sched_time', 'ASC')->get();
-		$sort = DB::table('cmd_module')
+		$sort = DB::table('posts')
 				->select('*')
 				->where('twitter_id', $request->id)
 				->where('post_type', '!=', 'evergreen-tweets')
@@ -436,7 +466,7 @@ class PostingController extends Controller
 
 	public function getMonth() {
 		// get the scheduleld months in database 
-		$getMonth = DB::table('cmd_module')
+		$getMonth = DB::table('posts')
 			->select(DB::raw('DISTINCT DATE_FORMAT(sched_time, "%M %Y") AS month'))
 			->where('post_type', '!=', 'evergreen-tweets')
 			->where('post_type', '!=', 'promos-tweets')

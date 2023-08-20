@@ -9,7 +9,7 @@ class CommandModule extends Model
 {
     use HasFactory;
 
-    protected $table = 'cmd_module';
+    protected $table = 'posts';
     protected $fillable = [
         'user_id',
         'twitter_id',

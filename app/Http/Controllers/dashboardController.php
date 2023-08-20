@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CommandModule;
+use App\Models\Schedule;
+use Illuminate\Support\Facades\Auth;
+
 
 class dashboardController extends Controller
 {
@@ -13,7 +17,7 @@ class dashboardController extends Controller
      */
     public function __construct()
     {
-        $this->middleware(['web', 'CheckSessionExpiration']);
+        // $this->middleware(['web', 'session_expired']);
     }
 
     /**
@@ -24,7 +28,15 @@ class dashboardController extends Controller
     public function index()
     {
 		$title = 'Dashboard page';
-        return view('dashboard')->with('title', $title);
+        $hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
+		->where('post_type', 'regular-tweets')
+		->exists();
+        // dd($hasRegularTweetsInQueue);
+        $hasCustomSlot = Schedule::where('user_id', Auth::id())->get();  
+        // dd($hasCustomSlot);   
+
+		return view('dashboard', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        // return view('dashboard')->with('title', $title);
     }
     
     public function help()

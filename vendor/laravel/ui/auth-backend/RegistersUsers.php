@@ -29,17 +29,9 @@ trait RegistersUsers
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
-    {
-        $validator = $this->validator($request->all());      
-        
-        if ($validator->fails()) {
-            // $errors = $validator->errors()->all();
-            // dd($validator);
-            Session::flash('errors', $validator->errors());
-            // return redirect()->back()->withErrors($validator)->withInput();
-            return redirect()->back()->withInput();
-        }
-
+    {        
+        $this->validator($request->all())->validate();                
+              
         event(new Registered($user = $this->create($request->all())));
 
         $this->guard()->login($user);

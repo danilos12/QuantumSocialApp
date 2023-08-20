@@ -142,13 +142,20 @@ class AppServiceProvider extends ServiceProvider
                     ->where('user_mngt.main_id', Auth::id())
                     ->count();
                 $view->with('cntmembers', $cntMembers);
+          
+                $hasRegularTweetsInQueue = DB::table('posts')
+                    ->where('user_id', Auth::id())
+                    ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                    ->where('post_type', 'regular-tweets')
+                    ->exists();
+                    // dd($hasRegularTweetsInQueue);
+                $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
 
-                // // api 
-                // $twitter_tkn = TwitterToken::where('twitter_id', $twitterID)->first();                
-                // $twitterDetails = TwitterHelper::getTwitterdetails($twitter_tkn);
-
-                // // dd($twitterDetails);
-                // $view->with('api_tdetails', $twitterDetails);            
+                
+                $hasCustomSlot = DB::table('schedule')
+                    ->where('user_id', Auth::id())
+                    ->get();
+                $view->with('hasCustomSlot', $hasCustomSlot);
 
             }        
         });
