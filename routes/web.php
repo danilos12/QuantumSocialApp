@@ -102,6 +102,7 @@ Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleControl
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
 Route::get('/cmd/{id}/post-type/{type}',[App\Http\Controllers\CommandmoduleController::class, 'getTweetsUsingPostTypes'])->name('cmd.post_type');
+Route::get('/cmd/get-custom-slot',[App\Http\Controllers\CommandmoduleController::class, 'getCustomSlot'])->name('cmd.get-custom-slot');
 
 Route::get('/schedule/slots',[App\Http\Controllers\PostingController::class, 'getScheduledSlots'])->name('schedule.slot');
 
@@ -117,12 +118,12 @@ Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');
 
 
-Route::middleware(['web','guest', 'CheckSessionExpiration'])
+Route::middleware(['web','guest', 'session_expired'])
     ->group(function () {
         Route::get('/session-login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])
             ->name('session-login')
-            ->withoutMiddleware(['CheckSessionExpiration']);
+            ->withoutMiddleware(['session_expired']);
         Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])
-            ->withoutMiddleware(['CheckSessionExpiration']);
+            ->withoutMiddleware(['session_expired']);
     });
 

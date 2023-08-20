@@ -13,6 +13,9 @@ class QuantumAcctMeta extends Model
     protected $fillable = [
         'user_id',
         'subscription', 
+        'subscription_free_counter',
+        'member_count',
+        'status',
         'timezone'
     ];
 }

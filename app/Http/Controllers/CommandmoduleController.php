@@ -39,10 +39,16 @@ class CommandmoduleController extends Controller
      */
     public function index()
     {
-		$title = 'Command Module';
-        return view('commandmodule')->with('title', $title);
-    }
+        $title = 'Command Module';
+        $userId = Auth::id(); //To check current user loggedin User ID dria
+        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+            ->where('sched_method', 'add-queue')
+            ->where('post_type', 'regular-tweets')
+            ->exists();      
 
+        return view('commandmodule', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+    }
+ 
     public function create(Request $request) {               
         try {                      
             $postData = $request->all();
@@ -73,17 +79,19 @@ class CommandmoduleController extends Controller
                 'active' => $checkToggle->queue_switch
             ];
 
+            dd($postData);
+
             // Determine the scheduling method and time based on the user's selected option
             if (isset($postData['scheduling-options'])) {
                 $sched_method = $postData['scheduling-options'];
                 switch ($postData['scheduling-options']) {
                     case 'add-queue':
-                        $count = DB::table('cmd_module')
+                        $count = DB::table('posts')
                             ->where('twitter_id', $main_twitter_id)
                             ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                             ->orderBy('sched_time', 'DESC')
                             ->count();
-                        $lastTweet = DB::table('cmd_module')
+                        $lastTweet = DB::table('posts')
                             ->where('twitter_id', $main_twitter_id)
                             ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                             ->orderBy('sched_time', 'DESC')
@@ -93,6 +101,7 @@ class CommandmoduleController extends Controller
 
                     case 'count-down':
                         $countDown = ($postData['c-set-countdown'] === '1') ? rtrim($postData['ct-set-countdown'], 's') : $postData['ct-set-countdown'];
+                        
                         $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
 
                         // modify the UTC datetime object by adding the countdown time
@@ -123,12 +132,12 @@ class CommandmoduleController extends Controller
                         break;
 
                     case 'rush-queue':
-                        $count = DB::table('cmd_module')
+                        $count = DB::table('posts')
                             ->where('twitter_id', $main_twitter_id)
                             ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                             ->count();
 
-                            $firstTweet = DB::table('cmd_module')
+                            $firstTweet = DB::table('posts')
                             ->where('twitter_id', $main_twitter_id)
                             ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                             ->where('sched_time', '>', TwitterHelper::now($user_id))
@@ -296,26 +305,17 @@ class CommandmoduleController extends Controller
         return response()->json($getUnselectedTwitter);
     }
 
-    public function customSlot(Request $request) {
+    public function getCustomSlot(Request $request) {
         try {
-            $getCustomSlot = '';
-    
-            if ($request->post_type === "undefined") {
-                $getCustomSlot = DB::table('schedule')
-                                ->join('days', 'days.day', '=', 'schedule.slot_day')
-                                ->select('schedule.*', 'days.*')
-                                ->where('user_id', Auth::id())
-                                ->orderBy('days.id', 'ASC')
-                                ->get();
-            } else {
-                $getCustomSlot = DB::table('schedule')
-                                ->join('days', 'days.day', '=', 'schedule.slot_day')
-                                ->select('schedule.*', 'days.*')
-                                ->where('user_id', Auth::id())
-                                ->where('schedule.post_type', $request->post_type)
-                                ->orderBy('days.id', 'ASC')
-                                ->get();
-            }
+               
+            $getCustomSlot = DB::table('schedule')
+                            ->join('days', 'days.day', '=', 'schedule.slot_day')
+                            ->select('schedule.*', 'days.*')
+                            ->where('user_id', Auth::id())
+                            ->where('schedule.post_type', $request->post_type)
+                            ->orderBy('days.id', 'ASC')
+                            ->get();
+
         } catch(Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
@@ -335,7 +335,7 @@ class CommandmoduleController extends Controller
             switch ($post_type) {
                 case 'posted': 
                     // dd(TwitterHelper::now(Auth::id()));
-                    $tweets = DB::table('cmd_module')
+                    $tweets = DB::table('posts')
                         ->where('twitter_id', $id)
                         ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
                         // ->where('sched_method', 'posted')
@@ -348,19 +348,19 @@ class CommandmoduleController extends Controller
                     
                 case 'queue':                                                             
 
-                    $posts = DB::table('cmd_module')                                         
+                    $posts = DB::table('posts')                                         
                             ->select('*')
                             ->whereIn('id', function ($query) {
                                 $query->select(DB::raw('MIN(id)'))
-                                ->from('cmd_module')
+                                ->from('posts')
                                 ->groupBy('post_type_code');
                             })
                             ->where('twitter_id', $id)
                             ->where('user_id', Auth::id())
                             ->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
-                            ->where('cmd_module.post_type', '!=','evergreen-tweets')
-                            ->where('cmd_module.post_type', '!=','promos-tweets')
-                            // ->where('cmd_module.post_type', '!=','tweet-storm-tweets')
+                            ->where('posts.post_type', '!=','evergreen-tweets')
+                            ->where('posts.post_type', '!=','promos-tweets')
+                            // ->where('posts.post_type', '!=','tweet-storm-tweets')
                             // ->where('active', $checkToggle->queue_switch)
                             ->orderBy('sched_time', 'ASC')
                             ->orderBy('sched_method', 'DESC')
@@ -425,11 +425,11 @@ class CommandmoduleController extends Controller
                     break;
 
                 case 'evergreen': 
-                    $tweets = DB::table('cmd_module')
+                    $tweets = DB::table('posts')
                         ->select('*')
                         ->whereIn('id', function ($query) {
                             $query->select(DB::raw('MIN(id)'))
-                            ->from('cmd_module')
+                            ->from('posts')
                             ->groupBy('post_type_code');
                         })
                         ->where('twitter_id', $id)
@@ -444,11 +444,11 @@ class CommandmoduleController extends Controller
                         break;    
 
                 case 'promo': 
-                    $tweets = DB::table('cmd_module')
+                    $tweets = DB::table('posts')
                         ->select('*')
                         ->whereIn('id', function ($query) {
                             $query->select(DB::raw('MIN(id)'))
-                            ->from('cmd_module')
+                            ->from('posts')
                             ->groupBy('post_type_code');
                         })
                         ->where('twitter_id', $id)
@@ -464,11 +464,11 @@ class CommandmoduleController extends Controller
                         break;    
 
                 case 'tweet-storms': 
-                    $tweets = DB::table('cmd_module')
+                    $tweets = DB::table('posts')
                     ->select('*')
                     ->whereIn('id', function ($query) {
                         $query->select(DB::raw('MIN(id)'))
-                        ->from('cmd_module')
+                        ->from('posts')
                         ->groupBy('post_type_code');
                     })
                     ->where('twitter_id', $id)
@@ -667,4 +667,3 @@ class CommandmoduleController extends Controller
     }    
 
 }
-

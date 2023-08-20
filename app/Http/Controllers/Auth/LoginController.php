@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
@@ -47,10 +48,13 @@ class LoginController extends Controller
 
     protected function sendFailedLoginResponse(Request $request)
     {
-        Session::flash('error', trans('auth.failed'));
-        $request->session()->flash('error', true);
+        // Session::flash('error', trans('auth.failed'));
+        // $request->session()->flash('error', true);
     
-        return redirect()->route('login')->withInput($request->only($this->username(), 'remember'));
+        // return redirect()->route('login')->withInput($request->only($this->username(), 'remember'));
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 
     // public function login(Request $request)

@@ -514,11 +514,12 @@ $(function($) {
                 div.attr("data-schedule", option);    
                 console.log(div.attr("data-schedule", option)) 
                 
-                var icon = $('.primary-post-type-buttons').find('.icon-active').data('type');
+                var icon = $('.primary-post-type-buttons').find('img.icon-active').data('type');
                 $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
                 $('#scheduling-method-custom-slot .inner .new-slot-time-wrapper1').attr('style', 'margin-left: 0.3em');
-                
-                getCustomSlot(icon);
+                var post_type = (typeof icon === 'undefined') ? 'regular-tweets' : icon;
+
+                getCustomSlot(post_type);
                 break;
 
             default:
@@ -585,32 +586,43 @@ $(function($) {
         }
     );           
 
-    function getCustomSlot(post_type) {
-        $.get(APP_URL + '/custom-slot?post_type=' + post_type, function(data) {
-            // success code here
-            // var option = $('<option>').val(data.slot_day).text(data.slot_day.toUpperCase());
-            console.log(data)
-            if (data.length > 0) {
-                var dropdown = customSlotdropdown();
-                $('.scheduling-details').html(dropdown)
+    async function getCustomSlot(post_type) {
+        console.log(post_type);
+        try {
+            const response = await fetch(APP_URL + '/cmd/get-custom-slot?post_type=' + post_type);
+            const responseData = await response.json();     
 
-                data.forEach(function(item) {
-                    var str = item.slot_day;
-                    var day = str.charAt(0).toUpperCase() + str.substring(1);
-                    var time = item.hour + ":" + item.minute_at + " " + item.ampm;
-                    var opt = $('<option>').val(day + " " + time).text(day + " " + time);
+            console.log(responseData);
+
+        } catch (err) {
+            console.log(err)
+        }
+
+        // $.get(APP_URL + '/custom-slot?post_type=' + post_type, function(data) {
+        //     // success code here
+        //     // var option = $('<option>').val(data.slot_day).text(data.slot_day.toUpperCase());
+        //     console.log(data)
+        //     if (data.length > 0) {
+        //         var dropdown = customSlotdropdown();
+        //         $('.scheduling-details').html(dropdown)
+
+        //         data.forEach(function(item) {
+        //             var str = item.slot_day;
+        //             var day = str.charAt(0).toUpperCase() + str.substring(1);
+        //             var time = item.hour + ":" + item.minute_at + " " + item.ampm;
+        //             var opt = $('<option>').val(day + " " + time).text(day + " " + time);
                                        
-                    $('select[name="custom-slot-datetime"]').append(opt)
-                })
-            } else {
-                var p = $('<p>').text('Please add slot in the slot scheduler page.');
-                $('.scheduling-details').html(p);
-            }
-        })
-        .fail(function(xhr, status, error) {
-        // error code here
-            console.log(xhr)
-        });
+        //             $('select[name="custom-slot-datetime"]').append(opt)
+        //         })
+        //     } else {
+        //         var p = $('<p>').text('Please add slot in the slot scheduler page.');
+        //         $('.scheduling-details').html(p);
+        //     }
+        // })
+        // .fail(function(xhr, status, error) {
+        // // error code here
+        //     console.log(xhr)
+        // });
     }
 
     function customSlotdropdown() {
