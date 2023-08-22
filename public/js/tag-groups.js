@@ -1,18 +1,16 @@
   // Get all the data from server          
-  $(document).ready(function() {
+  $(document).ready(function() {    
+
+    async function getTagGroups() {
+        try {
+            const response = await fetch(APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID);
+            const responseData = await response.json(); 
     
-    $.ajax({
-        type: "GET",
-        url: APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID, // Use the URL of your server-side script here
-        success: function (response) {
-            // Add the existing tag groups to the page
-            if (response.length > 0) {
-                $.each(response, function (index, k, value) {
-                    // console.log(this)
-                    var template = tagGrptemplateItem(
-                        this.tag_group_mvalue,
-                        this.tag_group_mkey
-                    );
+            if (responseData.length > 0) {
+                // console.log(responseData);
+                $.each(responseData, function (index, k, value) {
+                    console.log(this)
+                    var template = tagGrptemplateItem(this);
                     $("#tag-groups-content").append(template);
                 });
             } else {
@@ -20,87 +18,88 @@
                     "<div>No twitter accounts linked</div>"
                 );
             }
-        },
-        error: function (xhr, status, error) {
+
+        } catch (error) {
             console.log(
                 "An error occurred while fetching the existing tag groups: " +
                     error
             );
-        },
-    });
+        }
+    }
+    getTagGroups();
 
-   $('#tag-groups-content').on('click', '.tag-group-controller', function() {
+   $('#tag-groups-content').on('click', '.tag-group-controller', async function() {
         $('.tag-container').empty()
         var tag_id = $(this).find('.tag-option-title').attr('id');
-        $.ajax({
-            type: "GET",
-            url: APP_URL + "/cmd/get-tag-items/", // Use the URL of your server-side script here
-            data: {
-                twitter_id: TWITTER_ID,
-                tag_id,
-            },
-            success: function (response) {
-                // Add the existing tag groups to the page
-                if (response.length > 0) {
-                    $.each(response, function (index, k, value) {
-                        $(".tag-groups-right-column")
-                            .removeClass("section-hide")
-                            .find("input")
-                            .attr("data-id", tag_id);
-                        var template = addNewTagTemplateItem(
-                            this.tag_meta_value
-                        );
-                        $(".tag-container").append(template);
-                    });
-                    console.log(response);
-                } else {
+
+        try {
+            const response = await fetch(APP_URL + "/cmd/get-tag-items?twitter_id=" + TWITTER_ID + '&tag_id=' + tag_id);
+            const responseData = await response.json();
+            console.log(responseData)
+
+            if (responseData.length > 0) {
+                $.each(responseData, function (index, k, value) {
                     $(".tag-groups-right-column")
                         .removeClass("section-hide")
                         .find("input")
                         .attr("data-id", tag_id);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log(
-                    "An error occurred while fetching the existing tag groups: " +
-                        error
-                );
-            },
-        });
+                    var template = addNewTagTemplateItem(
+                        this
+                    );
+                    $(".tag-container").append(template);
+                });
+                console.log(response);
+            } else {
+                $(".tag-groups-right-column")
+                    .removeClass("section-hide")
+                    .find("input")
+                    .attr("data-id", tag_id);
+            }
+        } catch (err) {
+            console.error(err)
+        }
     });    
 
     // Add hashtags in the input fields
     var input, container, hashtagArray, t;
     
     addTagForm = $('#addTagForm');
-    input = $('#addTagForm_tags');
+    input = 
     container = $('.tag-container');
     hashtagArray = [];
     
 
-    input.on('keypress', function(event) {
+    $('#addTagForm_tags').on('keypress', async (event) => {
         if (event.keyCode === 13) {
             event.preventDefault();
 
-            // submitForm;
-            $.ajax({
-                type: "POST",
-                url: APP_URL + '/cmd/add-tag-item',            
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                data: {
-                    hashtag: this.value,
-                    twitter_id: TWITTER_ID,
-                    tag_id: this.getAttribute('data-id')
-                },
-                success: function(response) {
-                    console.log(response)
-                    var span = addNewTagTemplateItem(response.hashtag);
+            try {
+                const response = await fetch(APP_URL + '/cmd/add-tag-item', {     
+                    method: 'POST',                           
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    body: JSON.stringify({
+                        hashtag: event.target.value,
+                        twitter_id: TWITTER_ID,
+                        tag_id: event.target.dataset.id
+                    })
+                });
+                const responseData = await response.json();
+    
+                if (responseData.status === 200) {
+                    console.log(responseData)
+                    var span = addNewTagTemplateItem(responseData.hashtag);
                     container.append(span);
-                    response.value = '';                        
+                    response.value = '';  
+                } else {
+                    throw new Error('Request failed');
                 }
-            })                      
+                
+            } catch(err) {
+                console.error(err)
+            }                  
         }
     });
 
@@ -119,53 +118,54 @@
 
 
     // Add new tagGroup to DB
-    $('#addNewTagGrp').submit(function(event) {
+    $('#addNewTagGrp').submit(async function(event) {
         event.preventDefault(); // Prevent the default form submit behavior
 
         // Get input value
         var inputValue = $(".group-title-input").val();
 
-        // Send AJAX request
-        $.ajax({
-            type: "POST",
-            url: APP_URL + '/cmd/add-tag',            
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: { 
-                myInput: inputValue, 
-                twitter_id : TWITTER_ID 
-            },
-            success: function(response) {
-                // Handle successful response
-                // alert("Value saved to database!");
-                console.log(response)
-                var template = tagGrptemplateItem(response.value, response.key );
-                $(template).appendTo('#tag-groups-content');
-                // $('#tag-groups-content').load(APP_URL + '/get-tag-items');
+        try {
+            const response = await fetch(APP_URL + '/cmd/add-tag', {                
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                body: JSON.stringify({ // Convert the data to JSON string
+                    myInput: inputValue, 
+                    twitter_id: TWITTER_ID 
+                })
+            });
+            const responseData = await response.json();
 
-            },
-            error: function(xhr, status, error) {
-                console.log('An error occurred while submitting the form: ' + error);
+            if (responseData.status === 200) {
+                var template = tagGrptemplateItem(responseData.data);
+                // $(template).appendTo('#tag-groups-content');
+                $('#tag-groups-content').append(template);
+
+            } else {
+                throw new Error('Request failed');
             }
-        
-        });
+
+        } catch(err) {
+            console.log('Error:', err)
+        }
     });
 
     
-    function tagGrptemplateItem(v, k) {
+    function tagGrptemplateItem(data) {
         return $template = `<div class="tag-group-controller" >
                                 <div class"tag-group-option">
                                     <span class="tag-option-title-wrap">
                                         <img src="${APP_URL}/public/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon tag-option-icon" />
-                                        <span class="tag-option-title" id="${k}">${v}</span>
+                                        <span class="tag-option-title" id="${data.tag_group_mkey}">${data.tag_group_mvalue}</span>
                                     </span> 
                                 </div> 
                             </div> `;                
     }
 
     function addNewTagTemplateItem(hashtag) {
-        return $template = `<span class="existing-tag"><i class="xtag">X</i>${hashtag}</span>`        
+        return $template = `<span class="existing-tag"><i class="xtag">X</i>${hashtag.tag_meta_value}</span>`        
     }
 });
 

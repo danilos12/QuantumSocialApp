@@ -100,13 +100,12 @@ class CommandmoduleController extends Controller
                         break;
 
                     case 'set-countdown':
-                        $countDown = ($postData['c-set-countdown'] === '1') ? rtrim($postData['ct-set-countdown'], '/s') : $postData['ct-set-countdown'];
-                        
+                        $countDown = rtrim($postData['ct-set-countdown'], '/s');                        
                         $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
-
+                                                
                         // modify the UTC datetime object by adding the countdown time
                         $utc->modify($countDownWithWords);
-
+                        
                         // format the resulting datetime object as a string in the  'YYYY-MM-DD HH:MM:SS' format
                         $scheduled_time = $utc->format('Y-m-d H:i:s');
                         $sched_time = $scheduled_time;
@@ -214,8 +213,7 @@ class CommandmoduleController extends Controller
     }
 
     
-    public function addTagGroup(Request $request) {
-        
+    public function addTagGroup(Request $request) {        
         try {
             $insert = Tag_groups::create([
                 'user_id' => Auth::id(),
@@ -224,20 +222,10 @@ class CommandmoduleController extends Controller
                 'tag_group_mvalue' => $request->input('myInput'),
             ]);
 
-            if ($insert) {
-                $latestRecord = Tag_groups::where('user_id', Auth::id())
-                                ->latest('created_at')
-                                ->first();
-
-                // access the newly added column
-                $key = $latestRecord->tag_group_mkey;
-                $value = $latestRecord->tag_group_mvalue;
+            if ($insert) {                
                 // Return success response
-                return response()->json(['status' => '201', 'key' => $key, 'value' => $value]);
-            } else {
-                // Return error response
-                return response()->json(['status' => '400', 'message' => 'Bad request']);
-            }
+                return response()->json(['status' => 200, 'data' => $insert]);
+            }                
             
         } catch (Exception $e) {
             return response()->json(['status' => '400', 'message' => $e]);
@@ -245,7 +233,6 @@ class CommandmoduleController extends Controller
     } 
 
     public function addTagItem(Request $request) {
-        // dd($request);
         try {
             $insert = Tag_items::create([
                 'user_id' => Auth::id(),
@@ -254,18 +241,8 @@ class CommandmoduleController extends Controller
                 'tag_meta_value' => $request->input('hashtag'),
             ]);
 
-            if ($insert) {
-                $latestRecord = Tag_items::where('user_id', Auth::id())
-                ->latest('created_at')
-                    ->first();
-
-                // access the newly added column
-                $value = $latestRecord->tag_meta_value;
-                // Return success response
-                return response()->json(['status' => '201', 'hashtag' => $value]);
-            } else {
-                // Return error response
-                return response()->json(['status' => '400', 'message' => 'Bad request']);
+            if ($insert) {               
+                return response()->json(['status' => 200, 'hashtag' => $insert]);
             }
         } catch (Exception $e)  {
             return response()->json(['status' => '400', 'message' => $e]);

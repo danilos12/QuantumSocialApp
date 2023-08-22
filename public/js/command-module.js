@@ -743,13 +743,21 @@ $(function($) {
                 form.find('input[type="submit"]').prop("disabled", false);
                 form.find('input[type="submit"]').val("Data Saved!");
 
-                console.log(response);
-
-                var wrapper = postWrapper(1, response.tweet, response.tweet.post_type);
-                // console.log(response.tweet.post_type)
+                
                 if (response.tweet.post_type === 'regular-tweets') {
+                    var wrapper = postWrapper(response.tweet, response.tweet.post_type);
                     $('.queue-day-wrapper').append(wrapper);
                 } 
+                
+                if (response.tweet.post_type === 'evergreen-tweets') {
+                    var evergreenWrapper = postWrapperEvergreen(response.tweet);
+                    $('.profile-posts-inner').append(evergreenWrapper);
+                }
+
+                if (response.tweet.post_type === 'evergreen-tweets') {
+                    var promoWrapper = postWrapperPromo(response);
+                    $('.profile-posts-inner').append(promoWrapper);
+                }
     
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -955,7 +963,7 @@ function tweetInstance(items) {
 }
 
 
-function postWrapper(index, info, post_type) {
+function postWrapper(info, post_type) {
     console.log(info)
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
@@ -1048,190 +1056,182 @@ function postWrapper(index, info, post_type) {
             <!-- END Custom Queued Post Instance -->                                    
     `
   }       
-  
-  function postWrapperReserve(info) {
-    console.log(info);
-    const dateTimeString = info.sched_time;
-    const dateTime = new Date(dateTimeString);
-    const month = dateTime.toLocaleString('default', { month: 'short' });
-    const day = dateTime.getDate();
-    const year = dateTime.getFullYear();
-    const timeString = dateTime.toLocaleTimeString();
-    const fullDate = month + " " + day + ", " + year;
-  
-    var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
-    return $template  = `
-    <div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
-        <div class="queued-single-post">
-  
-        <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="queued-watermark">
-  
-        <div class="queued-single-start">
-            <span class="queued-post-time">${fullDate + " " + timeString}</span>
-            <span class="queued-post-data">
-            Reserved for ${post_type.toUpperCase()}
-            </span>
-        </div>  <!-- END .queue-single-start -->
-  
-        <div class="queued-single-end">
-  
-        </div>  <!-- END .queued-single-end -->
-  
-        </div>  <!-- END .queued-single-post -->
-    </div>
-    `;
-  
-  }
-  
-  function postWrapperEvergreen(info, index) {
-    const dateTimeString = info.sched_time;
-    const dateTime = new Date(dateTimeString);
-    const month = dateTime.toLocaleString('default', { month: 'short' });
-    const day = dateTime.getDate();
-    const year = dateTime.getFullYear();
-    const timeString = dateTime.toLocaleTimeString();
-    const fullDate = month + " " + day + ", " + year;
-    
-    return $template = `
-    <div class="mosaic-posts-outer evergreen-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
-      <div class="mosaic-watermark-wrap frosted">
-        <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="mosaic-watermark evergreen-watermark" />
-        <div class="mosaic-posts-inner">
-  
-          <div class="mosaic-post-controls">
-            <span class="mosaic-control-icon">
-              <img src="${APP_URL}/public/ui-images/icons/pg-add.svg"
-              class="ui-icon"/></span>
-  
-                  <!-- This one gets deleted after JS toggle & status is working. -->
-                  <span class="mosaic-control-icon">
-                    <img src="${APP_URL}/public/ui-images/icons/pg-remove.svg" class="ui-icon"/></span>
-  
-            <span class="mosaic-control-icon">
-              <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
-            <span class="mosaic-control-icon">
-              <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
-          </div>  <!-- END .mosaic-post-controls -->
-  
-          <div class="global-twitter-profile-header">
+
+function postWrapperReserve(info) {
+const dateTimeString = info.sched_time;
+const dateTime = new Date(dateTimeString);
+const month = dateTime.toLocaleString('default', { month: 'short' });
+const day = dateTime.getDate();
+const year = dateTime.getFullYear();
+const timeString = dateTime.toLocaleTimeString();
+const fullDate = month + " " + day + ", " + year;
+
+var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
+return $template  = `
+<div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
+    <div class="queued-single-post">
+
+    <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="queued-watermark">
+
+    <div class="queued-single-start">
+        <span class="queued-post-time">${fullDate + " " + timeString}</span>
+        <span class="queued-post-data">
+        Reserved for ${post_type.toUpperCase()}
+        </span>
+    </div>  <!-- END .queue-single-start -->
+
+    <div class="queued-single-end">
+
+    </div>  <!-- END .queued-single-end -->
+
+    </div>  <!-- END .queued-single-post -->
+</div>
+`;
+
+}
+
+function postWrapperEvergreen(info) {
+console.log(info);
+const dateTimeString = info.sched_time;
+const dateTime = new Date(dateTimeString);
+const month = dateTime.toLocaleString('default', { month: 'short' });
+const day = dateTime.getDate();
+const year = dateTime.getFullYear();
+const timeString = dateTime.toLocaleTimeString();
+const fullDate = month + " " + day + ", " + year;
+
+return $template = `
+<div class="mosaic-posts-outer evergreen-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
+    <div class="mosaic-watermark-wrap frosted">
+    <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="mosaic-watermark evergreen-watermark" />
+    <div class="mosaic-posts-inner">
+
+        <div class="mosaic-post-controls">        
+                <span class="mosaic-control-icon">
+                    <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" />
+                </span>
+                </div>  <!-- END .mosaic-post-controls -->
+
+        <div class="global-twitter-profile-header">
+        <a href="#">
+            <img src="${ TWITTER_PHOTO }"
+            class="global-profile-image" /></a>
+        <div class="global-profile-details">
+            <div class="global-profile-name">
             <a href="#">
-              <img src="${APP_URL}/public/temp-images/imgpsh_fullsize_anim (1).png"
+            ${TWITTER_NAME}</a>
+            </div>  <!-- END .global-author-name -->
+            <div class="global-profile-subdata">
+                <!-- <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
+                <span class="global-post-date">
+                <a href="">
+                ${ fullDate + ' ' + timeString }</a>
+                </span> -->
+            </div>  <!-- END .global-post-date-wrap -->
+        </div>  <!-- END .global-author-details -->
+        </div>  <!-- END .global-post-author -->
+
+        <div class="mosaic-post-data">
+        <div class="mosaic-post-text">
+            ${info.post_description}
+        </div>  <!-- END .mosaic-post-text -->
+        <!-- <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
+            class="mosaic-post-image" /> -->
+        </div>  <!-- END .mosaic-post-data -->
+
+        <div class="mosaic-post-scheduling">
+
+        <!-- <div class="mosaic-scheduling mosaic-scheduling-future">
+
+            <span class="mosaic-label mosaic-future-label">
+            <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
+            Schedule
+            </span>
+            <span class="mosaic-sched-buttons mosaic-future-buttons">
+            <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon evergreen-icon" id="ev-comment-${info.id}"/>
+            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon evergreen-icon" id="ev-retweet-${info.id}"/>
+            <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon evergreen-icon" id="ev-evergreen-${info.id}"/>
+            </span>
+
+        </div>  END .mosaic-scheduling-future -->
+
+        <div class="mosaic-scheduling mosaic-post-analytics">
+
+            <span class="mosaic-label mosaic-analytics-label">
+            <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
+            Analytics
+            </span>
+            <span class="mosaic-sched-buttons mosaic-analytics-buttons">
+            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
+            <span class="mosaic-stat stat-retweets">2.20</span>
+            <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" />
+            <span class="mosaic-stat stat-hearts">2010</span>
+            </span>
+
+        </div>  <!-- END .mosaic-post-analytics -->
+
+        </div>  <!-- END .mosaic-post-scheduling -->
+
+    </div>  <!-- END .mosaic-posts-inner -->
+    </div>  <!-- END .mosaic-watermark-wrap -->
+</div>  <!-- END .mosaic-posts-outer -->
+`;
+}
+
+function postWrapperPromo(info) {
+const dateTimeString = info.sched_time;
+const dateTime = new Date(dateTimeString);
+const month = dateTime.toLocaleString('default', { month: 'short' });
+const day = dateTime.getDate();
+const year = dateTime.getFullYear();
+const timeString = dateTime.toLocaleTimeString();
+const fullDate = month + " " + day + ", " + year;
+
+return $template = `<div class="mosaic-posts-outer promos-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
+    <div class="mosaic-watermark-wrap frosted">
+        <img src="${APP_URL}/public/ui-images/icons/17-promos.svg" class="mosaic-watermark promo-watermark" />
+        <div class="mosaic-posts-inner">
+
+        <div class="mosaic-post-controls">
+            <span class="mosaic-control-icon">
+            <img src="${APP_URL}/public/ui-images/icons/pg-add.svg"
+            class="ui-icon"/></span>                                   
+
+            <span class="mosaic-control-icon">
+            <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
+        </div>  <!-- END .mosaic-post-controls -->
+
+        <div class="global-twitter-profile-header">
+            <a href="#">
+            <img src="${ TWITTER_PHOTO }"
                 class="global-profile-image" /></a>
             <div class="global-profile-details">
-              <div class="global-profile-name">
+            <div class="global-profile-name">
                 <a href="#">
-                  William Wallace</a>
-              </div>  <!-- END .global-author-name -->
-              <div class="global-profile-subdata">
-                <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
-                <span class="global-post-date">
-                  <a href="">
-                    Dec. 16, 2022 @ 5:20 p.m.</a></span>
-              </div>  <!-- END .global-post-date-wrap -->
-            </div>  <!-- END .global-author-details -->
-          </div>  <!-- END .global-post-author -->
-  
-          <div class="mosaic-post-data">
-            <div class="mosaic-post-text">
-              ${info.post_description}
-            </div>  <!-- END .mosaic-post-text -->
-            <!-- <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
-              class="mosaic-post-image" /> -->
-          </div>  <!-- END .mosaic-post-data -->
-  
-          <div class="mosaic-post-scheduling">
-  
-            <div class="mosaic-scheduling mosaic-scheduling-future">
-  
-              <span class="mosaic-label mosaic-future-label">
-                <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
-                Schedule
-              </span>
-              <span class="mosaic-sched-buttons mosaic-future-buttons">
-                <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon" />
-                <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
-                <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon" />
-              </span>
-  
-            </div>  <!-- END .mosaic-scheduling-future -->
-  
-            <div class="mosaic-scheduling mosaic-post-analytics">
-  
-              <span class="mosaic-label mosaic-analytics-label">
-                <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
-                Analytics
-              </span>
-              <span class="mosaic-sched-buttons mosaic-analytics-buttons">
-                <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" />
-                <span class="mosaic-stat stat-retweets">2.20</span>
-                <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" />
-                <span class="mosaic-stat stat-hearts">2010</span>
-              </span>
-  
-            </div>  <!-- END .mosaic-post-analytics -->
-  
-          </div>  <!-- END .mosaic-post-scheduling -->
-  
-        </div>  <!-- END .mosaic-posts-inner -->
-      </div>  <!-- END .mosaic-watermark-wrap -->
-    </div>  <!-- END .mosaic-posts-outer -->
-    `;
-  }
-  
-  function postWrapperPromo(info, index) {
-    const dateTimeString = info.sched_time;
-    const dateTime = new Date(dateTimeString);
-    const month = dateTime.toLocaleString('default', { month: 'short' });
-    const day = dateTime.getDate();
-    const year = dateTime.getFullYear();
-    const timeString = dateTime.toLocaleTimeString();
-    const fullDate = month + " " + day + ", " + year;
-    
-    return $template = `
-    <div class="mosaic-posts-outer promo-mosaic" status="${info.active > 0 ? 'active' : 'inactive' }">
-        <div class="mosaic-watermark-wrap frosted">
-            <img src="${APP_URL}/public/ui-images/icons/17-promos.svg" class="mosaic-watermark promo-watermark" />
-            <div class="mosaic-posts-inner">
-  
-            <div class="mosaic-post-controls">
-                <span class="mosaic-control-icon">
-                <img src="${APP_URL}/public/ui-images/icons/pg-add.svg"
-                class="ui-icon"/></span>                                   
-  
-                <span class="mosaic-control-icon">
-                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
-            </div>  <!-- END .mosaic-post-controls -->
-  
-            <div class="global-twitter-profile-header">
-                <a href="#">
-                <img src="${APP_URL}/public/temp-images/imgpsh_fullsize_anim (1).png"
-                    class="global-profile-image" /></a>
-                <div class="global-profile-details">
-                <div class="global-profile-name">
-                    <a href="#">
-                    ${TWITTER_NAME}</a>
-                </div>  <!-- END .global-author-name -->
-                <div class="global-profile-subdata">
-                    <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
+                ${TWITTER_NAME}</a>
+            </div>  <!-- END .global-author-name -->
+            <div class="global-profile-subdata">
+                <!--  <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
                     <span class="global-post-date">
                     <a href="">
-                        ${ fullDate + " " + timeString }</a></span>
-                </div>  <!-- END .global-post-date-wrap -->
-                </div>  <!-- END .global-author-details -->
-            </div>  <!-- END .global-post-author -->
-  
-            <div class="mosaic-post-data">
-                <div class="mosaic-post-text">
-                ${info.post_description}
-                </div>  <!-- END .mosaic-post-text -->
-                <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
-                class="mosaic-post-image" />
-            </div>  <!-- END .mosaic-post-data -->
-  
-            </div>  <!-- END .mosaic-posts-inner -->
-        </div>  <!-- END .mosaic-watermark-wrap -->
-        </div>  <!-- END .mosaic-posts-outer -->
-        <!-- END Single Post Instance -->
-    `;
-  }
-  
+                    ${ fullDate + " " + timeString }</a>
+                    </span> -->
+            </div>  <!-- END .global-post-date-wrap -->
+            </div>  <!-- END .global-author-details -->
+        </div>  <!-- END .global-post-author -->
+
+        <div class="mosaic-post-data">
+            <div class="mosaic-post-text">
+            ${info.post_description}
+            </div>  <!-- END .mosaic-post-text -->
+            <!-- <img src="https://pbs.twimg.com/media/FkCLbE9XwAQ0Vm1.jpg"
+            class="mosaic-post-image" /> -->
+        </div>  <!-- END .mosaic-post-data -->
+
+        </div>  <!-- END .mosaic-posts-inner -->
+    </div>  <!-- END .mosaic-watermark-wrap -->
+    </div>  <!-- END .mosaic-posts-outer -->
+    <!-- END Single Post Instance -->
+`;
+}
+
