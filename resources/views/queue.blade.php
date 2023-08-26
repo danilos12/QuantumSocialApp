@@ -43,18 +43,18 @@
             <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" />
             Non-Campaign (0)
           </li>
-          <li id="evergreen">
+          {{-- <li id="evergreen">
             <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon" />
             Evergreen
-          </li>
-          <li id="retweet">
-            <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon" />
-            Retweets
           </li>
           <li id="promos">
             <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
             Promos
-          </li>         
+          </li> --}}         
+          <li id="retweet">
+            <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon" />
+            Retweets
+          </li>
         </ul>
       </div>  <!-- END .filter-wrap -->
       <div class="drop-button-wrap sort-wrap">
@@ -63,7 +63,10 @@
           Month:
           <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon drop-arrow" />
         </span>
-        <ul class="page-filters-dropdown profile-sort-dropdown queue-months-dropdown frosted">                            
+        <ul class="page-filters-dropdown profile-sort-dropdown queue-months-dropdown frosted">       
+          <li>
+            <img src="{{ asset('public/') }}/ui-images/icons/07-schedule.svg" class="ui-icon" />All
+          </li>                     
         </ul>
       </div>  <!-- END .sort-wrap -->
     </div>  <!-- END .filter-controls -->

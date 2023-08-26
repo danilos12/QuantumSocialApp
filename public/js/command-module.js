@@ -664,7 +664,10 @@ $(function($) {
           <option disabled selected>Minute</option>`;
           
         for (var i = 0; i <= 59; i++) {
-            html += `<option value="${i}">${i}</option>`;
+            // Add leading zero for single-digit numbers
+            var formattedMinute = (i < 10) ? `0${i}` : i;
+
+            html += `<option value="${formattedMinute}">${formattedMinute}</option>`;
         }
         
         html += `</select>
@@ -746,7 +749,7 @@ $(function($) {
                 
                 if (response.tweet.post_type === 'regular-tweets') {
                     var wrapper = postWrapper(response.tweet, response.tweet.post_type);
-                    $('.queue-day-wrapper').append(wrapper);
+                    $('.queue-day-wrapper').append(wrapper);                    
                 } 
                 
                 if (response.tweet.post_type === 'evergreen-tweets') {
@@ -784,8 +787,6 @@ $(function($) {
                     }
                 }
 
-                originalState();
-
                 form.find('input[type="submit"]').val("Beam me up scotty!");
             },
         });
@@ -814,19 +815,6 @@ $(function($) {
     
 });
 
-/** default state */
-function originalState() {
-    // console.log(type)
-    // $(".cross-tweet-profiles-inner.cmd img").attr("status", "");
-
-    // disableWatermark("twitter-tweets")
-    // $postIcon.data('select', 0)
-    // $postIcon.removeClass("icon-active");
-    // $postPanels.addClass("tweets-hide");
-    // $postPanels.find('[data-post="tweet-storm-tweets"]').addClass("tweets-hide");
-    // $(".more-tweets-roster").empty();
-    // $("#post_type_tweets").val("regular_tweets");
-}
 
 /** watermark logo */
 function disableWatermark(src, combo = null) {
@@ -964,7 +952,7 @@ function tweetInstance(items) {
 
 
 function postWrapper(info, post_type) {
-    console.log(info)
+    // console.log(info)
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString('default', { month: 'short' });
@@ -1058,35 +1046,35 @@ function postWrapper(info, post_type) {
   }       
 
 function postWrapperReserve(info) {
-const dateTimeString = info.sched_time;
-const dateTime = new Date(dateTimeString);
-const month = dateTime.toLocaleString('default', { month: 'short' });
-const day = dateTime.getDate();
-const year = dateTime.getFullYear();
-const timeString = dateTime.toLocaleTimeString();
-const fullDate = month + " " + day + ", " + year;
+    const dateTimeString = info.sched_time;
+    const dateTime = new Date(dateTimeString);
+    const month = dateTime.toLocaleString('default', { month: 'short' });
+    const day = dateTime.getDate();
+    const year = dateTime.getFullYear();
+    const timeString = dateTime.toLocaleTimeString();
+    const fullDate = month + " " + day + ", " + year;
 
-var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
-return $template  = `
-<div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
-    <div class="queued-single-post">
+    var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
+    return $template  = `
+    <div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
+        <div class="queued-single-post">
 
-    <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="queued-watermark">
+        <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="queued-watermark">
 
-    <div class="queued-single-start">
-        <span class="queued-post-time">${fullDate + " " + timeString}</span>
-        <span class="queued-post-data">
-        Reserved for ${post_type.toUpperCase()}
-        </span>
-    </div>  <!-- END .queue-single-start -->
+        <div class="queued-single-start">
+            <span class="queued-post-time">${fullDate + " " + timeString}</span>
+            <span class="queued-post-data">
+            Reserved for ${post_type.toUpperCase()}
+            </span>
+        </div>  <!-- END .queue-single-start -->
 
-    <div class="queued-single-end">
+        <div class="queued-single-end">
 
-    </div>  <!-- END .queued-single-end -->
+        </div>  <!-- END .queued-single-end -->
 
-    </div>  <!-- END .queued-single-post -->
-</div>
-`;
+        </div>  <!-- END .queued-single-post -->
+    </div>
+    `;
 
 }
 

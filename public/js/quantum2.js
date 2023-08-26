@@ -628,7 +628,7 @@ function openModal(modalId) {
 
 // Close modal
 function closeModal(modalId) {
-  console.log(modalId);
+  // console.log(modalId);
 
   // const modal = document.getElementById(modalId);
   // modal.style.display = 'none';  
@@ -643,6 +643,18 @@ function closeModal(modalId) {
   $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
 
   currentModal = null;
+  console.log(currentModal);
+
+  if (currentModal === null) {
+    // Get the current pathname
+    var currentPath = window.location.pathname;
+  
+    // Example: if you're on the page "https://example.com/about"
+    if (currentPath === "/queue" || currentPath === "/evergreen" || currentPath === "/promos") {
+      location.reload();
+    } 
+  }
+
 }
 
 // Open modal

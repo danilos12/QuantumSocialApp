@@ -1,26 +1,42 @@
-$(document).ready(function() {    
-    var currentUrl = window.location.href;
-    
-    // Extract the slug from the URL using regular expression
-    var slug = currentUrl.match(/\/([^\/]+)\/?$/)[1];
+// Function to get URL parameters as an object
+function getUrlParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const params = {};
 
+    urlParams.forEach((value, key) => {
+    params[key] = value;
+    });
 
+    return params;
+}
+
+$(document).ready(function() {     
+    // Parse the query string of the URL
     var method = $(".page-inner").attr("data-sched-method");          
     var data = []; // Initialize an empty array to store all the posts
     var currentPage = 1; // Start with the first page
     var postsPerPage = 40; // Number of posts to retrieve per scroll event
     var initialDataLoaded = false; // Flag to track if the initial data has been loaded
 
+    const params = getUrlParameters();
     async function fetchData() {
-        try {
-            const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method);
+        try {   
+            
+            var param = (Object.keys(params).length > 0) 
+                            ? (params.category === 'type' ) 
+                                ? '?id=' + TWITTER_ID + '&category=' + params.category + '&type=' + params.type  // source
+                                :  '?id=' + TWITTER_ID + '&category=' + params.category +  '&type=' + params.type // month
+                            : '?' ;
+            console.log(param) 
+            const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method + param);
             const responseData = await response.json();     
 
             switch (method) {
-                case 'queue':                             
+                case 'queue':          
+                    console.log(responseData);                   
                     // Assuming the response data is an array of posts
                     data = responseData; // Add the new posts to the existing array
-                     
+                        
                     if (data.length > 0) {
                         // Check if the initial data has been loaded
                         if (!initialDataLoaded) {
@@ -72,11 +88,12 @@ $(document).ready(function() {
                     }
                 break    
             }            
+        
         } catch (error) {
         console.log("An error occurred while fetching the data: " + error);
         }
     }      
-    fetchData(currentPage);
+    fetchData();
     
 
     // Function to append new posts to the container
@@ -97,7 +114,7 @@ $(document).ready(function() {
                         }
                     } else {
                         const postType = getPostType(k.post_type);
-                        console.log(k)
+                        // console.log(k)
                         const wrapper = postWrapper(k, postType);
                         $('.queue-day-wrapper').append(wrapper);
                     }
@@ -131,6 +148,7 @@ $(document).ready(function() {
     });
       
 
+   
     async function fetchDataByMonth() {
         try {
           const response = await fetch(APP_URL + '/post/getmonth?id=' + TWITTER_ID);
@@ -140,8 +158,14 @@ $(document).ready(function() {
             var li = $('<li>');       
         
                 if (month !== null) {                
-                    var updatedId = month.toLowerCase().replace(' ', '-');
-                    li.attr('id', updatedId);
+                    const date = new Date(month);
+                    const abbreviatedMonth = date.toLocaleString('en-us', { month: 'short' });
+                    const year = date.getFullYear();
+
+                    // Combine the abbreviated month and year
+                    const formattedDate = `${abbreviatedMonth.toLowerCase()}-${year}`;
+                    
+                    li.attr('id', formattedDate);
                     li.html(`<img src="${APP_URL}/public/ui-images/icons/07-schedule.svg" class="ui-icon" />${month}`)
                     $('.queue-months-dropdown').append(li);
                 }   
@@ -161,56 +185,34 @@ $(document).ready(function() {
       
 
     $('.queue-months-dropdown').on('click', 'li', async function(e) {
-        $month = e.target.id;
-        var url = APP_URL + '/post/sortbymonth?id=' + TWITTER_ID + '&month=' + $month
+        var month = this.id;
 
-        try {
-            const response = await fetch(url);
-            const responseData = await response.json();
-    
-            $('.queue-day-wrapper').empty();
-            if (responseData.data.length > 0) {                
-                // var details = fetchTwitterDetails(TWITTER_ID);
-                $.each(response.data, function (index, k) {
-                    var postType = getPostType(k.post_type);
-                    var wrapper = postWrapper(k, postType, index);                    
-    
-                    $('.queue-day-wrapper').append(wrapper);
-                });
-            } else {
-                $(".queue-day-wrapper").html("<div>No post found</div>");
-            } 
-        } catch (error) {
-            console.log("Failed to fetch data:", error);
-        }         
+        if (month === 'all') {
+            window.location.href = '/queue';
+        } 
+
+        const newUrl = `${window.location.pathname}?category=month&id=${TWITTER_ID}&type=${month}`;
+        window.history.pushState({ category: month }, "", newUrl);
+        location.reload();
     })
   
     $('ul.queue-page-dd').on('click', 'li', async function(e) {
         var type = this.id;
-        var url = APP_URL + '/post/sortbytype?id=' + TWITTER_ID + '&type=' + type;
-    
-        try {
-            const response = await fetch(url);
-            const responseData = await response.json();
-    
-            $('.queue-day-wrapper').empty();
-            if (responseData.data.length > 0) {
-                // var details = await fetchTwitterDetails(TWITTER_ID);
-    
-                $.each(responseData.data, function (index, k) {
-                    var postType = getPostType(k.post_type);
-                    var wrapper = postWrapper(k, postType, index);
-    
-                    $('.queue-day-wrapper').append(wrapper);
-                });
-            } else {
-                $(".queue-day-wrapper").html("<div>No post found</div>");
-            }
-        } catch (error) {
-            console.log("Failed to fetch data:", error);
-        }
-    });
 
+        if (type === 'all') {
+            window.location.href = '/queue';
+        } else {
+            const newUrl = `${window.location.pathname}?category=type&id=${TWITTER_ID}&type=${type}`;
+            window.history.pushState({ category: type }, "", newUrl);
+            location.reload();
+        }
+
+    });
+    
+    function sortBySourceAll() {
+        window.location.href = '/queue';
+    }
+    
     $('.queue-day-wrapper').on("click", 'img.queued-icon', async function(e) {
         var id = e.target.id;
         var rmId = id.split('-');
