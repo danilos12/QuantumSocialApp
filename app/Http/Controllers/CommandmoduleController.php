@@ -104,15 +104,16 @@ class CommandmoduleController extends Controller
                         $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
                                                 
                         // modify the UTC datetime object by adding the countdown time
-                        $utc->modify($countDownWithWords);
+                        $utcFormat = $utc->modify($countDownWithWords);
                         
                         // format the resulting datetime object as a string in the  'YYYY-MM-DD HH:MM:SS' format
-                        $scheduled_time = $utc->format('Y-m-d H:i:s');
+                        $scheduled_time = $utcFormat->format('Y-m-d H:i:s');
                         $sched_time = $scheduled_time;
                         break;
                         
                     case 'custom-time':
                         // Refactor this section to reduce duplication
+                        // dd($postData);
                         $formatted24hrTime = date('H:i', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
                         $custom_time = $postData['ct-time-date'] . ' ' . $formatted24hrTime;
 
@@ -233,6 +234,7 @@ class CommandmoduleController extends Controller
     } 
 
     public function addTagItem(Request $request) {
+        // dd($request);
         try {
             $insert = Tag_items::create([
                 'user_id' => Auth::id(),
@@ -304,10 +306,11 @@ class CommandmoduleController extends Controller
         return response()->json($getCustomSlot);
     }
  
-    public function getTweetsUsingPostTypes($id, $post_type) {
+    public function getTweetsUsingPostTypes(Request $request, $id, $post_type) {
         try {
             $tweets = '';   
             $checkToggle = TwitterToken::where('twitter_id', $id)->first();           
+            $type = ($request->input('category')) ? (($request->input('category') === 'type') ? 'type' : 'month') : '';
             
             switch ($post_type) {
                 case 'posted': 
@@ -339,11 +342,20 @@ class CommandmoduleController extends Controller
                             ->where('posts.post_type', '!=','promos-tweets')
                             // ->where('posts.post_type', '!=','tweet-storm-tweets')
                             // ->where('active', $checkToggle->queue_switch)
+                            ->when($type, function ($query) use ($type, $request) {
+                                if ($type === 'month') {
+                                    return $query->whereRaw("DATE_FORMAT(sched_time, '%b-%Y') = ?", $request->input('type'));
+                                } else {
+                                    return $query->whereRaw("posts.post_type = ?", $request->input('type'));                               
+                                }
+
+                                return $query;
+                            })                                                                                
                             ->orderBy('sched_time', 'ASC')
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
 
-                    // dd($posts)        ;
+                    // dd($posts);
                     $schedules = Schedule::where('user_id', Auth::id())->get();     
 
                     $recurringDates = [];

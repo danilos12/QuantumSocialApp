@@ -15,7 +15,7 @@
                 });
             } else {
                 $(".tag-groups-column-wrap").html(
-                    "<div>No twitter accounts linked</div>"
+                    "<div>No tags for this account. Create new!</div>"
                 );
             }
 
