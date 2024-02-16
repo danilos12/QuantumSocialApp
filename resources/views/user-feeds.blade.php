@@ -72,7 +72,7 @@
                   </div>  <!-- END .filter-controls -->
 
 
-                  <div class="profile-posts-outer">
+                  <div class="queued-posts-outer">
                     <div class="profile-posts-inner">
 
                       <!-- BEGIN Single Post Instance -->
@@ -191,7 +191,7 @@
 
 
                     </div>  <!-- END .profile-posts-inner -->
-                  </div>  <!-- END .profile-posts-outer -->
+                  </div>  <!-- END .queued-posts-outer -->
 
                 </div>  <!-- END .profile-inner -->
               </div>  <!-- END .profile-outer -->

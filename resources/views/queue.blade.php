@@ -84,7 +84,7 @@
     <div class="queued-posts-outer" id="queuePage" >
       <div class="queued-posts-inner">
         <div class="queue-day-wrapper page-wrapper">
-          <span class="queue-date-heading">Today</span>
+          {{-- <span class="queue-date-heading">Today</span> --}}
           
 
         {{-- </div>  <!-- END .queued-single-post-wrapper --> --}}

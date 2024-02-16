@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Schedule;
 use App\Models\CommandModule;
+use App\Models\Bulk_post;
 use App\Models\TwitterToken;
 use App\Models\Day;
+use App\Models\Twitter;
 use Exception;
 
 
@@ -44,11 +46,12 @@ class PostingController extends Controller
 	{
 		$title = 'Queue';
 		$userId = Auth::id(); //To check current user loggedin User ID dria
-        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
-        ->where('sched_method', 'add-queue')
-        ->where('post_type', 'regular-tweets')
-        ->exists();
-		return view('queue', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        // $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+        // ->where('sched_method', 'add-queue')
+        // ->where('post_type', 'regular-tweets')
+        // ->exists();
+		// return view('queue', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+		return view('queue')->with('title', $title);
 	}
 	
 	
@@ -229,6 +232,16 @@ class PostingController extends Controller
 		return view('posting', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
         // return view('posting')->with('title', $title);
     }
+
+	public function bulk_queue() {
+		$title = 'Bulk Queue';   
+		// $userId = Auth::id(); //To check current user loggedin User ID dria
+        // $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+        // ->where('sched_method', 'add-queue')
+        // ->where('post_type', 'regular-tweets')
+        // ->exists();
+		return view('bulk-queue')->with('title', $title);
+	}
 	
 	public function bulk_uploader()
     {
@@ -256,12 +269,16 @@ class PostingController extends Controller
 		}
 	}
 	
-	public function deletePost($id) {
-		$post_id = str_replace('delete-', '', $id);
-		
+	public function deletePost($id) {		
 		try {
-			// Find the data record by its ID
-			$queueDelete = CommandModule::findOrFail($post_id);
+			$explode = explode('-', $id);
+			
+			if ($explode[0] === 'deleteBulk') {
+				$queueDelete = Bulk_post::findOrFail($explode[1]);
+			} else {
+				// Find the data record by its ID
+				$queueDelete = CommandModule::findOrFail($explode[1]);
+			}
 
 			// Delete the data
 			$queueDelete->delete();
@@ -272,6 +289,28 @@ class PostingController extends Controller
 			// Error response
 			return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error deleting post']);
 		}
+	}
+
+	public function duplicatePost($id) {	
+        try {      
+            $post = Bulk_post::findOrFail($id);
+        
+            // Duplicate the data
+            $newRow = $post->replicate();
+
+            // Optionally, you can modify any specific values before saving the new row
+            $newRow->save();
+
+            // Redirect or return a response
+            return response()->json(['status' => 200, 'message' => 'Post duplicated successfully!']);
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();            
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
+        }    
 	}
 	
 	public function sortPostbyType(Request $request) {
@@ -290,11 +329,45 @@ class PostingController extends Controller
 
 	public function switchFromQueue(Request $request, $switch, $id) {		
 		try {
-			$k = ($switch === 'active') ? 1 : 0;
+			// dd($request);
+
+			$const = '';
 			
+
+			// TwitterToken::where('twitter_id', $id)->where('activate', 1)
+
 			//update first the switch
-			TwitterToken::where('twitter_id', $id)->where('active', 1)->update(['queue_switch' => $k]);
-						
+			switch ($request->method) {
+				case "queue" :
+					TwitterToken::where('twitter_id', $id)->update(['queue_switch' => ($switch === 'active' ? 1 : 0)]);
+					$const = CommandModule::where('twitter_id', $id)
+						->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
+						->update(['active' => ($switch === 'active' ? 1 : 0)]);
+					break;
+				case "promo" :
+					TwitterToken::where('twitter_id', $id)->update(['promo_switch' => ($switch === 'active' ? 1 : 0)]);
+					$const = CommandModule::where('twitter_id', $id)
+						->where('post_type', 'promos-tweets')
+						->update(['active' => ($switch === 'active' ? 1 : 0)]);
+						break;
+				case "evergreen" :
+					TwitterToken::where('twitter_id', $id)->update(['evergreen_switch' => ($switch === 'active' ? 1 : 0)]);
+					$const = CommandModule::where('twitter_id', $id)
+						->where('post_type', 'evergreen-tweets')
+						// ->get();
+						->update(['active' => ($switch === 'active' ? 1 : 0)]);
+					break;
+			} 
+
+			// dd($const);
+			// if ($switch === 'active') {
+				
+			// } else {
+			// 	$const = CommandModule::where('twitter_id', $id)
+			// 		->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
+			// 		->update(['active' => 0]);
+			// }
+
 			// $sort = '';
 			// switch ($request->method) {
 			// 	case "queue" : 
@@ -377,10 +450,10 @@ class PostingController extends Controller
 			// 		break;
 			// }			
 
-			return response()->json(['status' => 200, 'data' => $k]);
+			return response()->json(['status' => 200, 'data' => $const]);
 		} catch (Exception $e) {
 			Log::error('Error creating data: ' . $e->getMessage());
-			return response()->json(['status' => '500', 'error' => 'Switched data']);
+			return response()->json(['status' => '500', 'error' => 'Error to activate/inactive the post']);
 		}
 	}
 
@@ -429,7 +502,7 @@ class PostingController extends Controller
 	}	
 
 	public function editPostData(Request $request, $id) {
-		dd($request);
+		// dd($request);
 		try {
 			$postData = $request->all();
 			$posts = CommandModule::find($id);
@@ -533,5 +606,6 @@ class PostingController extends Controller
             return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }
 	}	
-	
+
+
 }

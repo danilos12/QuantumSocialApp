@@ -27,16 +27,16 @@ $(document).ready(function() {
                                 ? '?id=' + TWITTER_ID + '&category=' + params.category + '&type=' + params.type  // source
                                 :  '?id=' + TWITTER_ID + '&category=' + params.category +  '&type=' + params.type // month
                             : '?' ;
-            console.log(param) 
+
             const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method + param);
             const responseData = await response.json();     
 
             switch (method) {
                 case 'queue':          
-                    console.log(responseData);                   
+                                
                     // Assuming the response data is an array of posts
                     data = responseData; // Add the new posts to the existing array
-                        
+                    console.log(responseData)
                     if (data.length > 0) {
                         // Check if the initial data has been loaded
                         if (!initialDataLoaded) {
@@ -48,17 +48,17 @@ $(document).ready(function() {
                         $(".queue-day-wrapper").html("<div>No post found</div>");
                     }
 
+                    break; 
 
-                    break
-                case 'evergreen': 
+                case 'evergreen':                    
                     if (responseData.length > 0) {
                         $.each(responseData, (index, k) => {
                             const wrapper = postWrapperEvergreen(k);
     
-                            $('.profile-posts-inner').append(wrapper)                            
+                            $('.queued-posts-inner').append(wrapper)                            
                         })   
                     } else {
-                        $('.profile-posts-inner').append("<div> No evergreen posts found.</div>")
+                        $('.queued-posts-inner').append("<div> No evergreen posts found.</div>")
                     }
                     break
 
@@ -68,14 +68,14 @@ $(document).ready(function() {
                             console.log(k)
                             const wrapper = postWrapperPromo(k);
 
-                            $('.profile-posts-inner').append(wrapper)                       
+                            $('.queued-posts-inner').append(wrapper)                       
                         })   
                     } else {
-                        $('.profile-posts-inner').append("<div> No promo posts found.</div>")
+                        $('.queued-posts-inner').append("<div> No promo posts found.</div>")
                     }
+                    break;
                 
                 case 'posted' :
-                    console.log(responseData)
                     if (responseData.length > 0) {
                         $.each(responseData, (index, k) => {
                             const postType = getPostType(k.post_type);
@@ -86,11 +86,54 @@ $(document).ready(function() {
                     } else {
                         $(".queue-day-wrapper").html("<div>No post were posted yet</div>");
                     }
-                break    
+                    break;
+                case 'save-draft': 
+                    if (responseData.length > 0) {
+                        $.each(responseData, (index, k) => {
+                            const postType = getPostType(k.post_type);
+                            const wrapper = postWrapper(k, postType);
+
+                            $('.queue-day-wrapper').append(wrapper);                  
+                        })   
+                    } else {
+                        $(".queue-day-wrapper").html("<div>No post were posted yet</div>");
+                    }  
+                    break;
+                case 'bulk-queue': 
+                    if (responseData.length > 0) {
+                       
+                        // Group cards by date
+                        var groupedCards = responseData.reduce(function (acc, card) {
+                            acc[card.sched_time] = acc[card.sched_time] || [];
+                            acc[card.sched_time].push(card);
+                            return acc;
+                        }, {});
+
+
+                        for (var date in groupedCards) {
+                            if (groupedCards.hasOwnProperty(date)) {
+                                var petsa = new Date(date);
+                                var options = { year: 'numeric', month: 'long', day: 'numeric' };
+                                var formattedDate = petsa.toLocaleDateString('en-US', options);
+                                
+                                $('.queue-day-wrapper').append('<span class="queue-date-heading">'+ formattedDate +'</span>'); 
+                                groupedCards[date].forEach(function (card) {
+                                    const postType = getPostType('bulk-queue');
+                                    const wrapper = postWrapperBulk(card);
+                                    $('.queue-day-wrapper').append(wrapper);                          
+                                });
+                            }
+                        }
+
+                                            
+                    } else {
+                        $(".queue-day-wrapper").html("<div>No post were posted yet</div>");
+                    }  
+                break;
             }            
         
         } catch (error) {
-        console.log("An error occurred while fetching the data: " + error);
+            console.log("An error occurred while fetching the data: " + error);
         }
     }      
     fetchData();
@@ -98,13 +141,14 @@ $(document).ready(function() {
 
     // Function to append new posts to the container
     function appendPosts(startIndex, endIndex) {
+        // console.log(startIndex, endIndex)
         for (var i = startIndex; i < endIndex; i++) {
+            // console.log(data)
             if (i < data.length) {
                 var k = data[i];
                 var currentDate = new Date();
                 var dataDate = new Date(k.sched_time);
                 // Create the post element and append it to the container
-                // ...
                 if (dataDate > currentDate) {
 
                     if (k.sched_method === 'slot_sched') {
@@ -114,7 +158,6 @@ $(document).ready(function() {
                         }
                     } else {
                         const postType = getPostType(k.post_type);
-                        // console.log(k)
                         const wrapper = postWrapper(k, postType);
                         $('.queue-day-wrapper').append(wrapper);
                     }
@@ -269,30 +312,8 @@ $(document).ready(function() {
             case "delete":
                 console.log(rmId);
                 try {
-                    const response = await fetch(APP_URL + '/post/delete/' + id , {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
-                        },
-                        body: JSON.stringify({ id: id }),
-                    });
-                    
-                    const responseData = await response.json();
-                    var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
-                    
-                    if (responseData.status === 200) {
-                        alert(responseData.message);
-                        location.reload();
-                    } else {
-                        $('.queued-posts-outer').before(div);        
-                        console.log(1);
-                    } 
-                    
-                    // remove the div after 3 seconds
-                    setTimeout(function() {
-                        div.remove();
-                    }, 3000);
+                    deletePost(id);
+                                                   
                 } catch (error) {
                     console.log("Failed to delete data");
                 }
@@ -326,6 +347,76 @@ $(document).ready(function() {
                 break;
         }
     });
+
+
+    // delete icon
+    $(document).on('click', '.ui-icon[name="delete"]', async function(e) {
+        var id = e.target.id;    
+        var rmId = id.split('-');        
+        deletePost((rmId[0] === 'deleteBulk') ? id : rmId[1]);               
+    }); 
+     
+    // duplciate icon
+    $(document).on('click', '.ui-icon[name="duplicate"]', async function(e) {
+        var id = e.target.id;    
+        var rmId = id.split('-');        
+        duplicatePost(rmId[1]);               
+    }); 
+
+    async function duplicatePost(id) {        
+        const response = await fetch(APP_URL + '/post/duplicate/' + id , {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+            },
+            body: JSON.stringify({ id: id }),
+        });
+
+        const responseData= await response.json();                    
+        var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
+        
+        if (responseData.status === 200) {
+            alert(responseData.message);
+            location.reload();
+        } else {
+            $('.queued-posts-outer').before(div);        
+            console.log(1);
+        } 
+        
+        // remove the div after 3 seconds
+        setTimeout(function() {
+            div.remove();
+        }, 3000);
+    }
+     
+    
+    async function deletePost(id) {        
+        const response = await fetch(APP_URL + '/post/delete/' + id , {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+            },
+            body: JSON.stringify({ id: id }),
+        });
+
+        const responseData= await response.json();                    
+        var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
+        
+        if (responseData.status === 200) {
+            alert(responseData.message);
+            location.reload();
+        } else {
+            $('.queued-posts-outer').before(div);        
+            console.log(1);
+        } 
+        
+        // remove the div after 3 seconds
+        setTimeout(function() {
+            div.remove();
+        }, 3000);
+    }
 
     var initialFormData = {};
     $(document).on('submit', '#posting-tool-form-002', async function(e) {
@@ -390,11 +481,14 @@ $(document).ready(function() {
             });
     
             const responseData = await response.json();
-            console.log(responseData)     
+            console.log(responseData)      
             
             if (responseData.status === 200) {
-                console.log('Post status is now switched')
-            } 
+                window.location.reload();
+            } else {
+                alert(responseData.error);
+                window.location.reload();
+            }
 
         } catch (error) {
             console.log("Failed to fetch data:", error);
@@ -479,10 +573,7 @@ $(document).ready(function() {
                 },
             });
     
-            const data = await response.json();
-            console.log(data);
-            console.log(data.message);
-            console.log(1);
+            const data = await response.json();           
     
             if (data.status === 200) {
                 alert(data.message);
@@ -640,6 +731,8 @@ $(document).ready(function() {
             case "tweet-storm-tweets":
                 postType = "storm";
                 break;  
+            case "bulk-queue": 
+                postType = "custom"    
             default: 
                 postType = "custom";
                 break;            

@@ -4,6 +4,9 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Helpers\TwitterHelper;
+use App\Jobs\SchedulePosts;
+use Illuminate\Support\Facades\Auth;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,7 +18,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // $schedule->command('process:scheduled-posts')->everyMinute();
+        $schedule->job(new SchedulePosts)->everyMinute();
     }
 
     /**

@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\testingapi;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,6 +46,8 @@ Route::match(['get', 'post'], '/add-new-slot', [App\Http\Controllers\PostingCont
 
 Route::get('/tweet-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('tweet-stormer');
 Route::get('/bulk', [App\Http\Controllers\PostingController::class, 'bulk_uploader'])->name('bulk-uploader');
+Route::get('/bulk-queue', [App\Http\Controllers\PostingController::class, 'bulk_queue'])->name('bulk-queue');
+Route::post('/bulk/upload', [App\Http\Controllers\CommandmoduleController::class, 'upload'])->name('bulk-upload');
 
 Route::get('/campaigns', [App\Http\Controllers\CampaignsController::class, 'index'])->name('campaigns');
 Route::get('/promo', [App\Http\Controllers\CampaignsController::class, 'promo_tweets'])->name('promo-tweets');
@@ -115,6 +118,7 @@ Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, '
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
 Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+Route::post('/post/duplicate/{id}',[App\Http\Controllers\PostingController::class, 'duplicatePost'])->name('post.duplicate');
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');
 
 
@@ -126,4 +130,9 @@ Route::middleware(['web','guest', 'session_expired'])
         Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])
             ->withoutMiddleware(['session_expired']);
     });
+
+    Route::post('/register',[RegisterController::class, 'register'])->name('submit.form');
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+	Route::get('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'showCustomRegister'])->name('custom-vr');
+	Route::post('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'wpRegisterUser']);
 

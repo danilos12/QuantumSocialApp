@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeZone;
 use App\Helpers\TwitterHelper;
 use App\Models\TwitterSettings;
+use Illuminate\Support\Facades\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -125,7 +126,12 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('membership', $membership);                       
                 
                 $toggle = DB::table('twitter_meta')->where('user_id', Auth::id())->where('twitter_id', $twitterID)->first();     
-                $view->with('toggle', $toggle ? $toggle->queue_switch : null);                       
+                $currentRoute = Route::current()->uri;
+                if ($currentRoute === 'evergreen' || $currentRoute === 'promo' || $currentRoute === 'queue') {
+                    $view->with('toggle', $toggle->{$currentRoute . '_switch'});                       
+                } else {
+                    $view->with('toggle', null);                       
+                }
 
                 $getMembers = DB::table('user_mngt')
                     ->join('users', 'user_mngt.user_id', '=', 'users.id')
@@ -150,6 +156,8 @@ class AppServiceProvider extends ServiceProvider
                     ->exists();
                     // dd($hasRegularTweetsInQueue);
                 $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
+
+                
 
                 
                 $hasCustomSlot = DB::table('schedule')

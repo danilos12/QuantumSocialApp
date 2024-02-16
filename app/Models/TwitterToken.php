@@ -22,6 +22,8 @@ class TwitterToken extends Model
         'refresh_token',
         'expires_in',
         'active',
-        'queue_switch'
+        'queue_switch',
+        'promo_switch',
+        'evergreen_switch'
     ];
 }

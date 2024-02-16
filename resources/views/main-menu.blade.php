@@ -44,12 +44,12 @@
                 </a>
             </li>
 
-            <li id="tweet-stormer">	
+            {{-- <li id="tweet-stormer">	
                 <a href="{{ route('tweet-stormer') }}">
                     <img src = "{{asset('public/ui-images/icons/08-tweet-storm.svg')}} " class="menu-icon" />
                     Tweet Stormer
                 </a>
-            </li>
+            </li> --}}
 
             <li id="bulk-uploader">
                 <a href="{{ route('bulk-uploader') }}">
@@ -57,9 +57,15 @@
                     Bulk Uploader
                 </a>
             </li>
+            <li id="bulk-uploader">
+                <a href="{{ route('bulk-queue') }}">
+                    <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
+                    Bulk Queue
+                </a>
+            </li>
         </ul>
 
-        <li class="menu-item" data-toggle="collapse" data-target="#engagement">
+        {{-- <li class="menu-item" data-toggle="collapse" data-target="#engagement">
         <!-- <a href="{{ route('social-engage') }}"></a> -->
             <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />Engagement
         </li>
@@ -90,7 +96,7 @@
                     Hashtag Feeds
                 </a>
             </li>
-        </ul>
+        </ul> --}}
 
         <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
         <!-- <a href="{{ route('promo-tweets') }}"></a> -->
@@ -124,8 +130,8 @@
             </li>
         </ul>
 
-        <li class="menu-item">
+        {{-- <li class="menu-item">
             <a href="{{ route('trending-topics') }}">
                 <img src = "{{asset('public/ui-images/icons/19-trending.svg')}} " class="menu-icon" />Trending Topics
             </a>
-        </li>
+        </li> --}}
