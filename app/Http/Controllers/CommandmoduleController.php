@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\CommandModule;
+use App\Models\Bulk_post;
+use App\Models\Bulk_meta;
 use App\Models\Tag_groups;
 use App\Models\Tag_items;
 use App\Models\TwitterToken;
-use DateTime;
-use Date;
 use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
 use App\Models\Schedule;
-use Illuminate\Support\Facades\Session;
+use League\Csv\Reader; 
+// use DateTime;
+// use Date;
+// use Illuminate\Support\Facades\Log;
+// use Illuminate\Support\Facades\Session;
 
 
 class CommandmoduleController extends Controller
@@ -50,22 +53,22 @@ class CommandmoduleController extends Controller
     }
  
     public function create(Request $request) {               
-        try {                      
+        try {            
             $postData = $request->all();
             $user_id = Auth::id();
             $main_twitter_id = $postData['twitter_id'];
-            $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
-            $tweet_id = basename(parse_url($url, PHP_URL_PATH));
             $getToken = TwitterHelper::getTwitterToken($request->twitter_id);
             $twitterMeta = $getToken->toArray();
             $twitter_meta = $twitterMeta[0];
-            $utc = TwitterHelper::now($user_id);
+            $utc = TwitterHelper::now($user_id);            
+            $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
+            $tweet_id = basename(parse_url($url, PHP_URL_PATH));
+            $checkToggle = TwitterToken::where('twitter_id', $main_twitter_id)->where('active', 1)->first();
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially            
             $sched_method = null;           
             $sched_time = null;           
-            $checkToggle = TwitterToken::where('twitter_id', $main_twitter_id)->where('active', 1)->first();
 
-            // Save the regular tweet for main account
+            // Save the regular tweet for main account            
             $insertData = [
                 'user_id' => $user_id,
                 'twitter_id' => $main_twitter_id,
@@ -79,11 +82,9 @@ class CommandmoduleController extends Controller
                 'active' => $checkToggle->queue_switch
             ];
 
-            // dd($postData);
-
             // Determine the scheduling method and time based on the user's selected option
             if (isset($postData['scheduling-options'])) {
-                $sched_method = $postData['scheduling-options'];
+                $sched_method = $postData['scheduling-options'];               
                 switch ($postData['scheduling-options']) {
                     case 'add-queue':
                         $count = DB::table('posts')
@@ -127,7 +128,7 @@ class CommandmoduleController extends Controller
                         break;
                         
                     case 'custom-slot':
-                        $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));
+                        $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));                        
                         $sched_time = $date;
                         break;
 
@@ -147,9 +148,13 @@ class CommandmoduleController extends Controller
 
                         $sched_time = ($count > 0) ? $firstTweet->sched_time : $datetime; 
                         break;  
+                    case 'save-draft': 
+                        $sched_time = $utc->format('Y-m-d H:i:s');
+                        $sched_method = 'save-draft';
+                        break;                       
                 }
             } else {
-                $sched_time = $datetime;
+                $sched_time = $utc->format('Y-m-d H:i:s');;
                 $sched_method = 'save-draft';
             }     
 
@@ -159,17 +164,18 @@ class CommandmoduleController extends Controller
             foreach ($postData['textarea'] as $textarea) {
                 $insertData['post_description'] = $textarea;
                 $insertData['sched_method'] = $sched_method;
-                $insertData['sched_time'] = $sched_time;
+                $insertData['sched_time'] = $utc->format('Y-m-d H:i:s');
+
                 // $insertData['post_type'] = 'tweet-storm-tweets';
                 CommandModule::create($insertData);
                 
                 // // Post tweet if scheduling option is "send-now"
-                if ($postData['scheduling-options'] === 'send-now') {                    
+                if ($postData['scheduling-options'] === 'send-now') {                                        
                     if ($postData['post_type_tweets'] === "retweet-tweets") {                        
                         $responses[] = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");                        
                     }  else {
                         $responses[] = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-                    }
+                    }                    
                 }
 
                 // Save crosstweet data
@@ -234,7 +240,6 @@ class CommandmoduleController extends Controller
     } 
 
     public function addTagItem(Request $request) {
-        // dd($request);
         try {
             $insert = Tag_items::create([
                 'user_id' => Auth::id(),
@@ -245,9 +250,9 @@ class CommandmoduleController extends Controller
 
             if ($insert) {               
                 return response()->json(['status' => 200, 'hashtag' => $insert]);
-            }
+            } 
         } catch (Exception $e)  {
-            return response()->json(['status' => '400', 'message' => $e]);
+            return response()->json(['status' => '500', 'message' => $e]);
 
         }
 
@@ -309,7 +314,6 @@ class CommandmoduleController extends Controller
     public function getTweetsUsingPostTypes(Request $request, $id, $post_type) {
         try {
             $tweets = '';   
-            $checkToggle = TwitterToken::where('twitter_id', $id)->first();           
             $type = ($request->input('category')) ? (($request->input('category') === 'type') ? 'type' : 'month') : '';
             
             switch ($post_type) {
@@ -317,8 +321,9 @@ class CommandmoduleController extends Controller
                     // dd(TwitterHelper::now(Auth::id()));
                     $tweets = DB::table('posts')
                         ->where('twitter_id', $id)
-                        ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
-                        // ->where('sched_method', 'posted')
+                        // ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
+                        ->where('active', 1)                       
+                        ->where('sched_method', 'send-now')                       
                         ->get();
                     break;
                     
@@ -340,8 +345,6 @@ class CommandmoduleController extends Controller
                             ->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
-                            // ->where('posts.post_type', '!=','tweet-storm-tweets')
-                            // ->where('active', $checkToggle->queue_switch)
                             ->when($type, function ($query) use ($type, $request) {
                                 if ($type === 'month') {
                                     return $query->whereRaw("DATE_FORMAT(sched_time, '%b-%Y') = ?", $request->input('type'));
@@ -355,14 +358,15 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
 
-                    // dd($posts);
+                    // dd($posts, TwitterHelper::now(Auth::id()), $id,  Auth::id());
                     $schedules = Schedule::where('user_id', Auth::id())->get();     
-
+                    
                     $recurringDates = [];
                     $r = [];
                     $currentMonth = now()->month;
                     $currentYear = now()->year;
-
+                    // dd($posts, $r, $currentMonth, $currentYear);
+                    
                     foreach ($schedules as $schedule) {
                         $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
                         $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
@@ -370,7 +374,7 @@ class CommandmoduleController extends Controller
                         // $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth()->subMonths(2);
                         // $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
                         $startDate = Carbon::now()->startOfMonth();
-                        $endDate = Carbon::now()->addMonths(2)->endOfMonth();
+                        $endDate = Carbon::now()->addMonths(1)->endOfMonth();
                         $currentDate = $startDate->copy();
                         
                         while ($currentDate->lte($endDate)) {
@@ -398,7 +402,7 @@ class CommandmoduleController extends Controller
                     });
 
                     $mergedData = $objects->merge($posts);
-
+                    // dd($mergedData);
                     $currentDateTime = Carbon::now();
                     $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
                         $tweetDateTime = Carbon::parse($tweet->sched_time);
@@ -450,31 +454,62 @@ class CommandmoduleController extends Controller
                         ->orderBy('updated_at', 'ASC')
                         ->get();
 
-                        break;    
+                    break;    
 
                 case 'tweet-storms': 
                     $tweets = DB::table('posts')
-                    ->select('*')
-                    ->whereIn('id', function ($query) {
-                        $query->select(DB::raw('MIN(id)'))
-                        ->from('posts')
-                        ->groupBy('post_type_code');
-                    })
-                    ->where('twitter_id', $id)
-                    ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                    ->where('post_type', '=','tweet-storm-tweets')
-                    ->orderBy('sched_time', 'ASC')
-                    ->orderBy('sched_method', 'DESC')
-                    ->get();
-                    break;    
+                        ->select('*')
+                        ->whereIn('id', function ($query) {
+                            $query->select(DB::raw('MIN(id)'))
+                            ->from('posts')
+                            ->groupBy('post_type_code');
+                        })
+                        ->where('twitter_id', $id)
+                        ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                        ->where('post_type', '=','tweet-storm-tweets')
+                        ->orderBy('sched_time', 'ASC')
+                        ->orderBy('sched_method', 'DESC')
+                        ->get();
+                    break;   
+                case 'bulk-queue': 
+                    // $tweets = DB::table('posts')
+                    //     // ->join('twitter_accts', 'posts.twitter_id', '=', 'twitter_accts.twitter_id')
+                    //     ->select('*')
+                    //     ->where('twitter_id', $id)
+                    //     // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                    //     ->where('post_type', '=','regular-tweets')
+                    //     ->where('from_bulk', 1)
+                    //     ->where('sched_method', 'bulk-queue')
+                    //     ->orderBy('sched_time', 'ASC')
+                    //     ->orderBy('sched_method', 'DESC')
+                    //     ->get();
+
+                    $tweets = DB::table('bulk_post')
+                        ->join('twitter_accts', 'bulk_post.twitter_id', '=', 'twitter_accts.twitter_id') // Specify '=' for join condition
+                        ->join('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url') // Specify '=' for join condition
+                        ->select('bulk_post.id AS post_id', 'twitter_accts.id AS twitter_acct_id', 'bulk_post.*', 'twitter_accts.*') 
+                        ->where('bulk_post.twitter_id', $id) // Specify 'posts.twitter_id'
+                        ->where('bulk_post.user_id', Auth::id()) // Specify 'posts.twitter_id'
+                        // ->where('posts.sched_time', '>', TwitterHelper::now(Auth::id())) // Assuming 'sched_time' belongs to 'posts' table
+                        ->where('bulk_post.post_type', '=','regular-tweets') // Specify 'posts.post_type'
+                        // ->where('posts.from_bulk', 1) // Specify 'posts.from_bulk'
+                        ->where('bulk_post.sched_method', 'bulk-queue') // Specify 'posts.sched_method'
+                        ->orderBy('bulk_post.sched_time', 'ASC') // Specify 'posts.sched_time'
+                        ->orderBy('bulk_post.sched_method', 'DESC') // Specify 'posts.sched_method'
+                        // ->distinct() // Add this line to ensure uniqueness
+                        ->get();
+
+                    // dd($tweets);    
+
+                    break;                         
             }       
-            // dd($tweets);
-            return response()->json($tweets);
-            // if ($tweets) {
-            //     return response()->json(['status' => 200, 'message' => 'No tweets found', 'data' => $tweets]);
-            // } else {
-            //     return response()->json(['status' => 200, 'message' => 'No tweets found']);
-            // }
+
+            if ($tweets) {
+                // return response()->json(['status' => 200, 'data' => $tweets]);
+                return response()->json($tweets);
+            } else {
+                return response()->json(['status' => 204, 'message' => 'No tweets found']);
+            }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
@@ -654,5 +689,100 @@ class CommandmoduleController extends Controller
             return curl_error($curl);
         }
     }    
+
+    public function upload(Request $request)
+    {
+		if ($request->hasFile('csv_file')) {
+            // get the file
+			$file = $request->file('csv_file');
+
+            // parse the data in csv
+			$csvData = $this->parseCsv($file);                               
+            
+            // after getting the data from the csv, parse first the link to get the meta details, then add it into the database
+
+            // foreach($csvData as $)
+            foreach ($csvData as $key => $data) {
+                $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
+                // Format the timestamp as desired
+                $formattedDateTime = date("Y-m-d H:i:s", $timestamp);                                            
+                
+                $insertData = [
+                    'user_id' =>  Auth::id(),
+                    'twitter_id' => $request->input('twitter_id'),
+                    'post_type' => 'regular-tweets',
+                    'post_description' => $data['post_description'],
+                    'sched_method' => 'bulk-queue',
+                    'sched_time' => $formattedDateTime,
+                    'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
+                    'image_url' => isset($data['link_url']) ? $data['link_url'] : null,                                                        
+                ];               
+                                   
+                Bulk_post::create($insertData);
+                
+                if (isset($data['link_url'])) {
+                    // Check if the record already exists
+                     $findMeta = Bulk_meta::where('link_url', $data['link_url'])->first();                
+     
+                     if ($findMeta === null) {
+                         // The record does not exist, so scrape the meta tags
+                         $metaTags = $this->scrapeMetaTags($data['link_url']);
+     
+                         $metaData = [
+                             'meta_title' => $metaTags['og:title'],
+                             'meta_description' => $metaTags['og:description'],
+                             'meta_image' => $metaTags['og:image'],
+                             'link_url' => $data['link_url'],
+                         ];
+     
+                         // Create a new record in the database
+                         Bulk_meta::create($metaData);
+                     }
+                }
+
+            }
+
+            return response()->json(['message' => 'CSV data saved successfully'], 200);
+        } else {
+            return response()->json(['message' => 'No file uploaded'], 400);
+        }
+
+        return redirect()->back()->with('message', 'CSV file uploaded and processed successfully.');
+    }
+
+
+    function scrapeMetaTags($url) {
+        // Fetch the HTML content of the URL
+        $html = file_get_contents($url);
+    
+        // Create an array to store the meta tags
+        $metaTags = array();
+    
+        // Use a regular expression to match meta tags
+        preg_match_all('/<meta\s+([^>]*?)\s*\/?>/i', $html, $matches);
+    
+        // Loop through the matches and extract the meta tag attributes
+        foreach ($matches[1] as $match) {
+            // Use a regular expression to match the attribute name and value
+            preg_match('/\b(?:name|property|http-equiv)="([^"]*)"\s+content="([^"]*)"/i', $match, $attributes);
+    
+            // If the attribute name and value are found, add them to the meta tags array
+            if (isset($attributes[1]) && isset($attributes[2])) {
+                $metaTags[$attributes[1]] = $attributes[2];
+            }
+        }
+    
+        // Return the meta tags array
+        return $metaTags;
+    }
+
+
+	private function parseCsv($path)
+	{
+		$csv = Reader::createFromPath($path->getPathname(), 'r');
+        $csv->setHeaderOffset(0); // Assuming the first row contains headers
+
+        return iterator_to_array($csv->getRecords());
+	}
 
 }

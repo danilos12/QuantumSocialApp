@@ -52,9 +52,9 @@
 
 
     <div class="profile-posts-outer">
-      <div class="profile-posts-inner" id="evergreen">        
+      <div class="queued-posts-inner" id="evergreen">        
       </div>  <!-- END .profile-posts-inner -->
-    </div>  <!-- END .profile-posts-outer -->
+    </div>  <!-- END .queued-posts-outer -->
 
   </div>  <!-- END .profile-inner -->
 </div>  <!-- END .profile-outer -->

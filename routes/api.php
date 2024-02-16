@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\Auth\RegisterController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('auth/register', RegisterController::class); // Define route using RegisterController method
+// Route::post('auth/register', RegisterController::class)->middleware('auth');
+
+Route::get('scrape/', [RegisterController::class, 'scrapeMetaTags']);
+
+Route::get('test', function () {
+    return response()->json(['message' => 'API route is working!']);
 });

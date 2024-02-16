@@ -24,7 +24,9 @@ class CommandModule extends Model
         'sched_time',
         'crosstweet_accts',
         'post_type_code',
-        'active'
+        'active',
+        'from_bulk',
+        'image_url'
     ];
     public $timestamps = true;
 }

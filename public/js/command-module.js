@@ -515,8 +515,8 @@ $(function($) {
             
             case "custom-slot": 
                 div.attr("data-schedule", option);    
-                var dropdown = customSlotdropdown();
-                $('.scheduling-details').html(dropdown)
+                // var dropdown = customSlotdropdown();
+                // $('.scheduling-details').html(dropdown)
                 
                 var icon = $('.primary-post-type-buttons').find('img.icon-active').data('type');
                 $('#scheduling-method-custom-slot .inner').attr('style', 'display: flex');
@@ -598,6 +598,23 @@ $(function($) {
 
             console.log(responseData);
 
+            if (responseData.length > 0) {
+                var dropdown = customSlotdropdown();
+                $('.scheduling-details').html(dropdown)
+
+                console.log(responseData)
+                $.each(responseData, function(k, item) {
+                    var str = item.slot_day;
+                    var day = str.charAt(0).toUpperCase() + str.substring(1);
+                    var time = item.hour + ":" + item.minute_at + " " + item.ampm;
+                    var opt = $('<option>').val(day + " " + time).text(day + " " + time);
+                    console.log(item)
+                                       
+                    $('select[name="custom-slot-datetime"]').append(opt)
+                })
+
+            }
+
         } catch (err) {
             console.log(err)
         }
@@ -646,7 +663,7 @@ $(function($) {
     }
 
     function customSlotdropdown() {
-        var html = `<select name="custom-slot-datetime" class="scheduling-options-dd"></select>`
+        var html = `<select name="custom-slot-datetime" class="scheduling-options-dd">1</select>`
         return html;
     }
 
@@ -757,7 +774,7 @@ $(function($) {
                     $('.profile-posts-inner').append(evergreenWrapper);
                 }
 
-                if (response.tweet.post_type === 'evergreen-tweets') {
+                if (response.tweet.post_type === 'promos-tweets') {
                     var promoWrapper = postWrapperPromo(response);
                     $('.profile-posts-inner').append(promoWrapper);
                 }
@@ -974,7 +991,7 @@ function postWrapper(info, post_type) {
                     ${fullDate + " " + timeString}
                     </span>
                     <span class="queued-post-data">
-                    ${info.post_type_code + ": " +info.sched_method + ": " + info.post_description}
+                    ${info.post_description}
                     <!--info.post_description.substring(0, 17) + "..." -->
                     </span>
                 </div>  <!-- END .queue-single-start -->
@@ -982,7 +999,7 @@ function postWrapper(info, post_type) {
                 <div class="queued-single-end">
                     <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon queued-icon-ee" id="more-${info.id}" title="More" data-toggle="tooltip" />
                     <img src="${APP_URL}/public/ui-images/icons/pg-view.svg" class="ui-icon queued-icon queued-view-icon queued-icon-ee" id="view-${info.id}" title="View" data-toggle="tooltip" />
-                    <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon queued-icon-imp" data-icon="edit-post" id="edit-modal-${info.id}" title="Drafts" data-toggle="tooltip" />                        
+                    <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon queued-icon-imp" data-icon="edit-post" id="edit-modal-${info.id}" title="Edit" data-toggle="tooltip" />                        
                     <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon queued-icon-imp" id="delete-${info.id}" title="Delete" data-toggle="tooltip" />
                 </div>  <!-- END .queued-single-end -->
   
@@ -1056,10 +1073,10 @@ function postWrapperReserve(info) {
 
     var post_type = (info.post_type === "evergreen-tweets") ? "evergreen" : "promo";
     return $template  = `
-    <div class="queued-single-post-wrapper queue-type-evergreen" status="active" queue-type="${post_type}">
+    <div class="queued-single-post-wrapper queue-type-${post_type}" status="active" queue-type="${post_type}">
         <div class="queued-single-post">
 
-        <img src="${APP_URL}/public/ui-images/icons/pg-evergreen.svg" class="queued-watermark">
+        <img src="${APP_URL}/public/ui-images/icons/pg-${post_type}.svg" class="queued-watermark">
 
         <div class="queued-single-start">
             <span class="queued-post-time">${fullDate + " " + timeString}</span>
@@ -1079,7 +1096,6 @@ function postWrapperReserve(info) {
 }
 
 function postWrapperEvergreen(info) {
-console.log(info);
 const dateTimeString = info.sched_time;
 const dateTime = new Date(dateTimeString);
 const month = dateTime.toLocaleString('default', { month: 'short' });
@@ -1096,7 +1112,7 @@ return $template = `
 
         <div class="mosaic-post-controls">        
                 <span class="mosaic-control-icon">
-                    <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" />
+                    <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" id="delete-${info.id}" title="Delete" name="delete" />
                 </span>
                 </div>  <!-- END .mosaic-post-controls -->
 
@@ -1132,17 +1148,18 @@ return $template = `
         <!-- <div class="mosaic-scheduling mosaic-scheduling-future">
 
             <span class="mosaic-label mosaic-future-label">
-            <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
-            Schedule
+                <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
+                Schedule
             </span>
             <span class="mosaic-sched-buttons mosaic-future-buttons">
-            <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon evergreen-icon" id="ev-comment-${info.id}"/>
-            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon evergreen-icon" id="ev-retweet-${info.id}"/>
-            <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon evergreen-icon" id="ev-evergreen-${info.id}"/>
+                <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon evergreen-icon" id="ev-comment-${info.id}"/>
+                <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon evergreen-icon" id="ev-retweet-${info.id}"/>
+                <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon evergreen-icon" id="ev-evergreen-${info.id}"/>
             </span>
 
         </div>  END .mosaic-scheduling-future -->
 
+        <!--
         <div class="mosaic-scheduling mosaic-post-analytics">
 
             <span class="mosaic-label mosaic-analytics-label">
@@ -1156,9 +1173,8 @@ return $template = `
             <span class="mosaic-stat stat-hearts">2010</span>
             </span>
 
-        </div>  <!-- END .mosaic-post-analytics -->
-
-        </div>  <!-- END .mosaic-post-scheduling -->
+        </div> 
+        </div> -->
 
     </div>  <!-- END .mosaic-posts-inner -->
     </div>  <!-- END .mosaic-watermark-wrap -->
@@ -1182,29 +1198,31 @@ return $template = `<div class="mosaic-posts-outer promos-mosaic" status="${info
 
         <div class="mosaic-post-controls">
             <span class="mosaic-control-icon">
-            <img src="${APP_URL}/public/ui-images/icons/pg-add.svg"
-            class="ui-icon"/></span>                                   
+                <!-- <img src="${APP_URL}/public/ui-images/icons/pg-add.svg" class="ui-icon"/> -->
+            </span>                                   
 
             <span class="mosaic-control-icon">
-            <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
+                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" id="delete-${info.id}" title="Delete" name="delete"/>
+            </span>
         </div>  <!-- END .mosaic-post-controls -->
 
         <div class="global-twitter-profile-header">
             <a href="#">
-            <img src="${ TWITTER_PHOTO }"
-                class="global-profile-image" /></a>
+                <img src="${ TWITTER_PHOTO }" class="global-profile-image" />
+            </a>
             <div class="global-profile-details">
-            <div class="global-profile-name">
+                <div class="global-profile-name">
                 <a href="#">
-                ${TWITTER_NAME}</a>
-            </div>  <!-- END .global-author-name -->
+                    ${TWITTER_NAME}
+                </a>
+                </div>  <!-- END .global-author-name -->
             <div class="global-profile-subdata">
                 <!--  <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon" />
                     <span class="global-post-date">
                     <a href="">
                     ${ fullDate + " " + timeString }</a>
                     </span> -->
-            </div>  <!-- END .global-post-date-wrap -->
+                </div>  <!-- END .global-post-date-wrap -->
             </div>  <!-- END .global-author-details -->
         </div>  <!-- END .global-post-author -->
 
@@ -1223,3 +1241,86 @@ return $template = `<div class="mosaic-posts-outer promos-mosaic" status="${info
 `;
 }
 
+function postWrapperBulk(info) {
+    console.log(info);
+    const dateTimeString = info.sched_time;
+    const dateTime = new Date(dateTimeString);
+    const month = dateTime.toLocaleString('default', { month: 'short' });
+    const day = dateTime.getDate();
+    const year = dateTime.getFullYear();
+    const timeString = dateTime.toLocaleTimeString();
+    const fullDate = month + " " + day + ", " + year;
+
+    return $template = `<div class="queued-single-post-wrapper queue-type-custom" status="active" queue-type="custom">
+            <div class="queued-single-post-bulk" >
+                <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="queued-watermark">
+
+                <div class="queued-single-start-column">       
+                <span class="mt-3">
+                    <img src="${info.twitter_photo}" class=" queued-icon queued-edit-icon">
+                    ${info.twitter_name}
+                </span> 
+                <span>
+                    <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon queued-icon queued-view-icon" >
+                    ${timeString}
+                </span>        
+                <span>                  
+                    <img src="${APP_URL}/public/ui-images/icons/calendar.svg" class="ui-icon queued-icon queued-options-icon">
+                    ${month + ' ' + day + ', ' + year}
+                </span>
+                ${info.image_url !== null ? 
+                    `<span>
+                        <img src="${APP_URL}/public/ui-images/icons/pg-links.svg" class="ui-icon queued-icon queued-trash-icon">
+                        Photo
+                    </span>` 
+                    : ''}
+                ${info.link_url !== null ? 
+                    `<span>
+                        <img src="${APP_URL}/public/ui-images/icons/pg-links.svg" class="ui-icon queued-icon queued-trash-icon">
+                        Links
+                    </span>` 
+                    : ''}
+            </div>  
+                
+            <div class="queued-single-mid-column">                
+                <span class="queued-post-time">
+                    ${info.post_description}
+                </span>
+                     
+                ${info.link_url !== null ? 
+                    `<span class="queued-post-data">
+                        <div class="card" style="width: 350px; border: 1px solid var(--frost-background); margin-top: 2em;border-radius: 1em; position: relative;
+                        display: inline-block;
+                        overflow: hidden;">
+                            <img class="card-img-top" src="${info.meta_image}" alt="Card image cap" style="width: auto; height: 200px;     border-top-right-radius: 1em; border-top-left-radius: 1em;">                                                                                   
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="position: absolute;
+                            right: 5px;
+                            bottom: 265px;"><path d="M6.188 8.719c.439-.439.926-.801 1.444-1.087 2.887-1.591 6.589-.745 8.445 2.069l-2.246 2.245c-.644-1.469-2.243-2.305-3.834-1.949-.599.134-1.168.433-1.633.898l-4.304 4.306c-1.307 1.307-1.307 3.433 0 4.74 1.307 1.307 3.433 1.307 4.74 0l1.327-1.327c1.207.479 2.501.67 3.779.575l-2.929 2.929c-2.511 2.511-6.582 2.511-9.093 0s-2.511-6.582 0-9.093l4.304-4.306zm6.836-6.836l-2.929 2.929c1.277-.096 2.572.096 3.779.574l1.326-1.326c1.307-1.307 3.433-1.307 4.74 0 1.307 1.307 1.307 3.433 0 4.74l-4.305 4.305c-1.311 1.311-3.44 1.3-4.74 0-.303-.303-.564-.68-.727-1.051l-2.246 2.245c.236.358.481.667.796.982.812.812 1.846 1.417 3.036 1.704 1.542.371 3.194.166 4.613-.617.518-.286 1.005-.648 1.444-1.087l4.304-4.305c2.512-2.511 2.512-6.582.001-9.093-2.511-2.51-6.581-2.51-9.092 0z"/></svg>
+                            <div class="card-body" style="padding: 1em">
+                                <h4 class="card-title" style="font-weight:bold">${info.meta_title}</h4>
+                                <p class="card-text">${info.meta_description}</p>
+                                <a href="#" class="card-url" style="text-decoration: none; color: black">${info.link_url}</a>
+                            </div>
+                        </div>
+                    </span>
+                    ` : '' }
+                    
+                ${info.image_url !== null ? 
+                    `<span class="queued-post-data">
+                        <img class="card-img-top" src="${info.image_url}" alt="Card image cap" style="width: auto; height: 200px;border-top-right-radius: 1em;">                        
+                    </span>
+                    ` : '' }    
+                            
+            </div>
+
+            <div class="queued-single-end-column">
+                <!-- <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon" > -->
+                <img src="${APP_URL}/public/ui-images/icons/pg-clone.svg" class="ui-icon queued-icon queued-view-icon" name="duplicate" title="Duplicate" id="duplicate-${info.post_id}" >
+                <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon" name="edit" title="Edit" id="edit-${info.post_id}" >
+                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon" name="delete" title="Delete" id="deleteBulk-${info.post_id}" >
+            </div> 
+
+        </div> 
+    </div>
+    `
+}

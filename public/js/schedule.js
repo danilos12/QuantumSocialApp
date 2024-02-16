@@ -154,12 +154,11 @@ $(function() {
         <div class="slot-cell-inner scheduled-slot slot-${item.post_type}" id="${item.id}" data-day="${item.slot_day}" data-hour="${item.hour}" data-minute="${item.minute_at}" data-ampm="${item.ampm}" data-type="${item.post_type}">
             <div class="scheduled-slot-item">
                 <span class="slot-time" > ${item.hour + ":" + item.minute_at + " " + item.ampm}</span>
-            </div>
-            <div class="scheduled-slot-item">
                 <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon edit-scheduled" id="edit-${item.id}" />
                 <img src="${APP_URL}/public/ui-images/icons/pg-clone.svg" class="ui-icon clone-scheduled" id="clone-${item.id}" />
                 <img src="${APP_URL}/public/ui-images/icons/pg-close.svg" class="ui-icon delete-scheduled" id="delete-${item.id}" />
             </div>
+            
         </div>           
         `;
 
