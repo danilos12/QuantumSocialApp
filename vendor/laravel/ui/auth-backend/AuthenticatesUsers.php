@@ -6,8 +6,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Support\Facades\Session;
 
 trait AuthenticatesUsers
 {
@@ -34,20 +32,22 @@ trait AuthenticatesUsers
     public function login(Request $request)
     {
         $this->validateLogin($request);
-        
+
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
         // the IP address of the client making these requests into this application.
         if (method_exists($this, 'hasTooManyLoginAttempts') &&
             $this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
-            throw new AuthenticationException($this->sendLockoutResponse($request));
+
+            return $this->sendLockoutResponse($request);
         }
 
         if ($this->attemptLogin($request)) {
             if ($request->hasSession()) {
                 $request->session()->put('auth.password_confirmed_at', time());
             }
+
             return $this->sendLoginResponse($request);
         }
 
@@ -165,26 +165,19 @@ trait AuthenticatesUsers
      */
     public function logout(Request $request)
     {
-        // $this->guard()->logout();
+        $this->guard()->logout();
 
-        // $request->session()->invalidate();
+        $request->session()->invalidate();
 
-        // $request->session()->regenerateToken();
+        $request->session()->regenerateToken();
 
-        // if ($response = $this->loggedOut($request)) {            
-        //     return $response;
-        // }
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
 
-        // return $request->wantsJson()
-        //     ? new JsonResponse([], 204)
-        //     : redirect('/');
-        Auth::logout();
-
-        // Optional: Flush the user's session data
-        // session()->flush();
-
-        // Redirect the user to the login page or any other page as needed
-        return redirect()->route('login');
+        return $request->wantsJson()
+            ? new JsonResponse([], 204)
+            : redirect('/');
     }
 
     /**
@@ -195,10 +188,7 @@ trait AuthenticatesUsers
      */
     protected function loggedOut(Request $request)
     {
-        Auth::logout();
-
-        // Redirect the user to the login page or any other page as needed
-        return redirect()->route('login');
+        //
     }
 
     /**
