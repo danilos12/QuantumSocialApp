@@ -252,7 +252,7 @@
             console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
         } else {
             // If menuId is not defined or falsy, close all menus
-            $(`ul:not(${menuId})`).hide();
+            // $(`ul:not(${menuId})`).hide();
             // $(`li:not(${menuId})`).attr('aria-expanded', false);
           // Replace 'your-menu-selector' with the appropriate selector for your menus
         }
