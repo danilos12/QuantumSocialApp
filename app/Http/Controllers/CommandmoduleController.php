@@ -16,7 +16,7 @@ use App\Models\TwitterToken;
 use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
 use App\Models\Schedule;
-use League\Csv\Reader; 
+
 // use DateTime;
 // use Date;
 // use Illuminate\Support\Facades\Log;
@@ -498,20 +498,19 @@ class CommandmoduleController extends Controller
                     //     ->get();
 
                     $tweets = DB::table('bulk_post')
-                        ->join('twitter_accts', 'bulk_post.twitter_id', '=', 'twitter_accts.twitter_id')
-                        ->join('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url')
-                        ->select('bulk_post.id AS post_id', 'twitter_accts.id AS twitter_acct_id', 'bulk_post.*', 'twitter_accts.*', 'bulk_post.link_url AS url', 'bulk_meta.link_url AS meta_url', 'bulk_post.*', 'bulk_meta.*')
+                        ->leftJoin('twitter_accts', 'bulk_post.twitter_id', '=', 'twitter_accts.twitter_id')
+                        ->leftJoin('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url')
+                        ->select('bulk_post.*', 'twitter_accts.*', 'bulk_meta.*')
                         ->where([
                             ['bulk_post.twitter_id', '=', $id],
                             ['bulk_post.user_id', '=', Auth::id()],
                             ['bulk_post.post_type', '=', 'regular-tweets'],
                             ['bulk_post.sched_method', '=', 'bulk-queue']
-                        ])
+                        ])                        
                         ->orderBy('bulk_post.sched_time', 'ASC')
-                        ->distinct()
+                        // ->distinct()
                         ->get();
 
-                    // dd($tweets);    
 
                     break;                         
             }       
@@ -709,16 +708,14 @@ class CommandmoduleController extends Controller
 			$file = $request->file('csv_file');
 
             // parse the data in csv
-			$csvData = $this->parseCsv($file);                               
-            
-            // after getting the data from the csv, parse first the link to get the meta details, then add it into the database
-
-            // foreach($csvData as $)
+			$csvData = $this->parse($file);                     
+                        
+            // after getting the data from the csv, parse first the link to get the meta details, then add it into the database            
             foreach ($csvData as $key => $data) {
                 $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
                 // Format the timestamp as desired
                 $formattedDateTime = date("Y-m-d H:i:s", $timestamp);                                            
-                
+
                 $insertData = [
                     'user_id' =>  Auth::id(),
                     'twitter_id' => $request->input('twitter_id'),
@@ -727,30 +724,30 @@ class CommandmoduleController extends Controller
                     'sched_method' => 'bulk-queue',
                     'sched_time' => $formattedDateTime,
                     'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
-                    'image_url' => isset($data['link_url']) ? $data['link_url'] : null,                                                        
-                ];               
+                    'image_url' => isset($data['image_url']) ? $data['image_url'] : null,                                                        
+                ];         
                                    
                 Bulk_post::create($insertData);
                 
-                if (isset($data['link_url'])) {
+                if (isset($data['link_url']) && $data['link_url'] !== '') {
                     // Check if the record already exists
-                     $findMeta = Bulk_meta::where('link_url', $data['link_url'])->first();                
-     
-                     if ($findMeta === null) {
-                         // The record does not exist, so scrape the meta tags
-                         $metaTags = $this->scrapeMetaTags($data['link_url']);
-     
-                         $metaData = [
-                             'meta_title' => $metaTags['og:title'],
-                             'meta_description' => $metaTags['og:description'],
-                             'meta_image' => $metaTags['og:image'],
-                             'link_url' => $data['link_url'],
-                         ];
-     
-                         // Create a new record in the database
-                         Bulk_meta::create($metaData);
-                     }
-                }
+                    $findMeta = Bulk_meta::where('link_url', $data['link_url'])->first();              
+                                         
+                    if (!$findMeta) {
+                        // The record does not exist, so scrape the meta tags
+                        $metaTags = $this->scrapeMetaTags($data['link_url']);
+    
+                        $metaData = [
+                            'meta_title' => $metaTags['og:title'],
+                            'meta_description' => $metaTags['og:description'],
+                            'meta_image' => $metaTags['og:image'],
+                            'link_url' => $data['link_url'],
+                        ];
+    
+                        // Create a new record in the database
+                        Bulk_meta::create($metaData);
+                    }
+                } 
 
             }
 
@@ -760,6 +757,31 @@ class CommandmoduleController extends Controller
         }
 
         return redirect()->back()->with('message', 'CSV file uploaded and processed successfully.');
+    }
+
+    function scrapeMeta(Request $request) {
+        $findMeta = Bulk_meta::where('link_url', $request->input('url'))->first();          
+
+        if ($findMeta) {
+            $metaTags = $this->scrapeMetaTags($request->input('url'));
+
+            $findMeta->update([
+                'meta_title' => $metaTags['og:title'],
+                'meta_description' => $metaTags['og:description'],
+                'meta_image' => $metaTags['og:image'],
+            ]);
+        
+            return response()->json([
+                'status' => 200,
+                'message' => 'Meta tags updated successfully',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 500,
+            'message' => 'Meta tags not found',
+        ]);
+
     }
 
 
@@ -788,13 +810,33 @@ class CommandmoduleController extends Controller
         return $metaTags;
     }
 
+    private function parse($p) {
+        
+        // Open the CSV file
+        $fileHandle = fopen($p, 'r');
 
-	private function parseCsv($path)
-	{
-		$csv = Reader::createFromPath($path->getPathname(), 'r');
-        $csv->setHeaderOffset(0); // Assuming the first row contains headers
+        // Initialize an empty array to store the parsed CSV data
+        $parsedCsvData = [];
 
-        return iterator_to_array($csv->getRecords());
-	}
+        // Read the first row (header row) and discard it
+        $headerRow = fgetcsv($fileHandle);
+
+        // Loop through each remaining row
+        while (($row = fgetcsv($fileHandle)) !== false) {
+            // Combine the header row and the current row into an associative array
+            $rowData = array_combine($headerRow, $row);
+
+            // Use the first column as the array key
+            $key = $row[0];
+
+            // Add the row data to the parsed CSV data array using the first column as the key
+            $parsedCsvData[$key] = $rowData;
+        }
+
+        
+        // Close the file
+        fclose($fileHandle);
+        return $parsedCsvData;
+    }
 
 }
