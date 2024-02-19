@@ -119,6 +119,7 @@ Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'ed
 Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
 Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::post('/post/duplicate/{id}',[App\Http\Controllers\PostingController::class, 'duplicatePost'])->name('post.duplicate');
+Route::post('/reload-meta/scrape',[App\Http\Controllers\CommandmoduleController::class, 'scrapeMeta'])->name('scrape');
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');
 
 

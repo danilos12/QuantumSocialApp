@@ -1292,12 +1292,12 @@ function postWrapperBulk(info) {
                         <div class="card" style="width: 350px; border: 1px solid var(--frost-background); margin-top: 2em;border-radius: 1em; position: relative;
                         display: inline-block;
                         overflow: hidden;">
-                            <img class="card-img-top" src="${info.meta_image}" alt="Card image cap" style="width: auto; height: 200px;     border-top-right-radius: 1em; border-top-left-radius: 1em;">                                                                                   
-                            <img src="${APP_URL}/public/ui-images/icons/pg-links.svg" title="Reload meta" alt="Reload meta" style="position: absolute; right: 5px; bottom: 265px;">                            
+                            <img class="card-img-top" src="${info.meta_image}" alt="Card image cap" style="width: 100%; height: 200px;     border-top-right-radius: 1em; border-top-left-radius: 1em;">                                                                                   
+                            <img src="${APP_URL}/public/ui-images/icons/pg-links.svg" title="Reload meta" name="reload-meta" alt="Reload meta" style="position: absolute; right: 5px; bottom: 50%;" data-url="${info.link_url}">                            
                             <div class="card-body" style="padding: 1em">
                                 <h4 class="card-title" style="font-weight:bold">${info.meta_title}</h4>
                                 <p class="card-text">${info.meta_description}</p>
-                                <a href="#" class="card-url" style="text-decoration: none; color: black">${info.link_url}</a>
+                                <a href="${info.link_url}" class="card-url" target="_blank" style="text-decoration: none; color: black"> <img src="${APP_URL}/public/ui-images/icons/pg-links.svg" style="width:15px; height: 15px; margin-right: 5px"> ${info.link_url}</a>
                             </div>
                         </div>
                     </span>

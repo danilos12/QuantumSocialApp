@@ -348,6 +348,35 @@ $(document).ready(function() {
         }
     });
 
+    $(document).on('click', 'img[name="reload-meta"]', async function(e) {
+        const url = e.currentTarget.dataset.url;
+        // const username = 'username';
+        // const password = 'password';
+        // const credentials = `${username}:${password}`;
+        // const base64Credentials = btoa(credentials);
+
+        try {
+            
+            const response = await fetch(APP_URL + '/reload-meta/scrape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify({ url : url}),
+            });
+            const responseData = await response.json();
+            if (responseData.status === 200) {
+                alert(responseData.message);
+                location.reload();
+            } else {
+                $('.queued-posts-outer').before(div);        
+                console.log(1);
+            } 
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    });
 
     // delete icon
     $(document).on('click', '.ui-icon[name="delete"]', async function(e) {
