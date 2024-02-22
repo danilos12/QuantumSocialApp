@@ -471,34 +471,9 @@ class CommandmoduleController extends Controller
                         ->orderBy('sched_method', 'DESC')
                         ->get();
                     break;   
-                case 'bulk-queue': 
-                    // $tweets = DB::table('posts')
-                    //     // ->join('twitter_accts', 'posts.twitter_id', '=', 'twitter_accts.twitter_id')
-                    //     ->select('*')
-                    //     ->where('twitter_id', $id)
-                    //     // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                    //     ->where('post_type', '=','regular-tweets')
-                    //     ->where('from_bulk', 1)
-                    //     ->where('sched_method', 'bulk-queue')
-                    //     ->orderBy('sched_time', 'ASC')
-                    //     ->orderBy('sched_method', 'DESC')
-                    //     ->get();
-
-                    // $tweets = DB::table('bulk_post')
-                    //     ->join('twitter_accts', 'bulk_post.twitter_id', '=', 'twitter_accts.twitter_id') // Specify '=' for join condition
-                    //     ->join('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url') // Specify '=' for join condition
-                    //     ->select('bulk_post.id AS post_id', 'twitter_accts.id AS twitter_acct_id', 'bulk_post.*', 'twitter_accts.*') 
-                    //     ->select('bulk_post.link_url AS url', 'bulk_meta.link_url AS meta_url', 'bulk_post.*', 'bulk_meta.*') 
-                    //     ->where('bulk_post.twitter_id', $id) // Specify 'posts.twitter_id'
-                    //     ->where('bulk_post.user_id', Auth::id()) // Specify 'posts.twitter_id'
-                    //     ->where('bulk_post.post_type', '=','regular-tweets') // Specify 'posts.post_type'
-                    //     ->where('bulk_post.sched_method', 'bulk-queue') // Specify 'posts.sched_method'
-                    //     ->orderBy('bulk_post.sched_time', 'ASC') // Specify 'posts.sched_time'
-                    //     ->orderBy('bulk_post.sched_method', 'DESC') // Specify 'posts.sched_method                        // ->distinct() // Add this line to ensure uniqueness
-                    //     ->get();
-
+                case 'bulk-queue':                   
                     $tweets = DB::table('bulk_post')
-                        ->leftJoin('twitter_accts', 'bulk_post.twitter_id', '=', 'twitter_accts.twitter_id')
+                        ->leftJoin('twitter_accts', 'bulk_post.user_id', '=', 'twitter_accts.user_id')
                         ->leftJoin('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url')
                         ->select('bulk_post.*', 'twitter_accts.*', 'bulk_meta.*')
                         ->where([
@@ -508,7 +483,6 @@ class CommandmoduleController extends Controller
                             ['bulk_post.sched_method', '=', 'bulk-queue']
                         ])                        
                         ->orderBy('bulk_post.sched_time', 'ASC')
-                        // ->distinct()
                         ->get();
 
 
