@@ -36,7 +36,7 @@ Route::get('/profile/edit-password', [App\Http\Controllers\ProfileController::cl
 Route::post('/profile/edit-password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('update-password');
 
 Route::get('/posting', [App\Http\Controllers\PostingController::class, 'index'])->name('posting');
-Route::get('/queue', [App\Http\Controllers\PostingController::class, 'queue'])->name('queue');
+// Route::get('/queue', [App\Http\Controllers\PostingController::class, 'queue'])->name('queue');
 Route::get('/drafts', [App\Http\Controllers\PostingController::class, 'drafts'])->name('drafts');
 Route::get('/posted', [App\Http\Controllers\PostingController::class, 'posted'])->name('posted');
 Route::get('/schedule', [App\Http\Controllers\PostingController::class, 'slot_scheduler'])->name('slot-scheduler');
