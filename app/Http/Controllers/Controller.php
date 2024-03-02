@@ -13,6 +13,7 @@ use App\Models\MasterTwitterApiCredentials;
 use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
 use App\Models\TwitterSettings;
+use App\Helpers\TwitterHelper;
 use App\Models\TwitterSettingsMeta;
 use Exception;
 
@@ -21,7 +22,9 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    // Step 1 (Redirect to Authorize)
     public function checkTwitterCreds(Request $request, $id) {
+        
         try {
             $findCred = MasterTwitterApiCredentials::where('user_id', $id)->first();
 
@@ -42,13 +45,14 @@ class Controller extends BaseController
         }
     }
 
-     // STEP 1
-    public function twitterOAuth($twitterClientId) {
+     // Authorized
+    public function twitterOAuth($twitterClientId) {        
+
         // create an authorized URL 
         $url = $this->buildAuthorizedURL("https://twitter.com/i/oauth2/authorize", [
             'response_type' => 'code',
             'client_id' => $twitterClientId,
-            'redirect_uri' => env('TWITTER_CALLBACK_URL'),
+            'redirect_uri' => TwitterHelper::getActiveAPI(Auth::id())->callback_url,
             'scope' => 'tweet.read users.read follows.read follows.write tweet.write offline.access'           
         ]);
 
@@ -57,29 +61,24 @@ class Controller extends BaseController
 
     // STEP 2
     public function twitterOAuthCallback(Request $request) {
+        try {            
 
-        try {
-
-            if (isset($_GET['error'])) {
-                // return redirect('/');
-                // If there was an error saving data, redirect back to the previous page with an error message
-                return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
+            // if (isset($_GET['error'])) {
+            //     // return redirect('/');
+            //     // If there was an error saving data, redirect back to the previous page with an error message
+            //     return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
     
-            } else {
+            // } else {
     
-                $title = 'Profile ';
-        
-                $checkToken = TwitterToken::where('user_id', Auth::user()->id)->first();
-        
-                
+                                        
                 $codeVerifier = session()->get('code_verifier');
                 
                 $url = 'https://api.twitter.com/2/oauth2/token';
                 $data = array(
                     'code' => $request->input('code'),
                     'grant_type' => 'authorization_code',
-                    'client_id' => env('TWITTER_CLIENT_ID'),
-                    'redirect_uri' => env('TWITTER_CALLBACK_URL'),
+                    'client_id' => TwitterHelper::getActiveAPI(Auth::id())->oauth_id,
+                    'redirect_uri' => TwitterHelper::getActiveAPI(Auth::id())->callback_url,
                     'code_verifier' => $codeVerifier
                 );
         
@@ -90,10 +89,7 @@ class Controller extends BaseController
         
                 $response = $this->curlHttpRequest($url, $headers, $data);                       
                 $twitterId = $this->getTwitterdetails($response->access_token);
-    
-                // implement error when twitter is already saved before
-                // if ($twitterId)
-        
+            
                 // save the twitter details to database
                 $saveTwitterInfo = Twitter::updateOrCreate([
                     'twitter_id' => $twitterId->id,
@@ -121,7 +117,6 @@ class Controller extends BaseController
                         'refresh_token' => $response->refresh_token,
                         'expires_in' => $response->expires_in,
                         'active' => 1,
-                        'queue_switch' => 1
                     ]);
         
                     // save ut_user_mngt
@@ -174,7 +169,7 @@ class Controller extends BaseController
                     }
                                     
                 }
-            }
+            // }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();            
@@ -182,9 +177,7 @@ class Controller extends BaseController
             // Log or display the error message along with file and line number
             return response()->json(['status' => '409', 'error' => $trace, 'message' => $message]);
         }
-        
-
-        
+            
     }    
 
     public function getTwitterdetails($accessToken) {    

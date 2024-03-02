@@ -98,9 +98,8 @@ Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\GeneralSetti
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
 Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
-Route::post('/cmd/post/tweet-now/{id}',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
-Route::post('/cmd/post/duplicate-now/{id}',[App\Http\Controllers\CommandmoduleController::class, 'duplicateFromQueue'])->name('post.duplicate');
-Route::post('/cmd/post/move-to-top/{id}',[App\Http\Controllers\CommandmoduleController::class, 'moveTopFromQueue'])->name('post.move');
+Route::post('/cmd/post/tweet-now',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
+Route::post('/cmd/post/move-to-top',[App\Http\Controllers\CommandmoduleController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
@@ -118,6 +117,9 @@ Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, '
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
 Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+// Route::post('/cmd/post/duplicate/{id}',[App\Http\Controllers\CommandmoduleController::class, 'duplicateFromQueue'])->name('post.duplicate');
+Route::get('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // retrieve modal
+Route::post('/post/bulk_update/{id}',[App\Http\Controllers\PostingController::class, 'editBulkPost'])->name('post.bulk_update'); // update data in modal
 Route::post('/post/duplicate/{id}',[App\Http\Controllers\PostingController::class, 'duplicatePost'])->name('post.duplicate');
 Route::post('/reload-meta/scrape',[App\Http\Controllers\CommandmoduleController::class, 'scrapeMeta'])->name('scrape');
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');

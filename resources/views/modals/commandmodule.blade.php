@@ -234,12 +234,3 @@ div[data-schedule="none"] {
 
   </div>  <!-- END .posting-tool-inner -->
 </div>  <!-- END .posting-tool-outer -->
-
-
-
-<script>           
-</script>
-
-<style>
-
-</style>
