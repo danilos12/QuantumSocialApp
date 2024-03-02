@@ -264,6 +264,7 @@ $(document).ready(function() {
     function sortBySourceAll() {
         window.location.href = '/queue';
     }
+   
     
     $('.queue-day-wrapper').on("click", 'img.queued-icon', async function(e) {
         var id = e.target.id;
@@ -522,6 +523,7 @@ $(document).ready(function() {
       });
 
 
+    // edit bulk form
     $(document).on('submit', '.bulk-form', async function(e) {        
         e.preventDefault();
         const $form = $(e.target).serializeArray();
@@ -533,8 +535,8 @@ $(document).ready(function() {
         });
 
         try {
-            const response = await fetch(APP_URL + '/post/bulk_update/' + id, {
-                method: 'POST',
+            const response = await fetch(APP_URL + '/post/bulk_edit/' + id, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
