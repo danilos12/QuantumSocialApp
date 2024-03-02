@@ -16,6 +16,9 @@ class QuantumAcctMeta extends Model
         'subscription_free_counter',
         'member_count',
         'status',
-        'timezone'
+        'timezone',
+        'queue_switch',
+        'promo_switch',
+        'evergreen_switch'
     ];
 }

@@ -2,9 +2,11 @@
 
 namespace App\Helpers;
 
+use App\Http\Controllers\TwitterApi;
 use App\Models\TwitterToken;
 use Carbon\Carbon;
 use App\Models\QuantumAcctMeta;
+use App\Models\MasterTwitterApiCredentials;
 use App\Models\Twitter;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +18,7 @@ class TwitterHelper
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=' . env('TWITTER_CLIENT_ID'),
+            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=' . TwitterHelper::getActiveAPI(Auth::id())->oauth_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -134,6 +136,11 @@ class TwitterHelper
     public static function timezone($id) {
         $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
         return $acctMeta->timezone;       
+    }
+
+    public static function getActiveAPI($id) {
+        $activeAPI = MasterTwitterApiCredentials::where('user_id', $id)->first();
+        return $activeAPI;
     }
 
 }

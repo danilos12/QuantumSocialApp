@@ -1845,7 +1845,8 @@ img.mosaic-watermark.evergreen-watermark {
 }
 
 .queued-single-end-column .queued-icon {
-  margin-bottom: 0.5em;
+  margin-bottom: 1em;
+  cursor: pointer
 }
 
 .queued-single-end .queued-icon {
