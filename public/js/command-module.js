@@ -63,6 +63,8 @@ $(function($) {
             twitter_id: TWITTER_ID,
         },
         success: function(response) {
+
+            console.log(response)
             // Add the existing tag groups to the page
             if (response.length > 0) {
                 $.each(response, function(index, k) {
@@ -1053,8 +1055,8 @@ function postWrapper(info, post_type) {
             
             <div class="queued-options-wrapper frosted view-more view-${info.id}">
                 <div class="queued-options-inner view-more-inner">
-                    <span class="queued-option-item" id="post-now-${info.id}">Post Now</span>
-                    <span class="queued-option-item" id="duplicate-now-${info.id}">Duplicate Post</span>
+                    <span class="queued-option-item" id="postNow-${info.id}">Post Now</span>
+                    <span class="queued-option-item" id="duplicateNow-${info.id}">Duplicate Post</span>
                     <span class="queued-option-item" id="move-top-${info.id}">Move to Top</span>
                 </div>  <!-- END .queued-options-inner -->
             </div>  <!-- END .queued-options-wrapper -->
@@ -1242,7 +1244,6 @@ return $template = `<div class="mosaic-posts-outer promos-mosaic" status="${info
 }
 
 function postWrapperBulk(info) {
-    console.log(info);
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString('default', { month: 'short' });
@@ -1257,8 +1258,8 @@ function postWrapperBulk(info) {
 
                 <div class="queued-single-start-column">       
                 <span class="mt-3">
-                    <img src="${info.twitter_photo}" class=" queued-icon queued-edit-icon">
-                    ${info.twitter_name}
+                    <img src="${info.xphoto}" class=" queued-icon queued-edit-icon">
+                    ${info.xname}
                 </span> 
                 <span>
                     <img src="${APP_URL}/public/ui-images/icons/pg-time.svg" class="ui-icon queued-icon queued-view-icon" >
@@ -1313,9 +1314,9 @@ function postWrapperBulk(info) {
 
             <div class="queued-single-end-column">
                 <!-- <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon" > -->
-                <img src="${APP_URL}/public/ui-images/icons/pg-clone.svg" class="ui-icon queued-icon queued-view-icon" name="duplicate" title="Duplicate" id="duplicate-${info.post_id}" >
-                <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon" name="edit" title="Edit" id="edit-${info.post_id}" >
-                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon" name="delete" title="Delete" id="deleteBulk-${info.post_id}" >
+                <img src="${APP_URL}/public/ui-images/icons/pg-clone.svg" class="ui-icon queued-icon queued-view-icon" name="duplicate" title="Duplicate" id="duplicateBulk-${info.id}" >
+                <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon" name="edit" data-id="modal" title="Edit" id="editBulk-${info.id}" >
+                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon" name="delete" title="Delete" id="deleteBulk-${info.id}" >
             </div> 
 
         </div> 
