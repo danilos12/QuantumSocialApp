@@ -126,6 +126,12 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('membership', $membership);
 
                 $toggle = DB::table('twitter_meta')->where('user_id', Auth::id())->where('twitter_id', $twitterID)->first();
+
+                // membership
+                $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();
+                $view->with('membership', $membership);
+
+                $toggle = DB::table('users_meta')->where('user_id', Auth::id())->first();
                 $currentRoute = Route::current()->uri;
                 if ($currentRoute === 'evergreen' || $currentRoute === 'promo' || $currentRoute === 'queue') {
                     $view->with('toggle', $toggle->{$currentRoute . '_switch'});

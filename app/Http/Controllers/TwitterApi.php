@@ -28,7 +28,7 @@ class TwitterApi extends Controller
     public function getTweets($twitterId)
     {
         try {
-            $_ENV =  env('TWITTER_BEARER_TOKEN') ?? "AAAAAAAAAAAAAAAAAAAAAAX4lAEAAAAANMt4THwRzGff8IzPOSJAxsYDfnw%3D3UBzwDd2HJg4HZdl7vreAG5HoVNibNzXkIDL1qaER0UJ076wAX";
+            $_ENV =  TwitterHelper::getActiveAPI(Auth::id())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
@@ -80,7 +80,7 @@ class TwitterApi extends Controller
     public function getTweetFilters($twitterId, $type)
     {
         try {
-            $_ENV =  env('TWITTER_BEARER_TOKEN') ?? "AAAAAAAAAAAAAAAAAAAAAAX4lAEAAAAANMt4THwRzGff8IzPOSJAxsYDfnw%3D3UBzwDd2HJg4HZdl7vreAG5HoVNibNzXkIDL1qaER0UJ076wAX";
+            $_ENV =  TwitterHelper::getActiveAPI(Auth::id())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
@@ -242,11 +242,7 @@ class TwitterApi extends Controller
             ]);
         }
 
-    }
-
-    public function tweetSchedule(Request $request) {
-        
-    }
+    } 
 
     public function switchedAccount(Request $request) {
         $title = "Profile";        
