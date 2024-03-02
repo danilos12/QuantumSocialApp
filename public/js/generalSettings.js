@@ -76,46 +76,43 @@ $(document).ready(function() {
     }
   });
 
+  $(document).on('submit', '#master_api_form', async function(e) {        
+    e.preventDefault();
+    const $form = $(e.target).serializeArray();
+    var id = e.currentTarget.dataset.id;
+    console.log($form, id)
+    var formData = {};
+    $.each($form, function(index, field){
+        formData[field.name] = field.value;         
+    });
 
-  $('#twitter_api_saving').on("click", async function(e) {
-    e.preventDefault(); // Prevent form submission
-
-    var creds = {
-      'api_key' : $('#api_key').val(),
-      'api_secret' : $('#api_secret').val(),
-      'bearer_token' : $('#bearer_token').val(),
-      'oauth_id' : $('#oauth_id').val(),
-      'oauth_secret' : $('#oauth_secret').val(),
-    }
-    
     try {
       const response = await fetch(APP_URL + '/settings/twitter_api_creds/' + QUANTUM_ID, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json',
-              'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
           },
-          body: JSON.stringify(creds), // Use "body" instead of "data" to send the data
+          body: JSON.stringify(formData) // Convert the object to JSON string           
       });
-      
+      // console.log(response);
       const responseData = await response.json();
-      console.log(responseData);
 
       var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
         $(this).after(div);
       } else {
         $(this).after(div);
-      }
-      
-      // remove the div after 3 seconds
+      }      
+
       setTimeout(function() {
-        div.remove();
-      }, 3000);
-    } catch (error) {
-      console.log(error);
+      location.reload();
+      }, 3000); // Reload after 5 seconds (adjust the delay as needed)
+    } catch(err) {
+        console.log('Error fetching the data' + err)
     }
-  })
+  });
+
   
   $('#membership').change(async function(event) {
     var selectedValue = $(this).val();

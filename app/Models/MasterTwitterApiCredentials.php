@@ -22,6 +22,7 @@ class MasterTwitterApiCredentials extends Model
         'bearer_token', 
         'oauth_id',
         'oauth_secret',
+        'callback_url'
     ];
     public $timestamps = true;
 }
