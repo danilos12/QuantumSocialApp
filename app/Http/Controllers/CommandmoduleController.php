@@ -15,7 +15,9 @@ use App\Models\Tag_items;
 use App\Models\TwitterToken;
 use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
+use App\Models\QuantumAcctMeta;
 use App\Models\Schedule;
+use App\Models\User;
 
 // use DateTime;
 // use Date;
@@ -63,11 +65,11 @@ class CommandmoduleController extends Controller
             $utc = TwitterHelper::now($user_id);            
             $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
             $tweet_id = basename(parse_url($url, PHP_URL_PATH));
-            $checkToggle = TwitterToken::where('twitter_id', $main_twitter_id)->where('active', 1)->first();
+            $checkToggle = QuantumAcctMeta::where('user_id', Auth::id())->first();
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially            
             $sched_method = null;           
-            $sched_time = null;           
-
+            $sched_time = null;          
+            
             // Save the regular tweet for main account            
             $insertData = [
                 'user_id' => $user_id,
@@ -286,6 +288,8 @@ class CommandmoduleController extends Controller
                 ->where('twitter_accts.deleted', "=", 0)
                 ->get();
 
+            // dd($getUnselectedTwitter);    
+
         return response()->json($getUnselectedTwitter);
     }
 
@@ -358,7 +362,6 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_method', 'DESC')
                             ->get();               
 
-                    // dd($posts, TwitterHelper::now(Auth::id()), $id,  Auth::id());
                     $schedules = Schedule::where('user_id', Auth::id())->get();     
                     
                     $recurringDates = [];
@@ -475,7 +478,15 @@ class CommandmoduleController extends Controller
                     $tweets = DB::table('bulk_post')
                         ->leftJoin('twitter_accts', 'bulk_post.user_id', '=', 'twitter_accts.user_id')
                         ->leftJoin('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url')
-                        ->select('bulk_post.*', 'twitter_accts.*', 'bulk_meta.*')
+                        ->select(
+                            'bulk_post.*', 
+                            'twitter_accts.twitter_name as xname',
+                            'twitter_accts.twitter_photo as xphoto',
+                            'twitter_accts.twitter_username as xusername',
+                            'bulk_meta.meta_title as meta_title', 
+                            'bulk_meta.meta_description as meta_description', 
+                            'bulk_meta.meta_image as meta_image'
+                        )
                         ->where([
                             ['bulk_post.twitter_id', '=', $id],
                             ['bulk_post.user_id', '=', Auth::id()],
@@ -485,7 +496,7 @@ class CommandmoduleController extends Controller
                         ->orderBy('bulk_post.sched_time', 'ASC')
                         ->get();
 
-
+                        // dd($tweets);
                     break;                         
             }       
 
@@ -521,15 +532,15 @@ class CommandmoduleController extends Controller
         return $dates;
     }
 
-    public function postNowFromQueue(Request $request, $id)
+    public function postNowFromQueue(Request $request)
     {    
         try {            
             // Find the post based on the provided ID
-            $post_id = str_replace('post-now-', '', $id);
+            $post_id = str_replace('postNow-', '', $request->input('post'));
             $post = CommandModule::findOrFail($post_id);
 
             if ($post) {
-                $getToken = TwitterHelper::getTwitterToken($request->twitter_id);            
+                $getToken = TwitterHelper::getTwitterToken($request->input('twitter_id'));            
                 $twitterMeta = $getToken->toArray();
                 $twitter_meta = $twitterMeta[0];
 
@@ -558,33 +569,6 @@ class CommandmoduleController extends Controller
             return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
         }
         
-    }
-
-    public function duplicateFromQueue(Request $request, $id)
-    {  
-        try {      
-            $post_id = str_replace('duplicate-now-', '', $id);
-            $post = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])->findOrFail($post_id);
-        
-            // Duplicate the data
-            $newRow = $post->replicate();
-            // $newRow->save();
-
-            // Optionally, you can modify any specific values before saving the new row
-            $newRow->post_type_code = rand(10000, 99999);
-            $newRow->save();
-
-            // Redirect or return a response
-            // ...
-            return response()->json(['status' => 200, 'message' => 'Post duplicated successfully!']);
-
-        } catch (Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();            
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
-        }    
     }
 
     public function moveTopFromQueue(Request $request, $id) {

@@ -576,7 +576,6 @@ let currentModal = null;
 
 $('[data-id="modal"]').click(function(event) {
   $target = event.target.id;  
-  // console.log($target)
   openModal($target);
 })
 
@@ -628,7 +627,7 @@ function openModal(modalId) {
 
 // Close modal
 function closeModal(modalId) {
-  // console.log(modalId);
+  console.log(modalId);
 
   // const modal = document.getElementById(modalId);
   // modal.style.display = 'none';  
@@ -677,12 +676,12 @@ function openTwitterModal(modalId) {
   currentModal = modalId;
 }
 
-// Close modal when the user clicks outside the modal or presses the escape key
-window.onclick = function(event) {
-  if (event.target.classList.contains('modal-large-backdrop')) {
-    closeModal(currentModal);
-  }
-} 
+// // Close modal when the user clicks outside the modal or presses the escape key
+// window.onclick = function(event) {
+//   if (event.target.classList.contains('modal-large-backdrop')) {
+//     closeModal(currentModal);
+//   }
+// } 
 
 window.onkeyup = function(event) {
   if (event.key === 'Escape') {
