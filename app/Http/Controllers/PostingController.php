@@ -310,6 +310,7 @@ class PostingController extends Controller
 	}
 	
 	public function editBulk(Request $request, $id) {
+		
 		if ($request->isMethod('get')) {
 			try {
 				$queuePosts = Bulk_post::find($id);				
@@ -322,7 +323,7 @@ class PostingController extends Controller
 			}
 		} else {
 			try {
-				$postData = $request->all();
+				$postData = $request->all();				
 				$id = explode('-', $id); 
 				$posts = Bulk_post::find($id[2]);	
 	
@@ -333,17 +334,20 @@ class PostingController extends Controller
 					"post_type" => "regular-tweets",
 					"post_description" => $postData['bulkpost_description'],
 					"sched_time" => $date,
-					"link_url" => isset($postData['bulklink_url']) ? $postData['bulklink_url'] : "",
-					"image_url" => isset($postData['bulkimage_url']) ? $postData['bulkimage_url'] : ""
-				]);
+					"image_url" => (isset($postData['bulkimage_url']) && $postData['bulkimage_url'] !== null) ? $postData['bulkimage_url'] : "",
+					"link_url" => (isset($postData['bulklink_url'])  && $postData['bulklink_url'] !== null) ? $postData['bulklink_url'] : ""
+				]);			
 	
 				// // Save the changes
 				$posts->save();
+
+
+				$message = "Bulk post is updated succesfully. ";
 				
 				// check the link_url if already existing
-				if (isset($postData['bulklink_url'])) {
-					$findMeta = Bulk_meta::where('link_url', $postData['bulklink_url'])->first();
-					
+				if ($posts->save()) {
+					$findMeta = Bulk_meta::where('link_url', $posts['link_url'])->first();
+
 					if (!$findMeta) {
 						// The record does not exist, so scrape the meta tags
 						$metaTags =  (new CommandmoduleController)->scrapeMetaTags($postData['bulklink_url']);
@@ -357,11 +361,18 @@ class PostingController extends Controller
 	
 						// Create a new record in the database
 						Bulk_meta::create($metaData);
+
+						$message .= "New meta added in existing post";
+					} else {
+						$message .= "Meta is already saved before";
 					}
-				}			
+
+					// Return a success response
+					return response()->json(['status' => 200, 'message' => $message]);
+				}	else {
+					return response()->json(['status' => 500, 'message' => 'Something went wrong on saving']);					
+				} 	
 	
-				// // // Return a success response
-				return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
 	
 			} catch (Exception $e) {
 				$trace = $e->getTrace();
