@@ -180,14 +180,14 @@
                     <div class="form-group">                
                         <div class="col-md-12 col">
                             <label for="post description">Image URL</label>
-                            <input type="url" name="bulkimage_url" id="bulkimage_url" class="edit-bulkpost" placeholder="Image URL">
+                            <input type="text" name="bulkimage_url" id="bulkimage_url" class="edit-bulkpost" placeholder="Image URL">
                         </div>
                     </div>
                     
                     <div class="form-group">                                
                         <div class="col-md-12 col">
                             <label for="post description">Link URL</label>
-                            <input type="url" name="bulklink_url" id="bulklink_url" class="edit-bulkpost" placeholder="Link URL">
+                            <input type="text" name="bulklink_url" id="bulklink_url" class="edit-bulkpost" placeholder="Link URL">
                         </div>
                     </div>
                         

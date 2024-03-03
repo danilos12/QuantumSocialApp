@@ -51,13 +51,13 @@
                 </a>
             </li> --}}
 
-            <li id="bulk-uploader">
+            <li id="bulk">
                 <a href="{{ route('bulk-uploader') }}">
                     <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
                     Bulk Uploader
                 </a>
             </li>
-            <li id="bulk-uploader">
+            <li id="bulk-queue">
                 <a href="{{ route('bulk-queue') }}">
                     <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
                     Bulk Queue
