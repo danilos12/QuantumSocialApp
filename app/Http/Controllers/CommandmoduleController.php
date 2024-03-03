@@ -54,7 +54,7 @@ class CommandmoduleController extends Controller
         return view('commandmodule', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
     }
  
-    public function create(Request $request) {               
+    public function create(Request $request) {    
         try {            
             $postData = $request->all();
             $user_id = Auth::id();
@@ -674,7 +674,7 @@ class CommandmoduleController extends Controller
                 // Format the timestamp as desired
                 $formattedDateTime = date("Y-m-d H:i:s", $timestamp);                                            
 
-                $insertData = [
+                $insertData = Bulk_post::create([
                     'user_id' =>  Auth::id(),
                     'twitter_id' => $request->input('twitter_id'),
                     'post_type' => 'regular-tweets',
@@ -683,13 +683,11 @@ class CommandmoduleController extends Controller
                     'sched_time' => $formattedDateTime,
                     'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
                     'image_url' => isset($data['image_url']) ? $data['image_url'] : null,                                                        
-                ];         
-                                   
-                Bulk_post::create($insertData);
-                
-                if (isset($data['link_url']) && $data['link_url'] !== '') {
+                ]);         
+                                                   
+                if ($insertData) {
                     // Check if the record already exists
-                    $findMeta = Bulk_meta::where('link_url', $data['link_url'])->first();              
+                    $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();                                           
                                          
                     if (!$findMeta) {
                         // The record does not exist, so scrape the meta tags
@@ -704,6 +702,7 @@ class CommandmoduleController extends Controller
     
                         // Create a new record in the database
                         Bulk_meta::create($metaData);
+
                     }
                 } 
 
