@@ -7,8 +7,9 @@ use App\Models\User;
 use App\Models\GeneralSettings;
 use App\Models\QuantumAcctMeta;
 
-
-use Illuminate\Support\Facades\DB;
+// use DateTime;
+// use DateTimeZone;
+use Illuminate\Support\Facades\DB; 
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,25 @@ use Illuminate\Support\Facades\DB;
 |
 */
 
+Route::get('update-wp', function () {
+	$r = $_REQUEST;
+	if(isset( $r['wp_user_id'] ) ) {
+		
+		DB::table('app_usermeta')->updateOrInsert(
+        ['user_id' => $r['wp_user_id'], 'meta_key' => 'id_subscription'],
+        ['meta_value' => $r['membership_plan_id']]
+		);
+		
+		DB::table('app_usermeta')->updateOrInsert(
+        ['user_id' => $r['wp_user_id'], 'meta_key' => 'wp_subscription'],
+        ['meta_value' => $r['name_subscription']]
+		);
+		
+		return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
+		
+	}
+	
+});
 
 Route::get('wp', function () {
 	$r = $_REQUEST;
@@ -30,6 +50,8 @@ Route::get('wp', function () {
 		if( !is_numeric($r['wp_user_id'])  ) {
 
 				$user = User::create([
+				'firstname' => $r['wp_firstname'],
+				'lastname' => $r['wp_lastname'],
 				'email' => $r['wp_email'],
 				'password' => Hash::make($r['wp_password']),
 				]);
@@ -41,7 +63,13 @@ Route::get('wp', function () {
 						['user_id' => $user->id, 'meta_key' => 'id_subscription', 'meta_value' => $r['wp_subscription']],
 						['user_id' => $user->id, 'meta_key' => 'wp_subscription', 'meta_value' => $r['name_subscription']],
 					]);
-
+					
+					 DB::table('user_mngt')->insert([
+						'main_id' => $user->id,
+						'main_acct' => 1,
+						'sub_acct' => 0
+					]);
+					
 					$timezoneOffsetSeconds = timezone_offset_get(new DateTimeZone(date_default_timezone_get()), new DateTime());
 
 					// Create a new DateTime object with the current time and the timezone set above
@@ -69,12 +97,13 @@ Route::get('wp', function () {
 						'toggle_6' => 0,
 						'toggle_7' => 0,
 					];
-
+					
+					 GeneralSettings::create($generalSettings);
 
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
 			} else {
-					return response()->json(['status' =>'error']);
+					return response()->json(['status' =>'error', 'laravel_id' => 0]);
 			}
 
 
