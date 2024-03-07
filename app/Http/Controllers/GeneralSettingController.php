@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
@@ -13,11 +13,13 @@ use App\Models\QuantumAcctMeta;
 use App\Models\TwitterApiCredentials;
 use App\Models\UT_AcctMngt;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TeamMemberReg;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -33,7 +35,7 @@ class GeneralSettingController extends Controller
         $this->middleware('auth');
     }
 
-   
+
     public function saveSettings(Request $request) {
 
         $key = $request->input('meta_key');
@@ -46,54 +48,54 @@ class GeneralSettingController extends Controller
             switch ($id) {
                 case "general-settings":
                     $userId = $request->input('user_id');
-                    $settings = GeneralSettings::where('user_id', $userId)->update([$key => $value]);                    
-                    
+                    $settings = GeneralSettings::where('user_id', $userId)->update([$key => $value]);
+
                     $html = $this->renderTwitterAPiAccordion();
 
                     break;
-                
-                case "twitter-settings":                    
+
+                case "twitter-settings":
                     $twitterId = $request->input('twitter_id');
                     $settings = TwitterSettings::where('twitter_id' , $twitterId)->update([$key => $value]);
-                    
+
                     $html = TwitterSettings::where(['twitter_id' => $twitterId, $key => $value])->pluck($key)->first();
                     break;
-            } 
-              
+            }
+
             if ($settings) {
-                return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);                                                                       
+                return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);
             } else {
                 return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update your membership.']);
             }
 
         } catch(Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
-        
-    }    
+
+    }
 
     public function generalAndTwitterSettings() {
         $html = $this->renderTwitterAPiAccordion();
-        return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);   
+        return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);
     }
-    
+
     public function getTwitterForm(Request $request) {
-        try { 
+        try {
             TwitterSettings::join('ut_acct_mngt', 'ut_acct_mngt.twitter_id', 'settings_twitter.twitter_id')
                 ->where('ut_acct_mngt.user_id', Auth::id())
                 ->update(['toggle_10' => $request->toggle]);
-        
+
             // Retrieve the updated toggle_10 value
             $settings = TwitterSettings::join('ut_acct_mngt', 'ut_acct_mngt.twitter_id', 'settings_twitter.twitter_id')
                 ->where('ut_acct_mngt.user_id', Auth::id())
-                ->first();            
-            
-            $toggle_10 = $settings->toggle_10;                    
-            
+                ->first();
+
+            $toggle_10 = $settings->toggle_10;
+
             if ($toggle_10 === 1) {
                 // Find the existing record or create a new one
                 $credentials = TwitterApiCredentials::updateOrCreate(
@@ -109,16 +111,16 @@ class GeneralSettingController extends Controller
                 );
 
                 $html = view('twitterapi-form')->render();
-                return response()->json(['status' => 200, 'toggle' => 1, 'stat' => 'success', 'html' => $html, 'message' => "Enter your API credentials for this Twitter Account."]);   
+                return response()->json(['status' => 200, 'toggle' => 1, 'stat' => 'success', 'html' => $html, 'message' => "Enter your API credentials for this Twitter Account."]);
             } else {
                 $html = 'You are currently using Master API Credentials.<br> <span style="font-weight: 200; font-style=italic">(Turn this on to add account level credentials form).</span>';
-                return response()->json(['status' => 200, 'toggle' => 0, 'stat' => 'success', 'html' => $html]);   
+                return response()->json(['status' => 200, 'toggle' => 0, 'stat' => 'success', 'html' => $html]);
             }
-            
+
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
@@ -128,25 +130,25 @@ class GeneralSettingController extends Controller
     public function renderTwitterAPiAccordion() {
         $lastSavedData = GeneralSettings::where('user_id', Auth::id())->first();
         $html= '';
-        
-        if ($lastSavedData->toggle_1 === 1 && $lastSavedData->toggle_7 === 1) 
+
+        if ($lastSavedData->toggle_1 === 1 && $lastSavedData->toggle_7 === 1)
         {
             $html = view('master-api-and-twapi')->render();
         }
-        else if ($lastSavedData->toggle_1 === 0 && $lastSavedData->toggle_7 === 1) 
+        else if ($lastSavedData->toggle_1 === 0 && $lastSavedData->toggle_7 === 1)
         {
             $html = view('master-api-or-twapi')->render();
         }
-        else 
+        else
         {
             $html = null;
         }
 
         return $html;
     }
-    
+
     public function saveTwitterApi(Request $request, $twitter_id) {
-        
+
         try {
             // dd($request, $twitter_id);
             $saveTwitterApi = TwitterApiCredentials::where('user_id', Auth::id())->first();
@@ -166,7 +168,7 @@ class GeneralSettingController extends Controller
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
@@ -177,7 +179,7 @@ class GeneralSettingController extends Controller
     public function twitterApiCredentials(Request $request, $id) {
         try {
             $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => Auth::user()->id]);
-            
+
             if ($api->exists) {
                 $api->user_id = Auth::id();
                 $api->api_key = $request->input('api_key');
@@ -197,10 +199,10 @@ class GeneralSettingController extends Controller
                 $api->save();
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are succesfully saved']);
             }
-            
+
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
@@ -215,7 +217,7 @@ class GeneralSettingController extends Controller
 
             // Retrieve the recently saved data
             $updatedSubscription = $tw->subscription;
-            
+
             if ($updatedSubscription) {
                 return response()->json(['status' => 200, 'data' => $updatedSubscription,  'stat' => 'success', 'message' => 'Membership updated successfully']);
             } else {
@@ -224,31 +226,31 @@ class GeneralSettingController extends Controller
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'error' => $trace,  'stat' => 'danger', 'message' => $message]);
         }
     }
-    
+
     public function timezoneSettings(Request $request, $id) {
         try {
             $tw = QuantumAcctMeta::where('user_id', $id)->first();
-            $tw->timezone = $request->input('timezone');   
+            $tw->timezone = $request->input('timezone');
             $tw->save();
 
             // Retrieve the recently saved data
-            $updatedTimezone = $tw->timezone;  
-            
+            $updatedTimezone = $tw->timezone;
+
             if ($updatedTimezone) {
                 return response()->json(['status' => 200, 'data' => $updatedTimezone, 'stat' => 'success' ,'message' => 'Timezone updated successfully']);
             } else {
                 return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update your timezone.']);
             }
-          
+
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'stat' => 'danger' , 'error' => $trace, 'message' => $message]);
@@ -277,32 +279,32 @@ class GeneralSettingController extends Controller
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 
-    public function twitterSettingsMeta(Request $request, $twitter_id) {        
+    public function twitterSettingsMeta(Request $request, $twitter_id) {
         try {
             $settings = [];
             foreach ($request->request as $parameter) {
                 $key = $parameter['key'];
                 $value = $parameter['value'];
-                
+
                 $settings = TwitterSettingsMeta::where('twitter_id', $twitter_id)->update([$key => $value]);
             }
-            
+
             if ($settings) {
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Data is updated']);
             } else {
                 return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update.']);
             }
-            
+
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => 500, 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
@@ -310,46 +312,60 @@ class GeneralSettingController extends Controller
     }
 
     public function addNewMember(Request $request) {
-        try {
-            $findParentUser = User::find(Auth::id())->first(); 
+        $userId = Auth::id();
 
-            $insertNewMember = [
-                'firstname' => $request->input('firstname'),
-                'lastname' => $request->input('lastname'),
-                'email' => $request->input('email'),
-                'password' => $findParentUser->password,
-            ];
-            $saveMember = User::create($insertNewMember);
+        // Retrieve the subscription status from the users_meta table
+        $subscription = DB::table('users_meta')
+            ->leftJoin('members', 'users_meta.user_id', '=', 'members.account_holder_id')
+            ->select('users_meta.subscription', DB::raw('COUNT(members.id) as member_count'))
+            ->where('users_meta.user_id', $userId)
+            ->groupBy('users_meta.subscription')
+            ->first();
+            $randomPassword = Str::random(10);
 
-            // $users_meta = [
-            //     'subscription' 
-            // ]
+        $relational = [
+            'account_holder_id' => Auth::id(),
+            'fullname' => $request->input('fullname'),
+            'email' => $request->input('emails'),
+            'role' => $request->input('roles'),
+            'api_access' => $request->input('api_access'),
+            'admin_access' => false,
+            'password'=>$randomPassword,
+            'isverified'=>false,
 
-            $relational = [
-                'main_id' => Auth::id(),
-                'main_acct' => 0,
-                'sub_acct'  => 1,
-                'user_id' => $saveMember->id,
-                'deleted' => 0
-            ];
-            
-            $userMngt = DB::table('user_mngt')->insert($relational);
+            'tokens'=>''
+            // 'subscription_status'=>$subscription->subscription,
+        ];
+        if($subscription->subscription=='premium' ){
 
-            if ($saveMember && $userMngt) {
-                return response()->json(['status' => 200, 'stat'=> 'success', 'message' => 'New member added successfully']);
-            } else {            
-                return response()->json(['status' => 500, 'stat' => 'danger' , 'message' => "There's an error saving your data."]);
+
+            if($subscription->member_count<=1){
+
+
+                $userMngt = DB::table('members')->insert($relational);
+                $latestid = DB::getPdo()->lastInsertId();
+                if($userMngt){
+                    Mail::to($request->input('emails'))->send(new TeamMemberReg($latestid));
+
+                    return response()->json(['message'=>'New member is added','stat'=> 'success']);
+                }
+                else{
+                    return response()->json(['message'=>'New member is not added','stat'=> 'warning']);
+                }
+
+            }
+            else{
+                return response()->json(['message'=>'You have exceeded the limit of adding members please upgrade','stat'=> 'Upgrade!']);
             }
 
-        } catch(Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();            
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+
+        }else{
+            return response()->json(['stat'=> 'danger', 'message' => 'Your subscription is free']);
         }
+
     }
-    
+
+
     public function fetchMembers(Request $request) {
         try {
             $getMembers =  DB::table('user_mngt')
@@ -362,30 +378,30 @@ class GeneralSettingController extends Controller
             return response()->json(['status' => 200, 'message' => 'Fetching the data', 'data' => $getMembers]);
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);            
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 
     public function _editMember($id) {
-        try {                        
-            $getMember = User::find($id);           
-                
+        try {
+            $getMember = User::find($id);
+
             if ($getMember) {
                 return response()->json(['status' => 200, 'data' => $getMember]);
             }
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);         
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
-    
+
     public function _updateMember(Request $request, $id) {
         try {
             $editUser = User::where('id', $id)->update([
@@ -393,39 +409,79 @@ class GeneralSettingController extends Controller
                 'lastname' => $request->input('lastname'),
                 'email' => $request->input('email'),
             ]);
-            
-    
+
+
             if ($editUser) {
                 return response()->json(['status' => 200, 'stat'=> 'success', 'message' => 'User updated successfully']);
             } else {
                 return response()->json(['status' => 500, 'stat'=> 'danger', 'message' => 'Error in updating the data']);
             }
-    
+
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);         
-        }    
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
     }
-    
-    public function _deleteMember($id) {                
+
+    public function _deleteMember($id) {
         try {
-            $deleteUser = DB::table('user_mngt')->where('user_id', $id)->update(['deleted' => 1]);
+            $deleteUser = DB::table('members')->where('id', $id)->delete();
 
             if ($deleteUser) {
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'User deleted successfully.']);
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Member deleted successfully.']);
             } else {
-                return response()->json(['status' => 200, 'stat' => 'danger', 'message' => 'User deleted successfully.']);
+                return response()->json(['status' => 200, 'stat' => 'danger', 'message' => 'Member is not deleted successfully.']);
             }
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);         
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+    }
+    public function _apiaccess(Request $request){
+
+
+        try {
+            $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['api_access' => $request->input('api_access')]);
+
+            if ($apiaccess && $request->input('api_access')=== true) {
+                return response()->json(['stat' => 'success', 'message' => 'Member is allowed to access api']);
+            } else {
+                return response()->json(['stat' => 'warning', 'message' => 'Member is not allowed to access api']);
+            }
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+    }
+    public function _adminaccess(Request $request){
+
+
+        try {
+            $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['admin_access' => $request->input('admin_access')]);
+
+            if ($apiaccess && $request->input('admin_access')=== true) {
+                return response()->json(['stat' => 'success', 'message' => 'Admin Access Successful']);
+            } else {
+                return response()->json(['stat' => 'warning', 'message' => 'Admin Access not Allowed']);
+            }
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
 }

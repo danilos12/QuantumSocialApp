@@ -1,4 +1,21 @@
 $(document).ready(function () {
+    toastr.options = {
+        closeButton: false,
+        debug: false,
+        newestOnTop: true,
+        progressBar: false,
+        positionClass: "toast-top-center",
+        preventDuplicates: false,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "300",
+        timeOut: "5000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+    };
     // add team member modal
     $addTeamIcon = $(".add-team");
     $addTeamModal = $(".add-team-member-inner");
@@ -6,7 +23,8 @@ $(document).ready(function () {
 
     var $exitButton = $(".exit-button #closing");
     $addTeamIcon.click(function () {
-        if ($addTeamModal.first().is(":hidden")) {
+
+            $addTeamModal.css("display", "flex");
             $addTeamModal.toggle(
                 "puff",
                 { percent: 100, easing: "swing" },
@@ -17,7 +35,7 @@ $(document).ready(function () {
                 { percent: 100, easing: "swing" },
                 900
             );
-        }
+     
     });
     $exitButton.click(function () {
         $addTeamModal.fadeToggle(900);
@@ -379,12 +397,12 @@ $(document).ready(function () {
     });
     $(document).on("click", ".add-team-button", async function (e) {
         e.preventDefault();
-
+        var isChecked = $("#toggle_api").prop("checked");
         var data = {
-            firstname: $(".add-team-member-inner").find("#newuser_fname").val(),
-            email: $(".add-team-member-inner").find("#newuser_email").val(),
-
+            fullname: $(".add-team-member-inner").find("#newuser_fname").val(),
+            emails: $(".add-team-member-inner").find("#newuser_email").val(),
             roles: selectedRole,
+            api_access: isChecked,
         };
         console.log(data);
         try {
@@ -399,19 +417,15 @@ $(document).ready(function () {
                 body: JSON.stringify(data), // Convert the object to JSON string
             });
             const responseData = await response.json();
+            console.log(responseData);
 
-            var div = $(
-                `<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`
-            );
-            if (responseData.status === 200) {
-                $(this).after(div);
-            } else {
-                $(this).after(div);
+            if (responseData) {
+                toastr[responseData.stat](`Success, ${responseData.message}`);
             }
 
-            // setTimeout(function() {
-            //   location.reload();
-            // }, 1000); // Reload after 5 seconds (adjust the delay as needed)
+            setTimeout(function () {
+                location.reload();
+            }, 1000); // Reload after 5 seconds (adjust the delay as needed)
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
@@ -508,7 +522,6 @@ $(document).ready(function () {
                     );
                 }
             } else {
-                console.log($(this).hasClass("disabled"));
                 const response = await fetch(
                     APP_URL + "/settings/members/_delete/" + id[1],
                     {
@@ -525,13 +538,12 @@ $(document).ready(function () {
 
                 const responseData = await response.json();
 
-                var div = $(
-                    `<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`
-                );
                 if (responseData.status === 200) {
-                    $(".menu-team-members-add-accounts-section").after(div);
+                    toastr.success(`Success, ${responseData.message}`);
                 } else {
-                    $(".menu-team-members-add-accounts-section").after(div);
+                    toastr.warning(
+                        `${responseData.stat}, ${responseData.message}`
+                    );
                 }
 
                 setTimeout(function () {
@@ -546,4 +558,64 @@ $(document).ready(function () {
     $.fn.hasAttr = function (name) {
         return this.attr(name) !== undefined;
     };
+    // api access
+    $('input[name="grant-api-access"]').change(async function (e) {
+        var targetId = e.target.id;
+        var id = targetId.split("-"); // Corrected the split method call
+        var isChecked = $(this).is(":checked");
+        console.log(id[1]);
+        console.log(isChecked);
+        var data = {
+            id: id[1],
+            api_access: isChecked,
+        };
+
+        const response = await fetch(APP_URL + "/settings/members/_apiaccess", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            body: JSON.stringify(data),
+        });
+
+        const responseData = await response.json();
+
+        if (responseData) {
+            console.log(responseData);
+            toastr[responseData.stat](`Success, ${responseData.message}`);
+        }
+    });
+    $('input[name="grant-admin-access"]').change(async function (e) {
+        var targetId = e.target.id;
+        var id = targetId.split("-"); // Corrected the split method call
+        var isChecked = $(this).is(":checked");
+        console.log(id[1]);
+        console.log(isChecked);
+        var data = {
+            id: id[1],
+            admin_access: isChecked,
+        };
+
+        const response = await fetch(
+            APP_URL + "/settings/members/_adminaccess",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                body: JSON.stringify(data),
+            }
+        );
+
+        const responseData = await response.json();
+
+        if (responseData) {
+            console.log(responseData);
+            toastr[responseData.stat](`Success, ${responseData.message}`);
+        }
+    });
 });

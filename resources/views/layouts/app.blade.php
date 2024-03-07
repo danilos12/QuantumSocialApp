@@ -27,6 +27,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+<!-- Add Toastr.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+
 
 
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
@@ -227,12 +231,13 @@
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
   {{-- <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script> --}}
   {{-- <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>   --}}
 
   @yield('scripts')
+
   <script>
      $(document).ready(function() {
             // Alert
