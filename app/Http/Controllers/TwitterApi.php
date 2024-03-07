@@ -295,9 +295,10 @@ class TwitterApi extends Controller
     public function removeTwitterAccount(Request $request)
     {
         $id = $request->input('twitter_id');
-        $delete = Twitter::where('twitter_id', $id)->update(['deleted' => 1]);
+        $twitter = Twitter::where('twitter_id', $id)->where('user_id', Auth::id());
+        $twitter->delete();
 
-        return response()->json(['success' => true, "deleted" => $delete, 'message' => 'Twitter account is now deleted']);
+        return response()->json(['success' => true, "deleted" => $twitter, 'message' => 'Twitter account is now deleted']);
     }
 
     public function curlGetHttpRequest($url, $headers,  $data) {

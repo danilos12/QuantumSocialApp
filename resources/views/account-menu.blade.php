@@ -520,7 +520,7 @@
 </div>  <!-- END .main-settings-anchor -->
 
 <style>
-.general-settings-outer, .twitter-settings-outer, .help-page-outer {display: none;}
+.general-settings-outer, .twitter-settings-outer, .help-page-outer, .command-module-outer{display: none;}
 
 .mt-2 { margin-top: 0.5em;}
 </style>

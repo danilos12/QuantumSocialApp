@@ -21,9 +21,7 @@ class TwitterToken extends Model
         'access_token', 
         'refresh_token',
         'expires_in',
-        'active',
-        'queue_switch',
-        'promo_switch',
-        'evergreen_switch'
+        'active'
+        
     ];
 }

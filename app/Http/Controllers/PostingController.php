@@ -271,19 +271,118 @@ class PostingController extends Controller
 		} catch (Exception $e) {
 			return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error updating the post']);
 		}
+		
+		// if ($request->isMethod('get')) {
+		// } else {
+		// 	try {
+		// 		$postData = $request->all();
+		// 		$posts = CommandModule::find($id);
+		// 		$posts->update([
+		// 			'post_type' => $postData['post_type_tweets'],
+		// 			'tweetlink' => $postData['retweet-link-input'] ?? null,
+		// 			'rt_time' => $postData['num-custom-cm'] ?? null,
+		// 			'rt_frame' => $postData['time-custom-cm'] ?? null,
+		// 			'rt_ite' => $postData['iterations-custom-cm'] ?? null,
+		// 			'promo_id' => $postData['promo-tweets-cmp'] ?? null,
+		// 			'post_type_code' => rand(10000, 99999),
+		// 			'sched_method' => $postData['scheduling-options'],
+		// 			// 'sched_time' => Carbon::now()
+		// 		]);
+	
+		// 		foreach ($postData['textarea'] as $textarea) {
+		// 			$posts->post_description = $textarea;
+		// 		};
+	
+		// 		// // Save the changes
+		// 		$posts->save();
+	
+		// 		// // Return a success response
+		// 		return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
+	
+		// 	} catch (Exception $e) {
+		// 		$trace = $e->getTrace();
+		// 		$message = $e->getMessage();
+		// 		// Handle the error
+		// 		// Log or display the error message along with file and line number
+		// 		return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+		// 	}
+		// }
 	}
 	
 	public function editBulk(Request $request, $id) {
 		
-		try {
-			$queuePosts = Bulk_post::find($id);				
-			
-			// Return the view with the retrieved data
-			$html = view('modals.edit-bulk')->render();			
-			return response()->json(['status' => 200, 'data' => $queuePosts ,'html' => $html]);
-		} catch (Exception $e) {
-			return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error updating the post']);
+		if ($request->isMethod('get')) {
+			try {
+				$queuePosts = Bulk_post::find($id);				
+				
+				// Return the view with the retrieved data
+				$html = view('modals.edit-bulk')->render();			
+				return response()->json(['status' => 200, 'data' => $queuePosts ,'html' => $html]);
+			} catch (Exception $e) {
+				return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error updating the post']);
+			}
+		} else {
+			try {
+				$postData = $request->all();				
+				$id = explode('-', $id); 
+				$posts = Bulk_post::find($id[2]);	
+	
+				// Parse the date using Carbon
+				$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);			
+				
+				$posts->update([
+					"post_type" => "regular-tweets",
+					"post_description" => $postData['bulkpost_description'],
+					"sched_time" => $date,
+					"image_url" => (isset($postData['bulkimage_url']) && $postData['bulkimage_url'] !== null) ? $postData['bulkimage_url'] : "",
+					"link_url" => (isset($postData['bulklink_url'])  && $postData['bulklink_url'] !== null) ? $postData['bulklink_url'] : ""
+				]);			
+	
+				// // Save the changes
+				$posts->save();
+
+
+				$message = "Bulk post is updated succesfully. ";
+				
+				// check the link_url if already existing
+				if ($posts->save()) {
+					$findMeta = Bulk_meta::where('link_url', $posts['link_url'])->first();
+
+					if (!$findMeta) {
+						// The record does not exist, so scrape the meta tags
+						$metaTags =  (new CommandmoduleController)->scrapeMetaTags($postData['bulklink_url']);
+	
+						$metaData = [
+							'meta_title' => $metaTags['og:title'],
+							'meta_description' => $metaTags['og:description'],
+							'meta_image' => $metaTags['og:image'],
+							'link_url' => $postData['bulklink_url'],
+						];
+	
+						// Create a new record in the database
+						Bulk_meta::create($metaData);
+
+						$message .= "New meta added in existing post";
+					} else {
+						$message .= "Meta is already saved before";
+					}
+
+					// Return a success response
+					return response()->json(['status' => 200, 'message' => $message]);
+				}	else {
+					return response()->json(['status' => 500, 'message' => 'Something went wrong on saving']);					
+				} 	
+	
+	
+			} catch (Exception $e) {
+				$trace = $e->getTrace();
+				$message = $e->getMessage();            
+				// Handle the error
+				// Log or display the error message along with file and line number
+				return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+			}
 		}
+		
 	}
 	
 	public function deletePost($id) {				
@@ -472,57 +571,57 @@ class PostingController extends Controller
 		}
 	}
 
-	public function editBulkPost(Request $request, $id) {
-		try {
-			$postData = $request->all();
-			$id = explode('-', $id); 
-			$posts = Bulk_post::find($id[2]);	
+	// public function editBulkPost(Request $request, $id) {
+	// 	try {
+	// 		$postData = $request->all();
+	// 		$id = explode('-', $id); 
+	// 		$posts = Bulk_post::find($id[2]);	
 
-			// Parse the date using Carbon
-			$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);			
+	// 		// Parse the date using Carbon
+	// 		$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);			
 			
-			$posts->update([
-				"post_type" => "regular-tweets",
-				"post_description" => $postData['bulkpost_description'],
-				"sched_time" => $date,
-				"link_url" => isset($postData['bulklink_url']) ? $postData['bulklink_url'] : "",
-				"image_url" => isset($postData['bulkimage_url']) ? $postData['bulkimage_url'] : ""
-			]);
+	// 		$posts->update([
+	// 			"post_type" => "regular-tweets",
+	// 			"post_description" => $postData['bulkpost_description'],
+	// 			"sched_time" => $date,
+	// 			"link_url" => isset($postData['bulklink_url']) ? $postData['bulklink_url'] : "",
+	// 			"image_url" => isset($postData['bulkimage_url']) ? $postData['bulkimage_url'] : ""
+	// 		]);
 
-			// // Save the changes
-			$posts->save();
+	// 		// // Save the changes
+	// 		$posts->save();
 			
-			// check the link_url if already existing
-			if (isset($postData['bulklink_url'])) {
-				$findMeta = Bulk_meta::where('link_url', $postData['bulklink_url'])->first();
+	// 		// check the link_url if already existing
+	// 		if (isset($postData['bulklink_url'])) {
+	// 			$findMeta = Bulk_meta::where('link_url', $postData['bulklink_url'])->first();
 				
-				if (!$findMeta) {
-					// The record does not exist, so scrape the meta tags
-					$metaTags =  (new CommandmoduleController)->scrapeMetaTags($postData['bulklink_url']);
+	// 			if (!$findMeta) {
+	// 				// The record does not exist, so scrape the meta tags
+	// 				$metaTags =  (new CommandmoduleController)->scrapeMetaTags($postData['bulklink_url']);
 
-					$metaData = [
-						'meta_title' => $metaTags['og:title'],
-						'meta_description' => $metaTags['og:description'],
-						'meta_image' => $metaTags['og:image'],
-						'link_url' => $postData['bulklink_url'],
-					];
+	// 				$metaData = [
+	// 					'meta_title' => $metaTags['og:title'],
+	// 					'meta_description' => $metaTags['og:description'],
+	// 					'meta_image' => $metaTags['og:image'],
+	// 					'link_url' => $postData['bulklink_url'],
+	// 				];
 
-					// Create a new record in the database
-					Bulk_meta::create($metaData);
-				}
-			}			
+	// 				// Create a new record in the database
+	// 				Bulk_meta::create($metaData);
+	// 			}
+	// 		}			
 
-			// // // Return a success response
-			return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
+	// 		// // // Return a success response
+	// 		return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
 
-		} catch (Exception $e) {
-			$trace = $e->getTrace();
-            $message = $e->getMessage();            
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
-		}
-	}
+	// 	} catch (Exception $e) {
+	// 		$trace = $e->getTrace();
+    //         $message = $e->getMessage();            
+    //         // Handle the error
+    //         // Log or display the error message along with file and line number
+    //         return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+	// 	}
+	// }
 
 	public function getMonth() {
 		// get the scheduleld months in database

@@ -35,7 +35,7 @@ $(document).ready(function () {
                 { percent: 100, easing: "swing" },
                 900
             );
-     
+
     });
     $exitButton.click(function () {
         $addTeamModal.fadeToggle(900);
@@ -389,15 +389,13 @@ $(document).ready(function () {
             });
         }
     });
-    var selectedRole = "";
-    $(".dropdown .dropdown-item").click(function () {
-        selectedRole = $(this).data("value");
 
-        $("#dLabel").text(selectedRole);
-    });
+
+
     $(document).on("click", ".add-team-button", async function (e) {
         e.preventDefault();
         var isChecked = $("#toggle_api").prop("checked");
+        var selectedRole = $('input[name="fav_language"]:checked').val();
         var data = {
             fullname: $(".add-team-member-inner").find("#newuser_fname").val(),
             emails: $(".add-team-member-inner").find("#newuser_email").val(),

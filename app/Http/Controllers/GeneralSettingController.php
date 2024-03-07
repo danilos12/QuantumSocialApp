@@ -190,14 +190,10 @@ class GeneralSettingController extends Controller
                 $api->save();
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are succesfully updated']);
             } else {
+                $api = new MasterTwitterApiCredentials($request->all());
                 $api->user_id = Auth::id();
-                $api->api_key = $request->input('api_key');
-                $api->api_secret = $request->input('api_secret');
-                $api->bearer_token = $request->input('bearer_token');
-                $api->oauth_id = $request->input('oauth_id');
-                $api->oauth_secret = $request->input('oauth_secret');
                 $api->save();
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are succesfully saved']);
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
             }
 
         } catch (Exception $e) {
@@ -332,9 +328,8 @@ class GeneralSettingController extends Controller
             'admin_access' => false,
             'password'=>$randomPassword,
             'isverified'=>false,
-
             'tokens'=>''
-            // 'subscription_status'=>$subscription->subscription,
+
         ];
         if($subscription->subscription=='premium' ){
 
