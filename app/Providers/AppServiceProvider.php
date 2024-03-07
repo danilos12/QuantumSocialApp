@@ -125,33 +125,25 @@ class AppServiceProvider extends ServiceProvider
                 $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();
                 $view->with('membership', $membership);
 
-                $toggle = DB::table('twitter_meta')->where('user_id', Auth::id())->where('twitter_id', $twitterID)->first();
-
-                // membership
-                $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();
-                $view->with('membership', $membership);
-
                 $toggle = DB::table('users_meta')->where('user_id', Auth::id())->first();
                 $currentRoute = Route::current()->uri;
                 if ($currentRoute === 'evergreen' || $currentRoute === 'promo' || $currentRoute === 'queue') {
                     $view->with('toggle', $toggle->{$currentRoute . '_switch'});
                 } else {
-                    $view->with('toggle', null);
+                    $view->with('toggle', 0);
                 }
 
-                $getMembers = DB::table('user_mngt')
-                    ->join('users', 'user_mngt.user_id', '=', 'users.id')
-                    // ->join('users_meta', 'users_meta.user_id', '=', 'users.id')
-                    ->select('users.*', 'user_mngt.*')
-                    ->where('user_mngt.main_id', Auth::id())
-                    ->where('user_mngt.deleted', 0)
+                $getMembers = DB::table('members')
+                    ->join('users', 'members.account_holder_id', '=', 'users.id')
+                    ->select('users.*', 'members.*')
+                    ->where('members.account_holder_id', Auth::id())
                     ->get();
-                $view->with('membersss', $getMembers);
+                $view->with('team_members', $getMembers);
 
-                $cntMembers = DB::table('user_mngt')
-                    ->join('users', 'user_mngt.user_id', '=', 'users.id')
-                    ->select('users.*', 'user_mngt.*')
-                    ->where('user_mngt.main_id', Auth::id())
+                $cntMembers = DB::table('members')
+                    ->join('users', 'members.account_holder_id', '=', 'users.id')
+                    ->select('users.*', 'members.*')
+                    ->where('members.account_holder_id', Auth::id())
                     ->count();
                 $view->with('cntmembers', $cntMembers);
 

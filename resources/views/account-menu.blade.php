@@ -7,53 +7,56 @@
 
    <div class="add-team-member-modal">
     <div class="add-team-member-inner" style="color: white">
+      <div class="exit-button" >
 
+        <svg id="closing" style="width: 10%;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-2 h-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+
+      </div>
         <!-- BEGIN input copied from engage.html -->
         <div class="global-input-email add-team-fonts ">
         <form class="global-input-email">
-          <div class="exit-button" >
+            <div class="">
+              <div class="w-full" ><label for="newuser_fname" >YOU ARE CURRENLY EDITING:</label></div>
+              <div  id="alertcontainer" style="display: flex;justify-content:center; width:100%;"></div>
+                <div class="w-full">
+                  <div class="w-full" ><label for="newuser_fname" >FULL NAME</label></div>
 
-            <svg id="closing" style="width: 10%;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-2 h-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-            </svg>
+                <input type="text" placeholder="Name" id="newuser_fname"/>
+                </div>
+                <div class="">
 
+                    <label for="newuser_fname ">Email Address</label>
+
+
+                <input type="text" placeholder="Email" id="newuser_email"/>
+
+                </div>
           </div>
-          <div class="w-full" ><label for="newuser_fname" >YOU ARE CURRENLY EDITING:</label></div>
-            <div class="">
-              <div class="w-full" ><label for="newuser_fname" >FULL NAME</label></div>
-
-            <input type="text" placeholder="Name" id="newuser_fname"/>
-            </div>
-            <div class="">
-
-                <label for="newuser_fname ">Email Address</label>
-
-
-            <input type="text" placeholder="Email" id="newuser_email"/>
-
-            </div>
             <div class="conts">
-              <div class="">
-                <label for="newuser_fname" class="font-size-base">GRANT API ACCESS (Allow users to...)</label>
-              </div>
-              <div class="childs">
-              <input type="checkbox" class="menu-twirl-toggle" name="grant-api" id="toggle_api" >
+              <div class="w-full flex items-center">
+
+                <label for="toggle_api" class="font-size-base mr-3">GRANT API ACCESS (Allow users to...)</label>
+                <input type="checkbox" class="menu-twirl-toggle " name="grant-api" id="toggle_api" >
+
+
               </div>
 
-            </div>
-            <div class="conts mb-4">
-                  <label class="">Role</label>
-                  <div class="dropdown btn-group ml-4 w-full">
-                    <button id="dLabel" type="button" class="w-full border-0 rounded-lg" style="background:var(--frost-background);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Roles
 
-                    </button>
-                    <ul class="dropdown-menu w-full" aria-labelledby="dLabel">
-                      <li><a class="dropdown-item" href="#" data-value="Admin">Admin</a></li>
-                      <li><a class="dropdown-item" href="#" data-value="Member">Member</a></li>
-                    </ul>
-                  </div>
+              <div class="conts mb-4">
+                <div class="flex w-full">
+                  <input type="radio" id="admin_role" name="fav_language" value="Member">
+                  <label for="javascript">Team Member (Allows user to schedule posts..)</label>
+              </div>
+              <div class="flex w-full">
+                  <input type="radio" id="admin_role" name="fav_language" value="Admin">
+                  <label for="admin_role">Admin (Allows user to add other members)</label>
+              </div>
+
+              </div>
             </div>
+
 
 
 
@@ -143,7 +146,7 @@
             <span class="menu-section-header">Team Members </span>
 
               @if ($cntmembers > 0)
-                @foreach($membersss as $member)
+                @foreach($team_members as $member)
                   <div class="menu-team-account-outer">
                     <div class="menu-team-account-inner">
 
@@ -153,7 +156,7 @@
                         <div class="global-profile-details">
                             <div class="global-profile-name">
                             <a href="#">
-                            {{$member->firstname}}</a>
+                            {{$member->fullname}}</a>
                             </div>  <!-- END .global-profile-name -->
                             <div class="global-profile-subdata">
                             <span class="global-profile-email">
@@ -165,9 +168,35 @@
 
                         <div class="menu-social-account-options">
                           <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+
+                          <div class="childs-cont-2">
+                            <p class="childs-cont-p">ADMIN ACCESS</p>
+                            <p class="switchtexton">On</p>
+                            <p class="switchtextoff">Off</p>
+                            <div class="">
+
+
+                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_api-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+
+
+                              </div>
+                          </div>
+
+                          <div class="childs-cont">
+
+                            <p class="childs-cont-p">API ACCESS</p>
+                            <p class="switchtexton">On</p>
+                            <p class="switchtextoff">Off</p>
+                            <div class="">
+
+                            <input  type="checkbox" class="menu-twirl-toggle forchecked apiaccess" name="grant-api-access" id="toggle_api-{{$member->id}}" <?php echo $member->api_access == 1 ? 'checked' :'';?>>
+                          </div>
+                          </div>
+
+
                           <span class="menu-account-icons">
-                              <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/>
-                              <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}" />
+                           <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->id }}"/>
+                              <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img " title="Delete" data-toggle="tooltip" id="_delete-{{ $member->id }}" />
                           </span>
                         </div>  <!-- END .menu-social-account-options -->
 
@@ -230,8 +259,11 @@
                     <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                     <span class="menu-twirl-option-text">
                       Use this Master API for every Twitter account.</span>
-                </div>  <!-- END .menu-twirl-left -->
-                <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_1" {{ isset($generalSetting) ? ($generalSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
+                </div>
+                <!-- END .menu-twirl-left -->
+                <div class="menu-twirl-right">
+
+                  <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_1" {{ isset($generalSetting) ? ($generalSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
                 </div>  <!-- END .menu-twirl-right -->
               </div>  <!-- END .menu-twirl-option-inner -->
 

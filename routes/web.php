@@ -94,6 +94,8 @@ Route::post('/settings/_add_new', [App\Http\Controllers\GeneralSettingController
 Route::get('/settings/members/_edit/{id}', [App\Http\Controllers\GeneralSettingController::class, '_editMember'])->name('member.edit');
 Route::post('/settings/members/_update/{id}', [App\Http\Controllers\GeneralSettingController::class, '_updateMember'])->name('member.edit');
 Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\GeneralSettingController::class, '_deleteMember'])->name('member.delete');
+Route::post('/settings/members/_apiaccess', [App\Http\Controllers\GeneralSettingController::class, '_apiaccess'])->name('member.apiaccess');
+Route::post('/settings/members/_adminaccess', [App\Http\Controllers\GeneralSettingController::class, '_adminaccess'])->name('member.adminaccess');
 
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
@@ -132,10 +134,22 @@ Route::middleware(['web','guest', 'session_expired'])
             ->withoutMiddleware(['session_expired']);
         Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])
             ->withoutMiddleware(['session_expired']);
+
+
+
+
     });
 
     Route::post('/register',[RegisterController::class, 'register'])->name('submit.form');
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 	Route::get('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'showCustomRegister'])->name('custom-vr');
+
 	Route::post('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'wpRegisterUser']);
 
+
+
+
+    Route::get('/team-registration', function () {
+        return view('emails.team_members_registration');
+    })->name('memberregistration');
+    Route::post('/team-registration', [App\Http\Controllers\TeamMemberRegistration::class, 'team_member_reg'])->name('tocontroller');
