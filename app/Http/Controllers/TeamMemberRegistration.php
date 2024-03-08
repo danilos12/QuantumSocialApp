@@ -12,7 +12,7 @@ class TeamMemberRegistration extends Controller
 {
     public function team_member_reg(Request $request)
     {
-        $decryptedId = Crypt::decrypt($request->input('id'));
+        $decryptedId = Crypt::decrypt($request->input('fullname'));
         $decryptedToken = Crypt::decrypt($request->input('token'));
 
 
@@ -37,7 +37,7 @@ class TeamMemberRegistration extends Controller
 
 
             $passwordupdated =  DB::table('members')
-            ->where('id', $decryptedId)
+            ->where('fullname', $decryptedId)
             ->update(['isverified'=> true,'password'=>Hash::make($password),'tokens'=>'fully_verified']);
             if($passwordupdated){
                 return response()->json(['message' => 'You are now verified and can now logged in','stat'=>'success']);

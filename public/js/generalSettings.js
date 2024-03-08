@@ -20,9 +20,16 @@ $(document).ready(function () {
     $addTeamIcon = $(".add-team");
     $addTeamModal = $(".add-team-member-inner");
     $addTeamModal2 = $(".add-team-member-modal");
+    const addButton = document.querySelector(".add-team-button");
 
     var $exitButton = $(".exit-button #closing");
-    $addTeamIcon.click(function () {
+
+    if (addButton == document.querySelector(".add-team-button")) {
+        $addTeamIcon.click(function () {
+            const actionLabel = document.getElementById("actionLabel");
+            actionLabel.textContent = "ADDING";
+            const labeling = document.getElementById("labeling");
+            labeling.textContent = "ADD";
 
             $addTeamModal.css("display", "flex");
             $addTeamModal.toggle(
@@ -35,18 +42,31 @@ $(document).ready(function () {
                 { percent: 100, easing: "swing" },
                 900
             );
+        });
+    }
 
-    });
     $exitButton.click(function () {
         $addTeamModal.fadeToggle(900);
         $addTeamModal2.fadeToggle(900);
         $.when($addTeamModal.promise(), $addTeamModal2.promise()).done(
             function () {
                 $(".add-team-member-modal").hide();
+                if (document.querySelector(".edit-team-button")) {
+                    addButton.className = "add-team-button";
+                }
+                // reset all input values to default
+                $(".add-team-member-inner").find("#newuser_fname").val("");
+                $(".add-team-member-inner").find("#newuser_email").val("");
+                $("#toggle_api").prop("checked", false);
+                var emailSpan = document.getElementById("emailSpan");
+                var email = document.getElementById("newuser_email");
+
+                emailSpan.style.display = "none";
+                email.style.display = "inline";
+                $('input[name="fav_language"]').prop("checked", false);
             }
         );
     });
-
     $("div#link-twitter").on("click", async function (e) {
         try {
             const response = await fetch(
@@ -390,8 +410,6 @@ $(document).ready(function () {
         }
     });
 
-
-
     $(document).on("click", ".add-team-button", async function (e) {
         e.preventDefault();
         var isChecked = $("#toggle_api").prop("checked");
@@ -402,7 +420,7 @@ $(document).ready(function () {
             roles: selectedRole,
             api_access: isChecked,
         };
-        console.log(data);
+
         try {
             const response = await fetch(APP_URL + "/settings/_add_new", {
                 method: "POST",
@@ -415,40 +433,85 @@ $(document).ready(function () {
                 body: JSON.stringify(data), // Convert the object to JSON string
             });
             const responseData = await response.json();
-            console.log(responseData);
 
             if (responseData) {
-                toastr[responseData.stat](`Success, ${responseData.message}`);
+                if (responseData.stat == "success") {
+                    toastr[responseData.stat](
+                        `Success, ${responseData.message}`
+                    );
+                    // setTimeout(function () {
+                    //     location.reload();
+                    // }, 1000);
+                } else if (responseData.stat == "warning") {
+                    toastr[responseData.stat](
+                        `Warning!, ${responseData.message}`
+                    );
+                }
             }
 
-            setTimeout(function () {
-                location.reload();
-            }, 1000); // Reload after 5 seconds (adjust the delay as needed)
+            // Reload after 5 seconds (adjust the delay as needed)
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
     });
 
     $(document).on("click", ".edit-team-button", async function (e) {
-        var id = $(this).parent().parent();
-        var edit_id = id[0].id;
+        var isChecked = $("#toggle_api").prop("checked");
+        var selectedRole = $('input[name="fav_language"]:checked').val();
         var data = {
-            firstname: $("#" + edit_id)
-                .find("#newuser_fname")
-                .val(),
-            lastname: $("#" + edit_id)
-                .find("#newuser_lname")
-                .val(),
-            email: $("#" + edit_id)
-                .find("#newuser_email")
-                .val(),
+            user_id: edit_id[1],
+            fullname: $(".add-team-member-inner").find("#newuser_fname").val(),
+            emails: $(".add-team-member-inner").find("#newuser_email").val(),
+            roles: selectedRole,
+            api_access: isChecked,
         };
 
-        var targetId = edit_id.split("_");
+        try {
+            const response = await fetch(APP_URL + "/settings/members/_edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                body: JSON.stringify(data), // Convert the object to JSON string
+            });
+            const responseData = await response.json();
+
+            if (responseData.stat == "warning") {
+                toastr[responseData.stat](
+                    `${responseData.status_m}, ${responseData.message}`
+                );
+            }
+        } catch (err) {
+            console.log("Error fetching the data" + err);
+        }
+    });
+
+    // edit
+    var edit_id;
+    $(document).on("click", ".editing", async function (e) {
+        var targetId = e.target.id;
+        var id = targetId.split("-");
+        edit_id = id;
+        const actionLabel = document.getElementById("actionLabel");
+        const labeling = document.getElementById("labeling");
+        actionLabel.textContent = "EDITING";
+        labeling.textContent = "UPDATE";
+        $addTeamModal.css("display", "flex");
+        const addButton = document.querySelector(".add-team-button");
+        addButton.className = "edit-team-button";
+        $addTeamModal.toggle("puff", { percent: 100, easing: "swing" }, 100);
+        $addTeamModal2.toggle("puff", { percent: 100, easing: "swing" }, 900);
+        console.log(edit_id[1]);
+        var data = {
+            edit_id: edit_id[1],
+        };
 
         try {
             const response = await fetch(
-                APP_URL + "/settings/members/_update/" + targetId[1],
+                APP_URL + "/settings/members/_getedit",
                 {
                     method: "POST",
                     headers: {
@@ -462,96 +525,52 @@ $(document).ready(function () {
             );
             const responseData = await response.json();
 
-            var div = $(
-                `<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`
-            );
-            if (responseData.status === 200) {
-                $(this).after(div);
-            } else {
-                $(this).after(div);
-            }
+            if (responseData.stat == "warning") {
+                console.log(responseData.server.skla);
+                var fullname = document.getElementById("newuser_fname");
+                var email = document.getElementById("newuser_email");
+                var apiaccess = document.querySelector(
+                    'input[name="grant-api"]'
+                );
+                var adminRadio = document.querySelector('input[value="Admin"]');
+                var memberRadio = document.querySelector(
+                    'input[value="Member"]'
+                );
+                var emailSpan = document.getElementById("emailSpansa");
+                var parentspan = document.getElementById("emailSpan");
+                fullname.value = responseData.server.skla;
+                email.value = responseData.server.komgks;
+                apiaccess.checked = responseData.server.kolaj;
+                if (responseData.server.lokei === "Admin") {
+                    adminRadio.checked = true;
+                } else if (responseData.server.lokei === "Member") {
+                    memberRadio.checked = true;
+                }
+                if (responseData.server.ldrof == 1) {
+                    // Hide the input field
+                    email.style.display = "none";
 
-            setTimeout(function () {
-                location.reload();
-            }, 1000); // Reload after 5 seconds (adjust the delay as needed)
+                    // Set the text content of the span
+                    emailSpan.textContent = email.value; // You can set any text content here
+
+                    // Show the span
+                    parentspan.style.display = "flex";
+                }
+            }
         } catch (err) {
-            console.log("Error updating member data", err);
+            console.log("Error fetching the data" + err);
         }
     });
 
-    $(document).on("click", ".menu-account-icons-img", async function (e) {
+    // deleting team members start
+
+    $(document).on("click", ".deleting", async function (e) {
         var targetId = e.target.id;
         var id = targetId.split("-");
-
-        try {
-            if (id[0] === "_edit") {
-                const response = await fetch(
-                    APP_URL + "/settings/members/_edit/" + id[1]
-                );
-                const responseData = await response.json();
-
-                $(document)
-                    .find(".edit-team-member-inner")
-                    .attr("id", "edit_" + id[1]);
-                if (
-                    $("#edit_" + id[1])
-                        .first()
-                        .is(":hidden")
-                ) {
-                    $("#edit_" + id[1]).toggle(
-                        "slide",
-                        { direction: "up" },
-                        800
-                    );
-                    $("#edit_" + id[1])
-                        .find("#newuser_fname")
-                        .val(responseData.data.firstname);
-                    $("#edit_" + id[1])
-                        .find("#newuser_lname")
-                        .val(responseData.data.lastname);
-                    $("#edit_" + id[1])
-                        .find("#newuser_email")
-                        .val(responseData.data.email);
-                } else {
-                    $("#edit_" + id[1]).toggle(
-                        "slide",
-                        { direction: "up" },
-                        400
-                    );
-                }
-            } else {
-                const response = await fetch(
-                    APP_URL + "/settings/members/_delete/" + id[1],
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
-                                "content"
-                            ),
-                        },
-                        body: JSON.stringify({ delete: 1 }),
-                    }
-                );
-
-                const responseData = await response.json();
-
-                if (responseData.status === 200) {
-                    toastr.success(`Success, ${responseData.message}`);
-                } else {
-                    toastr.warning(
-                        `${responseData.stat}, ${responseData.message}`
-                    );
-                }
-
-                setTimeout(function () {
-                    location.reload();
-                }, 1000); // Reload after 5 seconds (adjust the delay as needed)
-            }
-        } catch (err) {
-            console.log("Error in handling action", err);
-        }
+        console.log(id);
     });
+
+    // deleting team members end
 
     $.fn.hasAttr = function (name) {
         return this.attr(name) !== undefined;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
+use Swift_TransportException;
+use Illuminate\Support\Facades\Log;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
 use App\Models\TwitterSettings;
@@ -307,58 +309,168 @@ class GeneralSettingController extends Controller
         }
     }
 
+
+
+
     public function addNewMember(Request $request) {
-        $userId = Auth::id();
+        try {
+            // Your existing code for adding a new member and sending an email goes here...
+            $userId = Auth::id();
 
-        // Retrieve the subscription status from the users_meta table
-        $subscription = DB::table('users_meta')
-            ->leftJoin('members', 'users_meta.user_id', '=', 'members.account_holder_id')
-            ->select('users_meta.subscription', DB::raw('COUNT(members.id) as member_count'))
-            ->where('users_meta.user_id', $userId)
-            ->groupBy('users_meta.subscription')
-            ->first();
+            // Retrieve the subscription status from the users_meta table
+            $subscription = DB::table('users_meta')
+                ->leftJoin('members', 'users_meta.user_id', '=', 'members.account_holder_id')
+                ->select('users_meta.subscription')
+                ->where('users_meta.user_id', $userId)
+                ->groupBy('users_meta.subscription')
+                ->first();
+
+
+                $email = $request->input('emails');
+            // Check if the subscription exists and handle accordingly
+            if (!$subscription->subscription) {
+                return response()->json(['message' => 'Subscription not found', 'stat'=> 'warning']);
+            }
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return response()->json(['message' => 'Invalid email address provided', 'stat' => 'warning']);
+            }
+            // Count the members with roles 'Admin' and 'Member'
+            $adminCount = DB::table('members')->where('role', 'Admin')->where('account_holder_id',$userId)->count();
+            $memberCount = DB::table('members')->where('role', 'Member')->where('account_holder_id',$userId)->count();
+
+            $existingUser = DB::table('members')->where('email', $request->input('emails'))->exists();
+
+
+            // Validate the email address
+
+            if ($existingUser) {
+                return response()->json(['message' => 'Email already exists','stat'=> 'warning']);
+            }
+            $hasaccess;
             $randomPassword = Str::random(10);
-
-        $relational = [
-            'account_holder_id' => Auth::id(),
-            'fullname' => $request->input('fullname'),
-            'email' => $request->input('emails'),
-            'role' => $request->input('roles'),
-            'api_access' => $request->input('api_access'),
-            'admin_access' => false,
-            'password'=>$randomPassword,
-            'isverified'=>false,
-            'tokens'=>''
-
-        ];
-        if($subscription->subscription=='premium' ){
-
-
-            if($subscription->member_count<=1){
-
-
-                $userMngt = DB::table('members')->insert($relational);
-                $latestid = DB::getPdo()->lastInsertId();
-                if($userMngt){
-                    Mail::to($request->input('emails'))->send(new TeamMemberReg($latestid));
-
-                    return response()->json(['message'=>'New member is added','stat'=> 'success']);
-                }
-                else{
-                    return response()->json(['message'=>'New member is not added','stat'=> 'warning']);
-                }
-
+            if($request->input('Admin')==='Admin'){
+                $hasaccess = true;
+            }else{
+                $hasaccess= false;
             }
-            else{
-                return response()->json(['message'=>'You have exceeded the limit of adding members please upgrade','stat'=> 'Upgrade!']);
-            }
+            $relational = [
+                'account_holder_id' => Auth::id(),
+                'fullname' => $request->input('fullname'),
+                'email' => $request->input('emails'),
+                'role' => $request->input('roles'),
+                'api_access' => $request->input('api_access'),
+                'admin_access' => $hasaccess,
+                'password' => $randomPassword,
+                'isverified' => false,
+                'tokens' => ''
+            ];
 
+
+
+            // // Check the subscription type and count limits
+// solar subscription
+        if ($subscription->subscription == 'solar' ) {
+            if($memberCount < 0 && $relational['role'] === 'Member' ){
+                    Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+                    $userMngt = DB::table('members')->insert($relational);
+                    if ($userMngt) {
+                        return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+                    } else {
+                        return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    }
+            }elseif($adminCount < 1 && $relational['role'] === 'Admin'){
+
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+                        $userMngt = DB::table('members')->insert($relational);
+                    if ($userMngt) {
+                        return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+                    } else {
+                        return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    }
+
+        }  else{
+            return response()->json(['message' => 'You have exceeded the numbers of member/admin', 'stat' => 'warning']);
+        }
+}
+
+
+// end of solar
+
+// galactic subscription
+
+if ($subscription->subscription == 'galactic' ) {
+    if($memberCount < 5 && $relational['role'] === 'Member' ){
+            Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+            $userMngt = DB::table('members')->insert($relational);
+            if ($userMngt) {
+                return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+            } else {
+                return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+            }
+        }elseif($adminCount < 3 && $relational['role'] === 'Admin'){
+
+                    Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+                    $userMngt = DB::table('members')->insert($relational);
+                if ($userMngt) {
+                    return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+                } else {
+                    return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                }
 
         }else{
-            return response()->json(['stat'=> 'danger', 'message' => 'Your subscription is free']);
-        }
-
+            return response()->json(['message' => 'You have exceeded the numbers of member/admin', 'stat' => 'warning']);
     }
+}
+
+
+
+// end of galactic
+        // astral subscription
+
+        if ($subscription->subscription == 'astral' ) {
+            if($memberCount < 10 && $relational['role'] === 'Member' ){
+                Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+                $userMngt = DB::table('members')->insert($relational);
+            if ($userMngt) {
+                return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+            } else {
+                return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+            }
+        }
+        elseif($adminCount < 5 && $relational['role'] === 'Admin')
+        {
+
+                    Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+                    $userMngt = DB::table('members')->insert($relational);
+                    if ($userMngt) {
+                        return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+                    } else {
+                        return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    }
+
+        }else
+        {
+            return response()->json(['message' => 'You have exceeded the numbers of member/admin', 'stat' => 'warning']);
+        }
+}
+
+// end of astral
+
+        } catch (Swift_TransportException $e) {
+            // Handle the Swift_TransportException
+            return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
+        }
+}
+    public function _getedit(Request $request){
+          $getMember =  DB::table('members')
+                ->select('fullname as skla','email as komgks','role as lokei','api_access as kolaj','isverified as ldrof')
+                ->where('id', $request->input('edit_id'))
+                ->first();
+
+
+        return response()->json(['server'=>$getMember,'message' => $request->input('edit_id'), 'stat' => 'warning']);
+    }
+
 
 
     public function fetchMembers(Request $request) {
@@ -380,22 +492,40 @@ class GeneralSettingController extends Controller
         }
     }
 
-    public function _editMember($id) {
-        try {
-            $getMember = User::find($id);
+    public function _editMember(Request $request) {
+        $editdataverified = [
+            'fullname'=>$request->input('fullname'),
+            'role'=>$request->input('roles'),
+            'api_access'=>$request->input('api_access'),
+        ];
+        $editdatanotverified = [
+            'fullname'=>$request->input('fullname'),
+            'email'=>$request->input('emails'),
+            'role'=>$request->input('roles'),
+            'api_access'=>$request->input('api_access'),
+        ];
+        $member_id = $request->input('user_id');
+        $isverified = DB::table('members')->where('email',$request->input('emails'))->value('isverified');
 
-            if ($getMember) {
-                return response()->json(['status' => 200, 'data' => $getMember]);
-            }
-
-        } catch (Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        if ($isverified) {
+            DB::table('members')->where('id',$member_id)->update($editdataverified);
+            return response()->json(['message' => "Email is already verified you can't edit it. Everything is updated except email",'status_m'=>'Warning!', 'stat' => 'warning']);
         }
+
+       $updatedata =  DB::table('members')->where('id',$member_id)->update($editdatanotverified);
+        if($updatedata){
+            return response()->json(['data_server' => $editdata,'status_m'=>'Success!', 'stat'=> 'success', 'message' => 'User updated successfully']);
+        }else{
+
+            return response()->json(['stat'=> 'warning','status_m'=>'Warning!', 'message' => 'Member is not updated'],422);
+        }
+
     }
+
+
+
+
+
 
     public function _updateMember(Request $request, $id) {
         try {
