@@ -19,10 +19,10 @@ class TeamMemberReg extends Mailable
      *
      * @return void
      */
-    public $latestid;
-    public function __construct($latestid)
+    public $fullname;
+    public function __construct($fullname)
     {
-        $this->latestid = $latestid;
+        $this->fullname = $fullname;
     }
 
     /**
@@ -40,10 +40,10 @@ class TeamMemberReg extends Mailable
 
 
         // Encrypt the ID
-        $encryptedId = Crypt::encrypt($this->latestid);
+        $encryptedId = Crypt::encrypt($this->fullname);
         // Insert the token into the database
 
-        DB::table('members')->where('id', $this->latestid)->update(['tokens' => $token]);
+        DB::table('members')->where('id', $this->fullname)->update(['tokens' => $token]);
 
         $emailLink = route('memberregistration', ['token' => Crypt::encrypt($token), 'id' => $encryptedId]);
 

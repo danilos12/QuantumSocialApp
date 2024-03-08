@@ -91,7 +91,8 @@ Route::get('/settings/twitter_form', [App\Http\Controllers\GeneralSettingControl
 Route::post('/settings/twitter_api/save/{twitter_id}', [App\Http\Controllers\GeneralSettingController::class, 'saveTwitterApi'])->name('twitter_api.save');
 Route::get('/settings/members', [App\Http\Controllers\GeneralSettingController::class, 'fetchMembers']);
 Route::post('/settings/_add_new', [App\Http\Controllers\GeneralSettingController::class, 'addNewMember'])->name('member.add');
-Route::get('/settings/members/_edit/{id}', [App\Http\Controllers\GeneralSettingController::class, '_editMember'])->name('member.edit');
+Route::post('/settings/members/_edit', [App\Http\Controllers\GeneralSettingController::class, '_editMember'])->name('member.edit');
+Route::post('/settings/members/_getedit', [App\Http\Controllers\GeneralSettingController::class, '_getedit'])->name('get.edit');
 Route::post('/settings/members/_update/{id}', [App\Http\Controllers\GeneralSettingController::class, '_updateMember'])->name('member.edit');
 Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\GeneralSettingController::class, '_deleteMember'])->name('member.delete');
 Route::post('/settings/members/_apiaccess', [App\Http\Controllers\GeneralSettingController::class, '_apiaccess'])->name('member.apiaccess');
