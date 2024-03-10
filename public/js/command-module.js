@@ -56,39 +56,39 @@ $(function($) {
     });
 
     /** Pull selected twitter account */
-    $.ajax({
-        type: "GET",
-        url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
-        data: {
-            twitter_id: TWITTER_ID,
-        },
-        success: function(response) {
+    // $.ajax({
+    //     type: "GET",
+    //     url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
+    //     data: {
+    //         twitter_id: TWITTER_ID,
+    //     },
+    //     success: function(response) {
 
-            console.log(response)
-            // Add the existing tag groups to the page
-            if (response.length > 0) {
-                $.each(response, function(index, k) {
-                    var img = $("<img>")
-                        .addClass("cross-tweet-profile-image")
-                        .attr("src", k.twitter_photo)
-                        .attr("id", "twitterId-" + k.twitter_id)
-                        .attr("name", 'cross_tweet_acct[]')
+    //         // console.log(response)
+    //         // Add the existing tag groups to the page
+    //         if (response.length > 0) {
+    //             $.each(response, function(index, k) {
+    //                 var img = $("<img>")
+    //                     .addClass("cross-tweet-profile-image")
+    //                     .attr("src", k.twitter_photo)
+    //                     .attr("id", "twitterId-" + k.twitter_id)
+    //                     .attr("name", 'cross_tweet_acct[]')
 
-                    $(img).appendTo($(".cross-tweet-profiles-inner.cmd"));
-                });
-            } else {
-                $(".posting-tool-columns")
-                    .find(".cross-tweet-profiles-outer")
-                    .append("<div>No other twitter accounts linked</div>");
-            }
-        },
-        error: function(xhr, status, error) {
-            console.log(
-                "An error occurred while fetching the existing tag groups: " +
-                error
-            );
-        },
-    });
+    //                 $(img).appendTo($(".cross-tweet-profiles-inner.cmd"));
+    //             });
+    //         } else {
+    //             $(".posting-tool-columns")
+    //                 .find(".cross-tweet-profiles-outer")
+    //                 .append("<div>No other twitter accounts linked</div>");
+    //         }
+    //     },
+    //     error: function(xhr, status, error) {
+    //         console.log(
+    //             "An error occurred while fetching the existing tag groups: " +
+    //             error
+    //         );
+    //     },
+    // });
 
     /** Post type and BgIcon */
     const $postPanels = $("div[data-post]");
@@ -720,10 +720,10 @@ $(function($) {
     // });
 
     /** Form submit */ 
-    $("#posting-tool-form-001").on("submit", function(e) {
-        const form = $(this);
-        console.log(form)
+    $("#posting-tool-form-001").on("submit", async function(e) {
         e.preventDefault();
+        // console.log(e)
+        const form = $(this);
         
         var crossTweet = [];
         $(".cross-tweet-profiles-inner.cmd img").each(function() {
@@ -750,49 +750,59 @@ $(function($) {
 
         console.log(formData)
 
-        form.find('input[type="submit"]').prop("disabled", true);
-        form.find('input[type="submit"]').val("Please wait..");
+        // form.find('input[type="submit"]').prop("disabled", true);
+        // form.find('input[type="submit"]').val("Please wait..");
 
-        $.ajax({
-            url: APP_URL + "/cmd/save",
-            method: "POST",
-            data: formData,
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            success: function(response) {
+        try {
+            const response = await fetch(APP_URL + '/cmd/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify({ formData }),                
+            });
+
+            const responseData = await response.json();
+
+            if (responseData.status == 403) 
+            {
+                openUpgradeModal(responseData);
+            } 
+            else if (responseData.status === 500) 
+            {
+                alert(responseData.message);
+                location.reload();
+            } 
+            else 
+            {
+
                 // Handle the server response here                
-                form.find('input[type="submit"]').prop("disabled", false);
                 form.find('input[type="submit"]').val("Data Saved!");
-
+                form.find('input[type="submit"]').prop("disabled", true);
+    
                 
-                if (response.tweet.post_type === 'regular-tweets') {
-                    var wrapper = postWrapper(response.tweet, response.tweet.post_type);
+                if (responseData.tweet.post_type === 'regular-tweets') {
+                    var wrapper = postWrapper(responseData.tweet, responseData.tweet.post_type);
                     $('.queue-day-wrapper').append(wrapper);                    
                 } 
                 
-                if (response.tweet.post_type === 'evergreen-tweets') {
-                    var evergreenWrapper = postWrapperEvergreen(response.tweet);
+                if (responseData.tweet.post_type === 'evergreen-tweets') {
+                    var evergreenWrapper = postWrapperEvergreen(responseData.tweet);
                     $('.profile-posts-inner').append(evergreenWrapper);
                 }
-
-                if (response.tweet.post_type === 'promos-tweets') {
-                    var promoWrapper = postWrapperPromo(response);
+    
+                if (responseData.tweet.post_type === 'promos-tweets') {
+                    var promoWrapper = postWrapperPromo(responseData);
                     $('.profile-posts-inner').append(promoWrapper);
                 }
     
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                // Handle errors here
-                console.log(jqXHR, textStatus, errorThrown);
-            },
-            complete: function() {
                 // loop through each input field in the form
                 for (let i = 0; i < form[0].elements.length; i++) {
                     // console.log(form[0].elements.length)
                     const element = form[0].elements[i];
                     // console.log(element)
-
+    
                     // check if the element is an input field      
                     if (
                         // element.nodeName === "INPUT" ||
@@ -805,10 +815,13 @@ $(function($) {
                         // console.log(element.value)                       
                     }
                 }
-
+                
                 form.find('input[type="submit"]').val("Beam me up scotty!");
-            },
-        });
+            }
+
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }       
     });
 
     /** alert confirmation */
@@ -1323,3 +1336,5 @@ function postWrapperBulk(info) {
     </div>
     `
 }
+
+
