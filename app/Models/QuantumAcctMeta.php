@@ -12,13 +12,12 @@ class QuantumAcctMeta extends Model
     protected $table = 'users_meta';
     protected $fillable = [
         'user_id',
-        'subscription', 
-        'subscription_free_counter',
-        'member_count',
-        'status',
+        'subscription_id',
         'timezone',
+        'trial_counter',
+        'status',
         'queue_switch',
         'promo_switch',
-        'evergreen_switch'
+        'evergreen_switch',
     ];
 }

@@ -75,14 +75,14 @@ Route::get('wp', function () {
 					// Create a new DateTime object with the current time and the timezone set above
 					$timezoneOffsetFormatted = sprintf('%+03d:%02d', $timezoneOffsetSeconds / 3600, abs($timezoneOffsetSeconds) % 3600 / 60);
 
+					
 
 					// general Settings
 					QuantumAcctMeta::create([
 						'user_id' => $user->id,
-						'subscription' => $r['name_subscription'],
+						'subscription_id' => $r['wp_subscription'],
 						'timezone' => $timezoneOffsetFormatted,
-						'subscription_free_counter' => 0,
-						'member_count' => 0,
+						'trial_counter' => 7,
 						'status' => 0
 					]);
 
@@ -98,7 +98,7 @@ Route::get('wp', function () {
 						'toggle_7' => 0,
 					];
 					
-					 GeneralSettings::create($generalSettings);
+					GeneralSettings::create($generalSettings);
 
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
