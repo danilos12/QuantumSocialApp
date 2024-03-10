@@ -268,4 +268,6 @@
     </div>  <!-- END .posting-tool-inner -->
   </div>  <!-- END .posting-tool-outer -->
 
-  
+  <style>
+    /* .general-settings-outer, .twitter-settings-outer, .help-page-outer, .command-module-outer {display: none;} */
+  </style>
