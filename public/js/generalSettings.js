@@ -12,19 +12,16 @@ $(document).ready(function() {
     }
   });  
   
-  $('div#link-twitter').on('click', async function(e) {    
+  $('div#link-twitter').on('click', async function(e) {        
     try {
       const response = await fetch(APP_URL + '/twitter/redirect/' + QUANTUM_ID);
       const responseData = await response.json();
-
-      console.log(responseData);
 
       var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
       if (responseData.status === 200) {
         window.location.href = responseData.redirect;
       } else {
-        $(this).parent().after(div);        
-        console.log(1);
+        openUpgradeModal(responseData);
       } 
     
       // remove the div after 3 seconds
