@@ -455,6 +455,3 @@
 }
 
 </script>
-@section('scripts')
-<script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
-@endsection
