@@ -164,8 +164,8 @@
                       <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
-                        {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" /> --}}
                       </a>
+                      {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-upgrade-page" data-id="modal" id="upgrade-page" /> --}}
                       <a href="https://quantumsocial.io/roadmap/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
                       </a>
@@ -210,6 +210,7 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
+      <div class="upgrade"></div>
   @else
     @endauth
   @endif
@@ -218,10 +219,11 @@
 
 	@if (Route::has('login'))
     @auth
-	  @include('account-menu')
+	  @include('account-menu')    
   @else
     @endauth
   @endif
+ 
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>

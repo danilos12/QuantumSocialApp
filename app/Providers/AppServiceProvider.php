@@ -12,6 +12,7 @@ use App\Models\User;
 use DateTime;
 use DateTimeZone;
 use App\Helpers\TwitterHelper;
+use App\Helpers\MembershipHelper;
 use App\Models\TwitterSettings;
 use Illuminate\Support\Facades\Route;
 
@@ -122,7 +123,10 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('twitterApiIndiv', $twitterApiIndiv);
                                                 
                 // membership 
-                $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();            
+                $membership = DB::table('users_meta')->where('user_id', Auth::id())
+                        ->join('plans', 'users_meta.subscription_id', 'plans.subscription_id')
+                        ->first();   
+                // dd($membership);         
                 $view->with('membership', $membership);                       
                 
                 $toggle = DB::table('users_meta')->where('user_id', Auth::id())->first();                    
@@ -156,9 +160,7 @@ class AppServiceProvider extends ServiceProvider
                     ->exists();
                     // dd($hasRegularTweetsInQueue);
                 $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
-
-                
-
+        
                 
                 $hasCustomSlot = DB::table('schedule')
                     ->where('user_id', Auth::id())

@@ -15,6 +15,7 @@ use App\Models\Tag_items;
 use App\Models\TwitterToken;
 use Carbon\Carbon;
 use App\Helpers\TwitterHelper;
+use App\Helpers\MembershipHelper;
 use App\Models\QuantumAcctMeta;
 use App\Models\Schedule;
 use App\Models\User;
@@ -55,189 +56,228 @@ class CommandmoduleController extends Controller
     }
  
     public function create(Request $request) {    
-        try {            
-            $postData = $request->all();
-            $user_id = Auth::id();
-            $main_twitter_id = $postData['twitter_id'];
-            $getToken = TwitterHelper::getTwitterToken($request->twitter_id);
-            $twitterMeta = $getToken->toArray();
-            $twitter_meta = $twitterMeta[0];
-            $utc = TwitterHelper::now($user_id);            
-            $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
-            $tweet_id = basename(parse_url($url, PHP_URL_PATH));
-            $checkToggle = QuantumAcctMeta::where('user_id', Auth::id())->first();
-            $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially            
-            $sched_method = null;           
-            $sched_time = null;          
-            
-            // Save the regular tweet for main account            
-            $insertData = [
-                'user_id' => $user_id,
-                'twitter_id' => $main_twitter_id,
-                'post_type' => $postData['post_type_tweets'],
-                'tweetlink' => $postData['retweet-link-input'] ?? null,
-                'rt_time' => $postData['num-custom-cm'] ?? null,
-                'rt_frame' => $postData['time-custom-cm'] ?? null,
-                'rt_ite' => $postData['iterations-custom-cm'] ?? null,
-                'promo_id' => $postData['promo-tweets-cmp'] ?? null,                 
-                'post_type_code' => rand(10000, 99999),
-                'active' => $checkToggle->queue_switch
-            ];
+        
+        $checkRole = MembershipHelper::tier(Auth::id());
 
-            // Determine the scheduling method and time based on the user's selected option
-            if (isset($postData['scheduling-options'])) {
-                $sched_method = $postData['scheduling-options'];               
-                switch ($postData['scheduling-options']) {
-                    case 'add-queue':
-                        $count = DB::table('posts')
-                            ->where('twitter_id', $main_twitter_id)
-                            ->whereNotIn('sched_method', ['send-now', 'save-draft'])
-                            ->orderBy('sched_time', 'DESC')
-                            ->count();
-                        $lastTweet = DB::table('posts')
-                            ->where('twitter_id', $main_twitter_id)
-                            ->whereNotIn('sched_method', ['send-now', 'save-draft'])
-                            ->orderBy('sched_time', 'DESC')
-                            ->first();
-                        $sched_time = ($count > 0) ? $lastTweet->sched_time : $datetime;
-                        break;
+        // Check the count of posts in the database for your subscription 
+        $postCount = DB::table('posts')
+            ->where('user_id', Auth::id())
+            ->count();        
 
-                    case 'set-countdown':
-                        $countDown = rtrim($postData['ct-set-countdown'], '/s');                        
-                        $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
-                                                
-                        // modify the UTC datetime object by adding the countdown time
-                        $utcFormat = $utc->modify($countDownWithWords);
-                        
-                        // format the resulting datetime object as a string in the  'YYYY-MM-DD HH:MM:SS' format
-                        $scheduled_time = $utcFormat->format('Y-m-d H:i:s');
-                        $sched_time = $scheduled_time;
-                        break;
-                        
-                    case 'custom-time':
-                        // Refactor this section to reduce duplication
-                        // dd($postData);
-                        $formatted24hrTime = date('H:i', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
-                        $custom_time = $postData['ct-time-date'] . ' ' . $formatted24hrTime;
-
-                        // modify the UTC datetime object by adding the custom time
-                        $utc->modify($custom_time);
-
-                        // format the resulting datetime object as a string in the 'YYYY-MM-DD HH:MM:SS' format
-                        $custom_time = $utc->format('Y-m-d H:i:s');
-
-                        $sched_time = $custom_time;
-                        break;
-                        
-                    case 'custom-slot':
-                        $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));                        
-                        $sched_time = $date;
-                        break;
-
-                    case 'rush-queue':
-                        $count = DB::table('posts')
-                            ->where('twitter_id', $main_twitter_id)
-                            ->whereNotIn('sched_method', ['send-now', 'save-draft'])
-                            ->count();
-
-                            $firstTweet = DB::table('posts')
-                            ->where('twitter_id', $main_twitter_id)
-                            ->whereNotIn('sched_method', ['send-now', 'save-draft'])
-                            ->where('sched_time', '>', TwitterHelper::now($user_id))
-                            ->orderBy('sched_time', 'ASC')
-                            ->first();
-
-
-                        $sched_time = ($count > 0) ? $firstTweet->sched_time : $datetime; 
-                        break;  
-                    case 'save-draft': 
-                        $sched_time = $utc->format('Y-m-d H:i:s');
-                        $sched_method = 'save-draft';
-                        break;                       
-                }
-            } else {
-                $sched_time = $utc->format('Y-m-d H:i:s');;
-                $sched_method = 'save-draft';
-            }     
-
-            // Save data for main account
-            // $responses = array();
-            $responses = [];
-            foreach ($postData['textarea'] as $textarea) {
-                $insertData['post_description'] = $textarea;
-                $insertData['sched_method'] = $sched_method;
-                $insertData['sched_time'] = $utc->format('Y-m-d H:i:s');
-
-                // $insertData['post_type'] = 'tweet-storm-tweets';
-                CommandModule::create($insertData);
+        // Add the limitation: run the code only if the count of posts is less than 5
+        if ($checkRole->mo_post_credits > $postCount) {        
+            try {            
+                $postData = $request->input('formData');                
+                $user_id = Auth::id();                
+                $main_twitter_id = $postData['twitter_id'];
+                $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
+                // $twitterMeta = $getToken->toArray();
+                $twitter_meta = $getToken->toArray();
+                $utc = TwitterHelper::now($user_id);            
+                $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
+                $tweet_id = basename(parse_url($url, PHP_URL_PATH));
+                $checkToggle = QuantumAcctMeta::where('user_id', Auth::id())->first();
+                $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially            
+                $sched_method = null;           
+                $sched_time = $utc->format('Y-m-d H:i:s');         
                 
-                // // Post tweet if scheduling option is "send-now"
-                if ($postData['scheduling-options'] === 'send-now') {                                        
-                    if ($postData['post_type_tweets'] === "retweet-tweets") {                        
-                        $responses[] = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");                        
-                    }  else {
-                        $responses[] = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-                    }                    
-                }
+                // Save the regular tweet for main account            
+                $insertData = [
+                    'user_id' => $user_id,
+                    'twitter_id' => $main_twitter_id,
+                    'post_type' => $postData['post_type_tweets'],
+                    'tweetlink' => $postData['retweet-link-input'] ?? null,
+                    'rt_time' => $postData['num-custom-cm'] ?? null,
+                    'rt_frame' => $postData['time-custom-cm'] ?? null,
+                    'rt_ite' => $postData['iterations-custom-cm'] ?? null,
+                    'promo_id' => $postData['promo-tweets-cmp'] ?? null,                 
+                    'post_type_code' => rand(10000, 99999),
+                    'active' => $checkToggle->queue_switch
+                ];
 
-                // Save crosstweet data
-                $crosstweetData = $insertData;
-                if (!empty($postData['crosstweet'])) {
-                    foreach ($postData['crosstweet'] as $key => $account) {
-                        $crosstweetData['post_description'] = $textarea;
+                // Determine the scheduling method and time based on the user's selected option
+                if (isset($postData['scheduling-options'])) {
+                    $sched_method = $postData['scheduling-options'];               
+                    switch ($postData['scheduling-options']) {
+                        case 'add-queue':
+                            $count = DB::table('posts')
+                                ->where('twitter_id', $main_twitter_id)
+                                ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                                ->orderBy('sched_time', 'DESC')
+                                ->count();
+                            $lastTweet = DB::table('posts')
+                                ->where('twitter_id', $main_twitter_id)
+                                ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                                ->orderBy('sched_time', 'DESC')
+                                ->first();
+                            $sched_time = ($count > 0) ? $lastTweet->sched_time : $datetime;
+                            break;
 
-                        $crosstweetId = str_replace('twitterId-', '', $account);
-                        $crosstweetData['twitter_id'] = $crosstweetId;
-                        $crosstweetData['crosstweet_accts'] = $key;
+                        case 'set-countdown':
+                            $countDown = rtrim($postData['ct-set-countdown'], '/s');                        
+                            $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
+                                                    
+                            // modify the UTC datetime object by adding the countdown time
+                            $utcFormat = $utc->modify($countDownWithWords);
+                            
+                            // format the resulting datetime object as a string in the  'YYYY-MM-DD HH:MM:SS' format
+                            $scheduled_time = $utcFormat->format('Y-m-d H:i:s');
+                            $sched_time = $scheduled_time;
+                            break;
+                            
+                        case 'custom-time':
+                            // Refactor this section to reduce duplication
+                            // dd($postData);
+                            $formatted24hrTime = date('H:i', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
+                            $custom_time = $postData['ct-time-date'] . ' ' . $formatted24hrTime;
 
-                        $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();
+                            // modify the UTC datetime object by adding the custom time
+                            $utc->modify($custom_time);
+
+                            // format the resulting datetime object as a string in the 'YYYY-MM-DD HH:MM:SS' format
+                            $custom_time = $utc->format('Y-m-d H:i:s');
+
+                            $sched_time = $custom_time;
+                            break;
+                            
+                        case 'custom-slot':
+                            $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));                        
+                            $sched_time = $date;
+                            break;
+
+                        case 'rush-queue':
+                            $count = DB::table('posts')
+                                ->where('twitter_id', $main_twitter_id)
+                                ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                                ->count();
+
+                                $firstTweet = DB::table('posts')
+                                ->where('twitter_id', $main_twitter_id)
+                                ->whereNotIn('sched_method', ['send-now', 'save-draft'])
+                                ->where('sched_time', '>', TwitterHelper::now($user_id))
+                                ->orderBy('sched_time', 'ASC')
+                                ->first();
+
+
+                            $sched_time = ($count > 0) ? $firstTweet->sched_time : $datetime; 
+                            break;  
+                        case 'save-draft': 
+                            $sched_time = $utc->format('Y-m-d H:i:s');
+                            $sched_method = 'save-draft';
+                            break;                       
+                    }
+                } else {
+                    $sched_time = $utc->format('Y-m-d H:i:s');
+                    $sched_method = 'save-draft';
+                }     
+
+                // Save data for main account
+                // $responses = array();
+                // $responses;
+                foreach ($postData['textarea'] as $textarea) {
+                    $insertData['post_description'] = $textarea;
+                    $insertData['sched_method'] = $sched_method;
+                    $insertData['sched_time'] = $sched_time;
+
+                    // $insertData['post_type'] = 'tweet-storm-tweets';
+                    
+                    
+                    // // Post tweet if scheduling option is "send-now"
+                    if ($postData['scheduling-options'] === 'send-now') {                                        
+                        if ($postData['post_type_tweets'] === "retweet-tweets") {                        
+                            $responses = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");                        
+                        }  else {
+                            $responses = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                        }     
                         
-                        CommandModule::create($crosstweetData);
+                        if ($responses->getOriginalContent()['status'] === 500) {                            
+                            return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                        } else {
+                            CommandModule::create($insertData);         
+                            return response()->json(['status' => 200, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                        }
 
-                        // Post tweet if scheduling option is "send-now"
-                        if ($postData['scheduling-options'] === 'send-now') {
-                            if ($postData['post_type_tweets'] === "retweet-tweets") {
-                                $responses[] = $this->tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
-                            } else {
-                                $responses[] = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                    } else {
+                        CommandModule::create($insertData);
+                    }
+
+                    // Save crosstweet data
+                    $crosstweetData = $insertData;
+                    if (!empty($postData['crosstweet'])) {
+                        foreach ($postData['crosstweet'] as $key => $account) {
+                            $crosstweetData['post_description'] = $textarea;
+
+                            $crosstweetId = str_replace('twitterId-', '', $account);
+                            $crosstweetData['twitter_id'] = $crosstweetId;
+                            $crosstweetData['crosstweet_accts'] = $key;
+
+                            $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();
+                            
+                            CommandModule::create($crosstweetData);
+
+                            // Post tweet if scheduling option is "send-now"
+                            if ($postData['scheduling-options'] === 'send-now') {
+                                if ($postData['post_type_tweets'] === "retweet-tweets") {
+                                    $responses[] = $this->tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
+                                } else {
+                                    $responses[] = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                                }
                             }
                         }
                     }
                 }
+
+                // Retrieve the last saved data
+                $lastSavedData = CommandModule::latest()->first();
+                                                
+                // Return success response
+                return response()->json(['status' => 200, 'message' => 'Data has been created.', 'tweet' => $lastSavedData]);
+
+            } catch (Exception $e) {
+                $trace = $e->getTrace();
+                $message = $e->getMessage();            
+                // Handle the error
+                // Log or display the error message along with file and line number
+                return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
             }
-
-            // Retrieve the last saved data
-            $lastSavedData = CommandModule::latest()->first();
-                                             
-            // Return success response
-            return response()->json(['status' => 200, 'message' => 'Data has been created.', 'tweet' => $lastSavedData]);
-
-        } catch (Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();            
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+        else {
+            // Return a response indicating that the limitation has been reached
+            $html = view('modals.upgrade')->render();
+            return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
     }
 
     
     public function addTagGroup(Request $request) {        
-        try {
-            $insert = Tag_groups::create([
-                'user_id' => Auth::id(),
-                'twitter_id' => $request->input('twitter_id'),
-                'tag_group_mkey' => "_" . strtolower(str_replace(' ', '_', $request->input('myInput'))), //add underscore in the beginner always
-                'tag_group_mvalue' => $request->input('myInput'),
-            ]);
+        $checkRole = MembershipHelper::tier(Auth::id());
 
-            if ($insert) {                
-                // Return success response
-                return response()->json(['status' => 200, 'data' => $insert]);
-            }                
-            
-        } catch (Exception $e) {
-            return response()->json(['status' => '400', 'message' => $e]);
+        $tagCount = DB::table('tag_groups_meta')
+            ->where('user_id', Auth::id())
+            ->count();            
+
+        if ($checkRole->hashtag_group > $tagCount ) {
+            try {
+                $insert = Tag_groups::create([
+                    'user_id' => Auth::id(),
+                    'twitter_id' => $request->input('twitter_id'),
+                    'tag_group_mkey' => "_" . strtolower(str_replace(' ', '_', $request->input('myInput'))), //add underscore in the beginner always
+                    'tag_group_mvalue' => $request->input('myInput'),
+                ]);
+    
+                if ($insert) {                
+                    // Return success response
+                    return response()->json(['status' => 200, 'data' => $insert, 'message' => 'Tag group added successfully']);
+                }                
+                
+            } catch (Exception $e) {
+                return response()->json(['status' => '400', 'message' => $e]);
+            }
+        } else {
+            // Return a response indicating that the limitation has been reached
+            $html = view('modals.upgrade')->render();
+            // return view('modals.upgrade', compact('showUpgradeModal'));
+            return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
     } 
 
@@ -541,16 +581,15 @@ class CommandmoduleController extends Controller
 
             if ($post) {
                 $getToken = TwitterHelper::getTwitterToken($request->input('twitter_id'));            
-                $twitterMeta = $getToken->toArray();
-                $twitter_meta = $twitterMeta[0];
+                // $twitterMeta = $getToken->toArray();
 
                 // check access tokenW
-                $this->tweet2twitter($twitter_meta, array('text' => urldecode($post->post_description)), "https://api.twitter.com/2/tweets");
-            }
+                $this->tweet2twitter($getToken, array('text' => urldecode($post->post_description)), "https://api.twitter.com/2/tweets");
+            } 
             
             //get time now 
             $utc = TwitterHelper::now(Auth::id());
-            $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially       
+            $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially                   
 
             // Update the desired fields with the request data
             $post->sched_method = 'send-now';
@@ -604,13 +643,14 @@ class CommandmoduleController extends Controller
 
 
     // API to post and retweet to twitter
-    function tweet2twitter($twitter_meta, $data, $endpoint) {
-
+    function tweet2twitter($twitter_meta, $data, $endpoint) {   
+        
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);  
 
         // send tweet
         $headers = array(
+            // 'Authorization: Bearer ' . 11,
             'Authorization: Bearer ' . $checkIfTokenExpired['token'],
             'Content-Type: application/json'
         );
