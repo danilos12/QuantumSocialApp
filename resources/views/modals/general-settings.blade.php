@@ -26,16 +26,9 @@
                 <span class="settings-item-label">Current Plan</span>
               </div>  <!-- END .settings-item-label -->
               <div class="settings-item-data-wrap">
-                <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription) : "Free" }} Plan</span>
+                <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
                 <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
-              </div>  <!-- END .settings-item-data -->
-              <div class="settings-item-data-wrap">
-                <!-- CARLO - Here's the source for that, which has SQL and Array versions:  https://gist.github.com/nodesocket/3919205 -->
-                <select name="membership" id="membership" class="time-zone-data">                        
-                  <option value="free" {{ isset($membership) ? ($membership->subscription === "free") ? "selected" : "" : "" }}>Free</option>                       
-                  <option value="premium" {{ isset($membership) ? ($membership->subscription === "premium") ? "selected" : "" : "" }}>Premium</option>                       
-                </select>
-              </div>  <!-- END .settings-item-data -->
+              </div>  <!-- END .settings-item-data -->             
             </div>  <!-- END .plan-data-wrap -->
 
             <div class="settings-item-wrap timezone-data-wrap">
@@ -429,7 +422,7 @@
   </div>  <!-- END .general-settings-outer -->
 
 <style>
-.twitter-settings-outer, .help-page-outer, .command-module-outer {display: none;}
+/* .twitter-settings-outer, .help-page-outer, .command-module-outer {display: none;} */
 
 .mt-2 { margin-top: 0.5em;}
 </style>
@@ -437,15 +430,15 @@
 <script>
     function deleteTwitterAccount(element) {
 
-        console.log(element)
-    // // Use the Fetch API to make an asynchronous request to the URL
-    fetch(APP_URL + '/twitter/remove', {
-        method: 'POST', // Or 'GET', 'PUT', etc. depending on your backend
-        body: JSON.stringify({ twitterId: TWITTER_ID }), // Send the Twitter ID as JSON data
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+      console.log(element)
+      // // Use the Fetch API to make an asynchronous request to the URL
+      fetch(APP_URL + '/twitter/remove', {
+          method: 'POST', // Or 'GET', 'PUT', etc. depending on your backend
+          body: JSON.stringify({ twitterId: TWITTER_ID }), // Send the Twitter ID as JSON data
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      })
     // .then(response => response.json()) // Parse the JSON response
     // .then(data => {
     //     // Get the alert message from the response
@@ -462,6 +455,3 @@
 }
 
 </script>
-@section('scripts')
-{{-- <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script> --}}
-@endsection

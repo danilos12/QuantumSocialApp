@@ -81,6 +81,7 @@ class TwitterHelper
         if (($expires_in + $created_at) <= time()) {
             $d = TwitterHelper::refreshAccessToken($refresh_token);
             session()->put('token_details', $d);
+            // dd($d);
 
             // update token in database
             TwitterToken::where('twitter_id', $twitter_id)
@@ -107,7 +108,7 @@ class TwitterHelper
             ->where('twitter_accts.user_id', '=', Auth::id())
             ->where('ut_acct_mngt.selected', '=', 1)
             ->where('twitter_meta.active', '=',   1)
-            ->get();
+            ->first();
 
         return $findActiveTwitter;
     }

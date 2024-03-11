@@ -604,15 +604,19 @@ $(document).ready(function() {
 
 // Open modal
 function openModal(modalId) {
+  console.log(modalId, currentModal)
+
   // Close any open modal
   if (currentModal !== null) {
     closeModal(currentModal);
   }
 
   $modalLargeAnchor.show();
+  // $(`.${modalId}-outer`).show()
   // Open the requested modal
   // const modal = document.getElementById(modalId);
   // modal.style.display = 'block';
+  // $('.modal-large-backdrop').find('div.modal-large-outer').not(`.${modalId}-outer`).attr('style', 'display: none');
 
   setTimeout(function() {
     $modalLargeBackdrop.fadeIn("slow");
@@ -636,6 +640,7 @@ function closeModal(modalId) {
     $modalLargeAnchor.fadeOut("slow");
     $modalLargeBackdrop.fadeOut("slow");
   }, 175);
+  // $modalLargeAnchor.remove();
 
   $('span.post-type-buttons img.post-tool-icon').removeClass('icon-active');    //remove active icons
   $('span.post-type-buttons img').removeClass('disabled');  // remove disabled 
@@ -721,3 +726,26 @@ $retweetTimerModalClose.click( function (){
 
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
+
+ // general modal opener
+//  $('[data-id="modal"]').on("click", async function(e) {
+//   var id = e.target.id;
+//   console.log(e);
+
+//   try {
+//       const response = await fetch(APP_URL + '/post/popup?modal=' + id);
+//       const responseData = await response.json();    
+      
+//       // render the modal
+//       $('.modal-large-backdrop').append(responseData.html);
+//   } catch (error) {
+//       console.log(error);
+//   }
+// })
+
+function openUpgradeModal(responseData) {
+  // render the modal
+  console.log(responseData)
+  $('.upgrade').append(responseData.html);
+  $('.upgrade').css('z-index', '1500');
+}
