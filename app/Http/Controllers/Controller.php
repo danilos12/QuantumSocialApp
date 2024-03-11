@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Twitter;
@@ -14,6 +15,7 @@ use App\Models\TwitterToken;
 use App\Models\UT_AcctMngt;
 use App\Models\TwitterSettings;
 use App\Helpers\TwitterHelper;
+use App\Helpers\MembershipHelper;
 use App\Models\TwitterSettingsMeta;
 use Exception;
 
@@ -24,25 +26,41 @@ class Controller extends BaseController
 
     // Step 1 (Redirect to Authorize)
     public function checkTwitterCreds(Request $request, $id) {
-        
-        try {
-            $findCred = MasterTwitterApiCredentials::where('user_id', $id)->first();
 
-            if ($findCred) {
-                $url = $this->twitterOAuth($findCred->oauth_id);
+        $checkRole = MembershipHelper::tier(Auth::id()); 
 
-                return response()->json(['status' => 200, 'redirect' => $url, 'stat' => 'success', 'message' => 'Redirecting to Twitter']);
-            } else {
-                return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Please add your Master API above.']);
+        $twitterCount = DB::table('twitter_accts')
+            ->where('user_id', Auth::id())
+            ->count(); 
+
+        if ($checkRole->member_count > $twitterCount) {
+           
+            try {
+                $findCred = MasterTwitterApiCredentials::where('user_id', $id)->first();
+    
+                if ($findCred) {
+                    $url = $this->twitterOAuth($findCred->oauth_id);
+    
+                    return response()->json(['status' => 200, 'redirect' => $url, 'stat' => 'success', 'message' => 'Redirecting to Twitter']);
+                } else {
+                    return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Please add your Master API above.']);
+                }
+    
+            } catch (Exception $e) {
+                $trace = $e->getTrace();
+                $message = $e->getMessage();            
+                // Handle the error
+                // Log or display the error message along with file and line number
+                return response()->json(['status' => 409, 'stat' => 'warning' ,'error' => $trace, 'message' => $message]);
             }
 
-        } catch (Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();            
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 409, 'stat' => 'warning' ,'error' => $trace, 'message' => $message]);
+        }  else {
+
+            // Return a response indicating that the limitation has been reached
+            $html = view('modals.upgrade')->render();
+            return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
+
     }
 
      // Authorized
