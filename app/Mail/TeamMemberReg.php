@@ -20,6 +20,7 @@ class TeamMemberReg extends Mailable
      * @return void
      */
     public $fullname;
+
     public function __construct($fullname)
     {
         $this->fullname = $fullname;
@@ -32,6 +33,8 @@ class TeamMemberReg extends Mailable
      */
     public function build()
     {
+
+
         try{
         $token = Str::random(32);
 
@@ -43,9 +46,9 @@ class TeamMemberReg extends Mailable
         $encryptedId = Crypt::encrypt($this->fullname);
         // Insert the token into the database
 
-        DB::table('members')->where('id', $this->fullname)->update(['tokens' => $token]);
+        DB::table('members')->where('fullname', $this->fullname)->update(['tokens' => $token]);
 
-        $emailLink = route('memberregistration', ['token' => Crypt::encrypt($token), 'id' => $encryptedId]);
+        $emailLink = route('memberregistration', ['token' => Crypt::encrypt($token), 'fullname' => $encryptedId]);
 
         return $this->view('emails.team_member_email_template')
         ->with(['emailLink' => $emailLink])

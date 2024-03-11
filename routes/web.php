@@ -22,10 +22,18 @@ Route::get('/', function () {
 */
 
 Auth::routes();
-// Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])->name('c.login');
+
+
+
+
+
+
+
+
 Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
+// Routes accessible only to authenticated members
 
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -130,7 +138,7 @@ Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingControll
 
 Route::get('/post/popup',[App\Http\Controllers\Controller::class, 'modalPopup'])->name('modal');
 
-Route::middleware(['web','guest', 'session_expired'])
+Route::middleware(['web','guest','session_expired'])
     ->group(function () {
         Route::get('/session-login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])
             ->name('session-login')
@@ -138,10 +146,9 @@ Route::middleware(['web','guest', 'session_expired'])
         Route::post('/login', [App\Http\Controllers\Auth\LoginController::class, 'login'])
             ->withoutMiddleware(['session_expired']);
 
-
-
-
     });
+
+
 
     Route::post('/register',[RegisterController::class, 'register'])->name('submit.form');
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -156,3 +163,10 @@ Route::middleware(['web','guest', 'session_expired'])
         return view('emails.team_members_registration');
     })->name('memberregistration');
     Route::post('/team-registration', [App\Http\Controllers\TeamMemberRegistration::class, 'team_member_reg'])->name('tocontroller');
+
+
+
+
+
+
+   

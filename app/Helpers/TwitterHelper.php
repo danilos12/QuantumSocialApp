@@ -8,11 +8,13 @@ use Carbon\Carbon;
 use App\Models\QuantumAcctMeta;
 use App\Models\MasterTwitterApiCredentials;
 use App\Models\Twitter;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 
 class TwitterHelper
 {
+
     public static function refreshAccessToken($refreshToken)
     {
         $curl = curl_init();
@@ -40,8 +42,8 @@ class TwitterHelper
     }
 
     public static function getTwitterdetails($accessToken)
-    {      
-        $checkIfTokenExpired = TwitterHelper::isTokenExpired($accessToken->expires_in ,strtotime($accessToken->updated_at), $accessToken->refresh_token, $accessToken->access_token, $accessToken->twitter_id);  
+    {
+        $checkIfTokenExpired = TwitterHelper::isTokenExpired($accessToken->expires_in ,strtotime($accessToken->updated_at), $accessToken->refresh_token, $accessToken->access_token, $accessToken->twitter_id);
 
         $headers = array(
             'Authorization: Bearer ' . $checkIfTokenExpired['token'],
@@ -72,7 +74,7 @@ class TwitterHelper
             $result = json_decode($response);
             return $result->data;
         }
-    }    
+    }
 
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
 
@@ -95,7 +97,7 @@ class TwitterHelper
         }
     }
 
-    public static function getTwitterToken($twitter_id) {       
+    public static function getTwitterToken($twitter_id) {
 
         $findActiveTwitter = Twitter::join('twitter_meta', 'twitter_accts.twitter_id', '=', 'twitter_meta.twitter_id')
             ->join('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
@@ -109,7 +111,7 @@ class TwitterHelper
 
         return $findActiveTwitter;
     }
-    
+
 
     public static function executeAfterFiveHoursFromLastUpdate($lastUpdated)
     {
@@ -125,17 +127,20 @@ class TwitterHelper
             // ...
         }
     }
+   
 
     public static function now($id) {
+
+
         $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
         $utc = Carbon::now($acctMeta->timezone);
 
-        return $utc;       
+        return $utc;
     }
-    
+
     public static function timezone($id) {
         $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
-        return $acctMeta->timezone;       
+        return $acctMeta->timezone;
     }
 
     public static function getActiveAPI($id) {

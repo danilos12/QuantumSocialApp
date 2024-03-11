@@ -24,11 +24,11 @@
 
 
                 @php
-                $id = request()->query('id');
+                $fullname = request()->query('fullname');
                 $token = request()->query('token');
             @endphp
                 <input type="hidden" name="token" value="{{ $token }}">
-                <input type="hidden" name="id" value="{{ $id }}">
+                <input type="hidden" name="fullname" value="{{ $fullname }}">
 
 
                 <div class="row mb-3">
@@ -70,11 +70,18 @@
                 type: 'POST',
                 data: formData,
                 success: function(response) {
-                    console.log(response);
+
                         if(response.stat=='success'){
                             $('.success-message').text(response.message).css('display', 'flex');
                             setTimeout(function() {
                                 $('.success-message').fadeOut('slow');
+                                window.location.href = "{{ route('session-login') }}";
+                            }, 3000);
+
+                        }else if(response.stat=='warning'){
+                            $('.error-message').text(response.message).css('display', 'flex');
+                            setTimeout(function() {
+                                $('.error-message').fadeOut('slow');
                                 window.location.href = "{{ route('session-login') }}";
                             }, 3000);
 

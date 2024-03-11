@@ -371,18 +371,20 @@ class GeneralSettingController extends Controller
 // solar subscription
         if ($subscription->subscription == 'solar' ) {
             if($memberCount < 0 && $relational['role'] === 'Member' ){
-                    Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+
                     $userMngt = DB::table('members')->insert($relational);
                     if ($userMngt) {
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
                     }
             }elseif($adminCount < 1 && $relational['role'] === 'Admin'){
 
-                        Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+
                         $userMngt = DB::table('members')->insert($relational);
                     if ($userMngt) {
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -400,18 +402,22 @@ class GeneralSettingController extends Controller
 
 if ($subscription->subscription == 'galactic' ) {
     if($memberCount < 5 && $relational['role'] === 'Member' ){
-            Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+
             $userMngt = DB::table('members')->insert($relational);
+
             if ($userMngt) {
+                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                 return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
             } else {
                 return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
             }
         }elseif($adminCount < 3 && $relational['role'] === 'Admin'){
 
-                    Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+
                     $userMngt = DB::table('members')->insert($relational);
+
                 if ($userMngt) {
+                    Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                     return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                 } else {
                     return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -429,9 +435,10 @@ if ($subscription->subscription == 'galactic' ) {
 
         if ($subscription->subscription == 'astral' ) {
             if($memberCount < 10 && $relational['role'] === 'Member' ){
-                Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+
                 $userMngt = DB::table('members')->insert($relational);
             if ($userMngt) {
+                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                 return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
             } else {
                 return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -440,9 +447,10 @@ if ($subscription->subscription == 'galactic' ) {
         elseif($adminCount < 5 && $relational['role'] === 'Admin')
         {
 
-                    Mail::to($request->input('emails'))->send(new TeamMemberReg($relational['fullname']));
+
                     $userMngt = DB::table('members')->insert($relational);
                     if ($userMngt) {
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
