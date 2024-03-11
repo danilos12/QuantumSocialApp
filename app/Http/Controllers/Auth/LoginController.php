@@ -8,7 +8,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\Auth;
 class LoginController extends Controller
 {
     /*
@@ -42,20 +42,32 @@ class LoginController extends Controller
     }
 
     public function showLoginForm()
-    {      
+    {
         return view('auth.login');
     }
+
+
+
+
+
+
+
+
+
+
+
 
     protected function sendFailedLoginResponse(Request $request)
     {
         // Session::flash('error', trans('auth.failed'));
         // $request->session()->flash('error', true);
-    
+
         // return redirect()->route('login')->withInput($request->only($this->username(), 'remember'));
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
         ]);
     }
+
 
     // public function login(Request $request)
     // {

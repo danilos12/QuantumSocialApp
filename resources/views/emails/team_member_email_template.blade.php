@@ -11,13 +11,12 @@
     </head>
     <body>
         <style>
-            .proper{
+            .proper {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 width: 100%;
                 margin-top: 10px;
-
             }
             @media screen {
                 @font-face {
@@ -240,20 +239,6 @@
                                     Quantum. First, you need to confirm your
                                     account. Just press the button below.
                                 </p>
-                                <div class="proper"
-
-                                >
-                                    <p
-                                        style="
-                                            font-size: 1.875rem;
-                                            line-height: 2.25rem;
-                                            font-weight: 700;
-                                        "
-                                    >
-                                        Verification Code
-                                    </p>
-                                    <p style="margin: 0">12373</p>
-                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -276,9 +261,8 @@
                                                 cellpadding="0"
                                             >
                                                 <p>
-                                                    Click the link below to
-                                                    input your verification code
-                                                    and set password
+                                                    Click the link below to set
+                                                    your own password
                                                 </p>
 
                                                 <tr>
@@ -289,11 +273,8 @@
                                                         "
                                                         bgcolor="#5b1c5a"
                                                     >
-
                                                         <a
-
                                                             href="{{ $emailLink }}"
-
                                                             target="_blank"
                                                             style="
                                                                 font-size: 20px;

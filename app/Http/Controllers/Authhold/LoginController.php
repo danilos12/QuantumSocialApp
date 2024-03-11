@@ -42,15 +42,19 @@ class LoginController extends Controller
     }
 
     public function showLoginForm()
-    {      
+    {
         return view('auth.login');
     }
+
+
+
+ 
 
     protected function sendFailedLoginResponse(Request $request)
     {
         // Session::flash('error', trans('auth.failed'));
         // $request->session()->flash('error', true);
-    
+
         // return redirect()->route('login')->withInput($request->only($this->username(), 'remember'));
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
