@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\TwitterHelper;
+use App\Helpers\MembershipHelper;
 use App\Models\Bulk_meta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -238,23 +239,41 @@ class PostingController extends Controller
     }
 
 	public function bulk_queue() {
+
+		$checkRole = MembershipHelper::tier(Auth::id());        
+		
 		$title = 'Bulk Queue';
-		// $userId = Auth::id(); //To check current user loggedin User ID dria
-        // $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
-        // ->where('sched_method', 'add-queue')
-        // ->where('post_type', 'regular-tweets')
-        // ->exists();
-		return view('bulk-queue')->with('title', $title);
+		if ($checkRole->basic_bulk_uploader === 1) {
+			// $userId = Auth::id(); //To check current user loggedin User ID dria
+			// $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
+			// ->where('sched_method', 'add-queue')
+			// ->where('post_type', 'regular-tweets')
+			// ->exists();
+			
+			return view('bulk-queue')->with('title', $title);
+		} else {
+			
+			$modalContent = view('modals.upgrade')->render();
+			return view('bulk-queue', compact('modalContent', 'title'));
+			// Return a response indicating that the limitation has been reached
+			// return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
+		}
 	}
 
 	public function bulk_uploader()
     {
+		$checkRole = MembershipHelper::tier(Auth::id());       
 		$title = 'Bulk Uploader';
 		$hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
 		->where('post_type', 'regular-tweets')
 		->exists();
-		return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
-        // return view('bulk')->with('title', $title);
+
+		if ($checkRole->basic_bulk_uploader === 1) {
+			return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+		} else {
+			$modalContent = view('modals.upgrade')->render();
+			return view('bulk-queue', compact('modalContent', 'title'));
+		}
     }
 
 	public function editPost(Request $request, $id) {
