@@ -210,7 +210,12 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
-      <div class="upgrade"></div>
+      <div class="upgrade">
+        @if(isset($modalContent))
+            <!-- Render the modal content -->
+            {!! $modalContent !!}
+        @endif
+      </div>
   @else
     @endauth
   @endif
@@ -251,7 +256,7 @@
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();
-            console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
+            // console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
         } else {
             // If menuId is not defined or falsy, close all menus
             // $(`ul:not(${menuId})`).hide();
