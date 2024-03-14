@@ -36,7 +36,7 @@ return [
     */
 
     'guards' => [
-        'member' => [
+        'member' =>[
             'driver' => 'session',
             'provider' => 'members',
 
@@ -77,7 +77,9 @@ return [
         'members' => [
             'driver' => 'eloquent',
             'model' => App\Models\Members::class,
+
         ],
+
     ],
 
 
@@ -109,6 +111,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
     ],
 
     /*

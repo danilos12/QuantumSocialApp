@@ -225,11 +225,11 @@
 
 	@if (Route::has('login'))
     @auth
-	  @include('account-menu')    
+	  @include('account-menu')
   @else
     @endauth
   @endif
- 
+
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>

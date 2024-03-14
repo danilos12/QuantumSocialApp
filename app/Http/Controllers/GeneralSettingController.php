@@ -7,6 +7,7 @@ use Swift_TransportException;
 use Illuminate\Support\Facades\Log;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
+
 use App\Models\TwitterSettings;
 use App\Models\TwitterSettingsMeta;
 use App\Models\GeneralSettings;
@@ -152,7 +153,7 @@ class GeneralSettingController extends Controller
     public function saveTwitterApi(Request $request, $twitter_id) {
 
         try {
-            // dd($request, $twitter_id);
+
             $saveTwitterApi = TwitterApiCredentials::where('user_id', Auth::id())->first();
             $saveTwitterApi->twitter_id = $twitter_id;
             $saveTwitterApi->api_key = $request->input('api_key');
@@ -314,23 +315,22 @@ class GeneralSettingController extends Controller
 
     public function addNewMember(Request $request) {
         try {
+
             // Your existing code for adding a new member and sending an email goes here...
             $userId = Auth::id();
 
             // Retrieve the subscription status from the users_meta table
             $subscription = DB::table('users_meta')
                 ->leftJoin('members', 'users_meta.user_id', '=', 'members.account_holder_id')
-                ->select('users_meta.subscription')
+                ->select('users_meta.subscription_id')
                 ->where('users_meta.user_id', $userId)
-                ->groupBy('users_meta.subscription')
                 ->first();
+            $subs_id = $subscription->subscription_id;
 
 
                 $email = $request->input('emails');
-            // Check if the subscription exists and handle accordingly
-            if (!$subscription->subscription) {
-                return response()->json(['message' => 'Subscription not found', 'stat'=> 'warning']);
-            }
+
+
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 return response()->json(['message' => 'Invalid email address provided', 'stat' => 'warning']);
             }
@@ -339,6 +339,8 @@ class GeneralSettingController extends Controller
             $memberCount = DB::table('members')->where('role', 'Member')->where('account_holder_id',$userId)->count();
 
             $existingUser = DB::table('members')->where('email', $request->input('emails'))->exists();
+
+
 
 
             // Validate the email address
@@ -367,9 +369,10 @@ class GeneralSettingController extends Controller
 
 
 
-            // // Check the subscription type and count limits
-// solar subscription
-        if ($subscription->subscription == 'solar' ) {
+            // Check the subscription type and count limits
+            // solar subscription
+        if ($subs_id == 1 ) {
+
             if($memberCount < 0 && $relational['role'] === 'Member' ){
 
                     $userMngt = DB::table('members')->insert($relational);
@@ -400,7 +403,8 @@ class GeneralSettingController extends Controller
 
 // galactic subscription
 
-if ($subscription->subscription == 'galactic' ) {
+if ($subs_id == 2 ) {
+
     if($memberCount < 5 && $relational['role'] === 'Member' ){
 
             $userMngt = DB::table('members')->insert($relational);
@@ -433,7 +437,8 @@ if ($subscription->subscription == 'galactic' ) {
 // end of galactic
         // astral subscription
 
-        if ($subscription->subscription == 'astral' ) {
+        if ($subs_id == 3 ) {
+
             if($memberCount < 10 && $relational['role'] === 'Member' ){
 
                 $userMngt = DB::table('members')->insert($relational);
@@ -501,14 +506,15 @@ if ($subscription->subscription == 'galactic' ) {
     }
 
     public function _editMember(Request $request) {
+
         $editdataverified = [
             'fullname'=>$request->input('fullname'),
             'role'=>$request->input('roles'),
             'api_access'=>$request->input('api_access'),
         ];
+
         $editdatanotverified = [
             'fullname'=>$request->input('fullname'),
-            'email'=>$request->input('emails'),
             'role'=>$request->input('roles'),
             'api_access'=>$request->input('api_access'),
         ];
@@ -522,7 +528,7 @@ if ($subscription->subscription == 'galactic' ) {
 
        $updatedata =  DB::table('members')->where('id',$member_id)->update($editdatanotverified);
         if($updatedata){
-            return response()->json(['data_server' => $editdata,'status_m'=>'Success!', 'stat'=> 'success', 'message' => 'User updated successfully']);
+            return response()->json(['status_m'=>'Success!', 'stat'=> 'success', 'message' => 'User updated successfully']);
         }else{
 
             return response()->json(['stat'=> 'warning','status_m'=>'Warning!', 'message' => 'Member is not updated'],422);
