@@ -1,9 +1,11 @@
+
+
 <div class="modal-large-anchor">
   <div class="modal-large-backdrop">
 
     <!-- BEGIN SETTINS MENUS -->
+    @include('modals.upgrade')
 
-   <!-- BEGIN ADD TEAM MEMBER MODAL -->
 
    <div class="add-team-member-modal">
     <div class="add-team-member-inner montserrat " style="color: white">
@@ -142,14 +144,15 @@
                   <span class="settings-item-label">Current Plan</span>
                 </div>  <!-- END .settings-item-label -->
                 <div class="settings-item-data-wrap">
-                  <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription) : "Free" }} Plan</span>
+                  <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : "No" }} Plan</span>
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
                 </div>  <!-- END .settings-item-data -->
                 <div class="settings-item-data-wrap">
                   <!-- CARLO - Here's the source for that, which has SQL and Array versions:  https://gist.github.com/nodesocket/3919205 -->
                   <select name="membership" id="membership" class="time-zone-data">
-                    <option value="free" {{ isset($membership) ? ($membership->subscription === "free") ? "selected" : "" : "" }}>Free</option>
-                    <option value="premium" {{ isset($membership) ? ($membership->subscription === "premium") ? "selected" : "" : "" }}>Premium</option>
+                    <option value="free" {{ isset($membership) ? ($membership->subscription_name === "solar") ? "selected" : "" : "" }}>Solar</option>
+                    <option value="galactic" {{ isset($membership) ? ($membership->subscription_name === "galactic") ? "selected" : "" : "" }}>Galactic</option>
+                    <option value="astral" {{ isset($membership) ? ($membership->subscription_name === "astral") ? "selected" : "" : "" }}>Astral</option>
                   </select>
                 </div>  <!-- END .settings-item-data -->
               </div>  <!-- END .plan-data-wrap -->
@@ -540,7 +543,7 @@
       </div>  <!-- END .general-settings-inner -->
     </div>  <!-- END .general-settings-outer -->
 
-    @include('help')
+
 
     @include('twittersettings')
 
@@ -549,8 +552,8 @@
   </div>  <!-- END .main-settings-background -->
   <!-- BEGIN COMMAND MODULE -->
 
-      @include('modals.commandmodule')
-      {{-- @include('modals.edit-commandmodule') --}}
+  @include('modals.commandmodule')
+  {{-- @include('modals.edit-commandmodule') --}}
 
   <!-- END COMMAND MODULE -->
 </div>  <!-- END .main-settings-anchor -->

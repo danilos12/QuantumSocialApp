@@ -10,7 +10,7 @@
     <div class="login-inner">
 
 
-        <form method="POST" action="{{ route('member.login') }}">
+        <form method="POST" action="{{ route('forauth') }}">
             @csrf
 
             <div class="row mb-3">

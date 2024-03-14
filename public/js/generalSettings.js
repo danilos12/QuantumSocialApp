@@ -439,13 +439,21 @@ $(document).ready(function () {
                     toastr[responseData.stat](
                         `Success, ${responseData.message}`
                     );
-                    // setTimeout(function () {
-                    //     location.reload();
-                    // }, 1000);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
                 } else if (responseData.stat == "warning") {
                     toastr[responseData.stat](
                         `Warning!, ${responseData.message}`
                     );
+                    var element = document.querySelector(
+                        ".modal-large-anchor-upgrade"
+                    );
+
+                    element.style.display = "flex";
+                    $addTeamModal.fadeToggle(900);
+                    $addTeamModal2.fadeToggle(900);
+                     $(".add-team-member-modal").hide();
                 }
             }
 
@@ -479,7 +487,11 @@ $(document).ready(function () {
             });
             const responseData = await response.json();
 
-            if (responseData.stat == "warning") {
+            if (responseData.stat == "success") {
+                toastr[responseData.stat](
+                    `${responseData.status_m}, ${responseData.message}`
+                );
+            } else if (responseData.stat == "warning") {
                 toastr[responseData.stat](
                     `${responseData.status_m}, ${responseData.message}`
                 );

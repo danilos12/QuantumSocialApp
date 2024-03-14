@@ -165,8 +165,13 @@ Route::middleware(['web','guest','session_expired'])
     Route::post('/team-registration', [App\Http\Controllers\TeamMemberRegistration::class, 'team_member_reg'])->name('tocontroller');
 
 
+    Route::get('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'showLoginForm'])->name('tomemberauth');
+    Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
 
 
-
-
-   
+    Route::middleware(['member-access'])->group(function(){
+        Route::get('/member/home',function(){
+  
+            return view('membersdashboard');
+        })->name('home');
+    });
