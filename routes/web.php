@@ -176,6 +176,14 @@ Route::middleware(['web','guest','session_expired'])
         Route::get('/member/home',function(){return view('layouts.membersdashboard');})->name('memberhome');
         Route::get('/member/promo',function(){return view('promo-tweets');})->name('memberpromo');
         Route::get('/member/banner',function(){return view('layouts.app');})->name('memberbanner');
-        Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\MemberCommandmodule::class, 'getTagGroups'])->name('cmd.get_tag_groupsmember');
+
+        // member command module class
+        Route::post('/cmd/save', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'create'])->name('cmd.save');
+        Route::post('/cmd/add-tag', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'addTagGroup'])->name('cmd.add_tag');
+        Route::post('/cmd/add-tag-item', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'addTagItem'])->name('cmd.add_tag_item');
+        Route::post('/cmd/post/tweet-now',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'postNowFromQueue'])->name('post.tweet');
+        Route::post('/cmd/post/move-to-top',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'moveTopFromQueue'])->name('post.move');
+        Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getTagGroups'])->name('cmd.get_tag_groups');
+
 
     });
