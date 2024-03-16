@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    $('#uploadCsv').on('click', function() {
+    $('#uploadCsv').on('click', async function() {
         var fileInput = $('#csvFileInput')[0].files[0];
 
         if (!fileInput) {
@@ -15,26 +15,31 @@ $(document).ready(function(){
 
         console.log(formData)
     
-
-        $.ajax({
-            url: APP_URL + '/bulk/upload', // Replace with your actual endpoint
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            success: function(data) {
-                alert(data.message);
-
+        try {
+            const response = await fetch(APP_URL + '/bulk/upload', {
+                method: 'POST',           
+                headers: {
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: formData,
+            });
+            const responseData = await response.json();    
+            
+            console.log(responseData)
+    
+            if (responseData.status === 200) {
+                alert(responseData.message);
+    
                 window.location.href = APP_URL + '/bulk-queue';
-                // Handle the response as needed
-            },
-            error: function(error) {
-                console.error('Error:', error);
+            } else {
+                openUpgradeModal(responseData);
             }
-        });
+           
+        } catch (err) {
+            console.log(err)
+        }
+
+
     });
 
     

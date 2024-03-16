@@ -69,42 +69,6 @@ Route::get('wp', function () {
 						['user_id' => $user->id, 'meta_key' => 'wp_subscription', 'meta_value' => $r['name_subscription']],
 					]);
 					
-					 DB::table('user_mngt')->insert([
-						'main_id' => $user->id,
-						'main_acct' => 1,
-						'sub_acct' => 0
-					]);
-					
-					$timezoneOffsetSeconds = timezone_offset_get(new DateTimeZone(date_default_timezone_get()), new DateTime());
-
-					// Create a new DateTime object with the current time and the timezone set above
-					$timezoneOffsetFormatted = sprintf('%+03d:%02d', $timezoneOffsetSeconds / 3600, abs($timezoneOffsetSeconds) % 3600 / 60);
-
-					
-
-					// general Settings
-					QuantumAcctMeta::create([
-						'user_id' => $user->id,
-						'subscription_id' => $r['wp_subscription'],
-						'timezone' => $timezoneOffsetFormatted,
-						'trial_counter' => 7,
-						'status' => 0
-					]);
-
-
-					$generalSettings = [
-						'user_id' => $user->id,
-						'toggle_1' => 0,
-						'toggle_2' => 0,
-						'toggle_3' => 0,
-						'toggle_4' => 0,
-						'toggle_5' => 0,
-						'toggle_6' => 0,
-						'toggle_7' => 0,
-					];
-					
-					GeneralSettings::create($generalSettings);
-
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
 			} else {

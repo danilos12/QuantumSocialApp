@@ -209,10 +209,17 @@
             window.location.href = "https://quantumsocial.io/wp-json/plan/login/subscription";
         })
 
-        $('.close-upgrade-page').on('click', function() {
-            console.log('close')
+        $('.close-upgrade-page').on('click', function(e) {
+            // Sub Menu
+            var uri =  "{{  basename($_SERVER['REQUEST_URI']) }}";
+
             $('.upgrade').attr('style', 'z-index:0');
             $('.modal-large-anchor-upgrade').attr('style', 'display: none');
+            $('.modal-large-anchor-upgrade').attr('style', 'display: none');
+
+            if (uri === "bulk-queue" || uri === "bulk") {
+                window.location.href = "{{ route('dashboard') }}"
+            }
         })
     })
 </script>
