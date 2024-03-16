@@ -6,8 +6,12 @@
     <div class="login-outer">
 
         <div class="login-inner">
-
-                <span class="invalid-feedback error-message " role="alert"></span>
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+                <span class="invalid-feedback error-message alert alert-danger" role="alert"></span>
                 <span class="invalid-feedback success-message " role="alert"></span>
 
 

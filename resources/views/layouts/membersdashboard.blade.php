@@ -1,64 +1,64 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-	@if (Route::has('login'))
-	 @auth
-    <title>{{ $title }}</title>
-    @else
-	 <title>{{ __('Login') }}</title>
-	@endauth
-	@endif
+        <!-- CSRF Token -->
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        @if (Route::has('tomemberauth'))
+         @auth
+        <title>{{ $title }}</title>
+        @else
+         <title>{{ __('Member') }}</title>
+        @endauth
+        @endif
 
-    <!-- Scripts -->
-  {{-- <script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script> --}}
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Scripts -->
+      {{-- <script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script> --}}
+      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  {{-- <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> --}}
-  <script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
+      {{-- <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> --}}
+      <script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
 
-    <!-- Fonts -->
-  <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
-<!-- Add Toastr.js CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-
-
+        <!-- Fonts -->
+      <link rel="dns-prefetch" href="//fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+    <!-- Add Toastr.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 
 
-	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
-	<link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
-	<link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
-	<link rel="stylesheet" href="{{ asset('public/css/command-module.css') }}">
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
-
-  {{-- <link rel="stylesheet" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css"> --}}
-  {{-- <link rel="stylesheet" href="{{ asset('public/js/emojionearea-master/dist/emojionearea.css') }}"> --}}
 
 
-  <script> var APP_URL = `{{ url('/') }}`; </script>
+        <link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/css/socialSettings.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/css/generalSettings.css') }}">
+        <link rel="stylesheet" href="{{ asset('public/css/command-module.css') }}">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+      <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
 
-  @if (Route::has('login'))
-  @auth
-  <script> var TWITTER_ID = `{{ $twitter_id }}`; </script>
-  <script> var TWITTER_NAME = `{{ $twitter_name }}`; </script>
-  <script> var TWITTER_PHOTO = `{{ $twitter_photo }}`; </script>
-  <script> var TWITTER_USN = `{{ $twitter_usn }}`; </script>
-  <script> var QUANTUM_ID = `{{ $user_id }}`; </script>
-  @endauth
-  @endif
-</head>
-<body class="{{ Route::has('login') ? 'darkmode' : '' }}">
+      {{-- <link rel="stylesheet" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css"> --}}
+      {{-- <link rel="stylesheet" href="{{ asset('public/js/emojionearea-master/dist/emojionearea.css') }}"> --}}
+
+
+      <script> var APP_URL = `{{ url('/') }}`; </script>
+      @if (Route::has('tomemberauth'))
+      @auth('member')
+      <script> var TWITTER_ID = `{{ $twitter_id }}`; </script>
+      <script> var TWITTER_NAME = `{{ $twitter_name }}`; </script>
+      <script> var TWITTER_PHOTO = `{{ $twitter_photo }}`; </script>
+      <script> var TWITTER_USN = `{{ $twitter_usn }}`; </script>
+      <script> var QUANTUM_ID = `{{ $user_id }}`; </script>
+      @endauth
+      @endif
+
+    </head>
+<body class="{{ Route::has('tomemberauth') ? 'darkmode' : '' }}">
   <canvas></canvas>
   <div class="interface-outer">
     <div class="interface-inner">
@@ -68,7 +68,7 @@
 
           <!-- Authentication Links -->
           @if (Route::has('login'))
-            @auth
+            @auth('member')
             <div class="banner-twitter-profile-wrap">
               <a href="#">
                 <div class="banner-twitter-profile-inner">
@@ -143,7 +143,7 @@
 
 
           @if (Route::has('login'))
-            @auth
+            @auth('member')
             <span class="toggle-wrap">
             <img src = "{{ asset('public/ui-images/icons/00f-moon.svg') }}"
               class="menu-icon dark-mode-toggle"
@@ -161,7 +161,7 @@
               <div class="main-menu">
                 <ul>
                 @if (Route::has('login'))
-                  @auth
+                  @auth('member')
                   @include('main-menu')
                 </ul>
 
@@ -224,7 +224,7 @@
   </div>  <!-- END .new-slot-anchor -->
 
 	@if (Route::has('login'))
-    @auth
+    @auth('member')
 	  @include('account-menu')
   @else
     @endauth
@@ -284,6 +284,5 @@
 
     });
   </script>
-
 </body>
 </html>

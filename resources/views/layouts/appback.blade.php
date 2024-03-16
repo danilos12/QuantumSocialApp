@@ -6,14 +6,10 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-	@if (Route::has('login'))
-	 @auth	
-    <title>{{ $title }}</title>
-    @else
-	 <title>{{ __('Login') }}</title>	
-	@endauth
-	@endif	
-	
+
+	 <title>Members</title>
+
+
     <!-- Scripts -->
 	<script type='text/javascript' src="{{ asset('public/js/jquery-3.6.1.min.js') }}"></script>
 	<script type='text/javascript' src="{{ asset('public/js/jquery-ui/jquery-ui.min.js') }}"></script>
@@ -21,11 +17,11 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
-	
+
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
 	<link rel="stylesheet" href="{{ asset('public/js/jquery-ui/jquery-ui.min.css') }}">
-	
-	
+
+
 </head>
 <body>
   <canvas></canvas>
@@ -36,8 +32,8 @@
 
           <span class="image-placeholder">Quantum Social</span>
 			 <!-- Authentication Links -->
-            @if (Route::has('login')) 
-			@auth	
+            @if (Route::has('login'))
+			@auth
           <div class="banner-twitter-profile-wrap">
             <a href="#">
               <div class="banner-twitter-profile-inner">
@@ -116,24 +112,24 @@
 			</a>
 			</div>
 			@endauth
-			@endif 	 
-			 
-			 
+			@endif
+
+
 			@if (Route::has('login'))
-				@auth		
+				@auth
 			  <span class="toggle-wrap">
 				<img src = "{{ asset('public/ui-images/icons/00f-moon.svg') }}"
 				  class="menu-icon dark-mode-toggle"
 				  id="dark-mode-toggle" />
 			  </span>
 			 @else
-				@endauth				 
-			@endif 
+				@endauth
+			@endif
         </div>  <!-- END .banner-inner -->
       </div>  <!-- END .banner-outer -->
 		 <div class="lower-area-outer">
         <div class="lower-area-inner">
-		 
+
           <div class="menu-outer">
             <div class="menu-inner">
 
@@ -141,7 +137,7 @@
 
                 <ul>
 				    @if (Route::has('login'))
-					@auth		
+					@auth
                   <li class="menu-item menu-margin">
 				  <a href="{{ route('dashboard') }}">
                     <img src = "{{ asset('public/ui-images/icons/01-dashboard.svg') }}" class="menu-icon" />
@@ -155,7 +151,7 @@
 				 <a href="{{ route('profiles') }}">
                     <img src = "{{ asset('public/ui-images/icons/02-profile.svg') }}" class="menu-icon" />
                     Profile</a></li>
-					
+
                   <li class="menu-item">
 				   <a href="{{ route('queue') }}">
                     <img src = "{{ asset('public/ui-images/icons/03-posting.svg') }}" class="menu-icon" />
@@ -167,23 +163,23 @@
                       <li>
                         <a href="{{ route('queue') }}"><img src = "{{asset('public/ui-images/icons/04-queue.svg')}} " class="menu-icon" />
                         Queue</a></li>
-						
+
                       <li>
                         <a href="{{ route('drafts') }}"><img src = " {{asset('public/ui-images/icons/05-drafts.svg')}} " class="menu-icon" />
                         Drafts</a></li>
-						
+
                       <li><a href="{{ route('posted') }}">
                         <img src = "{{asset('public/ui-images/icons/06-posted.svg')}} " class="menu-icon" />
                         Posted</a></li>
-					
+
                       <li>	<a href="{{ route('slot-scheduler') }}">
                         <img src = "{{asset('public/ui-images/icons/07-schedule.svg')}} " class="menu-icon" />
                         Slot Scheduler</a></li>
-					
+
                       <li>	<a href="{{ route('tweet-stormer') }}">
                         <img src = "{{asset('public/ui-images/icons/08-tweet-storm.svg')}} " class="menu-icon" />
                         Tweet Stormer</a></li>
-						
+
                       <li><a href="{{ route('bulk-uploader') }}">
                         <img src = " {{asset('public/ui-images/icons/09-bulk-upload.svg')}} " class="menu-icon" />
                         Bulk Uploader</a></li>
@@ -250,22 +246,22 @@
 							<form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
 								@csrf
 							</form>
-							
+
 						  </div>  <!-- END .settings-bar-inner -->
 						</div>  <!-- END .settings-bar-outer -->
-					
-					
+
+
 					@else
-						
+
 						 @endauth
 					@endif
-							
+
               </div>  <!-- END .main-menu -->
 
             </div>  <!-- END .menu-inner -->
           </div>  <!-- END .menu-outer -->
-	
-	
+
+
 
 		<div class="content-outer">
 			<div class="content-inner">
@@ -275,7 +271,7 @@
     </div>  <!-- END .interface-inner -->
   </div>  <!-- END .interface-outer -->
 		@if (Route::has('login'))
-	 @auth	
+	 @auth
 @if ($title == 'Slot Scheduler')
 	<div class="new-slot-anchor">
         <div class="new-slot-overlay">
@@ -309,10 +305,10 @@
                   <select id="hour-selector" name="hour-selector" class="hour-selector">
                     <option value="">Hour</option>
 					@for ($i = 1; $i <= 12; $i++)
-						
+
 						<option value="{{  $i }}"> {{  $i }}</option>
 					@endfor
-                   
+
                   </select>  <!-- END .hour-selector -->
 
                   <select id="minute-selector" name="minute-selector" class="minute-selector">
@@ -355,16 +351,16 @@
 
         </div>  <!-- END .new-slot-overlay -->
       </div>  <!-- END .new-slot-anchor -->
-		
-	@endif	
+
+	@endif
     @else
-	
+
 	@endauth
-	@endif	
+	@endif
 </div>
-	</div>	
+	</div>
 	@if (Route::has('login'))
-	 @auth	
+	 @auth
 	@include('account-menu')
 		 <style>
 	.general-settings-outer, .twitter-settings-outer {display: none;}
@@ -376,7 +372,7 @@
 	  <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
 	 @else
 	@endauth
-@endif	
- 
+@endif
+
 </body>
 </html>

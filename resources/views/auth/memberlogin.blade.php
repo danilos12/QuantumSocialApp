@@ -9,7 +9,11 @@
 <div class="login-outer" style="margin-top:4em">
     <div class="login-inner">
 
-
+        @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
         <form method="POST" action="{{ route('forauth') }}">
             @csrf
 
@@ -81,11 +85,7 @@
             </div>
         </form>
 
-        @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
+
     </div>
 </div>
 

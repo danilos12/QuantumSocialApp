@@ -9,7 +9,6 @@ class MemberLoginController extends Controller
 {
 
 
-
     public function showLoginForm()
     {
         return view('auth.memberlogin');
@@ -23,10 +22,8 @@ class MemberLoginController extends Controller
 
         if (Auth::guard('member')->attempt($credentials)) {
 
-            return redirect()->route('home');
-        }elseif(Auth::guard('web')->attempt($credentials)){
-            return redirect()->route('session-login');
-        } else {
+            return redirect()->route('memberhome');
+        }else {
             // Authentication failed
             return redirect()->route('tomemberauth')->with('error', 'Invalid credentials. Please try again.');
         }

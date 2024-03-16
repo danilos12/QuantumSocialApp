@@ -133,7 +133,13 @@
                   <span class="settings-item-label">Email Address</span>
                 </div>  <!-- END .settings-item-label -->
                 <div class="settings-item-data-wrap">
-                  <span class="settings-item-data account-email">{{ Auth::user()->email }}</span>
+                  <span class="settings-item-data account-email">
+                    @if(Auth::guard('member')->check())
+                        {{ $accthemail }}
+                    @else
+                        {{ Auth::user()->email }}
+                    @endif
+                </span>
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-key.svg" class="ui-icon change-pass" />
                 </div>  <!-- END .settings-item-data -->
               </div>  <!-- END .email-data-wrap -->

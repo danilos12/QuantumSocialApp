@@ -15,6 +15,7 @@ class CampaignsController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+  
     }
 
     /**
@@ -33,7 +34,7 @@ class CampaignsController extends Controller
 		return view('promo', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
         // return view('promo-tweets')->with('title', $title);
     }
-	
+
 	 public function promo_tweets()
     {
 		$title = 'Promo Tweets';
@@ -45,7 +46,7 @@ class CampaignsController extends Controller
 		return view('promo-tweets', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
         // return view('promo-tweets')->with('title', $title);
     }
-	
+
 	 public function evergreen_tweets()
     {
 		$title = 'Evergreen Tweets';
@@ -58,7 +59,7 @@ class CampaignsController extends Controller
 		return view('evergreentweets', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
         // return view('evergreentweets')->with('title', $title)->with('slug', $slug);
     }
-	
+
 	public function tweet_storms()
     {
 		$title = 'Tweet Storms';
@@ -70,7 +71,7 @@ class CampaignsController extends Controller
 		// return view('tweetstorms', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
         return view('tweetstorms')->with('title', $title);
     }
-	
+
 	public function tag_groups()
     {
 		$title = 'Tag Groups';
@@ -82,5 +83,5 @@ class CampaignsController extends Controller
 		return view('tags-groups', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
         // return view('tags-groups')->with('title', $title);
     }
-	
+
 }
