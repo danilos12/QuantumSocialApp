@@ -112,6 +112,7 @@ Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::
 Route::post('/cmd/post/tweet-now',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
 Route::post('/cmd/post/move-to-top',[App\Http\Controllers\CommandmoduleController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
+
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/unselected',[App\Http\Controllers\CommandmoduleController::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
 Route::get('/cmd/{id}/post-type/{type}',[App\Http\Controllers\CommandmoduleController::class, 'getTweetsUsingPostTypes'])->name('cmd.post_type');
@@ -169,9 +170,12 @@ Route::middleware(['web','guest','session_expired'])
     Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
 
 
-    Route::middleware(['member-access'])->group(function(){
-        Route::get('/member/home',function(){
-  
-            return view('membersdashboard');
-        })->name('home');
+
+    Route::middleware('member-access')->group(function(){
+
+        Route::get('/member/home',function(){return view('layouts.membersdashboard');})->name('memberhome');
+        Route::get('/member/promo',function(){return view('promo-tweets');})->name('memberpromo');
+        Route::get('/member/banner',function(){return view('layouts.app');})->name('memberbanner');
+        Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\MemberCommandmodule::class, 'getTagGroups'])->name('cmd.get_tag_groupsmember');
+
     });
