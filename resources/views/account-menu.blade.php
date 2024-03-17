@@ -1,10 +1,7 @@
 
 
 <div class="modal-large-anchor">
-  <div class="modal-large-backdrop">
-
-    <!-- BEGIN SETTINS MENUS -->
-    @include('modals.upgrade')
+  <div class="modal-large-backdrop"> 
 
 
    <div class="add-team-member-modal">
@@ -19,102 +16,72 @@
       </div>
         <!-- BEGIN input copied from engage.html -->
         <div class="global-input-email add-team-fonts ">
-        <form class="global-input-email">
-            <div class="">
-              <div class="w-full font-normal" ><label class="font-normal" for="newuser_fname" >YOU ARE CURRENLY <span id="actionLabel">ADDING</span>:</label></div>
-              <div  id="alertcontainer" style="display: flex;justify-content:center; width:100%;"></div>
-                <div class="w-full">
-                  <div class="w-full " ><label class="font-normal" for="newuser_fname" >FULL NAME</label></div>
+          <form class="global-input-email">
+              <div class="">
+                <div class="w-full font-normal" ><label class="font-normal" for="newuser_fname" >YOU ARE CURRENLY <span id="actionLabel">ADDING</span>:</label></div>
+                <div  id="alertcontainer" style="display: flex;justify-content:center; width:100%;"></div>
+                  <div class="w-full">
+                    <div class="w-full " ><label class="font-normal" for="newuser_fname" >FULL NAME</label></div>
 
-                <input class="h-10 w-full" type="text" placeholder="Name" id="newuser_fname"/>
-                </div>
-                <div class="w-full">
+                  <input class="h-10 w-full" type="text" placeholder="Name" id="newuser_fname"/>
+                  </div>
+                  <div class="w-full">
 
-                    <label class="font-normal" for="newuser_fname ">Email Address</label>
-                    <div id="emailSpan" style="display: none;align-items: center;height: 50px;">
-                      <div class="mr-3"><span id="emailSpansa" class="font-normal" ></span></div>
+                      <label class="font-normal" for="newuser_fname ">Email Address</label>
+                      <div id="emailSpan" style="display: none;align-items: center;height: 50px;">
+                        <div class="mr-3"><span id="emailSpansa" class="font-normal" ></span></div>
 
-                      <div class="w-5 h-5 svgiconhover">
-                        <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                        </svg>
-                        <div class="tooltip-text" id="tooltipText">Verified</div>
+                        <div class="w-5 h-5 svgiconhover">
+                          <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                          </svg>
+                          <div class="tooltip-text" id="tooltipText">Verified</div>
+                        </div>
                       </div>
-                    </div>
 
-                <input class="h-10 w-full" type="text" placeholder="Email" id="newuser_email"/>
+                  <input class="h-10 w-full" type="text" placeholder="Email" id="newuser_email"/>
 
-                </div>
-          </div>
-            <div class="conts">
-              <div class="flex w-full items-center">
-                <div class="flex justify-start items-center" >
-                <label for="toggle_api" class="font-size-base mr-3 font-normal ">GRANT API ACCESS (Allow users to...)</label>
-                <input type="checkbox" class="menu-twirl-toggle " name="grant-api" id="toggle_api" >
-              </div>
-
-              </div>
-
-
-              <div class="conts mb-4">
-                <div class="flex items-center w-full mb-11">
-                    <div class="flex justify-center" style="height: 20px;width:30px;" >
-                      <input style='scale:2.5' type="radio" id="member_role" name="fav_language" value="Member">
-                    </div>
-                <label class="bits font-normal" for="javascript">Team Member (Allows user to schedule posts..)</label>
-              </div>
-              <div class="flex w-full items-center ">
-                <div class="flex justify-center" style="height: 20px;width:30px;" >
-                    <input style="scale:2.5" type="radio" id="admin_role" name="fav_language" value="Admin">
-                </div>
-                <label class="bits font-normal" for="admin_role">Admin (Allows user to add other members)</label>
-              </div>
-
-              </div>
+                  </div>
             </div>
+              <div class="conts">
+                <div class="flex w-full items-center">
+                  <div class="flex justify-start items-center" >
+                  <label for="toggle_api" class="font-size-base mr-3 font-normal ">GRANT API ACCESS (Allow users to...)</label>
+                  <input type="checkbox" class="menu-twirl-toggle " name="grant-api" id="toggle_api" >
+                </div>
+
+                </div>
+
+
+                <div class="conts mb-4">
+                  <div class="flex items-center w-full mb-11">
+                      <div class="flex justify-center" style="height: 20px;width:30px;" >
+                        <input style='scale:2.5' type="radio" id="member_role" name="fav_language" value="Member">
+                      </div>
+                  <label class="bits font-normal" for="javascript">Team Member (Allows user to schedule posts..)</label>
+                </div>
+                <div class="flex w-full items-center ">
+                  <div class="flex justify-center" style="height: 20px;width:30px;" >
+                      <input style="scale:2.5" type="radio" id="admin_role" name="fav_language" value="Admin">
+                  </div>
+                  <label class="bits font-normal" for="admin_role">Admin (Allows user to add other members)</label>
+                </div>
+
+                </div>
+              </div>
 
 
 
 
-        </form>
-        <div class="center-block">
-          <span  class="add-team-button"><span id="labeling">Add</span></span>
-        </div>
+          </form>
+          <div class="center-block">
+            <span  class="add-team-button"><span id="labeling">Add</span></span>
+          </div>
         </div>
         <!-- END copied from engage.html -->
 
     </div>  <!-- END .add-team-member-inner -->
   </div>  <!-- END .add-team-member-modal -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <div class="modal-large-outer main-settings-outer general-settings-outer frosted">
       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" id="general-settings"/>
@@ -150,17 +117,9 @@
                   <span class="settings-item-label">Current Plan</span>
                 </div>  <!-- END .settings-item-label -->
                 <div class="settings-item-data-wrap">
-                  <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : "No" }} Plan</span>
+                  <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
-                </div>  <!-- END .settings-item-data -->
-                <div class="settings-item-data-wrap">
-                  <!-- CARLO - Here's the source for that, which has SQL and Array versions:  https://gist.github.com/nodesocket/3919205 -->
-                  <select name="membership" id="membership" class="time-zone-data">
-                    <option value="free" {{ isset($membership) ? ($membership->subscription_name === "solar") ? "selected" : "" : "" }}>Solar</option>
-                    <option value="galactic" {{ isset($membership) ? ($membership->subscription_name === "galactic") ? "selected" : "" : "" }}>Galactic</option>
-                    <option value="astral" {{ isset($membership) ? ($membership->subscription_name === "astral") ? "selected" : "" : "" }}>Astral</option>
-                  </select>
-                </div>  <!-- END .settings-item-data -->
+                </div>  <!-- END .settings-item-data -->             
               </div>  <!-- END .plan-data-wrap -->
 
               <div class="settings-item-wrap timezone-data-wrap">
@@ -186,7 +145,6 @@
 
         <!--     BEGIN TEAM MEMBERS   -->
         <div class="menu-section-outer team-account-outer">
-
           <div class="menu-section-inner team-account-inner">
             <span class="menu-section-header">Team Members </span>
 
@@ -314,42 +272,48 @@
 
               <!-- START auto-reply -->
               <div class="menu-subTwirl-outer">
-                <div class="subTwirl-header-wrap">
+                <form id="master_api_form">
+                  <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">API Key:</span>
-                </div>
-                <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>
-                </div>
-                <div class="subTwirl-header-wrap">
-                    <span class="subTwirl-header">API Secret:</span>
-                </div>
-                <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
-                </div>
-                <div class="subTwirl-header-wrap">
-                  <span class="subTwirl-header">Bearer Token:</span>
-                </div>
-                <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>
-                </div>
-                <div class="subTwirl-header-wrap">
-                  <span class="subTwirl-header">OAuth 2.0 ID:</span>
-                </div>
-                <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>
-                </div>
-                <div class="subTwirl-header-wrap">
-                  <span class="subTwirl-header">OAuth 2.0 Secret:</span>
-                </div>
-                <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
-                </div>
-                <div class="menu-subTwirl-inner">
-                  <button class="subTwirl-buttons" id="twitter_api_saving" style="margin-top: 0.5em; border: transparent" >
-                        Save API credentials
-                  </button>
-                </div>
-              </div>
+                  </div> 
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>                      
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                      <span class="subTwirl-header">API Secret:</span>
+                  </div> 
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>                     
+                  </div> 
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">Bearer Token:</span>
+                  </div> 
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>                      
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">OAuth 2.0 ID:</span>
+                  </div> 
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>                      
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">OAuth 2.0 Secret:</span>
+                  </div> 
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>                      
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">Callback URL</span>
+                  </div> 
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>                      
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">                        
+                  </div> 
+                </form>                  
+              </div>  
 
               <div class="menu-twirl-option-inner">
                 <div class="menu-twirl-left">

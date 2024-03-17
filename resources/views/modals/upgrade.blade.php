@@ -4,7 +4,7 @@
     }
 
     .modal-large-anchor-upgrade {
-        display: none;
+        display: flex;
         flex-direction: column;
         position: absolute;
         top: 0;
@@ -125,12 +125,24 @@
         text-transform: uppercase;
         font-weight: 600
     }
+
+    .modal-large-outer-upgrade {
+        display: flex;
+        flex-direction: column;
+        background: var(--frost-background);
+        color: var(--body-text);
+        width: 70%;
+        height: 80vh;
+        padding: 2.5em 3em 2.5em;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
 </style>
 
 <div class="modal-large-anchor-upgrade">
     <div class="modal-large-backdrop-upgrade">
-        <div class="modal-large-outer  upgrade-page-outer frosted">
-            <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-upgrade-page" id="upgrade-page"/>
+        <div class="modal-large-outer-upgrade  upgrade-page-outer frosted">
+            <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-upgrade-page"/>
 
             <div class="account-settings-header-wrap">
                 <img src="{{ asset('public/')}}/ui-images/logo/quantum-logo-white-lg.png" width="auto" height="50">
@@ -138,9 +150,14 @@
             {{-- <div data-form-url="{{ route('save-settings') }}" data-twitterid=" {{ isset($user) ? $user->twitter_id : " " }}" id="help-settings"></div> --}}
 
             <div class="main-container">
-                <h1 class="header">Choose your plan</h1>
-                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>
-
+                @if (Auth::guard('member')->check()) 
+                <h1 class="header">Member</h1>
+                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>                           
+                @else 
+                <h1 class="header">Account owner</h1>
+                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>                           
+                @endif 
+                
 
                 <div class="card-container">
                     <div class="card">
@@ -156,7 +173,9 @@
                             <div class="feature-item">3</div>
                             <div class="feature-item">4</div>
                         </div>
-                        <input type="button" class="card-cta" value="Upgrade" data-product-id="61">
+                        @if (Auth::guard('web')->check())                         
+                        <input type="button" class="card-cta" value="{{ ($product_id === 61) ? "Your Plan" : "Upgrade Now" }}" data-product-id="61" {{ ($product_id === 61) ? 'disabled' : "" }} >
+                        @endif
                     </div>
                     <div class="card">
                         <div class="card-header">Galactic</div>
@@ -171,7 +190,9 @@
                             <div class="feature-item">3</div>
                             <div class="feature-item">4</div>
                         </div>
-                        <input type="button" class="card-cta" value="Upgrade" data-product-id="62">
+                        @if (Auth::guard('web')->check()) 
+                        <input type="button" class="card-cta" value="{{ ($product_id === 62) ? "Your Plan" : "Upgrade Now" }}" data-product-id="62" {{ ($product_id === 62) ? 'disabled' : "" }} >
+                        @endif
                     </div>
                     <div class="card">
                         <div class="card-header">Astral</div>
@@ -186,7 +207,9 @@
                             <div class="feature-item">3</div>
                             <div class="feature-item">4</div>
                         </div>
-                        <input type="button" class="card-cta" value="Upgrade" data-product-id="63">
+                        @if (Auth::guard('web')->check()) 
+                        <input type="button" class="card-cta" value="{{ ($product_id === 63) ? "Your Plan" : "Upgrade Now" }}" data-product-id="63" {{ ($product_id === 63) ? 'disabled' : "" }} >
+                        @endif
                     </div>
                 </div>
             </div>
@@ -196,9 +219,6 @@
     </div>
 </div>
 
-<style>
-   /* .general-settings-outer, .twitter-settings-outer, .command-module-outer {display: none;} */
-</style>
 <script>
     $(document).ready(function(e) {
         // $('upgrade-outer-page').closest('.modal-large-outer').attr('style', '')
@@ -214,7 +234,6 @@
             var uri =  "{{  basename($_SERVER['REQUEST_URI']) }}";
 
             $('.upgrade').attr('style', 'z-index:0');
-            $('.modal-large-anchor-upgrade').attr('style', 'display: none');
             $('.modal-large-anchor-upgrade').attr('style', 'display: none');
 
             if (uri === "bulk-queue" || uri === "bulk") {
