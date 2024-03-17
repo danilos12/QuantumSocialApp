@@ -165,7 +165,8 @@ class AppServiceProvider extends ServiceProvider
                     // dd($hasRegularTweetsInQueue);
                 $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
 
-
+                $checkRole = MembershipHelper::tier(Auth::id());     
+                $view->with('product_id', $checkRole->subscription_id);
 
 
                 $hasCustomSlot = DB::table('schedule')
