@@ -200,7 +200,7 @@ div[data-schedule="none"] {
 
       <div class="posting-tool-submit-wrap">
         <div class="post-tool-submit-left">
-        <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
+          <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
             <option disabled selected value="save-draft" id="mainselect">Select a scheduling method...</option>
             <!-- <option value="add-queue">Add to Queue (default)</option> -->
             @if ($hasRegularTweetsInQueue)
@@ -216,7 +216,7 @@ div[data-schedule="none"] {
             @if ($hasRegularTweetsInQueue)
                 <option value="rush-queue">Rush In Queue</option>
             @endif
-        </select>
+          </select>
           <div class="scheduling-details">
             <div class="scheduling-details-countdown sop" id="scheduling-method-set-countdown" data-schedule="none" data-name="set-countdown" name="scheduling-method">                                                                                                                                                                                                      
             </div>  <!-- END .scheduling-details-countdown -->
@@ -234,3 +234,8 @@ div[data-schedule="none"] {
 
   </div>  <!-- END .posting-tool-inner -->
 </div>  <!-- END .posting-tool-outer -->
+<style>
+  .scheduling-details {
+    display: none;
+  }  
+</style>
