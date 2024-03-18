@@ -181,23 +181,17 @@ class GeneralSettingController extends Controller
 
     public function twitterApiCredentials(Request $request, $id) {
         try {
-            $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => Auth::user()->id]);
+            $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => Auth::id()]);
 
-            if ($api->exists) {
-                $api->user_id = Auth::id();
-                $api->api_key = $request->input('api_key');
-                $api->api_secret = $request->input('api_secret');
-                $api->bearer_token = $request->input('bearer_token');
-                $api->oauth_id = $request->input('oauth_id');
-                $api->oauth_secret = $request->input('oauth_secret');
-                $api->save();
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are succesfully updated']);
+            if ($api) {
+                $api->update($request->all());
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully updated']);
             } else {
                 $api = new MasterTwitterApiCredentials($request->all());
                 $api->user_id = Auth::id();
                 $api->save();
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
-            }
+            }            
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
