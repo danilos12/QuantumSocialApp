@@ -126,13 +126,14 @@
         font-weight: 600
     }
 
-    .modal-large-outer-upgrade {
-        display: flex;
+    .modal-large-outer-upgrade 
+    {         
+        display: flex;     
         flex-direction: column;
-        background: var(--frost-background);
+        /* background: var(--frost-background); */
         color: var(--body-text);
-        width: 70%;
-        height: 80vh;
+        /* width: 70%; */
+        /* height: 80vh; */
         padding: 2.5em 3em 2.5em;
         border-radius: 10px;
         box-sizing: border-box;
@@ -150,11 +151,11 @@
             {{-- <div data-form-url="{{ route('save-settings') }}" data-twitterid=" {{ isset($user) ? $user->twitter_id : " " }}" id="help-settings"></div> --}}
 
             <div class="main-container">
-                @if (Auth::guard('member')->check()) 
-                <h1 class="header">Member</h1>
+                @if (Auth::guard('web')->check()) 
+                <h1 class="header">Account owner</h1>
                 <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>                           
                 @else 
-                <h1 class="header">Account owner</h1>
+                <h1 class="header">Member</h1>
                 <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>                           
                 @endif 
                 

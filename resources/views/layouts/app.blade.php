@@ -64,7 +64,7 @@
     <div class="interface-inner">
 		  <div class="banner-outer">
         <div class="banner-inner">
-          <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-Horizontal-white.svg" class="image-placeholder" height="100%" />
+          <img src="{{ asset('public/')}}/ui-images/logo/light-mode-logo.svg" class="image-placeholder" height="100%" alt="Quantum Social Logo" id="app-logo" />
 
           <!-- Authentication Links -->
           @if (Route::has('login'))
