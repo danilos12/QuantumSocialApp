@@ -547,6 +547,7 @@ $(function ($) {
         var sopp = "";
         console.log(option);
         $(".scheduling-details").html();
+        $(".scheduling-details").css('display', 'block');
 
         // $('div[name="scheduling-method"]').filter('div[data-name!="' + option + '"]').attr("data-schedule", "none");
         // $(".date-picker-wrapper").empty()
