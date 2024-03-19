@@ -1,7 +1,7 @@
 
 
 <div class="modal-large-anchor">
-  <div class="modal-large-backdrop"> 
+  <div class="modal-large-backdrop">
 
 
    <div class="add-team-member-modal">
@@ -119,7 +119,7 @@
                 <div class="settings-item-data-wrap">
                   <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
-                </div>  <!-- END .settings-item-data -->             
+                </div>  <!-- END .settings-item-data -->
               </div>  <!-- END .plan-data-wrap -->
 
               <div class="settings-item-wrap timezone-data-wrap">
@@ -275,45 +275,45 @@
                 <form id="master_api_form">
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">API Key:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>                      
+                    <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">API Secret:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>                     
-                  </div> 
+                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
+                  </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">Bearer Token:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>                      
+                    <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">OAuth 2.0 ID:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>                      
+                    <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">OAuth 2.0 Secret:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>                      
+                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">Callback URL</span>
-                  </div> 
-                  <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>                      
                   </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">                        
-                  </div> 
-                </form>                  
-              </div>  
+                    <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
+                  </div>
+                </form>
+              </div>
 
               <div class="menu-twirl-option-inner">
                 <div class="menu-twirl-left">
