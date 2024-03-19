@@ -20,7 +20,7 @@ class MemberAuth
         $user = Auth::guard('member')->user();
 
         // Check if the user has the role 'Member'
-        if ($user && $user->role === 'Member') {
+        if ($user && $user->role === 'Member'||$user && $user->role === 'Admin') {
             return $next($request);
         }
 

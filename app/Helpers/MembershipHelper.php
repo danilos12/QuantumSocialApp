@@ -15,9 +15,18 @@ use Illuminate\Support\Facades\DB;
 class MembershipHelper
 {
     public static function tier($id) {
+            $userid;
+        if(Auth::check()){
+            $userid = Auth::id();
+        }elseif(Auth::guard('member')->user()->role === 'Admin'){
+            $userid =  self::membercurrent();
+
+        }
+
+
         $subscription = DB::table('users_meta')
             ->join('plans', 'users_meta.subscription_id', 'plans.subscription_id')
-            ->where('users_meta.user_id', Auth::id())
+            ->where('users_meta.user_id',$userid)
             ->first();
 
         return $subscription;

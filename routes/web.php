@@ -190,7 +190,8 @@ Route::middleware(['web','guest','session_expired'])
 
     Route::middleware('member-access')->group(function(){
 
-        Route::get('/member/home',function(){return view('layouts.membersdashboard');})->name('memberhome');
+        Route::get('/member/home',function()
+        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome');
         Route::get('/member/promo',function(){return view('promo-tweets');})->name('memberpromo');
         Route::get('/member/banner',function(){return view('layouts.app');})->name('memberbanner');
 
@@ -229,6 +230,6 @@ Route::middleware(['web','guest','session_expired'])
         Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_deleteMember'])->name('member.delete');
         Route::post('/settings/members/_apiaccess', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_apiaccess'])->name('member.apiaccess');
         Route::post('/settings/members/_adminaccess', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_adminaccess'])->name('member.adminaccess');
-
-
+        // member posting controller
+        Route::get('/member/schedule', [App\Http\Controllers\MemberController\MemberPosting::class, 'slot_scheduler'])->name('slot-scheduler');
     });

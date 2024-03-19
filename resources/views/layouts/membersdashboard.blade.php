@@ -206,7 +206,7 @@
     </div>  <!-- END .interface-inner -->
   </div>  <!-- END .interface-outer -->
 	@if (Route::has('login'))
-	  @auth
+	  @auth('member')
       @if ($title == 'Slot Scheduler')
       <div class="new-slot-anchor">
         <div class="new-slot-overlay">
