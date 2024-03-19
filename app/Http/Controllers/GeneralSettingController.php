@@ -36,6 +36,7 @@ class GeneralSettingController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('member-access')->only('addNewMember');
     }
 
 
@@ -191,7 +192,7 @@ class GeneralSettingController extends Controller
                 $api->user_id = Auth::id();
                 $api->save();
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
-            }            
+            }
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
