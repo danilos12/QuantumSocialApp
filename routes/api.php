@@ -9,7 +9,7 @@ use App\Models\QuantumAcctMeta;
 
 // use DateTime;
 // use DateTimeZone;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -30,21 +30,21 @@ use Illuminate\Support\Facades\DB;
 Route::get('update-wp', function () {
 	$r = $_REQUEST;
 	if(isset( $r['wp_user_id'] ) ) {
-		
+
 		DB::table('app_usermeta')->updateOrInsert(
         ['user_id' => $r['wp_user_id'], 'meta_key' => 'id_subscription'],
         ['meta_value' => $r['membership_plan_id']]
 		);
-		
+
 		DB::table('app_usermeta')->updateOrInsert(
         ['user_id' => $r['wp_user_id'], 'meta_key' => 'wp_subscription'],
         ['meta_value' => $r['name_subscription']]
 		);
-		
+
 		return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
-		
+
 	}
-	
+
 });
 
 Route::get('wp', function () {
@@ -68,7 +68,6 @@ Route::get('wp', function () {
 						['user_id' => $user->id, 'meta_key' => 'id_subscription', 'meta_value' => $r['wp_subscription']],
 						['user_id' => $user->id, 'meta_key' => 'wp_subscription', 'meta_value' => $r['name_subscription']],
 					]);
-					
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
 			} else {
