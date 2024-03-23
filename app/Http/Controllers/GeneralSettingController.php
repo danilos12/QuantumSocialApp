@@ -7,7 +7,7 @@ use Swift_TransportException;
 use Illuminate\Support\Facades\Log;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
-
+use App\Helpers\MembershipHelper;
 use App\Models\TwitterSettings;
 use App\Models\TwitterSettingsMeta;
 use App\Models\GeneralSettings;
@@ -33,12 +33,32 @@ class GeneralSettingController extends Controller
      *
      * @return void
      */
+    protected $defaultid;
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('member-access')->only('addNewMember');
+        if (Auth::guard('web')->check()) {
+            $this->middleware('auth');
+
+        }
+        if(Auth::guard('member')->check()) {
+
+            $this->middleware('member-access');
+
+
+        }
+
+
     }
 
+    protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
+    }
 
     public function saveSettings(Request $request) {
 
@@ -182,17 +202,26 @@ class GeneralSettingController extends Controller
 
     public function twitterApiCredentials(Request $request, $id) {
         try {
-            $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => Auth::id()]);
+
+
+
+                $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => $this->setDefaultId()]);
+
+
+            if(Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1) ){
 
             if ($api) {
                 $api->update($request->all());
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully updated']);
+                return response()->json(['status' => 200, 'stat' => 'success' ,'message' => 'Master API Credentials are successfully updated']);
             } else {
                 $api = new MasterTwitterApiCredentials($request->all());
                 $api->user_id = Auth::id();
                 $api->save();
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
             }
+        }else{
+            return response()->json([ 'stat' => 'danger', 'message' => 'You are not allowed to modify this']);
+        }
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
@@ -312,7 +341,10 @@ class GeneralSettingController extends Controller
         try {
 
             // Your existing code for adding a new member and sending an email goes here...
-            $userId = Auth::id();
+            if( Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
+                $userId = $this->setDefaultId();
+
+                $html = view('modals.upgrade')->render();
 
             // Retrieve the subscription status from the users_meta table
             $subscription = DB::table('users_meta')
@@ -351,7 +383,7 @@ class GeneralSettingController extends Controller
                 $hasaccess= false;
             }
             $relational = [
-                'account_holder_id' => Auth::id(),
+                'account_holder_id' => $userId,
                 'fullname' => $request->input('fullname'),
                 'email' => $request->input('emails'),
                 'role' => $request->input('roles'),
@@ -389,7 +421,7 @@ class GeneralSettingController extends Controller
                     }
 
         }  else{
-            return response()->json(['message' => 'You have exceeded the numbers of member/admin', 'stat' => 'warning']);
+            return response()->json(['stat' => 'warning','status' => 403, 'message' => 'You have exceeded the numbers of member/admin', 'html' => $html]);
         }
 }
 
@@ -423,8 +455,10 @@ if ($subs_id == 2 ) {
                 }
 
         }else{
-            return response()->json(['message' => 'You have exceeded the numbers of member/admin', 'stat' => 'warning']);
-    }
+
+            return response()->json(['stat' => 'warning','status' => 403, 'message' => 'You have exceeded the numbers of member/admin', 'html' => $html]);
+
+        }
 }
 
 
@@ -458,26 +492,37 @@ if ($subs_id == 2 ) {
 
         }else
         {
-            return response()->json(['message' => 'You have exceeded the numbers of member/admin', 'stat' => 'warning']);
+
+            return response()->json(['stat' => 'warning','status' => 403, 'message' => 'You have exceeded the numbers of member/admin', 'html' => $html]);
+
         }
 }
 
 // end of astral
-
+        }else{
+            return response()->json(['message' => 'You are not allowed to add members please ask permission to owner', 'stat' => 'warning']);
+        }
         } catch (Swift_TransportException $e) {
             // Handle the Swift_TransportException
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
 }
     public function _getedit(Request $request){
+
+
+
           $getMember =  DB::table('members')
                 ->select('fullname as skla','email as komgks','role as lokei','api_access as kolaj','isverified as ldrof')
                 ->where('id', $request->input('edit_id'))
                 ->first();
 
 
-        return response()->json(['server'=>$getMember,'message' => $request->input('edit_id'), 'stat' => 'warning']);
-    }
+            return response()->json(['server'=>$getMember,'message' => $request->input('edit_id'), 'stat' => 'warning']);
+
+
+
+
+}
 
 
 
@@ -501,6 +546,9 @@ if ($subs_id == 2 ) {
     }
 
     public function _editMember(Request $request) {
+
+        if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
+
 
         $editdataverified = [
             'fullname'=>$request->input('fullname'),
@@ -528,8 +576,11 @@ if ($subs_id == 2 ) {
 
             return response()->json(['stat'=> 'warning','status_m'=>'Warning!', 'message' => 'Member is not updated'],422);
         }
-
+    }else{
+        return response()->json(['status_m'=>'Warning!', 'stat'=> 'warning', 'message' => 'You are not allowed to edit the member, please ask permission to owner']);
     }
+
+}
 
 
 
@@ -562,14 +613,19 @@ if ($subs_id == 2 ) {
 
     public function _deleteMember($id) {
         try {
+            if(Auth::guard('web')->check()|| Auth::guard('member')->user()->admin_access == 1){
+
+
             $deleteUser = DB::table('members')->where('id', $id)->delete();
 
             if ($deleteUser) {
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Member deleted successfully.']);
             } else {
-                return response()->json(['status' => 200, 'stat' => 'danger', 'message' => 'Member is not deleted successfully.']);
+                return response()->json(['status' => 200, 'stat' => 'warning', 'message' => 'Member is not deleted successfully.']);
             }
-
+        }else{
+            return response()->json(['status' => 200, 'stat' => 'warning', 'message' => 'You are not allowed to delete this member']);
+        }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
@@ -579,17 +635,20 @@ if ($subs_id == 2 ) {
         }
     }
     public function _apiaccess(Request $request){
-
-
         try {
+
+        if(Auth::guard('web')->check()||Auth::guard('member')->user()->admin_access == 1){
+
             $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['api_access' => $request->input('api_access')]);
 
             if ($apiaccess && $request->input('api_access')=== true) {
                 return response()->json(['stat' => 'success', 'message' => 'Member is allowed to access api']);
             } else {
-                return response()->json(['stat' => 'warning', 'message' => 'Member is not allowed to access api']);
+                return response()->json(['stat' => 'success', 'message' => 'Member is not allowed to access api']);
             }
-
+        }else{
+            return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to update this please ask permission to owner']);
+        }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
@@ -602,14 +661,19 @@ if ($subs_id == 2 ) {
 
 
         try {
+            if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
+
+
             $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['admin_access' => $request->input('admin_access')]);
 
-            if ($apiaccess && $request->input('admin_access')=== true) {
+            if ($apiaccess && $request->input('admin_access') === true) {
                 return response()->json(['stat' => 'success', 'message' => 'Admin Access Successful']);
             } else {
-                return response()->json(['stat' => 'warning', 'message' => 'Admin Access not Allowed']);
+                return response()->json(['stat' => 'success', 'message' => 'Admin Access is now updated']);
             }
-
+        }else{
+            return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to modify this']);
+        }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();

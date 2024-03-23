@@ -21,6 +21,22 @@ Route::get('/', function () {
 });
 */
 
+
+
+
+
+Route::get('/login/member', function () {
+    // Redirect authenticated users to member home
+    if(Auth::guard('member')->check()) {
+        return redirect()->route('memberhome');
+    }
+    return view('auth.memberlogin');
+})->name('tomemberauth');
+
+Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
+Route::post('/logout/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'logout'])->name('memberlogout');
+
+
 Auth::routes();
 
 
@@ -94,7 +110,7 @@ Route::get('/user-lists', [App\Http\Controllers\EngagementController::class, 'c_
 Route::get('/hashtag-feeds', [App\Http\Controllers\EngagementController::class, 'c_hashtag_feeds'])->name('social-hashtag-feeds');
 Route::get('/trending', [App\Http\Controllers\TrendingtopicsController::class, 'index'])->name('trending-topics');
 
-// twitter API
+// twitter API/twitter/redirect/
 Route::get('/twitter/redirect/{id}', [App\Http\Controllers\Controller::class, 'checkTwitterCreds']);
 Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOAuthCallback']);
 Route::get('/post/popup',[App\Http\Controllers\Controller::class, 'modalPopup'])->name('modal');
@@ -123,7 +139,7 @@ Route::get('/settings/twitter_toggle', [App\Http\Controllers\GeneralSettingContr
 Route::get('/settings/twitter_form', [App\Http\Controllers\GeneralSettingController::class, 'getTwitterForm'])->name('twitter_form');
 Route::post('/settings/twitter_api/save/{twitter_id}', [App\Http\Controllers\GeneralSettingController::class, 'saveTwitterApi'])->name('twitter_api.save');
 Route::get('/settings/members', [App\Http\Controllers\GeneralSettingController::class, 'fetchMembers']);
-Route::post('/settings/_add_new', [App\Http\Controllers\GeneralSettingController::class, 'addNewMember'])->name('member.add')->middleware('auth');
+Route::post('/settings/_add_new', [App\Http\Controllers\GeneralSettingController::class, 'addNewMember'])->name('member.add');
 Route::post('/settings/members/_edit', [App\Http\Controllers\GeneralSettingController::class, '_editMember'])->name('member.edit');
 Route::post('/settings/members/_getedit', [App\Http\Controllers\GeneralSettingController::class, '_getedit'])->name('get.edit');
 Route::post('/settings/members/_update/{id}', [App\Http\Controllers\GeneralSettingController::class, '_updateMember'])->name('member.edit');
@@ -184,52 +200,23 @@ Route::middleware(['web','guest','session_expired'])
 
 
 
-    Route::get('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'showLoginForm'])->name('tomemberauth');
-    Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
+
+
+
 
 
     Route::middleware('member-access')->group(function(){
 
         Route::get('/member/home',function()
         {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome');
-        Route::get('/member/promo',function(){return view('promo-tweets');})->name('memberpromo');
+        Route::get('/member/promo',function(){
+
+            return view('promo-tweets')->with('title','Promo');});
         Route::get('/member/banner',function(){return view('layouts.app');})->name('memberbanner');
 
-        // member command module class
-        Route::get('/command-module', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'index'])->name('command-module');
-        Route::post('/cmd/save', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'create'])->name('cmd.save');
-        Route::post('/cmd/add-tag', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'addTagGroup'])->name('cmd.add_tag');
-        Route::post('/cmd/add-tag-item', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'addTagItem'])->name('cmd.add_tag_item');
-        Route::post('/cmd/post/tweet-now',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'postNowFromQueue'])->name('post.tweet');
-        Route::post('/cmd/post/move-to-top',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'moveTopFromQueue'])->name('post.move');
-        Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getTagGroups'])->name('cmd.get_tag_groups');
-        Route::post('/bulk/upload', [App\Http\Controllers\MemberController\MemberCommandmodule::class, 'upload'])->name('bulk-upload');
-        Route::get('/cmd/get-tag-items',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getTagItems'])->name('cmd.get_tag_items');
-        Route::get('/cmd/{id}/post-type/{type}',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getTweetsUsingPostTypes'])->name('cmd.post_type');
-        Route::get('/cmd/get-custom-slot',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getCustomSlot'])->name('cmd.get-custom-slot');
-        Route::get('/cmd/unselected',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getUnselectedTwitterAccounts'])->name('cmd.unused');
-        Route::post('/reload-meta/scrape',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'scrapeMeta'])->name('scrape');
-        Route::get('/promos/get/{id}',[App\Http\Controllers\MemberController\MemberCommandmodule::class, 'getPromos'])->name('promos.get');
 
 
 
-        // member general settings
-        Route::post('/settings', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'saveSettings'])->name('save-settings');
-        Route::post('/settings/twitter_api_creds/{user_id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'twitterApiCredentials'])->name('api_settings');
-        Route::post('/settings/timezone/{user_id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'timezoneSettings'])->name('timezone');
-        Route::post('/settings/membership/{user_id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'membershipSettings'])->name('membership');
-        Route::post('/settings/twitter_meta/{twitter_id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'twitterSettingsMeta'])->name('twitter_settings_meta');
-        Route::get('/settings/twitter_toggle', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'generalAndTwitterSettings'])->name('twitter_toggle');
-        Route::get('/settings/twitter_form', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'getTwitterForm'])->name('twitter_form');
-        Route::post('/settings/twitter_api/save/{twitter_id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'saveTwitterApi'])->name('twitter_api.save');
-        Route::get('/settings/members', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'fetchMembers']);
-        Route::post('/settings/_add_new', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, 'addNewMember'])->name('member.add');
-        Route::post('/settings/members/_edit', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_editMember'])->name('member.edit');
-        Route::post('/settings/members/_getedit', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_getedit'])->name('get.edit');
-        Route::post('/settings/members/_update/{id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_updateMember'])->name('member.edit');
-        Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_deleteMember'])->name('member.delete');
-        Route::post('/settings/members/_apiaccess', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_apiaccess'])->name('member.apiaccess');
-        Route::post('/settings/members/_adminaccess', [App\Http\Controllers\MemberController\MemberGeneralSettings::class, '_adminaccess'])->name('member.adminaccess');
-        // member posting controller
-        Route::get('/member/schedule', [App\Http\Controllers\MemberController\MemberPosting::class, 'slot_scheduler'])->name('slot-scheduler');
+
+
     });

@@ -23,20 +23,36 @@ use Exception;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    // if(Auth::guard('member')->user()->admin_access == 1){
+    // }else{
+    //             return response()->json(['stat' => 'warning', 'error' => $trace, 'message' => 'You are not allowed to add twitter account, please ask permission to the owner']);
+    //         }
 
+    protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
+    }
     // Step 1 (Redirect to Authorize)
     public function checkTwitterCreds(Request $request, $id) {
 
-        $checkRole = MembershipHelper::tier($id);
+        if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
+        $checkRole = MembershipHelper::tier($this->setDefaultId());
 
         $twitterCount = DB::table('twitter_accts')
-            ->where('user_id', $id)
+            ->where('user_id', $this->setDefaultId())
             ->count();
+
+
 
         if ($checkRole->member_count > $twitterCount) {
 
             try {
-                $findCred = MasterTwitterApiCredentials::where('user_id', $id)->first();
+                $findCred = MasterTwitterApiCredentials::where('user_id', $this->setDefaultId())->first();
 
                 if ($findCred) {
                     $url = $this->twitterOAuth($findCred->oauth_id);
@@ -61,21 +77,20 @@ class Controller extends BaseController
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
 
+    }else{
+        return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to add twitter account, please ask permission to the owner']);
+    }
+
     }
 
      // Authorized
     public function twitterOAuth($twitterClientId) {
-        if(Auth::guard('member')->user()->role === 'Admin'){
-            $userid =  MembershipHelper::membercurrent();
-        }else{
 
-            $userid = Auth::id();
-        }
         // create an authorized URL
         $url = $this->buildAuthorizedURL("https://twitter.com/i/oauth2/authorize", [
             'response_type' => 'code',
             'client_id' => $twitterClientId,
-            'redirect_uri' => TwitterHelper::getActiveAPI($userid)->callback_url,
+            'redirect_uri' => TwitterHelper::getActiveAPI($this->setDefaultId())->callback_url,
             'scope' => 'tweet.read users.read follows.read follows.write tweet.write offline.access'
         ]);
 
@@ -92,12 +107,10 @@ class Controller extends BaseController
             //     return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
 
             // } else {
-                if(Auth::guard('member')->user()->role === 'Admin'){
-                    $userid =  self::membercurrent();
-                }else{
 
-                    $userid = Auth::id();
-                }
+
+                    $userid =  $this->setDefaultId();
+
 
                 $codeVerifier = session()->get('code_verifier');
 
@@ -151,7 +164,7 @@ class Controller extends BaseController
                     $selectedAcct = UT_AcctMngt::firstOrCreate([
                         'user_id' => $userid,
                         'twitter_id' => $twitterId->id,
-                        'selected' => Twitter::where('user_id', Auth::id())->count() === 1 ? 1 : 0
+                        'selected' => Twitter::where('user_id', $userid)->count() === 1 ? 1 : 0
                     ]);
 
                     TwitterSettings::create([
@@ -185,7 +198,7 @@ class Controller extends BaseController
                         'text_ender_dm' => 'For more great content please follow me @' . $twitterId->id,
                     ]);
 
-                    session()->put('id', Auth::id());
+                    session()->put('id', $this->setDefaultId());
 
                     if ($saveToken && $selectedAcct) {
                         return redirect('profile')->with('success', 'Twitter info and access token saved successfully!');
@@ -289,7 +302,11 @@ class Controller extends BaseController
             $data = json_decode($response);
             return $data;
         } else {
-            return curl_error($curl);
+            if (is_string($response)) {
+                return ['error' => $response];
+            } else {
+                return ['error' => 'Unknown error occurred'];
+            }
         }
 
     }

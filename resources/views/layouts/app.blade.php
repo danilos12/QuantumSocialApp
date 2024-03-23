@@ -68,7 +68,7 @@
 
           <!-- Authentication Links -->
           @if (Route::has('login'))
-            @auth
+            @auth('web')
             <div class="banner-twitter-profile-wrap">
               <a href="#">
                 <div class="banner-twitter-profile-inner">

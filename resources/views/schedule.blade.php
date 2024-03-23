@@ -1,9 +1,15 @@
 
 
 
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
 
+@if($layout)
+    @extends($layout)
+@endif
 
-    @extends('layouts.app')
 
 
 @section('content')

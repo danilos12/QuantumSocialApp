@@ -35,7 +35,26 @@ class CommandmoduleController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        if (Auth::guard('web')->check()) {
+            $this->middleware('auth');
+
+        }
+        if(Auth::guard('member')->check()) {
+
+            $this->middleware('member-access');
+
+
+        }
+    }
+
+    protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
     }
 
     /**
@@ -57,18 +76,18 @@ class CommandmoduleController extends Controller
 
     public function create(Request $request) {
 
-        $checkRole = MembershipHelper::tier(Auth::id());
+        $checkRole = MembershipHelper::tier($this->setDefaultId());
 
         // Check the count of posts in the database for your subscription
         $postCount = DB::table('posts')
-            ->where('user_id', Auth::id())
+            ->where('user_id', $this->setDefaultId())
             ->count();
 
         // Add the limitation: run the code only if the count of posts is less than 5
         if ($checkRole->mo_post_credits > $postCount) {
             try {
                 $postData = $request->input('formData');
-                $user_id = Auth::id();
+                $user_id = $this->setDefaultId();
                 $main_twitter_id = $postData['twitter_id'];
                 $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
                 // $twitterMeta = $getToken->toArray();
@@ -76,7 +95,7 @@ class CommandmoduleController extends Controller
                 $utc = TwitterHelper::now($user_id);
                 $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
                 $tweet_id = basename(parse_url($url, PHP_URL_PATH));
-                $checkToggle = QuantumAcctMeta::where('user_id', Auth::id())->first();
+                $checkToggle = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
                 $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
                 $sched_method = null;
                 $sched_time = $utc->format('Y-m-d H:i:s');
@@ -141,7 +160,7 @@ class CommandmoduleController extends Controller
                             break;
 
                         case 'custom-slot':
-                            $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));
+                            $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone($this->setDefaultId()));
                             $sched_time = $date;
                             break;
 
@@ -385,8 +404,8 @@ class CommandmoduleController extends Controller
                                 ->groupBy('post_type_code');
                             })
                             ->where('twitter_id', $id)
-                            ->where('user_id', Auth::id())
-                            ->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
+                            ->where('user_id', $this->setDefaultId())
+                            ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
                             ->when($type, function ($query) use ($type, $request) {
@@ -402,7 +421,7 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_method', 'DESC')
                             ->get();
 
-                    $schedules = Schedule::where('user_id', Auth::id())->get();
+                    $schedules = Schedule::where('user_id', $this->setDefaultId())->get();
 
                     $recurringDates = [];
                     $r = [];
@@ -472,7 +491,7 @@ class CommandmoduleController extends Controller
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','evergreen-tweets')
                         // ->where('active', $checkToggle->queue_switch)
-                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
+                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->orderBy('updated_at', 'ASC')
@@ -491,7 +510,7 @@ class CommandmoduleController extends Controller
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','promos-tweets')
                         // ->where('active', $checkToggle->queue_switch)
-                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(Auth::id()))
+                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->orderBy('updated_at', 'ASC')
@@ -508,7 +527,7 @@ class CommandmoduleController extends Controller
                             ->groupBy('post_type_code');
                         })
                         ->where('twitter_id', $id)
-                        ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                        ->where('sched_time', '>', TwitterHelper::now($this->setDefaultId()))
                         ->where('post_type', '=','tweet-storm-tweets')
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -529,7 +548,7 @@ class CommandmoduleController extends Controller
                         )
                         ->where([
                             ['bulk_post.twitter_id', '=', $id],
-                            ['bulk_post.user_id', '=', Auth::id()],
+                            ['bulk_post.user_id', '=', $this->setDefaultId()],
                             ['bulk_post.post_type', '=', 'regular-tweets'],
                             ['bulk_post.sched_method', '=', 'bulk-queue']
                         ])

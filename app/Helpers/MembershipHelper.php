@@ -16,7 +16,7 @@ class MembershipHelper
 {
     public static function tier($id) {
             $userid;
-        if(Auth::check()){
+        if(Auth::guard('web')->check()){
             $userid = Auth::id();
         }elseif(Auth::guard('member')->user()->role === 'Admin'){
             $userid =  self::membercurrent();
@@ -57,4 +57,5 @@ class MembershipHelper
 
         return $acctemail;
     }
+
 }
