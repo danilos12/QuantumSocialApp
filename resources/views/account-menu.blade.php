@@ -148,7 +148,7 @@
           <div class="menu-section-inner team-account-inner">
             <span class="menu-section-header">Team Members </span>
 
-              @if ($cntmembers > 0)
+              {{-- @if ($cntmembers > 0) --}}
                 @foreach($team_members as $member)
                   <div class="menu-team-account-outer">
                     <div class="menu-team-account-inner">
@@ -157,9 +157,19 @@
 
                         <div class="global-team-profile-header">
                         <div class="global-profile-details">
-                            <div class="global-profile-name">
+                            <div class="global-profile-name flex">
+
                             <a href="#">
-                            {{$member->fullname}}</a>
+                            {{$member->fullname}}
+                            @auth('member')
+                            @if(Auth::guard('member')->user()->id == $member->id)
+                             (You)
+                             @else
+
+                            @endif
+                            @endauth
+                            </a>
+
                             </div>  <!-- END .global-profile-name -->
                             <div class="global-profile-subdata">
                             <span class="global-profile-email">
@@ -167,7 +177,17 @@
                               </span>
                             </div>  <!-- END .global-post-date-wrap -->
                         </div>  <!-- END .global-team-profile-details -->
-                        </div>  <!-- END .global-team-profile-header -->
+                        </div>
+
+                        @auth('member')
+
+
+                        <!-- END .global-team-profile-header -->
+                        @if(Auth::guard('member')->user()->id == $member->id)
+
+
+
+                        @else
 
                         <div class="menu-social-account-options">
                           <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
@@ -179,7 +199,7 @@
                             <div class="">
 
 
-                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_api-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
 
 
                               </div>
@@ -201,12 +221,55 @@
                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img editing" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->id }}"/>
                               <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img deleting" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->id }}" />
                           </span>
-                        </div>  <!-- END .menu-social-account-options -->
+                        </div>
+                          <!-- END .menu-social-account-options -->
+                        @endif
+                        @endauth
+                        @auth('web')
 
+
+
+
+                        <div class="menu-social-account-options">
+                          <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+
+                          <div class="childs-cont-2">
+                            <p class="childs-cont-p">ADMIN ACCESS</p>
+                            <p class="switchtexton">On</p>
+                            <p class="switchtextoff">Off</p>
+                            <div class="">
+
+
+                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+
+
+                              </div>
+                          </div>
+
+                          <div class="childs-cont">
+
+                            <p class="childs-cont-p">API ACCESS</p>
+                            <p class="switchtexton">On</p>
+                            <p class="switchtextoff">Off</p>
+                            <div class="">
+
+                            <input  type="checkbox" class="menu-twirl-toggle forchecked apiaccess" name="grant-api-access" id="toggle_api-{{$member->id}}" <?php echo $member->api_access == 1 ? 'checked' :'';?>>
+                          </div>
+                          </div>
+
+
+                          <span class="menu-account-icons">
+                           <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img editing" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->id }}"/>
+                              <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img deleting" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->id }}" />
+                          </span>
+                        </div>
+                          <!-- END .menu-social-account-options -->
+
+                        @endauth
                     </div>  <!-- END .menu-social-account-inner -->
                   </div>  <!-- END .menu-social-account-outer -->
                 @endforeach
-              @enderror
+              {{-- @enderror --}}
 
               {{-- <div class="edit-team-member-modal" >
                 <div class="edit-team-member-inner frosted" >

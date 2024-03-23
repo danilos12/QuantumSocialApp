@@ -32,7 +32,25 @@ class PostingController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+		if (Auth::guard('web')->check()) {
+            $this->middleware('auth');
+
+        }
+        if(Auth::guard('member')->check()) {
+
+            $this->middleware('member-access');
+
+
+        }
+    }
+	protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
     }
 
     /**
@@ -90,7 +108,7 @@ class PostingController extends Controller
 		$title = 'Slot Scheduler';
 		$days = array(1 => 'sunday', 2 => 'monday', 3 => 'tuesday', 4 => 'wednesday', 5 => 'thursday', 6 => 'friday', 7 => 'saturday');
 
-		$userId = Auth::id();
+		$userId = $this->setDefaultId();
 
 		$my_schedule = DB::table('schedule')->select('*')->where('user_id', '=', $userId)->orderBy('minute_at', 'asc')->get();
 
@@ -110,7 +128,7 @@ class PostingController extends Controller
 			return redirect('/schedule');
 		} else {
 			dd(12);
-			$userId = Auth::id();
+			$userId = $this->setDefaultId();
 			$current_date_time = Carbon::now()->toDateTimeString(); // Produces something like "2019-03-11 12:25:00"
 
 			$list = array();
@@ -151,7 +169,7 @@ class PostingController extends Controller
 
 				if (isset($postSlot['make-promo'])) {
 					foreach ($postSlot['make-promo'] as $promo) {
-						$update->user_id = Auth::id();
+						$update->user_id = $this->setDefaultId();
 						$update->slot_day = $postSlot['days-selector'];
 						$update->hour = $postSlot['hour-selector'];
 						$update->minute_at = ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'];
@@ -199,7 +217,7 @@ class PostingController extends Controller
 				// $datetime = $captureDate->format('Y-m-d H:i:s');
 
 				$insertData = [
-					'user_id' => Auth::id(),
+					'user_id' => $this->setDefaultId(),
 					'slot_day' => $postSlot['days-selector'],
 					'hour' => $postSlot['hour-selector'],
 					'minute_at' => ($postSlot['minute-selector'] === null) ? '00' : $postSlot['minute-selector'],
@@ -240,8 +258,8 @@ class PostingController extends Controller
 
 	public function bulk_queue() {
 
-		$checkRole = MembershipHelper::tier(Auth::id());        
-		
+		$checkRole = MembershipHelper::tier($this->setDefaultId());
+
 		$title = 'Bulk Queue';
 		if ($checkRole->basic_bulk_uploader === 1) {
 			// $userId = Auth::id(); //To check current user loggedin User ID dria
@@ -249,10 +267,10 @@ class PostingController extends Controller
 			// ->where('sched_method', 'add-queue')
 			// ->where('post_type', 'regular-tweets')
 			// ->exists();
-			
+
 			return view('bulk-queue')->with('title', $title);
 		} else {
-			
+
 			$modalContent = view('modals.upgrade')->render();
 			return view('bulk-queue', compact('modalContent', 'title'));
 			// Return a response indicating that the limitation has been reached
@@ -262,7 +280,7 @@ class PostingController extends Controller
 
 	public function bulk_uploader()
     {
-		$checkRole = MembershipHelper::tier(Auth::id());       
+		$checkRole = MembershipHelper::tier($this->setDefaultId());
 		$title = 'Bulk Uploader';
 		$hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
 		->where('post_type', 'regular-tweets')
@@ -290,7 +308,7 @@ class PostingController extends Controller
 		} catch (Exception $e) {
 			return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error updating the post']);
 		}
-		
+
 		// if ($request->isMethod('get')) {
 		// } else {
 		// 	try {
@@ -307,17 +325,17 @@ class PostingController extends Controller
 		// 			'sched_method' => $postData['scheduling-options'],
 		// 			// 'sched_time' => Carbon::now()
 		// 		]);
-	
+
 		// 		foreach ($postData['textarea'] as $textarea) {
 		// 			$posts->post_description = $textarea;
 		// 		};
-	
+
 		// 		// // Save the changes
 		// 		$posts->save();
-	
+
 		// 		// // Return a success response
 		// 		return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
-	
+
 		// 	} catch (Exception $e) {
 		// 		$trace = $e->getTrace();
 		// 		$message = $e->getMessage();
@@ -327,42 +345,42 @@ class PostingController extends Controller
 		// 	}
 		// }
 	}
-	
+
 	public function editBulk(Request $request, $id) {
-		
+
 		if ($request->isMethod('get')) {
 			try {
-				$queuePosts = Bulk_post::find($id);				
-				
+				$queuePosts = Bulk_post::find($id);
+
 				// Return the view with the retrieved data
-				$html = view('modals.edit-bulk')->render();			
+				$html = view('modals.edit-bulk')->render();
 				return response()->json(['status' => 200, 'data' => $queuePosts ,'html' => $html]);
 			} catch (Exception $e) {
 				return response()->json(['status' => 500, 'stat' => 'danger', 'message' => 'Error updating the post']);
 			}
 		} else {
 			try {
-				$postData = $request->all();				
-				$id = explode('-', $id); 
-				$posts = Bulk_post::find($id[2]);	
-	
+				$postData = $request->all();
+				$id = explode('-', $id);
+				$posts = Bulk_post::find($id[2]);
+
 				// Parse the date using Carbon
-				$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);			
-				
+				$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);
+
 				$posts->update([
 					"post_type" => "regular-tweets",
 					"post_description" => $postData['bulkpost_description'],
 					"sched_time" => $date,
 					"image_url" => (isset($postData['bulkimage_url']) && $postData['bulkimage_url'] !== null) ? $postData['bulkimage_url'] : "",
 					"link_url" => (isset($postData['bulklink_url'])  && $postData['bulklink_url'] !== null) ? $postData['bulklink_url'] : ""
-				]);			
-	
+				]);
+
 				// // Save the changes
 				$posts->save();
 
 
 				$message = "Bulk post is updated succesfully. ";
-				
+
 				// check the link_url if already existing
 				if ($posts->save()) {
 					$findMeta = Bulk_meta::where('link_url', $posts['link_url'])->first();
@@ -370,14 +388,14 @@ class PostingController extends Controller
 					if (!$findMeta) {
 						// The record does not exist, so scrape the meta tags
 						$metaTags =  (new CommandmoduleController)->scrapeMetaTags($postData['bulklink_url']);
-	
+
 						$metaData = [
 							'meta_title' => $metaTags['og:title'],
 							'meta_description' => $metaTags['og:description'],
 							'meta_image' => $metaTags['og:image'],
 							'link_url' => $postData['bulklink_url'],
 						];
-	
+
 						// Create a new record in the database
 						Bulk_meta::create($metaData);
 
@@ -389,22 +407,22 @@ class PostingController extends Controller
 					// Return a success response
 					return response()->json(['status' => 200, 'message' => $message]);
 				}	else {
-					return response()->json(['status' => 500, 'message' => 'Something went wrong on saving']);					
-				} 	
-	
-	
+					return response()->json(['status' => 500, 'message' => 'Something went wrong on saving']);
+				}
+
+
 			} catch (Exception $e) {
 				$trace = $e->getTrace();
-				$message = $e->getMessage();            
+				$message = $e->getMessage();
 				// Handle the error
 				// Log or display the error message along with file and line number
 				return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
 			}
 		}
-		
+
 	}
-	
-	public function deletePost($id) {				
+
+	public function deletePost($id) {
 		try {
 			$explode = explode('-', $id);
 
@@ -422,15 +440,15 @@ class PostingController extends Controller
 			return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Post deleted successfully']);
 		} catch (\Exception $e) {
 			$trace = $e->getTrace();
-            $message = $e->getMessage();            
+            $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
             return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
 		}
 	}
 
-	public function duplicatePost($id) {	
-        try {      
+	public function duplicatePost($id) {
+        try {
 			$explode = explode('-', $id);
 
 			if ($explode[0] === 'duplicateBulk') {
@@ -443,11 +461,11 @@ class PostingController extends Controller
 				$newRow = $queueDuplicate->replicate();
 				$newRow->post_type_code = rand(10000, 99999);
 			}
-            
-			
+
+
 			// Optionally, you can modify any specific values before saving the new row
 			$newRow->post_description = $queueDuplicate->post_description . ' - Copy';
-			$newRow->save();            
+			$newRow->save();
 
             // Redirect or return a response
             return response()->json(['status' => 200, 'message' => 'Post duplicated successfully!']);
@@ -475,15 +493,15 @@ class PostingController extends Controller
 		return response()->json(['success' => true, 'data' => $sort]);
 	}
 
-	public function switchFromQueue(Request $request, $switch, $id) {		
-		try {			
+	public function switchFromQueue(Request $request, $switch, $id) {
+		try {
 			//update first the switch
-			QuantumAcctMeta::where('user_id', Auth::id())->update(['queue_switch' => ($switch === 'active' ? 1 : 0)]);
-			
+			QuantumAcctMeta::where('user_id', $this->setDefaultId())->update(['queue_switch' => ($switch === 'active' ? 1 : 0)]);
+
 			switch ($request->method) {
 				case "queue" :
 					$const = CommandModule::where('twitter_id', $id)
-						->where('sched_time', '>=', TwitterHelper::now(Auth::id()))
+						->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
 						->update(['active' => ($switch === 'active' ? 1 : 0)]);
 					break;
 				case "promo" :
@@ -499,9 +517,9 @@ class PostingController extends Controller
 				// case "bulk-queue" :
 				// 	$const = Bulk_post::where('twitter_id', $id)
 						// ->where('post_type', 'evergreen-tweets')
-				// 		->update(['active' => ($switch === 'active' ? 1 : 0)]);		
+				// 		->update(['active' => ($switch === 'active' ? 1 : 0)]);
 					break;
-			} 			
+			}
 
 			return response()->json(['status' => 200, 'data' => $const]);
 		} catch (Exception $e) {
@@ -513,7 +531,7 @@ class PostingController extends Controller
 	public function getScheduledSlots (Request $request) {
 		try {
 			// get all the shedule that is under user_id
-			$slot = Schedule::where('user_id', Auth::id())->get();
+			$slot = Schedule::where('user_id', $this->setDefaultId())->get();
 
 			return response()->json(['status' => 200, 'message' => 'Get schedule', 'data' => $slot]);
 		} catch (Exception $e) {
@@ -593,12 +611,12 @@ class PostingController extends Controller
 	// public function editBulkPost(Request $request, $id) {
 	// 	try {
 	// 		$postData = $request->all();
-	// 		$id = explode('-', $id); 
-	// 		$posts = Bulk_post::find($id[2]);	
+	// 		$id = explode('-', $id);
+	// 		$posts = Bulk_post::find($id[2]);
 
 	// 		// Parse the date using Carbon
-	// 		$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);			
-			
+	// 		$date = Carbon::createFromFormat('Y M. d g:i A', $postData['bulkpost_date'] . " ". $postData['ct-hour'] . ":" .  $postData['ct-min'] . " " . $postData['ct-format']);
+
 	// 		$posts->update([
 	// 			"post_type" => "regular-tweets",
 	// 			"post_description" => $postData['bulkpost_description'],
@@ -609,11 +627,11 @@ class PostingController extends Controller
 
 	// 		// // Save the changes
 	// 		$posts->save();
-			
+
 	// 		// check the link_url if already existing
 	// 		if (isset($postData['bulklink_url'])) {
 	// 			$findMeta = Bulk_meta::where('link_url', $postData['bulklink_url'])->first();
-				
+
 	// 			if (!$findMeta) {
 	// 				// The record does not exist, so scrape the meta tags
 	// 				$metaTags =  (new CommandmoduleController)->scrapeMetaTags($postData['bulklink_url']);
@@ -628,14 +646,14 @@ class PostingController extends Controller
 	// 				// Create a new record in the database
 	// 				Bulk_meta::create($metaData);
 	// 			}
-	// 		}			
+	// 		}
 
 	// 		// // // Return a success response
 	// 		return response()->json(['status' => 200, 'message' => 'Data updated successfully']);
 
 	// 	} catch (Exception $e) {
 	// 		$trace = $e->getTrace();
-    //         $message = $e->getMessage();            
+    //         $message = $e->getMessage();
     //         // Handle the error
     //         // Log or display the error message along with file and line number
     //         return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);

@@ -79,9 +79,14 @@
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
               <div class="banner-twitter-settings">
-              @if($acct_twitter_count >  0)
-              <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" />
-              @endif
+                @if (Auth::guard('member')->user()->role == 'Admin')
+                  @if($acct_twitter_count >  0)
+                  <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" />
+                  @endif
+                  @else
+
+                @endif
+
               </div>
               <div class="twitter-dropdown-wrap">
                 <img src = "{{ asset('public/ui-images/icons/00-hamburger.svg') }}" class="menu-icon hamburger" />
@@ -167,7 +172,13 @@
 
                 <div class="settings-bar-outer">
                   <div class="settings-bar-inner">
-                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+                    @if (Auth::guard('member')->user()->role == 'Admin')
+                    @auth('member')
+                    <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+                    @endauth
+                    @else
+
+                      @endif
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
                       </a>
@@ -175,10 +186,10 @@
                       <a href="https://quantumsocial.io/roadmap/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
                       </a>
-                      <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                      <a class="dropdown-item" href="{{ route('memberlogout') }}" onclick="event.preventDefault(); document.getElementById('logout-formx').submit();">
                           <img src = "{{ asset('public/ui-images/icons/00e-logout.svg') }}" class="menu-icon" />
                       </a>
-                      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                      <form id="logout-formx" action="{{ route('memberlogout') }}" method="POST" class="d-none">
                           @csrf
                       </form>
 
@@ -200,7 +211,11 @@
                   {{ session('alert') }}
               </div>
             @endif
+            @auth('member')
+
+
             @yield('content')
+            @endauth
           </div>
         </div>
     </div>  <!-- END .interface-inner -->
