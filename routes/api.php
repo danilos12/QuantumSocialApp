@@ -70,6 +70,7 @@ Route::get('wp', function () {
 					]);
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
+					
 			} else {
 					return response()->json(['status' =>'error', 'laravel_id' => 0]);
 			}
