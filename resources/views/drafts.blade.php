@@ -1,4 +1,12 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
+
 
 @section('content')
 <div class="page-outer queue-outer">
@@ -17,7 +25,7 @@
                       <div class="queue-day-wrapper">
                         <span class="queue-date-heading">Today</span>
                       </div>
-                     
+
                     </div>  <!-- END .queue-posts-inner -->
                   </div>  <!-- END .queue-posts-outer -->
 

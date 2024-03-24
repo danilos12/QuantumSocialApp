@@ -1,71 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
-
-use Exception;
+namespace App\Http\Controllers\MemberController;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use App\Models\CommandModule;
-use App\Models\Bulk_post;
-use App\Models\Bulk_meta;
-use App\Models\Tag_groups;
-use App\Models\Tag_items;
-use App\Models\TwitterToken;
-use Carbon\Carbon;
-use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
-use App\Models\QuantumAcctMeta;
-use App\Models\Schedule;
-use App\Models\User;
-
-// use DateTime;
-// use Date;
-// use Illuminate\Support\Facades\Log;
-// use Illuminate\Support\Facades\Session;
-
-
-class CommandmoduleController extends Controller
+use App\Models\Tag_groups;
+class MemberCommandmodule extends Controller
 {
-       /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        if (Auth::guard('web')->check()) {
-            $this->middleware('auth');
-
-        }
-        if(Auth::guard('member')->check()) {
-
-            $this->middleware('member-access');
-
-
-        }
+    public function __constructor(){
+        $this->middleware('member-access');
     }
 
-    protected function setDefaultId()
-    {
-        if (Auth::guard('web')->check()) {
-            return $this->defaultid = Auth::id();
-        }
-        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
-            return $this->defaultid = MembershipHelper::membercurrent();
-        }
-    }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         $title = 'Command Module';
-        $userId = Auth::id(); //To check current user loggedin User ID dria
+        $userId = MembershipHelper::membercurrent();
         $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
             ->where('sched_method', 'add-queue')
             ->where('post_type', 'regular-tweets')
@@ -74,20 +25,21 @@ class CommandmoduleController extends Controller
         return view('commandmodule', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
     }
 
+
     public function create(Request $request) {
 
-        $checkRole = MembershipHelper::tier($this->setDefaultId());
+        $checkRole = MembershipHelper::tier(MembershipHelper::membercurrent());
 
         // Check the count of posts in the database for your subscription
         $postCount = DB::table('posts')
-            ->where('user_id', $this->setDefaultId())
+            ->where('user_id', MembershipHelper::membercurrent())
             ->count();
 
         // Add the limitation: run the code only if the count of posts is less than 5
         if ($checkRole->mo_post_credits > $postCount) {
             try {
                 $postData = $request->input('formData');
-                $user_id = $this->setDefaultId();
+                $user_id = MembershipHelper::membercurrent();
                 $main_twitter_id = $postData['twitter_id'];
                 $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
                 // $twitterMeta = $getToken->toArray();
@@ -95,7 +47,7 @@ class CommandmoduleController extends Controller
                 $utc = TwitterHelper::now($user_id);
                 $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
                 $tweet_id = basename(parse_url($url, PHP_URL_PATH));
-                $checkToggle = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
+                $checkToggle = QuantumAcctMeta::where('user_id', MembershipHelper::membercurrent())->first();
                 $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
                 $sched_method = null;
                 $sched_time = $utc->format('Y-m-d H:i:s');
@@ -160,7 +112,7 @@ class CommandmoduleController extends Controller
                             break;
 
                         case 'custom-slot':
-                            $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone($this->setDefaultId()));
+                            $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone(Auth::id()));
                             $sched_time = $date;
                             break;
 
@@ -268,17 +220,19 @@ class CommandmoduleController extends Controller
     }
 
 
+
+
     public function addTagGroup(Request $request) {
-        $checkRole = MembershipHelper::tier(Auth::id());
+        $checkRole = MembershipHelper::tier(MembershipHelper::membercurrent());
 
         $tagCount = DB::table('tag_groups_meta')
-            ->where('user_id', Auth::id())
+            ->where('user_id', MembershipHelper::membercurrent())
             ->count();
 
         if ($checkRole->hashtag_group > $tagCount ) {
             try {
                 $insert = Tag_groups::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => MembershipHelper::membercurrent(),
                     'twitter_id' => $request->input('twitter_id'),
                     'tag_group_mkey' => "_" . strtolower(str_replace(' ', '_', $request->input('myInput'))), //add underscore in the beginner always
                     'tag_group_mvalue' => $request->input('myInput'),
@@ -300,10 +254,11 @@ class CommandmoduleController extends Controller
         }
     }
 
+
     public function addTagItem(Request $request) {
         try {
             $insert = Tag_items::create([
-                'user_id' => Auth::id(),
+                'user_id' => MembershipHelper::membercurrent(),
                 'twitter_id' => $request->input('twitter_id'),
                 'tag_meta_key' => $request->input('tag_id'),
                 'tag_meta_value' => $request->input('hashtag'),
@@ -319,15 +274,22 @@ class CommandmoduleController extends Controller
 
     }
 
+
+
     public function getTagGroups($id) {
         try {
-            $tagGroups = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
 
-            return response()->json($tagGroups);
+               $userid =  MembershipHelper::membercurrent();
+
+
+            $tagGroups = Tag_groups::where(['user_id' => $userid, 'twitter_id' => $id])->get();
+
+            return response()->json([$tagGroups]);
         }  catch (Exception $e) {
             return response()->json(['status' => '400', 'message' => $e]);
         }
     }
+
 
     public function getTagItems(Request $request) {
         $twitterId = $request->input('twitter_id');
@@ -337,13 +299,14 @@ class CommandmoduleController extends Controller
         return response()->json($tagItems);
     }
 
+
     public function getUnselectedTwitterAccounts() {
 
         $getUnselectedTwitter = DB::table('twitter_accts')
                 ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                 ->select('twitter_accts.*', 'ut_acct_mngt.*')
                 ->where('ut_acct_mngt.selected', "=", 0) // selected
-                ->where('ut_acct_mngt.user_id', "=", Auth::id())
+                ->where('ut_acct_mngt.user_id', "=", MembershipHelper::membercurrent())
                 ->where('twitter_accts.deleted', "=", 0)
                 ->get();
 
@@ -358,7 +321,7 @@ class CommandmoduleController extends Controller
             $getCustomSlot = DB::table('schedule')
                             ->join('days', 'days.day', '=', 'schedule.slot_day')
                             ->select('schedule.*', 'days.*')
-                            ->where('user_id', Auth::id())
+                            ->where('user_id', MembershipHelper::membercurrent())
                             ->where('schedule.post_type', $request->post_type)
                             ->orderBy('days.id', 'ASC')
                             ->get();
@@ -373,6 +336,8 @@ class CommandmoduleController extends Controller
 
         return response()->json($getCustomSlot);
     }
+
+
 
     public function getTweetsUsingPostTypes(Request $request, $id, $post_type) {
         try {
@@ -404,8 +369,8 @@ class CommandmoduleController extends Controller
                                 ->groupBy('post_type_code');
                             })
                             ->where('twitter_id', $id)
-                            ->where('user_id', $this->setDefaultId())
-                            ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
+                            ->where('user_id', MembershipHelper::membercurrent())
+                            ->where('sched_time', '>=', TwitterHelper::now(MembershipHelper::membercurrent()))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
                             ->when($type, function ($query) use ($type, $request) {
@@ -421,7 +386,7 @@ class CommandmoduleController extends Controller
                             ->orderBy('sched_method', 'DESC')
                             ->get();
 
-                    $schedules = Schedule::where('user_id', $this->setDefaultId())->get();
+                    $schedules = Schedule::where('user_id', MembershipHelper::membercurrent())->get();
 
                     $recurringDates = [];
                     $r = [];
@@ -491,7 +456,7 @@ class CommandmoduleController extends Controller
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','evergreen-tweets')
                         // ->where('active', $checkToggle->queue_switch)
-                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
+                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(MembershipHelper::membercurrent()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->orderBy('updated_at', 'ASC')
@@ -510,7 +475,7 @@ class CommandmoduleController extends Controller
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                         ->where('post_type', '=','promos-tweets')
                         // ->where('active', $checkToggle->queue_switch)
-                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
+                        ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now(MembershipHelper::membercurrent()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
                         ->orderBy('updated_at', 'ASC')
@@ -527,7 +492,7 @@ class CommandmoduleController extends Controller
                             ->groupBy('post_type_code');
                         })
                         ->where('twitter_id', $id)
-                        ->where('sched_time', '>', TwitterHelper::now($this->setDefaultId()))
+                        ->where('sched_time', '>', TwitterHelper::now(MembershipHelper::membercurrent()))
                         ->where('post_type', '=','tweet-storm-tweets')
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -548,7 +513,7 @@ class CommandmoduleController extends Controller
                         )
                         ->where([
                             ['bulk_post.twitter_id', '=', $id],
-                            ['bulk_post.user_id', '=', $this->setDefaultId()],
+                            ['bulk_post.user_id', '=', MembershipHelper::membercurrent()],
                             ['bulk_post.post_type', '=', 'regular-tweets'],
                             ['bulk_post.sched_method', '=', 'bulk-queue']
                         ])
@@ -575,6 +540,7 @@ class CommandmoduleController extends Controller
 
     }
 
+
     public function getDatesByDayOfWeek($dayOfWeek, $month, $year)
     {
         $dates = [];
@@ -590,6 +556,7 @@ class CommandmoduleController extends Controller
 
         return $dates;
     }
+
 
     public function postNowFromQueue(Request $request)
     {
@@ -607,7 +574,7 @@ class CommandmoduleController extends Controller
             }
 
             //get time now
-            $utc = TwitterHelper::now(Auth::id());
+            $utc = TwitterHelper::now(MembershipHelper::membercurrent());
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
 
             // Update the desired fields with the request data
@@ -629,6 +596,7 @@ class CommandmoduleController extends Controller
 
     }
 
+
     public function moveTopFromQueue(Request $request, $id) {
         try {
             // dd($id);
@@ -637,7 +605,7 @@ class CommandmoduleController extends Controller
 
             $nearestPost = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])
                 ->where('twitter_id', $request->twitter_id)
-                ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                ->where('sched_time', '>', TwitterHelper::now(MembershipHelper::membercurrent()))
                 ->orderBy('sched_time', 'ASC')
                 ->first();
 
@@ -661,7 +629,6 @@ class CommandmoduleController extends Controller
     }
 
 
-    // API to post and retweet to twitter
     function tweet2twitter($twitter_meta, $data, $endpoint) {
 
         // check access token
@@ -734,7 +701,7 @@ class CommandmoduleController extends Controller
                 $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
 
                 $insertData = Bulk_post::create([
-                    'user_id' =>  Auth::id(),
+                    'user_id' =>  MembershipHelper::membercurrent(),
                     'twitter_id' => $request->input('twitter_id'),
                     'post_type' => 'regular-tweets',
                     'post_description' => $data['post_description'],
@@ -775,6 +742,9 @@ class CommandmoduleController extends Controller
         return redirect()->back()->with('message', 'CSV file uploaded and processed successfully.');
     }
 
+
+
+
     function scrapeMeta(Request $request) {
         $findMeta = Bulk_meta::where('link_url', $request->input('url'))->first();
 
@@ -800,7 +770,6 @@ class CommandmoduleController extends Controller
 
     }
 
-
     function scrapeMetaTags($url) {
         // Fetch the HTML content of the URL
         $html = file_get_contents($url);
@@ -825,6 +794,7 @@ class CommandmoduleController extends Controller
         // Return the meta tags array
         return $metaTags;
     }
+
 
     private function parse($p) {
 
