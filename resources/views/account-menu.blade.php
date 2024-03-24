@@ -83,6 +83,33 @@
     </div>  <!-- END .add-team-member-inner -->
   </div>  <!-- END .add-team-member-modal -->
 
+   <div class="change-pass-modal" style="display: none"> 
+      <div class="change-pass-inner frosted">         
+          <!-- BEGIN input copied from engage.html -->
+          <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/>
+          <div class="exit-button" >
+            <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon settings-close close-change-pass" id="close-change-pass"/>
+          </div>
+
+          <div class="menu-header font-white">Change Password</div>
+          <div class="global-input-email"> 
+            <form id="changePassForm">
+              <div class="global-input-text input-text">  
+                <input type="text" placeholder="Old Password" id="old_password" name="old_password"/>
+              </div>
+              
+              <div class="global-input-text input-text">  
+                <input type="text" placeholder="New Password" id="new_password" name="new_password"/>
+              </div>
+
+              <input type="submit" value="Change Password" class="font-white">
+            </form>                  
+          </div>
+          <!-- END copied from engage.html -->
+
+      </div>  <!-- END .add-team-member-inner -->
+    </div>  <!-- END .add-team-member-modal -->   
+
     <div class="modal-large-outer main-settings-outer general-settings-outer frosted">
       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" id="general-settings"/>
       <div class="menu-header">General Settings</div>
