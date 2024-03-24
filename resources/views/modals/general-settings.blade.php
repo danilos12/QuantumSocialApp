@@ -72,7 +72,8 @@
                       <div class="global-profile-details">
                           <div class="global-profile-name">
                           <a href="#">
-                          {{$member->firstname}}</a>
+                          <!-- {{$member->firstname}} -->
+                        </a>
                           </div>  <!-- END .global-profile-name -->
                           <div class="global-profile-subdata">
                           <span class="global-profile-email">
