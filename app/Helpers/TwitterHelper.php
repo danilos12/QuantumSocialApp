@@ -2,21 +2,25 @@
 
 namespace App\Helpers;
 
+use App\Http\Controllers\TwitterApi;
 use App\Models\TwitterToken;
 use Carbon\Carbon;
 use App\Models\QuantumAcctMeta;
+use App\Models\MasterTwitterApiCredentials;
 use App\Models\Twitter;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 
 class TwitterHelper
 {
+
     public static function refreshAccessToken($refreshToken)
     {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=' . env('TWITTER_CLIENT_ID'),
+            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=' . TwitterHelper::getActiveAPI(Auth::id())->oauth_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -38,8 +42,8 @@ class TwitterHelper
     }
 
     public static function getTwitterdetails($accessToken)
-    {      
-        $checkIfTokenExpired = TwitterHelper::isTokenExpired($accessToken->expires_in ,strtotime($accessToken->updated_at), $accessToken->refresh_token, $accessToken->access_token, $accessToken->twitter_id);  
+    {
+        $checkIfTokenExpired = TwitterHelper::isTokenExpired($accessToken->expires_in ,strtotime($accessToken->updated_at), $accessToken->refresh_token, $accessToken->access_token, $accessToken->twitter_id);
 
         $headers = array(
             'Authorization: Bearer ' . $checkIfTokenExpired['token'],
@@ -70,13 +74,14 @@ class TwitterHelper
             $result = json_decode($response);
             return $result->data;
         }
-    }    
+    }
 
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
 
         if (($expires_in + $created_at) <= time()) {
             $d = TwitterHelper::refreshAccessToken($refresh_token);
             session()->put('token_details', $d);
+            // dd($d);
 
             // update token in database
             TwitterToken::where('twitter_id', $twitter_id)
@@ -93,7 +98,7 @@ class TwitterHelper
         }
     }
 
-    public static function getTwitterToken($twitter_id) {       
+    public static function getTwitterToken($twitter_id) {
 
         $findActiveTwitter = Twitter::join('twitter_meta', 'twitter_accts.twitter_id', '=', 'twitter_meta.twitter_id')
             ->join('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
@@ -103,11 +108,11 @@ class TwitterHelper
             ->where('twitter_accts.user_id', '=', Auth::id())
             ->where('ut_acct_mngt.selected', '=', 1)
             ->where('twitter_meta.active', '=',   1)
-            ->get();
+            ->first();
 
         return $findActiveTwitter;
     }
-    
+
 
     public static function executeAfterFiveHoursFromLastUpdate($lastUpdated)
     {
@@ -123,17 +128,25 @@ class TwitterHelper
             // ...
         }
     }
+   
 
     public static function now($id) {
+
+
         $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
         $utc = Carbon::now($acctMeta->timezone);
 
-        return $utc;       
+        return $utc;
     }
-    
+
     public static function timezone($id) {
         $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
-        return $acctMeta->timezone;       
+        return $acctMeta->timezone;
+    }
+
+    public static function getActiveAPI($id) {
+        $activeAPI = MasterTwitterApiCredentials::where('user_id', $id)->first();
+        return $activeAPI;
     }
 
 }

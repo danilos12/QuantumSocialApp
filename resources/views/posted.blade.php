@@ -1,4 +1,12 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
+
 
 @section('content')
 <div class="page-outer queue-outer">
@@ -99,7 +107,7 @@
       <div class="posted-posts-inner">
 
         <div class="queue-day-wrapper">
-          <span class="queue-date-heading">Today</span>                       
+          <span class="queue-date-heading">Today</span>
 
         </div>  <!-- END .queue-day-wrapper" -->
         <!-- END TweetStorm Queued Post Instance -->

@@ -9,7 +9,6 @@
             if (responseData.length > 0) {
                 // console.log(responseData);
                 $.each(responseData, function (index, k, value) {
-                    console.log(this)
                     var template = tagGrptemplateItem(this);
                     $("#tag-groups-content").append(template);
                 });
@@ -143,8 +142,10 @@
                 // $(template).appendTo('#tag-groups-content');
                 $('#tag-groups-content').append(template);
 
+                alert(responseData.message);
+                location.reload();
             } else {
-                throw new Error('Request failed');
+                openUpgradeModal(responseData);
             }
 
         } catch(err) {
