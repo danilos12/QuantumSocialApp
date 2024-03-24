@@ -62,7 +62,7 @@
           <span class="menu-section-header">Team Members </span>
 
             @if ($cntmembers > 0) 
-              @foreach($members as $member)
+              @foreach($team_members as $member)
                 <div class="menu-team-account-outer"> 
                   <div class="menu-team-account-inner"> 
             
