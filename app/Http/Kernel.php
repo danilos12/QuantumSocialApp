@@ -72,5 +72,6 @@ class Kernel extends HttpKernel
         'session_expired' => \App\Http\Middleware\CheckSessionExpiration::class,
         'member-access' => \App\Http\Middleware\MemberAuth::class,
         'weborauth' => \App\Http\Middleware\WeborMember::class,
+
     ];
 }

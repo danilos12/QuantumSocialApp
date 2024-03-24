@@ -14,7 +14,7 @@
             @csrf
 
             <div class="row mb-3">
-                
+
                 <div class="col-md-12">
                     <input placeholder="Email Address" id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autocomplete="email" autofocus>
 
@@ -24,10 +24,10 @@
                         </span>
                     @enderror
                 </div>
-            </div>               
+            </div>
 
             <div class="row mb-3">
-                
+
                 <div class="col-md-12" style="margin-top: 1em">
                     <input placeholder="{{ __('Password') }}" id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="current-password">
 
@@ -44,7 +44,7 @@
                     <div class="form-check p_05">
                         <div class="checkbox-wrapper">
                             <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-    
+
                             <label class="form-check-label" for="remember">
                                 {{ __('Remember Me') }}
                             </label>
@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="row mb-12">
-                
+
                 <div class="col-md-12">
                     <button type="submit" class="btn btn-primary btnlogin" >
                         {{ __('Connect') }}
@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <div class>                  
+            <div class>
                 <div class="d-flex justify-space-between m1em">
                     <div class="p-2">
                         @if (Route::has('password.request'))
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </form>
-        
+
         @if(session('error'))
             <div class="alert alert-danger">
                 {{ session('error') }}
@@ -128,7 +128,7 @@
 
 
 
-.login-inner input[type="email"], .login-inner input[type="password"] {	
+.login-inner input[type="email"], .login-inner input[type="password"] {
     width: 338px;
     height: 41px;
     flex-shrink: 0;
@@ -177,7 +177,7 @@
   align-items: center;
 }
 
-.content-outer { 
+.content-outer {
     justify-item: center;
     margin-left: 0;
     /* text-color: #ffffff */
