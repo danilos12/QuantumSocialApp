@@ -33,30 +33,27 @@ class TeamMemberReg extends Mailable
      */
     public function build()
     {
+        try {
+            $token = Str::random(32);
 
+            // Store the token in the session
+            session(['registration_token' => $token]);
 
-        try{
-        $token = Str::random(32);
+            // Encrypt the ID
+            $encryptedId = Crypt::encrypt($this->fullname);
 
-        // Store the token in the session
-        session(['registration_token' => $token]);
+            // Insert the token into the database
+            DB::table('members')->where('fullname', $this->fullname)->update(['tokens' => $token]);
 
+            $emailLink = route('memberregistration', ['token' => Crypt::encrypt($token), 'fullname' => $encryptedId]);
 
-        // Encrypt the ID
-        $encryptedId = Crypt::encrypt($this->fullname);
-        // Insert the token into the database
-
-        DB::table('members')->where('fullname', $this->fullname)->update(['tokens' => $token]);
-
-        $emailLink = route('memberregistration', ['token' => Crypt::encrypt($token), 'fullname' => $encryptedId]);
-
-        return $this->view('emails.team_member_email_template')
-        ->with(['emailLink' => $emailLink])
-        ->subject('Team Member Registration');
-}
-        catch (EncryptException $e) {
+            return $this->view('emails.team_member_email_template')
+                        ->with(['emailLink' => $emailLink])
+                        ->subject('Team Member Registration');
+        } catch (EncryptException $e) {
             // Handle encryption error
             return response()->json(['error' => 'Encryption failed'], 400);
         }
     }
+
 }
