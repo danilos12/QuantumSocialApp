@@ -20,6 +20,7 @@ use App\Models\QuantumAcctMeta;
 use App\Models\Schedule;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 
 // use DateTime;
@@ -67,13 +68,8 @@ class CommandmoduleController extends Controller
     public function index()
     {
         $title = 'Command Module';
-        $userId = Auth::id(); //To check current user loggedin User ID dria
-        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
-            ->where('sched_method', 'add-queue')
-            ->where('post_type', 'regular-tweets')
-            ->exists();
 
-        return view('commandmodule', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        return view('commandmodule')->with('title', $title);
     }
 
     public function create(Request $request) {
@@ -197,7 +193,7 @@ class CommandmoduleController extends Controller
 
                 // Save data for main account
                 // $responses = array();
-                // $responses;
+                $messages = '';
                 foreach ($postData['textarea'] as $textarea) {
                     $insertData['post_description'] = $textarea;
                     $insertData['sched_method'] = $sched_method;
@@ -205,21 +201,30 @@ class CommandmoduleController extends Controller
                     $insertData['post_type'] = 'tweet-storm-tweets';
 
 
-                    // // Post tweet if scheduling option is "send-now"
+                    // Post tweet if scheduling option is "send-now"
                     if ($postData['scheduling-options'] === 'send-now') {
                         if ($postData['post_type_tweets'] === "retweet-tweets") {
                             $responses = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
+
+                            if ($responses->getOriginalContent()['status'] === 500) {
+                                return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            } else {
+                                CommandModule::create($insertData);
+
+                                $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
+                            }
                         }  else {
                             $responses = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-                        }
 
-                        if ($responses->getOriginalContent()['status'] === 500) {
-                            return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
-                        } else {
-                            CommandModule::create($insertData);
-                            return response()->json(['status' => 200, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
-                        }
+                            if ($responses->getOriginalContent()['status'] === 500) {
+                                return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            } else {
+                                CommandModule::create($insertData);
 
+                                $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
+                            }
+                        }
+                     
                     } else {
                         CommandModule::create($insertData);
                     }
@@ -232,19 +237,26 @@ class CommandmoduleController extends Controller
 
                             $crosstweetId = str_replace('twitterId-', '', $account);
                             $crosstweetData['twitter_id'] = $crosstweetId;
-                            $crosstweetData['crosstweet_accts'] = $key;
+                            $crosstweetData['crosstweets_accts'] = $key;
 
-                            $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();
-
-                            CommandModule::create($crosstweetData);
+                            $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();                           
 
                             // Post tweet if scheduling option is "send-now"
                             if ($postData['scheduling-options'] === 'send-now') {
                                 if ($postData['post_type_tweets'] === "retweet-tweets") {
-                                    $responses[] = $this->tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
+                                    $responses = $this->tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
                                 } else {
-                                    $responses[] = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                                    $responses = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+
+                                    if ($responses->getOriginalContent()['status'] === 500) {
+                                        return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                                    } else {                                       
+                                        CommandModule::create($crosstweetData);
+                                        $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
+                                    }
                                 }
+                            } else {
+                                CommandModule::create($crosstweetData);
                             }
                         }
                     }
@@ -254,7 +266,7 @@ class CommandmoduleController extends Controller
                 $lastSavedData = CommandModule::latest()->first();
 
                 // Return success response
-                return response()->json(['status' => 200, 'message' => 'Data has been created.', 'tweet' => $lastSavedData]);
+                return response()->json(['status' => 200, 'message' => 'Data has been created. ' . $messages, 'tweet' => $lastSavedData]);
 
             } catch (Exception $e) {
                 $trace = $e->getTrace();
@@ -723,101 +735,180 @@ class CommandmoduleController extends Controller
     }
 
     // to be back
-    public function upload(Request $request)
-    {
-		if ($request->hasFile('csv_file')) {
+    // public function upload(Request $request)
+    // {
+	// 	if ($request->hasFile('csv_file')) {
             
-            // Validate the uploaded file
-            $validator = Validator::make($request->all(), [
-                'csv_file' => 'required|file|mimes:csv,txt',
-            ]);
+    //         // Validate the uploaded file
+    //         $validator = Validator::make($request->all(), [
+    //             'csv_file' => 'required|file|mimes:csv,txt',
+    //         ]);
             
 
-            // Handle validation errors
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
+    //         // Handle validation errors
+    //         if ($validator->fails()) {
+    //             return redirect()->back()->withErrors($validator)->withInput();
+    //         }
 
-             // Process the CSV file
-            $file = $request->file('csv_file');
-            $rows = array_map('str_getcsv', file($file));            
+    //          // Process the CSV file
+    //         $file = $request->file('csv_file');
+    //         $rows = array_map('str_getcsv', file($file));            
 
-            $errorRows = [];
-            foreach ($rows as $row) {
-                // Perform validation on each row
-                $validator = Validator::make($row, [
-                    'image_url' => 'required',
-                    'link_url' => 'required',
-                    // Add more validation rules as needed
-                ]);
+    //         $errorRows = [];
+    //         foreach ($rows as $row) {
+    //             // Perform validation on each row
+    //             $validator = Validator::make($row, [
+    //                 'image_url' => 'required',
+    //                 'link_url' => 'required',
+    //                 // Add more validation rules as needed
+    //             ]);
     
-                // Check if validation failed for the current row
-                if ($validator->fails()) {
-                    // Store the error details along with the row data
-                    $errorRows[] = [
-                        'data' => $row,
-                        'errors' => $validator->errors()->toArray(),
-                    ];
-                } else {
-                    // Process valid data (e.g., insert into database)
-                    // YourModel::create($row);
-                }
+    //             // Check if validation failed for the current row
+    //             if ($validator->fails()) {
+    //                 // Store the error details along with the row data
+    //                 $errorRows[] = [
+    //                     'data' => $row,
+    //                     'errors' => $validator->errors()->toArray(),
+    //                 ];
+    //             } else {
+    //                 // Process valid data (e.g., insert into database)
+    //                 // YourModel::create($row);
+    //             }
+    //         }
+
+    //         dd($errorRows);
+    //         return redirect()->back()->with('success', 'CSV uploaded successfully.')->with('errorRows', $errorRows);
+    //         // get the file
+	// 		$file = $request->file('csv_file');
+
+    //         // parse the data in csv
+	// 		$csvData = $this->parse($file);
+
+    //         // after getting the data from the csv, parse first the link to get the meta details, then add it into the database
+    //         foreach ($csvData as $key => $data) {
+    //             $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
+    //             // Format the timestamp as desired
+    //             $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
+
+    //             $insertData = Bulk_post::create([
+    //                 'user_id' =>  Auth::id(),
+    //                 'twitter_id' => $request->input('twitter_id'),
+    //                 'post_type' => 'regular-tweets',
+    //                 'post_description' => $data['post_description'],
+    //                 'sched_method' => 'bulk-queue',
+    //                 'sched_time' => $formattedDateTime,
+    //                 'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
+    //                 'image_url' => isset($data['image_url']) ? $data['image_url'] : null,
+    //             ]);
+
+    //             if ($insertData) {
+    //                 // Check if the record already exists
+    //                 $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
+
+    //                 if (!$findMeta) {
+    //                     // The record does not exist, so scrape the meta tags
+    //                     $metaTags = $this->scrapeMetaTags($data['link_url']);
+
+    //                     $metaData = [
+    //                         'meta_title' => $metaTags['og:title'],
+    //                         'meta_description' => $metaTags['og:description'],
+    //                         'meta_image' => $metaTags['og:image'],
+    //                         'link_url' => $data['link_url'],
+    //                     ];
+
+    //                     // Create a new record in the database
+    //                     Bulk_meta::create($metaData);
+
+    //                 }
+    //             }
+
+    //         }
+
+    //         return response()->json(['message' => 'CSV data saved successfully'], 200);
+    //     } else {
+    //         return response()->json(['message' => 'No file uploaded'], 400);
+    //     }
+
+    //     return redirect()->back()->with('message', 'CSV file uploaded and processed successfully.');
+    // }
+
+    public function upload(Request $request) {
+
+        // Validate the request data
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        // Get the file
+        $file = $request->file('csv_file');
+
+        // Parse the CSV data
+        $csvData = $this->parse($file);
+
+        // Initialize an array to store validation errors
+        $errors = [];
+
+        $message = '';
+
+        // Validate each row of the CSV data
+        foreach ($csvData as $key => $data) {
+            $validator = Validator::make($data, [
+                'post_description' => 'required',
+                'year' => 'required|digits:4',
+                'month' => 'required|digits_between:1,2|between:1,12',
+                'day' => 'required|digits_between:1,2|between:1,31',
+                'hour' => 'required|digits_between:1,2|between:0,23',
+                'minute' => 'required|digits_between:1,2|between:0,59',
+                'link_url' => ['required', Rule::requiredIf(empty($data['image_url']))],
+                'image_url' => ['required', Rule::requiredIf(empty($data['link_url']))],
+            ]);
+
+            if ($validator->fails()) {
+                $errors[] = [
+                    'row' => $key + 1,
+                    'errors' => $validator->errors()->all(),
+                ];
+            } else {
+                // // Validation passed, save the data to the database
+                // $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
+                // $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
+
+                // $insertData = Bulk_post::create([
+                //     'user_id' => Auth::id(),
+                //     'twitter_id' => $request->input('twitter_id'),
+                //     'post_type' => 'regular-tweets',
+                //     'post_description' => $data['post_description'],
+                //     'sched_method' => 'bulk-queue',
+                //     'sched_time' => $formattedDateTime,
+                //     'link_url' => $data['link_url'],
+                //     'image_url' => $data['image_url'],
+                // ]);
+
+                // // Create Bulk_meta record if it doesn't exist
+                // if ($insertData) {
+                //     $findMeta = Bulk_meta::where('link_url', $data['link_url'])->first();
+                //     if (!$findMeta) {
+                //         $metaTags = $this->scrapeMetaTags($data['link_url']);
+                //         $metaData = [
+                //             'meta_title' => $metaTags['og:title'],
+                //             'meta_description' => $metaTags['og:description'],
+                //             'meta_image' => $metaTags['og:image'],
+                //             'link_url' => $data['link_url'],
+                //         ];
+                //         Bulk_meta::create($metaData);
+                //     }
+                // }
+                    $message = 'yow';
             }
-
-            dd($errorRows);
-            return redirect()->back()->with('success', 'CSV uploaded successfully.')->with('errorRows', $errorRows);
-            // // get the file
-			// $file = $request->file('csv_file');
-
-            // // parse the data in csv
-			// $csvData = $this->parse($file);
-
-            // // after getting the data from the csv, parse first the link to get the meta details, then add it into the database
-            // foreach ($csvData as $key => $data) {
-            //     $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
-            //     // Format the timestamp as desired
-            //     $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
-
-            //     $insertData = Bulk_post::create([
-            //         'user_id' =>  Auth::id(),
-            //         'twitter_id' => $request->input('twitter_id'),
-            //         'post_type' => 'regular-tweets',
-            //         'post_description' => $data['post_description'],
-            //         'sched_method' => 'bulk-queue',
-            //         'sched_time' => $formattedDateTime,
-            //         'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
-            //         'image_url' => isset($data['image_url']) ? $data['image_url'] : null,
-            //     ]);
-
-            //     if ($insertData) {
-            //         // Check if the record already exists
-            //         $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
-
-            //         if (!$findMeta) {
-            //             // The record does not exist, so scrape the meta tags
-            //             $metaTags = $this->scrapeMetaTags($data['link_url']);
-
-            //             $metaData = [
-            //                 'meta_title' => $metaTags['og:title'],
-            //                 'meta_description' => $metaTags['og:description'],
-            //                 'meta_image' => $metaTags['og:image'],
-            //                 'link_url' => $data['link_url'],
-            //             ];
-
-            //             // Create a new record in the database
-            //             Bulk_meta::create($metaData);
-
-            //         }
-            //     }
-
-            // }
-
-            // return response()->json(['message' => 'CSV data saved successfully'], 200);
-        } else {
-            return response()->json(['message' => 'No file uploaded'], 400);
         }
 
-        return redirect()->back()->with('message', 'CSV file uploaded and processed successfully.');
+        if (!empty($errors)) {
+            return response()->json(['errors' => $errors], 422);
+        } else {
+            return response()->json(['message' => 'CSV data saved successfully' . $message], 200);
+        }
+
+
     }
 
     function scrapeMeta(Request $request) {
