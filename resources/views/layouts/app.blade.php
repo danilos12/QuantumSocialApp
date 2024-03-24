@@ -24,9 +24,14 @@
     <!-- Fonts -->
   <link rel="dns-prefetch" href="//fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
+<!-- Add Toastr.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
+
 
 
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
@@ -36,6 +41,7 @@
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+
   {{-- <link rel="stylesheet" href="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.css"> --}}
   {{-- <link rel="stylesheet" href="{{ asset('public/js/emojionearea-master/dist/emojionearea.css') }}"> --}}
 
@@ -58,11 +64,11 @@
     <div class="interface-inner">
 		  <div class="banner-outer">
         <div class="banner-inner">
-          <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-Horizontal-white.svg" class="image-placeholder" height="100%" />
+          <img src="{{ asset('public/')}}/ui-images/logo/light-mode-logo.svg" class="image-placeholder" height="100%" alt="Quantum Social Logo" id="app-logo" />
 
           <!-- Authentication Links -->
           @if (Route::has('login'))
-            @auth
+            @auth('web')
             <div class="banner-twitter-profile-wrap">
               <a href="#">
                 <div class="banner-twitter-profile-inner">
@@ -164,8 +170,8 @@
                       <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
-                        {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" data-id="modal" id="help-page" /> --}}
                       </a>
+                      {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-upgrade-page" data-id="modal" id="upgrade-page" /> --}}
                       <a href="https://quantumsocial.io/roadmap/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
                       </a>
@@ -210,6 +216,12 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
+      <div class="upgrade">
+        @if(isset($modalContent))
+            <!-- Render the modal content -->
+            {!! $modalContent !!}
+        @endif
+      </div>
   @else
     @endauth
   @endif
@@ -222,15 +234,18 @@
   @else
     @endauth
   @endif
+
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
   {{-- <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script> --}}
   {{-- <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>   --}}
 
   @yield('scripts')
+
   <script>
      $(document).ready(function() {
             // Alert
@@ -249,7 +264,7 @@
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();
-            console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
+            // console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
         } else {
             // If menuId is not defined or falsy, close all menus
             // $(`ul:not(${menuId})`).hide();
@@ -270,7 +285,7 @@
           }
           var li = $(this).find('li');
         });
-      })      
+      })
 
     });
   </script>

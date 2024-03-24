@@ -36,7 +36,7 @@ $(document).ready(function() {
                                 
                     // Assuming the response data is an array of posts
                     data = responseData; // Add the new posts to the existing array
-                    console.log(responseData)
+
                     if (data.length > 0) {
                         // Check if the initial data has been loaded
                         if (!initialDataLoaded) {
@@ -101,7 +101,7 @@ $(document).ready(function() {
                     break;
                 case 'bulk-queue': 
                     if (responseData.length > 0) {
-                       
+                       console.log(responseData);
                         // Group cards by date
                         var groupedCards = responseData.reduce(function (acc, card) {
                             acc[card.sched_time] = acc[card.sched_time] || [];
@@ -219,12 +219,21 @@ $(document).ready(function() {
     }
     fetchDataByMonth();
     
+    // close modal
     $(document).on('click', 'img#edit-commandmodule', function(event) {
         $target = event.target.dataset.id;  
         closeModal($target);
         $('.modal-large-anchor div.edit-commandmodule-outer').remove();
         $('.ui-effects-placeholder').remove();
-    })
+    })    
+    
+    // close modal
+    $(document).on('click', 'img#edit-bulk', function(event) {
+        $target = event.target.dataset.id;  
+        closeModal($target);
+        $('.modal-large-anchor div.edit-bulk-outer').remove();
+        $('.ui-effects-placeholder').remove();
+    })    
       
 
     $('.queue-months-dropdown').on('click', 'li', async function(e) {
@@ -255,10 +264,12 @@ $(document).ready(function() {
     function sortBySourceAll() {
         window.location.href = '/queue';
     }
+   
     
     $('.queue-day-wrapper').on("click", 'img.queued-icon', async function(e) {
         var id = e.target.id;
         var rmId = id.split('-');
+        console.log(id, rmId);
     
         switch (rmId[0]) {
             case "edit":
@@ -326,13 +337,13 @@ $(document).ready(function() {
                 $addTeamModal.on('click', 'span', function(e) {
                     $spanId = e.target.id; 
                     $spanIdsplit = $spanId.split('-');
+
                     switch ($spanIdsplit[0]) {
-                        case 'post':
-                            console.log($spanIdsplit);
+                        case 'postNow':
                             postTweetNow($spanId);
                             break;
                         
-                        case 'duplicate':
+                        case 'duplicateNow':
                             duplicatePostNow($spanId);
                             break;
                         
@@ -343,18 +354,51 @@ $(document).ready(function() {
                 });
                 break;
             
+            case "editBulk" : 
+                
+                const response = await fetch(APP_URL + '/post/bulk_edit/' + rmId[1]);
+                const responseData = await response.json();              
+
+                const dateTimeString = responseData.data['sched_time'];
+                const dateTime = new Date(dateTimeString);
+                const month = dateTime.toLocaleString('default', { month: 'short' });
+                const day = dateTime.getDate();
+                const year = dateTime.getFullYear();
+                const timeString = dateTime.toLocaleTimeString();
+                const fullDate = year + " " + month + ". " + day;
+                        
+                const getTimeFormat = timeString.split(' ');
+                const splitTime = timeString.split(':');
+                console.log(getTimeFormat, splitTime);
+                
+                // render the modal
+                $('.modal-large-backdrop').append(responseData.html);
+
+                // $('.edit-bulk-outer').addClass('edit-bulk-' + responseData.data['id'] + '-outer')
+                $('.edit-bulk-outer').find('.bulk-form').attr('data-id','edit-bulk-' + responseData.data['id'])
+                $('#bulkpost_description').val(responseData.data['post_description']);
+                $('#datepicker').val(fullDate);
+                $('.edit-bulk-outer').find(`.bulk-form select[name="ct-hour"] option[value=${splitTime[0]}]`).attr('selected', true);
+                $('.edit-bulk-outer').find(`.bulk-form select[name="ct-min"] option[value=${splitTime[1]}]`).attr('selected', true);
+                $('.edit-bulk-outer').find(`.bulk-form select[name="ct-format"] option[value=${getTimeFormat[1]}]`).attr('selected', true);
+                $('#bulkimage_url').val(responseData.data['image_url'])
+                $('#bulklink_url').val(responseData.data['link_url'])
+
+
+                openModal("edit-bulk-" + responseData.data['id']);
+                break;
+            case "duplicateBulk": 
+                duplicatePost(id);         
+                break;
+            case "deleteBulk": 
+                deletePost(id);
             default:
                 break;
         }
     });
 
     $(document).on('click', 'img[name="reload-meta"]', async function(e) {
-        const url = e.currentTarget.dataset.url;
-        // const username = 'username';
-        // const password = 'password';
-        // const credentials = `${username}:${password}`;
-        // const base64Credentials = btoa(credentials);
-
+        const url = e.currentTarget.dataset.url;        
         try {
             
             const response = await fetch(APP_URL + '/reload-meta/scrape', {
@@ -371,27 +415,12 @@ $(document).ready(function() {
                 location.reload();
             } else {
                 $('.queued-posts-outer').before(div);        
-                console.log(1);
             } 
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     });
-
-    // delete icon
-    $(document).on('click', '.ui-icon[name="delete"]', async function(e) {
-        var id = e.target.id;    
-        var rmId = id.split('-');        
-        deletePost((rmId[0] === 'deleteBulk') ? id : rmId[1]);               
-    }); 
-     
-    // duplciate icon
-    $(document).on('click', '.ui-icon[name="duplicate"]', async function(e) {
-        var id = e.target.id;    
-        var rmId = id.split('-');        
-        duplicatePost(rmId[1]);               
-    }); 
-
+    
     async function duplicatePost(id) {        
         const response = await fetch(APP_URL + '/post/duplicate/' + id , {
             method: 'POST',
@@ -447,11 +476,10 @@ $(document).ready(function() {
         }, 3000);
     }
 
-    var initialFormData = {};
+    // var initialFormData = {};
     $(document).on('submit', '#posting-tool-form-002', async function(e) {
         e.preventDefault();
         const form = $(this);
-        console.log(form.find('.post-textarea'));
         var id = e.currentTarget.dataset.id;
         const $form = $(form).serializeArray();
 
@@ -493,6 +521,44 @@ $(document).ready(function() {
             console.log('Error fetching the data' + err)
         }
       });
+
+
+    // edit bulk form
+    $(document).on('submit', '.bulk-form', async function(e) {        
+        e.preventDefault();
+        const $form = $(e.target).serializeArray();
+        var id = e.currentTarget.dataset.id;
+
+        var formData = {};
+        $.each($form, function(index, field){
+            formData[field.name] = field.value;         
+        });
+
+        try {
+            const response = await fetch(APP_URL + '/post/bulk_edit/' + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify(formData) // Convert the object to JSON string           
+            });
+            // console.log(response);
+            const responseData = await response.json();
+
+            if (responseData.status === 200) {
+                alert(responseData.message);                
+            } else {
+                alert(responseData.message)
+            }
+
+            setTimeout(function() {
+            location.reload();
+            }, 2000); // Reload after 5 seconds (adjust the delay as needed)
+        } catch(err) {
+            console.log('Error fetching the data: ' + err);
+        }
+    })  
 
       
     // switch
@@ -570,14 +636,14 @@ $(document).ready(function() {
         }
     }
    
-    async function postTweetNow(id) {
+    async function postTweetNow(id) {        
         try {
-            const response = await fetch(APP_URL + '/cmd/post/tweet-now/' + id + '?twitter_id=' + TWITTER_ID, {
+            const response = await fetch(APP_URL + '/cmd/post/tweet-now?post=' + id + '&twitter_id=' + TWITTER_ID, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
-                },
+                },                
             });
     
             const data = await response.json();
@@ -594,7 +660,7 @@ $(document).ready(function() {
     
     async function duplicatePostNow(id) {
         try {
-            const response = await fetch(APP_URL + '/cmd/post/duplicate-now/' + id + '?twitter_id=' + TWITTER_ID, {
+            const response = await fetch(APP_URL + '/post/duplicate/' + id, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

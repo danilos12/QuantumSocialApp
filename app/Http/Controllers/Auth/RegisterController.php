@@ -8,11 +8,13 @@ use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Validator;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\GeneralSettings;
 use App\Models\QuantumAcctMeta;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
 
 
 class RegisterController extends Controller
@@ -60,10 +62,10 @@ class RegisterController extends Controller
             // 'lastname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);                       
-      
+        ]);
+
     }
-    
+
 
     /**
      * Create a new user instance after a valid registration.
@@ -72,25 +74,25 @@ class RegisterController extends Controller
      * @return \App\Models\User
      */
     protected function create(array $data)
-    {        
+    {
         $user = User::create([
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-        
+
         DB::table('user_mngt')->insert([
             'main_id' => $user->id,
             'main_acct' => 1,
             'sub_acct' => 0
         ]);
-    
+
         $timezoneOffsetSeconds = timezone_offset_get(new DateTimeZone(date_default_timezone_get()), new DateTime());
 
         // Create a new DateTime object with the current time and the timezone set above
         $timezoneOffsetFormatted = sprintf('%+03d:%02d', $timezoneOffsetSeconds / 3600, abs($timezoneOffsetSeconds) % 3600 / 60);
-        
+
 
         // general Settings
         QuantumAcctMeta::create([
@@ -101,7 +103,7 @@ class RegisterController extends Controller
             'member_count' => 0,
             'status' => 0
         ]);
-   
+
 
         $generalSettings = [
             'user_id' => $user->id,
@@ -116,7 +118,8 @@ class RegisterController extends Controller
 
 
         GeneralSettings::create($generalSettings);
-        
+
         return $user;
     }
+
 }

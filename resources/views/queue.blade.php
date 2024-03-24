@@ -1,4 +1,11 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
 
 @section('content')
 <div class="page-outer queue-outer">
@@ -9,9 +16,9 @@
         <span class="profile-heading">
           The Queue</span>
         <div class="toggle-wrapper">
-          <label class="toggleSwitch large">            
+          <label class="toggleSwitch large">
             <input type="checkbox" id="post-status" {{ $toggle > 0 ? 'checked' : '' }}/>
-            
+
             <span>
                 <span>INACTIVE</span>
                 <span>ACTIVE</span>
@@ -50,7 +57,7 @@
           <li id="promos">
             <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon" />
             Promos
-          </li> --}}         
+          </li> --}}
           <li id="retweet">
             <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon" />
             Retweets
@@ -63,10 +70,10 @@
           Month:
           <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon drop-arrow" />
         </span>
-        <ul class="page-filters-dropdown profile-sort-dropdown queue-months-dropdown frosted">       
+        <ul class="page-filters-dropdown profile-sort-dropdown queue-months-dropdown frosted">
           <li>
             <img src="{{ asset('public/') }}/ui-images/icons/07-schedule.svg" class="ui-icon" />All
-          </li>                     
+          </li>
         </ul>
       </div>  <!-- END .sort-wrap -->
     </div>  <!-- END .filter-controls -->
@@ -74,7 +81,7 @@
     <div id="spinner" style="display: none;">
       Loading
     </div>
-    <div id="error" style="display: none;">      
+    <div id="error" style="display: none;">
     </div>
     @if(session()->has('message'))
         <div class="alert alert-success">
@@ -85,7 +92,7 @@
       <div class="queued-posts-inner">
         <div class="queue-day-wrapper page-wrapper">
           {{-- <span class="queue-date-heading">Today</span> --}}
-          
+
 
         {{-- </div>  <!-- END .queued-single-post-wrapper --> --}}
         </div>  <!-- END .queue-day-wrapper" -->
