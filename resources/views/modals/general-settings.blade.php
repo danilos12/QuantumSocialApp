@@ -7,7 +7,7 @@
       <div class="menu-section-outer quantum-settings-outer">
         <div class="menu-section-inner quantum-settings-inner" id="quantum_acct">
           <span class="menu-section-header">
-            Quantum Account</span>
+            Quantum Account</span>           
 
             <div class="settings-item-wrap email-data-wrap">
               <div class="settings-item-label-wrap">
@@ -52,6 +52,9 @@
         </div>  <!-- END .quantum-settings-inner -->
       </div>  <!-- END .quantum-settings-outer -->
       
+
+      @if (Auth::guard('web')->check()) 
+
       <!--     BEGIN TEAM MEMBERS   -->
       <div class="menu-section-outer team-account-outer">
 
@@ -129,37 +132,8 @@
         </div>  <!-- END .social-accounts-inner -->
 
 
-        <!-- BEGIN ADD TEAM MEMBER MODAL -->
-
-        <div class="add-team-member-modal"> 
-          <div class="add-team-member-inner frosted"> 
-
-              <!-- BEGIN input copied from engage.html -->
-              <div class="global-input-email"> 
-              <form>
-                  <div class="global-input-text input-text">  
-                  <input type="text" placeholder="First Name" id="newuser_fname"/>
-                  </div>
-                  
-                  <div class="global-input-text input-text">  
-                  <input type="text" placeholder="Last Name" id="newuser_lname" />
-                  </div>
-
-                  <div class="global-input-text input-text">  
-                  <input type="text" placeholder="Email address" id="newuser_email" />
-                  </div>
-
-              </form>
-              <span class="add-team-button"> 
-                  Add<span>
-              </div>
-              <!-- END copied from engage.html -->
-
-          </div>  <!-- END .add-team-member-inner -->
-        </div>  <!-- END .add-team-member-modal -->
 
 
-                              <!-- END ADD TEAM MEMBER MODAL -->
       </div>  <!-- END .team-account-outer -->
       <!--     END TEAM MEMBERS    -->
 
@@ -417,6 +391,8 @@
 
         </div>  <!-- END .advanced-preferences-inner -->
       </div>  <!-- END .advanced-preferences-outer -->
+
+      @endif
 
     </div>  <!-- END .general-settings-inner -->
   </div>  <!-- END .general-settings-outer -->
