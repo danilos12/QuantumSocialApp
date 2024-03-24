@@ -423,13 +423,14 @@
                           </div>  <!-- END .global-author-details -->
                         </div>  <!-- END .global-twitter-profile-header -->
 
-                        <div class="menu-social-account-options">
+                        <span class="menu-account-icons">
                           <span class="menu-account-default" data-twitter_id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account. Page will reload after select" default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
-                          <span class="menu-account-icons">
-                          <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Settings" id="twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
-                          <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-url="{{ route("twitter.remove") }}" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
-                          </span>
-                        </div>  <!-- END .menu-social-account-options -->
+                          @if ($selected_user->twitter_id === $acct->twitter_id)
+                          <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
+                          @else 
+                          <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" onclick="deleteTwitterAccount(this)"/>
+                          @endif
+                        </span>
 
                       </div>  <!-- END .menu-social-account-inner -->
                     </div>  <!-- END .menu-social-account-outer -->
