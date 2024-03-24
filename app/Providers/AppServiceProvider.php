@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
         // share to all views
         View::composer('*', function ($view) {
 
-            if (auth()->check()) {
+            if (Auth::guard('web')->check()) {
 
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
@@ -165,7 +165,7 @@ class AppServiceProvider extends ServiceProvider
                     // dd($hasRegularTweetsInQueue);
                 $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
 
-                $checkRole = MembershipHelper::tier(Auth::id());     
+                $checkRole = MembershipHelper::tier(Auth::id());
                 $view->with('product_id', $checkRole->subscription_id);
 
 

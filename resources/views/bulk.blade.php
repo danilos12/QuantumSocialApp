@@ -1,4 +1,11 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
 
 @section('content')
 
@@ -16,7 +23,7 @@
                   {{-- <div class="bulk-upload-section">
                     <span class="bulk-upload-title">Advance Uploader:
                       <form id="uploadCsvForm">
-                        <input type="file" accept=".csv" class="bulk-upload-file-selector" id="csvFileInput" />                        
+                        <input type="file" accept=".csv" class="bulk-upload-file-selector" id="csvFileInput" />
                         <input value="Schedule Your Posts" class="bulk-upload-submit" id="uploadCsv"/>
                     </form>
                   </div>   --}}

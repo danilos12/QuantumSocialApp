@@ -1,7 +1,7 @@
 
 
 <div class="modal-large-anchor">
-  <div class="modal-large-backdrop"> 
+  <div class="modal-large-backdrop">
 
 
    <div class="add-team-member-modal">
@@ -119,7 +119,7 @@
                 <div class="settings-item-data-wrap">
                   <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
-                </div>  <!-- END .settings-item-data -->             
+                </div>  <!-- END .settings-item-data -->
               </div>  <!-- END .plan-data-wrap -->
 
               <div class="settings-item-wrap timezone-data-wrap">
@@ -148,7 +148,7 @@
           <div class="menu-section-inner team-account-inner">
             <span class="menu-section-header">Team Members </span>
 
-              @if ($cntmembers > 0)
+              {{-- @if ($cntmembers > 0) --}}
                 @foreach($team_members as $member)
                   <div class="menu-team-account-outer">
                     <div class="menu-team-account-inner">
@@ -157,9 +157,19 @@
 
                         <div class="global-team-profile-header">
                         <div class="global-profile-details">
-                            <div class="global-profile-name">
+                            <div class="global-profile-name flex">
+
                             <a href="#">
-                            {{$member->fullname}}</a>
+                            {{$member->fullname}}
+                            @auth('member')
+                            @if(Auth::guard('member')->user()->id == $member->id)
+                             (You)
+                             @else
+
+                            @endif
+                            @endauth
+                            </a>
+
                             </div>  <!-- END .global-profile-name -->
                             <div class="global-profile-subdata">
                             <span class="global-profile-email">
@@ -167,7 +177,17 @@
                               </span>
                             </div>  <!-- END .global-post-date-wrap -->
                         </div>  <!-- END .global-team-profile-details -->
-                        </div>  <!-- END .global-team-profile-header -->
+                        </div>
+
+                        @auth('member')
+
+
+                        <!-- END .global-team-profile-header -->
+                        @if(Auth::guard('member')->user()->id == $member->id)
+
+
+
+                        @else
 
                         <div class="menu-social-account-options">
                           <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
@@ -179,7 +199,7 @@
                             <div class="">
 
 
-                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_api-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
 
 
                               </div>
@@ -201,12 +221,55 @@
                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img editing" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->id }}"/>
                               <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img deleting" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->id }}" />
                           </span>
-                        </div>  <!-- END .menu-social-account-options -->
+                        </div>
+                          <!-- END .menu-social-account-options -->
+                        @endif
+                        @endauth
+                        @auth('web')
 
+
+
+
+                        <div class="menu-social-account-options">
+                          <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+
+                          <div class="childs-cont-2">
+                            <p class="childs-cont-p">ADMIN ACCESS</p>
+                            <p class="switchtexton">On</p>
+                            <p class="switchtextoff">Off</p>
+                            <div class="">
+
+
+                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+
+
+                              </div>
+                          </div>
+
+                          <div class="childs-cont">
+
+                            <p class="childs-cont-p">API ACCESS</p>
+                            <p class="switchtexton">On</p>
+                            <p class="switchtextoff">Off</p>
+                            <div class="">
+
+                            <input  type="checkbox" class="menu-twirl-toggle forchecked apiaccess" name="grant-api-access" id="toggle_api-{{$member->id}}" <?php echo $member->api_access == 1 ? 'checked' :'';?>>
+                          </div>
+                          </div>
+
+
+                          <span class="menu-account-icons">
+                           <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img editing" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->id }}"/>
+                              <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img deleting" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->id }}" />
+                          </span>
+                        </div>
+                          <!-- END .menu-social-account-options -->
+
+                        @endauth
                     </div>  <!-- END .menu-social-account-inner -->
                   </div>  <!-- END .menu-social-account-outer -->
                 @endforeach
-              @enderror
+              {{-- @enderror --}}
 
               {{-- <div class="edit-team-member-modal" >
                 <div class="edit-team-member-inner frosted" >
@@ -275,45 +338,45 @@
                 <form id="master_api_form">
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">API Key:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>                      
+                    <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">API Secret:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>                     
-                  </div> 
+                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
+                  </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">Bearer Token:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>                      
+                    <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">OAuth 2.0 ID:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>                      
+                    <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">OAuth 2.0 Secret:</span>
-                  </div> 
+                  </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>                      
+                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">Callback URL</span>
-                  </div> 
-                  <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>                      
                   </div>
                   <div class="menu-subTwirl-inner">
-                    <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">                        
-                  </div> 
-                </form>                  
-              </div>  
+                    <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
+                  </div>
+                </form>
+              </div>
 
               <div class="menu-twirl-option-inner">
                 <div class="menu-twirl-left">

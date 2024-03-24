@@ -121,7 +121,7 @@ $(document).ready(function () {
         console.log($form, id)
         var formData = {};
         $.each($form, function(index, field){
-            formData[field.name] = field.value;         
+            formData[field.name] = field.value;
         });
 
         try {
@@ -131,48 +131,58 @@ $(document).ready(function () {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
                 },
-                body: JSON.stringify(formData) // Convert the object to JSON string           
+                body: JSON.stringify(formData) // Convert the object to JSON string
             });
             // console.log(response);
             const responseData = await response.json();
-      
+
             var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
             if (responseData.status === 200) {
               $(this).after(div);
             } else {
               $(this).after(div);
-            }      
-      
+            }
+            if(responseData.stat === 'danger'){
+                $(this).after(div);
+            }
+
             setTimeout(function() {
             location.reload();
             }, 3000); // Reload after 5 seconds (adjust the delay as needed)
         } catch(err) {
             console.log('Error fetching the data' + err)
         }
-    });    
+    });
 
-    $('div#link-twitter').on('click', async function(e) {        
+    $('div#link-twitter').on('click', async function(e) {
         try {
           const response = await fetch(APP_URL + '/twitter/redirect/' + QUANTUM_ID);
           const responseData = await response.json();
-    
+
           var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
           console.log(responseData.status);
           if (responseData.status === 200) {
             window.location.href = responseData.redirect;
           } else {
             openUpgradeModal(responseData);
-          } 
-        
+          }
+
           // remove the div after 3 seconds
           setTimeout(function() {
             div.remove();
           }, 3000);
+        if(responseData.stat === 'warning'){
+            toastr[responseData.stat](
+                `Warning! ${responseData.message}`
+            );
+        }
+
+
         } catch (error) {
           console.log(error);
         }
       })
-      
+
 
     // modal slider
     // $(document).ready(function() {
@@ -216,7 +226,7 @@ $(document).ready(function () {
         } catch (error) {
             console.log(error);
         }
-    });    
+    });
 
     $("#membership").change(async function (event) {
         var selectedValue = $(this).val();
@@ -309,30 +319,37 @@ $(document).ready(function () {
 
     // delete twitter
     $(".delete-account").click(function (event) {
-        console.log(1)
-        // $.ajax({
-        //     url: $(this).data("url"),
-        //     method: "POST",
-        //     data: {
-        //         twitter_id: $(this).data("twitterid"),
-        //     },
-        //     headers: {
-        //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-        //     },
-        //     success: function (response) {
-        //         // Handle success
-        //         if (response.deleted === 1) {
-        //             location.reload();
-        //         } else {
-        //             console.log("error");
-        //         }
-        //     },
-        //     error: function (jqXHR, textStatus, errorThrown) {
-        //         // Handle error
-        //         console.log(jqXHR, textStatus, errorThrown);
-        //     },
-        // });
+        $.ajax({
+            url: $(this).data("url"),
+            method: "POST",
+            data: {
+                twitter_id: $(this).data("twitterid"),
+            },
+            headers: {
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+            },
+            success: function (response) {
+                // Handle success
+                if (response.deleted === 1) {
+                    location.reload();
+                } else {
+                    console.log("error");
+                }
+
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+
+                if (jqXHR.status === 403) {
+                    // Display a warning message to the user
+                    toastr[jqXHR.responseJSON.stat](jqXHR.responseJSON.message);
+                }
+
+            },
+        });
     });
+
+
 
     $('img.ui-icon[data-icon="twitter-settings"]').on(
         "click",
@@ -477,16 +494,9 @@ $(document).ready(function () {
                     }, 1000);
                 } else if (responseData.stat == "warning") {
                     toastr[responseData.stat](
-                        `Warning!, ${responseData.message}`
+                        `Warning! ${responseData.message}`
                     );
-                    var element = document.querySelector(
-                        ".modal-large-anchor-upgrade"
-                    );
-
-                    element.style.display = "flex";
-                    $addTeamModal.fadeToggle(900);
-                    $addTeamModal2.fadeToggle(900);
-                     $(".add-team-member-modal").hide();
+                    openUpgradeModal(responseData);
                 }
             }
 
@@ -506,7 +516,7 @@ $(document).ready(function () {
             roles: selectedRole,
             api_access: isChecked,
         };
-
+        console.log('EDITUPDATEMEMBERS');
         try {
             const response = await fetch(APP_URL + "/settings/members/_edit", {
                 method: "POST",
@@ -549,7 +559,7 @@ $(document).ready(function () {
         addButton.className = "edit-team-button";
         $addTeamModal.toggle("puff", { percent: 100, easing: "swing" }, 100);
         $addTeamModal2.toggle("puff", { percent: 100, easing: "swing" }, 900);
-        console.log(edit_id[1]);
+
         var data = {
             edit_id: edit_id[1],
         };
@@ -602,6 +612,8 @@ $(document).ready(function () {
                     parentspan.style.display = "flex";
                 }
             }
+
+
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
@@ -612,7 +624,32 @@ $(document).ready(function () {
     $(document).on("click", ".deleting", async function (e) {
         var targetId = e.target.id;
         var id = targetId.split("-");
-        console.log(id);
+        console.log(id[1]);
+        console.log(id[0]);
+
+
+
+        const response = await fetch(APP_URL + "/settings/members/_delete/" + id[1], {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                    "content"
+                ),
+            },
+
+        });
+        const responseData = await response.json();
+
+        if (responseData.stat == "success") {
+            toastr[responseData.stat](
+                `Success! ${responseData.message}`
+            );
+        } else if (responseData.stat == "warning") {
+            toastr[responseData.stat](
+                `Warning! ${responseData.message}`
+            );
+        }
     });
 
     // deleting team members end
@@ -643,17 +680,26 @@ $(document).ready(function () {
 
         const responseData = await response.json();
 
-        if (responseData) {
-            console.log(responseData);
-            toastr[responseData.stat](`Success, ${responseData.message}`);
+        if (responseData.stat == 'success') {
+
+            toastr[responseData.stat](`Success! ${responseData.message}`);
+        }
+        if (responseData.stat == 'warning') {
+            if(isChecked){
+                $('#toggle_api-' + id[1]).prop('checked', false);
+            }
+            if(!isChecked){
+                $('#toggle_api-' + id[1]).prop('checked', true);
+            }
+
+            toastr[responseData.stat](`Warning! ${responseData.message}`);
         }
     });
     $('input[name="grant-admin-access"]').change(async function (e) {
         var targetId = e.target.id;
         var id = targetId.split("-"); // Corrected the split method call
         var isChecked = $(this).is(":checked");
-        console.log(id[1]);
-        console.log(isChecked);
+
         var data = {
             id: id[1],
             admin_access: isChecked,
@@ -675,9 +721,22 @@ $(document).ready(function () {
 
         const responseData = await response.json();
 
-        if (responseData) {
-            console.log(responseData);
-            toastr[responseData.stat](`Success, ${responseData.message}`);
+        if (responseData.stat == 'success') {
+
+            toastr[responseData.stat](`Success! ${responseData.message}`);
+        }
+        if(responseData.stat == 'warning'){
+            if(isChecked){
+                $('#toggle_admin-' + id[1]).prop('checked', false);
+            }
+            if(!isChecked){
+                $('#toggle_admin-' + id[1]).prop('checked', true);
+            }
+
+
+
+            toastr[responseData.stat](`Warning! ${responseData.message}`);
+
         }
     });
 });
