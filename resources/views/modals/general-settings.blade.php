@@ -87,6 +87,8 @@
                         <span class="menu-account-icons">
                             {{-- <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/> --}}
                             {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}" /> --}}
+                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->account_holder_id }}"/>
+                            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->account_holder_id }}" />
                         </span>
                       </div>  <!-- END .menu-social-account-options -->
 
