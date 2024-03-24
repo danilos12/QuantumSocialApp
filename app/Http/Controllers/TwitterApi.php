@@ -292,13 +292,43 @@ class TwitterApi extends Controller
         return $tweets;
     }
 
+    // to be back
     public function removeTwitterAccount(Request $request)
     {
         $id = $request->input('twitter_id');
         $twitter = Twitter::where('twitter_id', $id)->where('user_id', Auth::id());
-        $twitter->delete();
+        
+        // Deleting the Twitter account
+        $deletedTwitter = $twitter->delete();
 
-        return response()->json(['success' => true, "deleted" => $twitter, 'message' => 'Twitter account is now deleted']);
+        // Checking if the Twitter account deletion was successful
+        if ($deletedTwitter) {
+            // Deleting associated Twitter meta
+            $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', Auth::id());
+            $deletedMeta = $deleteTwitterMeta->delete();
+            
+            // If deletion of Twitter meta is successful
+            if ($deletedMeta) {
+                return response()->json([
+                    'success' => true,
+                    'deleted_twitter' => $twitter, // Sending deleted Twitter account details
+                    'deleted_meta' => $deleteTwitterMeta, // Sending deleted Twitter meta details
+                    'message' => 'Twitter account and associated meta data are now deleted'
+                ]);
+            } else {
+                // If deletion of Twitter meta fails
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete associated Twitter meta data'
+                ], 500);
+            }
+        } else {
+            // If deletion of Twitter account fails
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete Twitter account'
+            ], 500);
+        }
     }
 
     public function curlGetHttpRequest($url, $headers,  $data) {

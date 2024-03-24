@@ -68,6 +68,52 @@ $(document).ready(function () {
         );
     });
 
+    $('img.change-pass').on('click', function(e) {
+        console.log(e);
+        $('.change-pass-modal').css('display', 'block')
+    })
+
+    $('#close-change-pass').on('click', function(e) {
+        console.log(e);
+        $('.change-pass-modal').css('display', 'none')
+    })
+
+    // change password modal
+    $(document).on('submit', '#changePassForm', async function(e) {
+        e.preventDefault();
+        const $form = $(e.target).serializeArray();
+        var formData = {};
+        $.each($form, function(index, field){
+            formData[field.name] = field.value;         
+        });
+
+        try {
+            const response = await fetch(APP_URL + '/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify(formData) // Convert the object to JSON string           
+            });
+            const responseData = await response.json();
+      
+            var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
+            if (responseData.status === 200) {
+              $(this).after(div);
+            } else {
+              $(this).after(div);
+            }      
+      
+            // remove the div after 3 seconds
+            setTimeout(function() {
+                div.remove();
+            }, 3000);
+        } catch(err) {
+            console.log('Error fetching the data' + err)
+        }
+    })
+
     $(document).on('submit', '#master_api_form', async function(e) {        
         e.preventDefault();
         const $form = $(e.target).serializeArray();
@@ -263,28 +309,29 @@ $(document).ready(function () {
 
     // delete twitter
     $(".delete-account").click(function (event) {
-        $.ajax({
-            url: $(this).data("url"),
-            method: "POST",
-            data: {
-                twitter_id: $(this).data("twitterid"),
-            },
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            success: function (response) {
-                // Handle success
-                if (response.deleted === 1) {
-                    location.reload();
-                } else {
-                    console.log("error");
-                }
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-                // Handle error
-                console.log(jqXHR, textStatus, errorThrown);
-            },
-        });
+        console.log(1)
+        // $.ajax({
+        //     url: $(this).data("url"),
+        //     method: "POST",
+        //     data: {
+        //         twitter_id: $(this).data("twitterid"),
+        //     },
+        //     headers: {
+        //         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        //     },
+        //     success: function (response) {
+        //         // Handle success
+        //         if (response.deleted === 1) {
+        //             location.reload();
+        //         } else {
+        //             console.log("error");
+        //         }
+        //     },
+        //     error: function (jqXHR, textStatus, errorThrown) {
+        //         // Handle error
+        //         console.log(jqXHR, textStatus, errorThrown);
+        //     },
+        // });
     });
 
     $('img.ui-icon[data-icon="twitter-settings"]').on(

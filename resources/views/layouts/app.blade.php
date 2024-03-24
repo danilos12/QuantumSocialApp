@@ -79,8 +79,10 @@
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
               <div class="banner-twitter-settings">
+              @if (Auth::guard('web')->check()) 
               @if($acct_twitter_count >  0)
               <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" />
+              @endif
               @endif
               </div>
               <div class="twitter-dropdown-wrap">
@@ -167,7 +169,9 @@
 
                 <div class="settings-bar-outer">
                   <div class="settings-bar-inner">
+                      @if (Auth::guard('web')->check()) 
                       <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+                      @endif
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
                       </a>
