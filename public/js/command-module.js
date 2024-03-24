@@ -33,62 +33,62 @@ $(function ($) {
     // });
 
     /** Pull tags */
-    $.ajax({
-        type: "GET",
-        url: APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID, // Use the URL of your server-side script here
-        success: function (response) {
-            console.log(response);
-            $.each(response, function (index, k) {
-                var option = $("<option>")
-                    .addClass("modal-select-tag-group")
-                    .attr("value", k.tag_group_mkey)
-                    .text(k.tag_group_mvalue);
-                $(option).appendTo($("select#tag-groups"));
-            });
-        },
-        error: function (xhr, status, error) {
-            console.log(
-                "An error occurred while fetching the existing tag groups: " +
-                    error
-            );
-        },
-    });
-  
-
-    /** Pull selected twitter account */
     // $.ajax({
     //     type: "GET",
-    //     url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
-    //     data: {
-    //         twitter_id: TWITTER_ID,
+    //     url: APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID, // Use the URL of your server-side script here
+    //     success: function (response) {
+    //         console.log(response);
+    //         $.each(response, function (index, k) {
+    //             var option = $("<option>")
+    //                 .addClass("modal-select-tag-group")
+    //                 .attr("value", k.tag_group_mkey)
+    //                 .text(k.tag_group_mvalue);
+    //             $(option).appendTo($("select#tag-groups"));
+    //         });
     //     },
-    //     success: function(response) {
-
-    //         // console.log(response)
-    //         // Add the existing tag groups to the page
-    //         if (response.length > 0) {
-    //             $.each(response, function(index, k) {
-    //                 var img = $("<img>")
-    //                     .addClass("cross-tweet-profile-image")
-    //                     .attr("src", k.twitter_photo)
-    //                     .attr("id", "twitterId-" + k.twitter_id)
-    //                     .attr("name", 'cross_tweet_acct[]')
-
-    //                 $(img).appendTo($(".cross-tweet-profiles-inner.cmd"));
-    //             });
-    //         } else {
-    //             $(".posting-tool-columns")
-    //                 .find(".cross-tweet-profiles-outer")
-    //                 .append("<div>No other twitter accounts linked</div>");
-    //         }
-    //     },
-    //     error: function(xhr, status, error) {
+    //     error: function (xhr, status, error) {
     //         console.log(
     //             "An error occurred while fetching the existing tag groups: " +
-    //             error
+    //                 error
     //         );
     //     },
     // });
+  
+
+    /** Pull selected twitter account */
+    $.ajax({
+        type: "GET",
+        url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
+        data: {
+            twitter_id: TWITTER_ID,
+        },
+        success: function(response) {
+
+            // console.log(response)
+            // Add the existing tag groups to the page
+            if (response.length > 0) {
+                $.each(response, function(index, k) {
+                    var img = $("<img>")
+                        .addClass("cross-tweet-profile-image")
+                        .attr("src", k.twitter_photo)
+                        .attr("id", "twitterId-" + k.twitter_id)
+                        .attr("name", 'cross_tweet_acct[]')
+
+                    $(img).appendTo($(".cross-tweet-profiles-inner.cmd"));
+                });
+            } else {
+                $(".posting-tool-columns")
+                    .find(".cross-tweet-profiles-outer")
+                    .append("<div>No other twitter accounts linked</div>");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log(
+                "An error occurred while fetching the existing tag groups: " +
+                error
+            );
+        },
+    });
 
     /** Post type and BgIcon */
     const $postPanels = $("div[data-post]");
@@ -295,7 +295,7 @@ $(function ($) {
                         .length > 0
                         ? combod
                         : "",
-                    "posting-tool-form-001"
+                    "posting-tool-form-001", 'add-tweet-initial', ''
                 );
             }
         }
@@ -436,7 +436,7 @@ $(function ($) {
     }
 
     /** add new text area instance */
-    $(".posting-tool-col").on("click", ".add-tweet-initial", function (event) {
+    $(".posting-tool-col").on("click", ".add-tweet-initial", function (e) {
         parentForm = $(this).parent().parent().parent().attr("id");
         $('input[id="post_type_tweets"]').val("tweet-storm-tweets");
 
@@ -458,14 +458,22 @@ $(function ($) {
             type = "tweet-storm-tweets";
         }
 
-        addTweetTextArea(type, combo, parentForm);
+        if ($(this).hasClass('add-tweet-again-button')) {
+            // Get the ID of the textarea associated with this button
+            var textareaId = e.target.parentElement.id;
+            addTweetTextArea(type, combo, parentForm, 'add-tweet-initial-button', textareaId);
+        }
+        else {            
+            addTweetTextArea(type, combo, parentForm, 'add-tweet-initial', '');
+        }
+
         $postIcon
             .filter('img[data-type="tweet-storm-tweets"]')
             .addClass("icon-active");
         $postPanels
             .filter('div[data-post="tweet-storm-tweets"]')
             .removeClass("tweets-hide");
-    });
+    });    
 
     /** remove new tweet instance */
     $(document).on("click", ".remove-new-tweet", function () {
@@ -546,8 +554,7 @@ $(function ($) {
         var div = $("#scheduling-method-" + option);
         var sopp = "";
         console.log(option);
-        $(".scheduling-details").html();
-        $(".scheduling-details").css('display', 'block');
+        $(".scheduling-details").html();        
 
         // $('div[name="scheduling-method"]').filter('div[data-name!="' + option + '"]').attr("data-schedule", "none");
         // $(".date-picker-wrapper").empty()
@@ -557,6 +564,7 @@ $(function ($) {
 
         switch (option) {
             case "set-countdown":
+                $(".scheduling-details").css('display', 'block');
                 div.attr("data-schedule", option);
                 var dropdown = customSetCountdown();
                 $(".scheduling-details").html(dropdown);
@@ -579,6 +587,7 @@ $(function ($) {
                 break;
 
             case "custom-time":
+                $(".scheduling-details").css('display', 'block');
                 div.attr("data-schedule", option);
                 var dropdown = customTimedropdown();
                 $(".scheduling-details").html(dropdown);
@@ -618,6 +627,7 @@ $(function ($) {
                 break;
 
             case "custom-slot":
+                $(".scheduling-details").css('display', 'block');
                 div.attr("data-schedule", option);
                 // var dropdown = customSlotdropdown();
                 // $('.scheduling-details').html(dropdown)
@@ -881,6 +891,7 @@ $(function ($) {
         formData["crosstweet"] = crossTweet;
         formData["textarea"] = textArea;
         formData["twitter_id"] = TWITTER_ID;
+        formData["social_media"] = 'twitter'
 
         console.log(formData);
 
@@ -906,6 +917,9 @@ $(function ($) {
             } else if (responseData.status === 500) {
                 alert(responseData.message);
                 location.reload();
+            } else if (responseData.status === 200) {
+                alert(responseData.message);
+                window.location.href = APP_URL + '/posted';
             } else {
                 // Handle the server response here
                 form.find('input[type="submit"]').val("Data Saved!");
@@ -1024,22 +1038,19 @@ function disableWatermark(src, combo = null) {
 /** add new etxtInstance and update existing */
 var itemsPerPage = 10;
 var $items = 1;
-function addTweetTextArea(entryPoint, combo, action) {
-    console.log(action);
-    var newTextbox = tweetInstance($items + 1);
-    // newTextbox = $(newTextbox);
-
-    // Increment the ID and name attributes of the input element
-    // var newId = "textbox-" + $items;
-    // newTextbox
-    //     .find(".add-tweet-outer")
-    //     .attr("id", newId)
-    //     .attr("name", newId);
+var itemText = 0;
+function addTweetTextArea(entryPoint, combo, action, clss, textareaId) {
+    console.log(entryPoint, combo, action, clss, textareaId);
+    var newTextbox = tweetInstance($items );   
 
     // Append the new textbox to the container
-    $("#" + action)
-        .find(".more-tweets-roster")
-        .append(newTextbox);
+    if (clss === 'add-tweet-initial') {
+        $("#" + action)
+            .find(".more-tweets-roster")
+            .prepend(newTextbox);
+    } else {
+        $('#' + textareaId).after(newTextbox);
+    }
 
     // Increment the number of items and pages
     $items++;
@@ -1047,11 +1058,15 @@ function addTweetTextArea(entryPoint, combo, action) {
 
     disableWatermark(entryPoint, combo, action);
 
-    // Update page info
-    updateItemInfo(action);
+    itemText = $('.more-tweets-roster').children().length + 1;
+    // updateTextareaIds(itemText)
+    // console.log(action)
+    updateItemInfo(action, clss)
 }
 
-function updateItemInfo(action) {
+
+/** Update page counter */
+function updateItemInfo(action, clss) {
     // Update current page based on current item count and items per page
     var currentPage = Math.ceil($(".add-tweet-outer").length / itemsPerPage);
     var totalItems = $(".add-tweet-outer").length + 1;
@@ -1059,10 +1074,11 @@ function updateItemInfo(action) {
     var endIndex = Math.min(currentPage * itemsPerPage, totalItems);
     // console.log(currentPage, totalItems, startIndex, endIndex);
 
-    $("#" + action + " .add-tweet-outer").each(function (index) {
+    // if (clss === 'add-tweet-initial')
+    $(".add-tweet-outer").each(function (index) {
         // get the textbox element
         var textbox = $(this);
-        // console.log(textbox, index);
+        console.log(textbox, index);
 
         // update the page info for this textbox
         var newId = "textbox-" + (index + 1);
@@ -1118,14 +1134,14 @@ function tweetInstance(items) {
                     <div class="post-area-right new-post-right">
                         <div class="post-right-buttons new-post-right-buttons">
                             <img src="${APP_URL}/public/ui-images/icons/pg-close.svg" class="ui-icon post-tool-icon remove-new-tweet" /><br />
-                            <img src="${APP_URL}/public/ui-images/icons/pg-image.svg" class="ui-icon post-tool-icon add-image-icon" /><br />
-                            <img src="${APP_URL}/public/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br />
-                            <img src="${APP_URL}/public/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon" /><br />
+                            <!-- <img src="${APP_URL}/public/ui-images/icons/pg-image.svg" class="ui-icon post-tool-icon add-image-icon" /><br /> -->
+                            <!-- <img src="${APP_URL}/public/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br />  -->
+                            <!-- <img src="${APP_URL}/public/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon" /><br />  -->
                         </div>  <!-- END .post-right-buttons -->
                     </div>  <!-- END .post-area-right -->
                 </div>  <!-- END .new-post-wrap -->
             </div>  <!-- END .add-tweet-inner -->
-            <img src="${APP_URL}/public/ui-images/icons/add-post.svg" class="ui-icon add-tweet-icon add-tweet-again-button" />
+            <img src="${APP_URL}/public/ui-images/icons/add-post.svg" class="ui-icon add-tweet-icon add-tweet-initial add-tweet-again-button" />
         </div>
             `;
 
@@ -1133,7 +1149,7 @@ function tweetInstance(items) {
 }
 
 function postWrapper(info, post_type) {
-    // console.log(info)
+    console.log(info)
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString("default", { month: "short" });
@@ -1164,20 +1180,27 @@ function postWrapper(info, post_type) {
                     </span>
                 </div>  <!-- END .queue-single-start -->
 
-                <div class="queued-single-end">
+                
+                ${info.sched_method !== 'send-now' ? 
+                `<div class="queued-single-end">
                     <img src="${APP_URL}/public/ui-images/icons/pg-dots.svg" class="ui-icon queued-icon queued-options-icon queued-icon-ee" id="more-${
-        info.id
-    }" title="More" data-toggle="tooltip" />
-                    <img src="${APP_URL}/public/ui-images/icons/pg-view.svg" class="ui-icon queued-icon queued-view-icon queued-icon-ee" id="view-${
-        info.id
-    }" title="View" data-toggle="tooltip" />
-                    <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon queued-icon-imp" data-icon="edit-post" id="edit-modal-${
-        info.id
-    }" title="Edit" data-toggle="tooltip" />
-                    <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon queued-icon-imp" id="delete-${
-        info.id
-    }" title="Delete" data-toggle="tooltip" />
-                </div>  <!-- END .queued-single-end -->
+                    info.id
+                }" title="More" data-toggle="tooltip" />
+                                <img src="${APP_URL}/public/ui-images/icons/pg-view.svg" class="ui-icon queued-icon queued-view-icon queued-icon-ee" id="view-${
+                    info.id
+                }" title="View" data-toggle="tooltip" />
+                                <img src="${APP_URL}/public/ui-images/icons/05-drafts.svg" class="ui-icon queued-icon queued-edit-icon queued-icon-imp" data-icon="edit-post" id="edit-modal-${
+                    info.id
+                }" title="Edit" data-toggle="tooltip" />
+                                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon queued-icon queued-trash-icon queued-icon-imp" id="delete-${
+                    info.id
+                }" title="Delete" data-toggle="tooltip" />
+                        
+                            </div>  <!-- END .queued-single-end -->
+                ` : 
+                '' }
+
+
 
             </div>  <!-- END .queued-single-post -->
 
