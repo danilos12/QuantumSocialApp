@@ -34,67 +34,70 @@ class dashboardController extends Controller
 		$date = date('Y-m-d');
 		$key = 'check_subscriptions_'.$date;
 
-		$wpdata = Cache::remember($key, now()->addMinutes(60), function () {
-			return DB::table('app_usermeta')->select('*')->where('user_id', Auth::id())->get();
-		});
+		// Auth::guard('web')->check(); Admin
+		// Auth::guard('member')->check(); Team member
 
-		$wts = array();
-		if (Cache::has($key)) {
+		// $wpdata = Cache::remember($key, now()->addMinutes(60), function () {
+		// 	return DB::table('app_usermeta')->select('*')->where('user_id', Auth::id())->get();
+		// });
 
-			$fr = cache($key);
-			foreach( $fr as $vd => $frs ) {
-				$wts[$frs->meta_key] = $frs->meta_value;
-			}
+		// $wts = array();
+		// if (Cache::has($key)) {
 
-			// API endpoint URL
-			$checkoutUrl = 'https://quantumsocial.io/wp-json/qtm/q5/verify/';
-			// Authorization token
-			$curl = curl_init();
+		// 	$fr = cache($key);
+		// 	foreach( $fr as $vd => $frs ) {
+		// 		$wts[$frs->meta_key] = $frs->meta_value;
+		// 	}
 
-			curl_setopt_array($curl, array(
-			CURLOPT_URL => $checkoutUrl,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => array(
-			  'token_id_user' => $wts['wp_user_id'],
-			  'code_access' => 'a81748202668f51001db39ba72830c34'
-			  ),
-			CURLOPT_USERNAME => $wts['wp_app_client'],
-			CURLOPT_PASSWORD => $wts['wp_app_password'],
-			CURLOPT_HTTPHEADER => array(
-				'Authorization: '.$wts['wp_app_access'],
-				),
-			));
+		// 	// API endpoint URL
+		// 	$checkoutUrl = 'https://quantumsocial.io/wp-json/qtm/q5/verify/';
+		// 	// Authorization token
+		// 	$curl = curl_init();
 
-			$wp_response = curl_exec($curl);
-			curl_close($curl);
+		// 	curl_setopt_array($curl, array(
+		// 	CURLOPT_URL => $checkoutUrl,
+		// 	CURLOPT_RETURNTRANSFER => true,
+		// 	CURLOPT_ENCODING => '',
+		// 	CURLOPT_MAXREDIRS => 10,
+		// 	CURLOPT_TIMEOUT => 0,
+		// 	CURLOPT_FOLLOWLOCATION => true,
+		// 	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		// 	CURLOPT_CUSTOMREQUEST => 'POST',
+		// 	CURLOPT_POSTFIELDS => array(
+		// 	  'token_id_user' => $wts['wp_user_id'],
+		// 	  'code_access' => 'a81748202668f51001db39ba72830c34'
+		// 	  ),
+		// 	CURLOPT_USERNAME => $wts['wp_app_client'],
+		// 	CURLOPT_PASSWORD => $wts['wp_app_password'],
+		// 	CURLOPT_HTTPHEADER => array(
+		// 		'Authorization: '.$wts['wp_app_access'],
+		// 		),
+		// 	));
 
-
-			$obj = json_decode($wp_response);
-			$g = array();
-			$g['status'] = $obj->status;
-			$g['message'] = $obj->message;
-			$g['auth_renew'] = $obj->auth_renew;
-			$g['subscription'] = $obj->subscription;
-		}
+		// 	$wp_response = curl_exec($curl);
+		// 	curl_close($curl);
 
 
-        $hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
-		->where('post_type', 'regular-tweets')
-		->exists();
-        // dd($hasRegularTweetsInQueue);
-        $hasCustomSlot = Schedule::where('user_id', Auth::id())->get();
-        // dd($hasCustomSlot);
+		// 	$obj = json_decode($wp_response);
+		// 	$g = array();
+		// 	$g['status'] = $obj->status;
+		// 	$g['message'] = $obj->message;
+		// 	$g['auth_renew'] = $obj->auth_renew;
+		// 	$g['subscription'] = $obj->subscription;
+		// }
+
+
+        // $hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
+		// ->where('post_type', 'regular-tweets')
+		// ->exists();
+        // // dd($hasRegularTweetsInQueue);
+        // $hasCustomSlot = Schedule::where('user_id', Auth::id())->get();
+        // // dd($hasCustomSlot);
 
 
 
-		return view('dashboard', ['title' => $title, 'np' => $wp_response, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
-        // return view('dashboard')->with('title', $title);
+		// return view('dashboard', ['title' => $title, 'np' => $wp_response, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+        return view('dashboard')->with('title', $title);
     }
 
     public function help()
