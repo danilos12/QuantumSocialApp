@@ -23,6 +23,30 @@
     </div>  <!-- END .account-settings-header-wrap -->            
     
     <div class="modal-large-inner main-settings-inner twitter-settings-inner">
+        <div class="menu-section-outer x-share-access-outer">
+            <div class="menu-section-inner x-share-access-inner">
+    
+                <div class="menu-section-twirl-header-outer">
+                    <div class="menu-section-twirl-header-inner">
+    
+                    <span class="menu-section-header">
+                        X Account Share access</span>
+    
+                    <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
+                        class="ui-icon menu-section-twirl-icon menu-section-preferences-twirl" data-toggle="collapse" data-target="#x-share-access-twirl" />
+    
+                    </div>  <!-- END .menu-section-twirl-header-inner -->
+                </div>  <!-- END .menu-section-twirl-header-outer -->
+    
+                <div class="menu-section-twirl-section-outer collapse" id="x-share-access-twirl">
+                    <div class="menu-section-twirl-section-inner">
+    
+                        fsasdfa
+    
+                    </div>  <!-- END .menu-section-twirl-section-inner -->
+                </div>  <!-- END .menu-section-twirl-section-outer -->
+            </div>  <!-- END .x-share-access-inner -->
+        </div>  <!-- END .x-share-access-outer -->
 
         <div class="menu-section-outer command-module-account-outer">
             <div class="menu-section-inner command-module-account-inner">

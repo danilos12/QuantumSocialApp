@@ -19,6 +19,8 @@ use App\Helpers\MembershipHelper;
 use App\Models\QuantumAcctMeta;
 use App\Models\Schedule;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
+
 
 // use DateTime;
 // use Date;
@@ -84,7 +86,7 @@ class CommandmoduleController extends Controller
             ->count();
 
         // Add the limitation: run the code only if the count of posts is less than 5
-        if ($checkRole->mo_post_credits > $postCount) {
+        if ($checkRole->mo_post_credits > $postCount) {                  
             try {
                 $postData = $request->input('formData');
                 $user_id = $this->setDefaultId();
@@ -111,8 +113,11 @@ class CommandmoduleController extends Controller
                     'rt_ite' => $postData['iterations-custom-cm'] ?? null,
                     'promo_id' => $postData['promo-tweets-cmp'] ?? null,
                     'post_type_code' => rand(10000, 99999),
-                    'active' => $checkToggle->queue_switch
+                    'active' => $checkToggle->queue_switch, 
+                    'social_media' => $postData['social_media'] // 1 => twitter, 2 => facebook, 3= instagram
                 ];
+
+                // dd($insertData);
 
                 // Determine the scheduling method and time based on the user's selected option
                 if (isset($postData['scheduling-options'])) {
@@ -197,8 +202,7 @@ class CommandmoduleController extends Controller
                     $insertData['post_description'] = $textarea;
                     $insertData['sched_method'] = $sched_method;
                     $insertData['sched_time'] = $sched_time;
-
-                    // $insertData['post_type'] = 'tweet-storm-tweets';
+                    $insertData['post_type'] = 'tweet-storm-tweets';
 
 
                     // // Post tweet if scheduling option is "send-now"
@@ -718,56 +722,97 @@ class CommandmoduleController extends Controller
         }
     }
 
+    // to be back
     public function upload(Request $request)
     {
 		if ($request->hasFile('csv_file')) {
-            // get the file
-			$file = $request->file('csv_file');
+            
+            // Validate the uploaded file
+            $validator = Validator::make($request->all(), [
+                'csv_file' => 'required|file|mimes:csv,txt',
+            ]);
+            
 
-            // parse the data in csv
-			$csvData = $this->parse($file);
-
-            // after getting the data from the csv, parse first the link to get the meta details, then add it into the database
-            foreach ($csvData as $key => $data) {
-                $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
-                // Format the timestamp as desired
-                $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
-
-                $insertData = Bulk_post::create([
-                    'user_id' =>  Auth::id(),
-                    'twitter_id' => $request->input('twitter_id'),
-                    'post_type' => 'regular-tweets',
-                    'post_description' => $data['post_description'],
-                    'sched_method' => 'bulk-queue',
-                    'sched_time' => $formattedDateTime,
-                    'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
-                    'image_url' => isset($data['image_url']) ? $data['image_url'] : null,
-                ]);
-
-                if ($insertData) {
-                    // Check if the record already exists
-                    $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
-
-                    if (!$findMeta) {
-                        // The record does not exist, so scrape the meta tags
-                        $metaTags = $this->scrapeMetaTags($data['link_url']);
-
-                        $metaData = [
-                            'meta_title' => $metaTags['og:title'],
-                            'meta_description' => $metaTags['og:description'],
-                            'meta_image' => $metaTags['og:image'],
-                            'link_url' => $data['link_url'],
-                        ];
-
-                        // Create a new record in the database
-                        Bulk_meta::create($metaData);
-
-                    }
-                }
-
+            // Handle validation errors
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
             }
 
-            return response()->json(['message' => 'CSV data saved successfully'], 200);
+             // Process the CSV file
+            $file = $request->file('csv_file');
+            $rows = array_map('str_getcsv', file($file));            
+
+            $errorRows = [];
+            foreach ($rows as $row) {
+                // Perform validation on each row
+                $validator = Validator::make($row, [
+                    'image_url' => 'required',
+                    'link_url' => 'required',
+                    // Add more validation rules as needed
+                ]);
+    
+                // Check if validation failed for the current row
+                if ($validator->fails()) {
+                    // Store the error details along with the row data
+                    $errorRows[] = [
+                        'data' => $row,
+                        'errors' => $validator->errors()->toArray(),
+                    ];
+                } else {
+                    // Process valid data (e.g., insert into database)
+                    // YourModel::create($row);
+                }
+            }
+
+            dd($errorRows);
+            return redirect()->back()->with('success', 'CSV uploaded successfully.')->with('errorRows', $errorRows);
+            // // get the file
+			// $file = $request->file('csv_file');
+
+            // // parse the data in csv
+			// $csvData = $this->parse($file);
+
+            // // after getting the data from the csv, parse first the link to get the meta details, then add it into the database
+            // foreach ($csvData as $key => $data) {
+            //     $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
+            //     // Format the timestamp as desired
+            //     $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
+
+            //     $insertData = Bulk_post::create([
+            //         'user_id' =>  Auth::id(),
+            //         'twitter_id' => $request->input('twitter_id'),
+            //         'post_type' => 'regular-tweets',
+            //         'post_description' => $data['post_description'],
+            //         'sched_method' => 'bulk-queue',
+            //         'sched_time' => $formattedDateTime,
+            //         'link_url' => isset($data['link_url']) ? $data['link_url'] : null,
+            //         'image_url' => isset($data['image_url']) ? $data['image_url'] : null,
+            //     ]);
+
+            //     if ($insertData) {
+            //         // Check if the record already exists
+            //         $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
+
+            //         if (!$findMeta) {
+            //             // The record does not exist, so scrape the meta tags
+            //             $metaTags = $this->scrapeMetaTags($data['link_url']);
+
+            //             $metaData = [
+            //                 'meta_title' => $metaTags['og:title'],
+            //                 'meta_description' => $metaTags['og:description'],
+            //                 'meta_image' => $metaTags['og:image'],
+            //                 'link_url' => $data['link_url'],
+            //             ];
+
+            //             // Create a new record in the database
+            //             Bulk_meta::create($metaData);
+
+            //         }
+            //     }
+
+            // }
+
+            // return response()->json(['message' => 'CSV data saved successfully'], 200);
         } else {
             return response()->json(['message' => 'No file uploaded'], 400);
         }
