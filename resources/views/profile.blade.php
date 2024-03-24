@@ -9,9 +9,9 @@
         <div id="getting-tweets" style="display: none; color: white">
           Getting tweets...
         </div>
-      
+
         @include('selectedAcctTweets')
-    </div>              
+    </div>
 </div>  <!-- END .profile-outer -->
 @endsection
 @section('scripts')

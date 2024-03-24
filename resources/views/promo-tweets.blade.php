@@ -1,4 +1,11 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
 
 @section('content')
 
@@ -79,7 +86,7 @@
 
 
     <div class="profile-posts-outer" >
-      <div class="queued-posts-inner" id="promo">                      
+      <div class="queued-posts-inner" id="promo">
       </div>  <!-- END .profile-posts-inner -->
     </div>  <!-- END .queued-posts-outer -->
 
