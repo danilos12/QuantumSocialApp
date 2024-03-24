@@ -30,7 +30,7 @@
 
                   <div class="bulk-upload-section">
                     <span class="bulk-upload-title">Basic Upload: <span class="font-italic">(Please upload .csv file)</span>
-                      <form id="uploadCsvForm">
+                      <form id="uploadCsvForm" >
                         {{-- @csrf --}}
                         <input type="file" accept=".csv" class="bulk-upload-file-selector" id="csvFileInput" />
                         {{-- <span class="bulk-upload-promo-title">
@@ -40,10 +40,20 @@
                             <option value="null">Select a Promo Campaign...</option>
                             <option>All Promo Titles Here</option>
                         </select> --}}
-                        <input value="Schedule Your Posts" class="bulk-upload-submit" id="uploadCsv"/>
+                        <input value="Schedule Your Posts" class="bulk-upload-submit" id="uploadCsv" />
                     </form>
 
+                    {{-- to be back --}}
                   </div>  <!-- END .bulk-upload-section -->
+                  @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                  @endif
                   </div>
 
                   <div class="uploader-tips">

@@ -4229,6 +4229,59 @@ input#toggle_api {
     align-items: center;
     background: rgba(143, 116, 188, 0.4);
 }
+
+
+.change-pass-modal {
+    display: flex;
+    justify-items: center;
+    flex-direction: row;
+    position: fixed;
+    top: 0%;
+    left: 0%;
+    margin-right: 5%;
+    width: 100vw;
+    height: 100vh;
+
+    backdrop-filter: blur(5px);
+    /*
+  right: 0;
+  min-height: 1px;
+*/
+    z-index: 79;
+}
+.change-pass-inner {
+    position: relative;
+    top: 25%;
+    left: 35%;
+    width: 513px;
+    padding: 2em 2em 1em;
+    border-radius: 10px;
+    backdrop-filter: blur(3px);
+    flex-direction: column;
+    align-items: center;
+    background: rgba(143, 116, 188, 0.4);
+}
+
+.change-pass-inner .global-input-text {
+    width: 100%!important;
+    margin: 0 0 0.5em 0;
+    /* margin-bottom: 0.5em; */
+}
+
+.change-pass-inner .global-input-text input {
+    width: 100%!important;
+}
+
+
+.change-pass-inner input[type=submit] {
+    width: 100%;
+    margin-bottom: 0.5em;
+    background: #43EBF180;
+    border: none;
+    padding: 0.5em;
+    border-radius: 0.5em;
+}
+
 .font-white {
     color: white;
 }

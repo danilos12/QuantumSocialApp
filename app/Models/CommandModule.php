@@ -26,7 +26,8 @@ class CommandModule extends Model
         'post_type_code',
         'active',
         'from_bulk',
-        'image_url'
+        'image_url',
+        'social_media'
     ];
     public $timestamps = true;
 }
