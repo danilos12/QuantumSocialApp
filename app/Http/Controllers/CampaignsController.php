@@ -91,6 +91,9 @@ class CampaignsController extends Controller
 
 	public function tag_groups()
     {
+     
+
+
 		$title = 'Tag Groups';
         $userId = $this->setDefaultId(); //To check current user loggedin User ID dria
         $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
@@ -98,7 +101,8 @@ class CampaignsController extends Controller
         ->where('post_type', 'regular-tweets')
         ->exists();
 		return view('tags-groups', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
-        // return view('tags-groups')->with('title', $title);
+
+
     }
 
 }

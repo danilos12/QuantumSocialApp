@@ -55,7 +55,7 @@ class GeneralSettingController extends Controller
         if (Auth::guard('web')->check()) {
             return $this->defaultid = Auth::id();
         }
-        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+        if (Auth::guard('member')->check()) {
             return $this->defaultid = MembershipHelper::membercurrent();
         }
     }
@@ -110,12 +110,12 @@ class GeneralSettingController extends Controller
     public function getTwitterForm(Request $request) {
         try {
             TwitterSettings::join('ut_acct_mngt', 'ut_acct_mngt.twitter_id', 'settings_twitter.twitter_id')
-                ->where('ut_acct_mngt.user_id', Auth::id())
+                ->where('ut_acct_mngt.user_id', $this->setDefaultId())
                 ->update(['toggle_10' => $request->toggle]);
 
             // Retrieve the updated toggle_10 value
             $settings = TwitterSettings::join('ut_acct_mngt', 'ut_acct_mngt.twitter_id', 'settings_twitter.twitter_id')
-                ->where('ut_acct_mngt.user_id', Auth::id())
+                ->where('ut_acct_mngt.user_id', $this->setDefaultId())
                 ->first();
 
             $toggle_10 = $settings->toggle_10;
@@ -123,7 +123,7 @@ class GeneralSettingController extends Controller
             if ($toggle_10 === 1) {
                 // Find the existing record or create a new one
                 $credentials = TwitterApiCredentials::updateOrCreate(
-                    ['user_id' => Auth::id()],
+                    ['user_id' => $this->setDefaultId()],
                     [
                         'twitter_id' => null,
                         'api_key' => null,
@@ -152,7 +152,7 @@ class GeneralSettingController extends Controller
     }
 
     public function renderTwitterAPiAccordion() {
-        $lastSavedData = GeneralSettings::where('user_id', Auth::id())->first();
+        $lastSavedData = GeneralSettings::where('user_id', $this->setDefaultId())->first();
         $html= '';
 
         if ($lastSavedData->toggle_1 === 1 && $lastSavedData->toggle_7 === 1)
@@ -175,7 +175,7 @@ class GeneralSettingController extends Controller
 
         try {
 
-            $saveTwitterApi = TwitterApiCredentials::where('user_id', Auth::id())->first();
+            $saveTwitterApi = TwitterApiCredentials::where('user_id', $this->setDefaultId())->first();
             $saveTwitterApi->twitter_id = $twitter_id;
             $saveTwitterApi->api_key = $request->input('api_key');
             $saveTwitterApi->api_secret = $request->input('api_secret');
@@ -215,7 +215,7 @@ class GeneralSettingController extends Controller
                 return response()->json(['status' => 200, 'stat' => 'success' ,'message' => 'Master API Credentials are successfully updated']);
             } else {
                 $api = new MasterTwitterApiCredentials($request->all());
-                $api->user_id = Auth::id();
+                $api->user_id = $this->setDefaultId();
                 $api->save();
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
             }
@@ -286,17 +286,17 @@ class GeneralSettingController extends Controller
             $selectAcct = $request->input('selected');
 
             // update to be selected
-            UT_AcctMngt::where(['twitter_id'=> $twitterId, 'user_id' => Auth::id()])->update(['selected' => $selectAcct]);
-            $updatedRecord = UT_AcctMngt::where(['twitter_id' => $twitterId, 'user_id' => Auth::id()])->select('twitter_id')->first();
+            UT_AcctMngt::where(['twitter_id'=> $twitterId, 'user_id' => $this->setDefaultId()])->update(['selected' => $selectAcct]);
+            $updatedRecord = UT_AcctMngt::where(['twitter_id' => $twitterId, 'user_id' => $this->setDefaultId()])->select('twitter_id')->first();
 
             // Retrieve the twitter_id value from the updated record
             $twitterId = $updatedRecord->twitter_id;
 
             // set others to false
-            UT_AcctMngt::where('user_id', Auth::id())->where('twitter_id', '!=', $twitterId)->update(['selected' => 0]);
+            UT_AcctMngt::where('user_id', $this->setDefaultId())->where('twitter_id', '!=', $twitterId)->update(['selected' => 0]);
 
             // retrieve updated data
-            $selectedAcct = UT_AcctMngt::where(['twitter_id' => $twitterId, 'user_id' => Auth::id()])->pluck('selected');
+            $selectedAcct = UT_AcctMngt::where(['twitter_id' => $twitterId, 'user_id' => $this->setDefaultId()])->pluck('selected');
 
             return response()->json(['status' => 200, 'data' => $selectedAcct, 'message' => 'Twitter account is now updated']);
 
@@ -402,20 +402,20 @@ class GeneralSettingController extends Controller
         if ($subs_id == 1 ) {
 
             if($memberCount < 0 && $relational['role'] === 'Member' ){
-                    Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+
                     $userMngt = DB::table('members')->insert($relational);
                     if ($userMngt) {
-
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
                     }
             }elseif($adminCount < 1 && $relational['role'] === 'Admin'){
-                    Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+
 
                         $userMngt = DB::table('members')->insert($relational);
                     if ($userMngt) {
-
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -434,22 +434,22 @@ class GeneralSettingController extends Controller
 if ($subs_id == 2 ) {
 
     if($memberCount < 5 && $relational['role'] === 'Member' ){
-        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+
             $userMngt = DB::table('members')->insert($relational);
 
             if ($userMngt) {
-
+                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                 return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
             } else {
                 return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
             }
         }elseif($adminCount < 3 && $relational['role'] === 'Admin'){
 
-            Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                     $userMngt = DB::table('members')->insert($relational);
 
                 if ($userMngt) {
 
+                    Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                     return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                 } else {
                     return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -470,10 +470,10 @@ if ($subs_id == 2 ) {
         if ($subs_id == 3 ) {
 
             if($memberCount < 10 && $relational['role'] === 'Member' ){
-                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+
                 $userMngt = DB::table('members')->insert($relational);
             if ($userMngt) {
-
+                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                 return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
             } else {
                 return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -481,11 +481,11 @@ if ($subs_id == 2 ) {
         }
         elseif($adminCount < 5 && $relational['role'] === 'Admin')
         {
-            Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+
 
                     $userMngt = DB::table('members')->insert($relational);
                     if ($userMngt) {
-
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
@@ -532,7 +532,7 @@ if ($subs_id == 2 ) {
             $getMembers =  DB::table('user_mngt')
                 ->join('users', 'user_mngt.user_id', '=', 'users.id')
                 ->select('users.*', 'user_mngt.*')
-                ->where('user_mngt.main_id', Auth::id())
+                ->where('user_mngt.main_id', $this->setDefaultId())
                 ->get();
 
 

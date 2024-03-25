@@ -48,7 +48,7 @@ class PostingController extends Controller
         if (Auth::guard('web')->check()) {
             return $this->defaultid = Auth::id();
         }
-        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+        if (Auth::guard('member')->check()) {
             return $this->defaultid = MembershipHelper::membercurrent();
         }
     }
@@ -281,6 +281,7 @@ class PostingController extends Controller
 	public function bulk_uploader()
     {
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
+
 		$title = 'Bulk Uploader';
 		$hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
 		->where('post_type', 'regular-tweets')
