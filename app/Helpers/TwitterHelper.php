@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\Auth;
 class TwitterHelper
 {
 
+    protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
+    }
+
     public static function refreshAccessToken($refreshToken)
     {
         $curl = curl_init();
@@ -99,13 +109,13 @@ class TwitterHelper
     }
 
     public static function getTwitterToken($twitter_id) {
-
+        $defaultId = (new self())->setDefaultId();
         $findActiveTwitter = Twitter::join('twitter_meta', 'twitter_accts.twitter_id', '=', 'twitter_meta.twitter_id')
             ->join('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
             ->select('twitter_accts.*', 'twitter_meta.*', 'ut_acct_mngt.selected')
             ->where('twitter_accts.twitter_id', '=', $twitter_id)
             ->where('twitter_accts.deleted', '=', 0)
-            ->where('twitter_accts.user_id', '=', Auth::id())
+            ->where('twitter_accts.user_id', '=', $defaultId)
             ->where('ut_acct_mngt.selected', '=', 1)
             ->where('twitter_meta.active', '=',   1)
             ->first();
@@ -116,6 +126,7 @@ class TwitterHelper
 
     public static function executeAfterFiveHoursFromLastUpdate($lastUpdated)
     {
+
         // Convert the last update time to a Carbon object
         $lastUpdated = Carbon::parse($lastUpdated);
 
@@ -128,24 +139,27 @@ class TwitterHelper
             // ...
         }
     }
-   
+
 
     public static function now($id) {
 
-
-        $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
+        $defaultId = (new self())->setDefaultId();
+        $acctMeta = QuantumAcctMeta::where('user_id', $defaultId)->first();
         $utc = Carbon::now($acctMeta->timezone);
 
         return $utc;
     }
 
     public static function timezone($id) {
-        $acctMeta = QuantumAcctMeta::where('user_id', $id)->first();
+        $defaultId = (new self())->setDefaultId();
+        $acctMeta = QuantumAcctMeta::where('user_id', $defaultId)->first();
         return $acctMeta->timezone;
     }
 
     public static function getActiveAPI($id) {
-        $activeAPI = MasterTwitterApiCredentials::where('user_id', $id)->first();
+        $defaultId = (new self())->setDefaultId();
+
+        $activeAPI = MasterTwitterApiCredentials::where('user_id', $defaultId)->first();
         return $activeAPI;
     }
 
