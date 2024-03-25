@@ -231,7 +231,11 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
-      <div class="upgrade"></div>
+      <div class="upgrade">
+        @if(isset($modalContent))
+            <!-- Render the modal content -->
+            {!! $modalContent !!}
+        @endif</div>
     @else
       @endauth
     @endif
