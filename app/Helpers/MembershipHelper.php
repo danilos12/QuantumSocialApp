@@ -18,7 +18,7 @@ class MembershipHelper
             $userid;
         if(Auth::guard('web')->check()){
             $userid = Auth::id();
-        }elseif(Auth::guard('member')->user()->role === 'Admin'){
+        }elseif(Auth::guard('member')->user()){
             $userid =  self::membercurrent();
 
         }
