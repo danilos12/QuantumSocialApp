@@ -126,9 +126,9 @@
         font-weight: 600
     }
 
-    .modal-large-outer-upgrade 
-    {         
-        display: flex;     
+    .modal-large-outer-upgrade
+    {
+        display: flex;
         flex-direction: column;
         /* background: var(--frost-background); */
         color: var(--body-text);
@@ -151,14 +151,14 @@
             {{-- <div data-form-url="{{ route('save-settings') }}" data-twitterid=" {{ isset($user) ? $user->twitter_id : " " }}" id="help-settings"></div> --}}
 
             <div class="main-container">
-                @if (Auth::guard('web')->check()) 
+                @if (Auth::guard('web')->check())
                 <h1 class="header">Account owner</h1>
-                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>                           
-                @else 
+                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>
+                @else
                 <h1 class="header">Member</h1>
-                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>                           
-                @endif 
-                
+                <p>Effective content management is essential for success in the digital age, allowing you to build credibility, engage your audience, and stay ahead of the competition</p>
+                @endif
+
 
                 <div class="card-container">
                     <div class="card">
@@ -174,7 +174,7 @@
                             <div class="feature-item">3</div>
                             <div class="feature-item">4</div>
                         </div>
-                        @if (Auth::guard('web')->check())                         
+                        @if (Auth::guard('web')->check())
                         <input type="button" class="card-cta" value="{{ ($product_id === 61) ? "Your Plan" : "Upgrade Now" }}" data-product-id="61" {{ ($product_id === 61) ? 'disabled' : "" }} >
                         @endif
                     </div>
@@ -191,7 +191,7 @@
                             <div class="feature-item">3</div>
                             <div class="feature-item">4</div>
                         </div>
-                        @if (Auth::guard('web')->check()) 
+                        @if (Auth::guard('web')->check())
                         <input type="button" class="card-cta" value="{{ ($product_id === 62) ? "Your Plan" : "Upgrade Now" }}" data-product-id="62" {{ ($product_id === 62) ? 'disabled' : "" }} >
                         @endif
                     </div>
@@ -208,7 +208,7 @@
                             <div class="feature-item">3</div>
                             <div class="feature-item">4</div>
                         </div>
-                        @if (Auth::guard('web')->check()) 
+                        @if (Auth::guard('web')->check())
                         <input type="button" class="card-cta" value="{{ ($product_id === 63) ? "Your Plan" : "Upgrade Now" }}" data-product-id="63" {{ ($product_id === 63) ? 'disabled' : "" }} >
                         @endif
                     </div>
@@ -238,7 +238,17 @@
             $('.modal-large-anchor-upgrade').attr('style', 'display: none');
 
             if (uri === "bulk-queue" || uri === "bulk") {
-                window.location.href = "{{ route('dashboard') }}"
+                @if (Auth::guard('web')->check())
+                var redirectUrl = "{{ route('dashboard') }}";
+                @endif
+                @if (Auth::guard('member')->check())
+                var redirectUrl = "{{ route('memberhome') }}";
+                @endif
+
+                if(redirectUrl){
+                    window.location.href = redirectUrl;
+                }
+
             }
         })
     })

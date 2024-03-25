@@ -67,7 +67,7 @@
           <img src="{{ asset('public/')}}/ui-images/logo/QuantumLogo-Horizontal-white.svg" class="image-placeholder" height="100%" />
 
           <!-- Authentication Links -->
-          @if (Route::has('login'))
+          @if (Route::has('tomemberauth'))
             @auth('member')
             <div class="banner-twitter-profile-wrap">
               <a href="#">
@@ -235,7 +235,8 @@
         @if(isset($modalContent))
             <!-- Render the modal content -->
             {!! $modalContent !!}
-        @endif</div>
+        @endif
+      </div>
     @else
       @endauth
     @endif
