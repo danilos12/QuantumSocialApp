@@ -84,7 +84,7 @@ $(document).ready(function () {
         const $form = $(e.target).serializeArray();
         var formData = {};
         $.each($form, function(index, field){
-            formData[field.name] = field.value;         
+            formData[field.name] = field.value;
         });
 
         try {
@@ -94,17 +94,17 @@ $(document).ready(function () {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
                 },
-                body: JSON.stringify(formData) // Convert the object to JSON string           
+                body: JSON.stringify(formData) // Convert the object to JSON string
             });
             const responseData = await response.json();
-      
+
             var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
             if (responseData.status === 200) {
               $(this).after(div);
             } else {
               $(this).after(div);
-            }      
-      
+            }
+
             // remove the div after 3 seconds
             setTimeout(function() {
                 div.remove();
@@ -114,7 +114,7 @@ $(document).ready(function () {
         }
     })
 
-    $(document).on('submit', '#master_api_form', async function(e) {        
+    $(document).on('submit', '#master_api_form', async function(e) {
         e.preventDefault();
         const $form = $(e.target).serializeArray();
         var id = e.currentTarget.dataset.id;
@@ -645,10 +645,14 @@ $(document).ready(function () {
             toastr[responseData.stat](
                 `Success! ${responseData.message}`
             );
+            setTimeout(function () {
+                location.reload();
+            }, 1000);
         } else if (responseData.stat == "warning") {
             toastr[responseData.stat](
                 `Warning! ${responseData.message}`
             );
+   
         }
     });
 

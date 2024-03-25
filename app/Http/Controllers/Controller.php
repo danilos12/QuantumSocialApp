@@ -23,10 +23,6 @@ use Exception;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    // if(Auth::guard('member')->user()->admin_access == 1){
-    // }else{
-    //             return response()->json(['stat' => 'warning', 'error' => $trace, 'message' => 'You are not allowed to add twitter account, please ask permission to the owner']);
-    //         }
 
     protected function setDefaultId()
     {
