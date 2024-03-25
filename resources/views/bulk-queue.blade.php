@@ -1,7 +1,10 @@
-@if(Auth::guard('web')->check())
-@extends('layouts.app')
-@elseif(Auth::guard('member')->check())
-@extends('layouts.membersdashboard')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
 @endif
 
 @section('content')
