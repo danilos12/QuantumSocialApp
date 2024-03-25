@@ -7,7 +7,7 @@
       <div class="menu-section-outer quantum-settings-outer">
         <div class="menu-section-inner quantum-settings-inner" id="quantum_acct">
           <span class="menu-section-header">
-            Quantum Account</span>           
+            Quantum Account</span>
 
             <div class="settings-item-wrap email-data-wrap">
               <div class="settings-item-label-wrap">
@@ -28,7 +28,7 @@
               <div class="settings-item-data-wrap">
                 <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
                 <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
-              </div>  <!-- END .settings-item-data -->             
+              </div>  <!-- END .settings-item-data -->
             </div>  <!-- END .plan-data-wrap -->
 
             <div class="settings-item-wrap timezone-data-wrap">
@@ -41,7 +41,7 @@
                 <select name="timezone_offset" id="timezone-offset" class="time-zone-data">
                   @if ($timezones)
                   @foreach ($timezones as $timezone)
-                  <option value='{{ isset($timezone) ? $timezone->value : "" }}' {{ isset($timezone) ? ($mainUser->timezone ?? "") === $timezone->value ? "selected" : "" : "" }}>{{ isset($timezone) ? $timezone->label : "" }}</option>                       
+                  <option value='{{ isset($timezone) ? $timezone->value : "" }}' {{ isset($timezone) ? ($mainUser->timezone ?? "") === $timezone->value ? "selected" : "" : "" }}>{{ isset($timezone) ? $timezone->label : "" }}</option>
                   @endforeach
                   @endif
                 </select>
@@ -51,9 +51,9 @@
 
         </div>  <!-- END .quantum-settings-inner -->
       </div>  <!-- END .quantum-settings-outer -->
-      
 
-      @if (Auth::guard('web')->check()) 
+
+      @if (Auth::guard('web')->check())
 
       <!--     BEGIN TEAM MEMBERS   -->
       <div class="menu-section-outer team-account-outer">
@@ -61,75 +61,79 @@
         <div class="menu-section-inner team-account-inner">
           <span class="menu-section-header">Team Members </span>
 
-            @if ($cntmembers > 0) 
+            @if ($cntmembers > 0)
               @foreach($team_members as $member)
-                <div class="menu-team-account-outer"> 
-                  <div class="menu-team-account-inner"> 
-            
+                <div class="menu-team-account-outer">
+                  <div class="menu-team-account-inner">
+
                       <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
-            
-                      <div class="global-team-profile-header"> 
+
+                      <div class="global-team-profile-header">
                       <div class="global-profile-details">
                           <div class="global-profile-name">
                           <a href="#">
                           <!-- {{$member->firstname}} -->
                         </a>
+                          <!-- {{$member->firstname}} -->
+                        </a>
                           </div>  <!-- END .global-profile-name -->
                           <div class="global-profile-subdata">
-                          <span class="global-profile-email"> 
-                              <!-- <a href="">{{$member->email}}</a> -->
+                          <span class="global-profile-email">
+                              <a href="">{{$member->email}}</a>
                             </span>
                           </div>  <!-- END .global-post-date-wrap -->
                       </div>  <!-- END .global-team-profile-details -->
                       </div>  <!-- END .global-team-profile-header -->
-            
+
                       <div class="menu-social-account-options">
                         <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
                         <span class="menu-account-icons">
-                            <!-- <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/> -->
-                            <!-- <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}" />  -->
+                            {{-- <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->user_id }}"/> --}}
+                            {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->user_id }}" /> --}}
+                            <img src="{{ asset('public/')}}/ui-images/icons/05-drafts.svg" class="ui-icon menu-account-icons-img" title="Edit" data-toggle="tooltip" id="_edit-{{ $member->account_holder_id }}"/>
+                            <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon menu-account-icons-img {{ $member->main_acct === 1 ? 'disabled' : ''}}" title="Delete" data-toggle="tooltip" id="_delete-{{ $member->account_holder_id }}" />
                         </span>
                       </div>  <!-- END .menu-social-account-options -->
-            
+
                   </div>  <!-- END .menu-social-account-inner -->
-                </div>  <!-- END .menu-social-account-outer -->   
+                </div>  <!-- END .menu-social-account-outer -->
               @endforeach
             @enderror
 
-            <div class="edit-team-member-modal" > 
-              <div class="edit-team-member-inner frosted" > 
-        
+            <div class="edit-team-member-modal" >
+              <div class="edit-team-member-inner frosted" >
+
                   <!-- BEGIN input copied from engage.html -->
-                  <div class="global-input-email"> 
+                  <div class="global-input-email">
                   <form>
-                      <div class="global-input-text input-text">  
+                      <div class="global-input-text input-text">
                       <input type="text" placeholder="First Name" id="newuser_fname"/>
                       </div>
-                      
-                      <div class="global-input-text input-text">  
+
+                      <div class="global-input-text input-text">
                       <input type="text" placeholder="Last Name" id="newuser_lname" />
                       </div>
-        
-                      <div class="global-input-text input-text">  
+
+                      <div class="global-input-text input-text">
                       <input type="text" placeholder="Email address" id="newuser_email" />
                       </div>
-        
+
                   </form>
-                  <span class="edit-team-button"> 
+                  <span class="edit-team-button">
                       Edit<span>
                   </div>
                   <!-- END copied from engage.html -->
-        
+
               </div>  <!-- END .add-team-member-inner -->
             </div>  <!-- END .add-team-member-modal -->
 
-            <div class="menu-team-members-add-accounts-section"> 
+            <div class="menu-team-members-add-accounts-section">
               <div class="add-account add-team">
                   <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon" />
                   + Add New Member
               </div>  <!-- END .add-twitter-account -->
             </div>  <!-- END .menu-social-add-accounts-section -->
-          
+
         </div>  <!-- END .social-accounts-inner -->
 
 
@@ -141,13 +145,13 @@
       <div class="menu-section-outer social-accounts-outer">
         <div class="menu-section-inner social-accounts-inner">
           <span class="menu-section-header">Twitter API Credential</span>
-          
+
           <div class="menu-twirl-option-outer">
             <div class="menu-twirl-option-inner">
               <div class="menu-twirl-left">
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                   <span class="menu-twirl-option-text">
-                    Use this Master API for every Twitter account.</span> 
+                    Use this Master API for every Twitter account.</span>
               </div>  <!-- END .menu-twirl-left -->
               <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_1" {{ isset($generalSetting) ? ($generalSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
               </div>  <!-- END .menu-twirl-right -->
@@ -158,51 +162,51 @@
               <form id="master_api_form">
                 <div class="subTwirl-header-wrap">
                   <span class="subTwirl-header">API Key:</span>
-                </div> 
+                </div>
                 <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>                      
+                  <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>
                 </div>
                 <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">API Secret:</span>
-                </div> 
+                </div>
                 <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>                     
-                </div> 
+                  <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
+                </div>
                 <div class="subTwirl-header-wrap">
                   <span class="subTwirl-header">Bearer Token:</span>
-                </div> 
+                </div>
                 <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>                      
+                  <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>
                 </div>
                 <div class="subTwirl-header-wrap">
                   <span class="subTwirl-header">OAuth 2.0 ID:</span>
-                </div> 
+                </div>
                 <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>                      
+                  <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>
                 </div>
                 <div class="subTwirl-header-wrap">
                   <span class="subTwirl-header">OAuth 2.0 Secret:</span>
-                </div> 
+                </div>
                 <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>                      
+                  <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
                 </div>
                 <div class="subTwirl-header-wrap">
                   <span class="subTwirl-header">Callback URL</span>
-                </div> 
-                <div class="menu-subTwirl-inner">
-                  <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>                      
                 </div>
                 <div class="menu-subTwirl-inner">
-                  <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">                        
-                </div> 
-              </form>                  
-            </div>  
+                  <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>
+                </div>
+                <div class="menu-subTwirl-inner">
+                  <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
+                </div>
+              </form>
+            </div>
 
             <div class="menu-twirl-option-inner">
               <div class="menu-twirl-left">
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                   <span class="menu-twirl-option-text">
-                    Allow each Twitter account to have its own API <br>                          
+                    Allow each Twitter account to have its own API <br>
                     <span style="font-weight: 200; font-style: italic;">(Keeping this off forces all accounts to use the Master API, but activating it will give the choice on the account level in each Twitter account's settings.)</span>
                   </span>
               </div>  <!-- END .menu-twirl-left -->
@@ -210,14 +214,14 @@
               </div>  <!-- END .menu-twirl-right -->
             </div>  <!-- END .menu-twirl-option-inner -->
           </div>  <!-- END .menu-twirl-option-outer -->
-                        
+
         </div>  <!-- END .social-accounts-inner -->
       </div>  <!-- END .social-accounts-outer -->
 
 
       <div class="menu-section-outer social-accounts-outer">
         <div class="menu-section-inner social-accounts-inner">
-          <span class="menu-section-header">Social Accounts</span>                  
+          <span class="menu-section-header">Social Accounts</span>
             @if ($acct_twitter_count > 0)
                   @foreach($twitter_accts as $acct)
                   <!-- BEGIN .menu-social-account Instance -->
@@ -242,7 +246,7 @@
                           </div>  <!-- END .global-post-date-wrap -->
                         </div>  <!-- END .global-author-details -->
                       </div>  <!-- END .global-twitter-profile-header -->
-          
+
                       <div class="menu-social-account-options">
                         <span class="menu-account-default" data-twitter_id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account. Page will reload after select" default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
                         <span class="menu-account-icons">
@@ -255,13 +259,13 @@
                   </div>  <!-- END .menu-social-account-outer -->
                   <!-- END .menu-social-account Instance -->
                   @endforeach
-                  
+
             @else
                 <p>No accounts found</p>
             @endif
 
             <div class="menu-social-add-accounts-section">
-              <div class="add-account add-twitter-account" id="link-twitter">                                   
+              <div class="add-account add-twitter-account" id="link-twitter">
                 <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon vertical-middle" />
                     <span>+ Twitter</span>
               </div>  <!-- END .add-twitter-account -->
@@ -403,7 +407,7 @@
 
 .mt-2 { margin-top: 0.5em;}
 </style>
-    
+
 <script>
     function deleteTwitterAccount(element) {
 
