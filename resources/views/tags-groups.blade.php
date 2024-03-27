@@ -1,4 +1,13 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->user()->role == 'Admin' ? 'layouts.membersdashboard' : redirect()->route('memberhome'));
+?>
+
+@if(is_string($layout))
+    @extends($layout)
+@else
+    {{ $layout->send() }}
+@endif
 
 @section('content')
 <div class="page-outer tag-groups-outer">
@@ -32,7 +41,7 @@
 
                           <div class="tag-groups-column tag-groups-left-column">
                             <div class="tag-groups-left-column-inside" id="tag-groups-content">
-                                                         
+
                             </div>  <!-- END .tag-groups-left-column-inside -->
                           </div>  <!-- END .tag-groups-left-column -->
                           <div class="tag-groups-column tag-groups-right-column section-hide">
@@ -81,7 +90,7 @@
     color: white;
     padding: 6px;
     margin: 5px;
-  } 
+  }
 
   .section-hide {
     display: none!important;
@@ -90,7 +99,7 @@
   .xtag {
     pointer-events: all;
     display: inline-block;
-    content: 'x';  
+    content: 'x';
     height: 20px;
     width: 20px;
     margin-right: 6px;

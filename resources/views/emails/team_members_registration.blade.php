@@ -79,14 +79,14 @@
                             $('.success-message').text(response.message).css('display', 'flex');
                             setTimeout(function() {
                                 $('.success-message').fadeOut('slow');
-                                window.location.href = "{{ route('session-login') }}";
+                                window.location.href = "{{ route('forauth') }}";
                             }, 3000);
 
                         }else if(response.stat=='warning'){
                             $('.error-message').text(response.message).css('display', 'flex');
                             setTimeout(function() {
                                 $('.error-message').fadeOut('slow');
-                                window.location.href = "{{ route('session-login') }}";
+                                window.location.href = "{{ route('forauth') }}";
                             }, 3000);
 
                         }
