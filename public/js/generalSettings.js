@@ -516,7 +516,7 @@ $(document).ready(function () {
             roles: selectedRole,
             api_access: isChecked,
         };
-        console.log('EDITUPDATEMEMBERS');
+
         try {
             const response = await fetch(APP_URL + "/settings/members/_edit", {
                 method: "POST",
@@ -534,10 +534,16 @@ $(document).ready(function () {
                 toastr[responseData.stat](
                     `${responseData.status_m}, ${responseData.message}`
                 );
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
             } else if (responseData.stat == "warning") {
                 toastr[responseData.stat](
                     `${responseData.status_m}, ${responseData.message}`
                 );
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
             }
         } catch (err) {
             console.log("Error fetching the data" + err);
@@ -624,10 +630,6 @@ $(document).ready(function () {
     $(document).on("click", ".deleting", async function (e) {
         var targetId = e.target.id;
         var id = targetId.split("-");
-        console.log(id[1]);
-        console.log(id[0]);
-
-
 
         const response = await fetch(APP_URL + "/settings/members/_delete/" + id[1], {
             method: "POST",
@@ -745,6 +747,6 @@ $(document).ready(function () {
     });
 
 
-    
+
 
 });

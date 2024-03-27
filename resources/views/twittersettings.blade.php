@@ -41,7 +41,7 @@
                 <div class="menu-section-twirl-section-outer collapse" id="x-share-access-twirl">
                     <div class="menu-section-twirl-section-inner">
 
-                        @foreach($team_members as $member)
+                        @foreach($xmembersaccess as $member)
                         <div class="menu-team-account-outer">
                           <div class="menu-team-account-inner">
 

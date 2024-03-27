@@ -145,13 +145,21 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 $getMembers = DB::table('members')
-                    ->leftJoin('users', 'members.account_holder_id', '=', 'users.id')
-                    ->leftJoin('member_xaccount', 'members.account_holder_id', '=', 'member_xaccount.user_id')
-                    ->select('users.*', 'members.*','member_xaccount.*')
+                    ->join('users', 'members.account_holder_id', '=', 'users.id')
+                    ->select('users.*', 'members.*')
                     ->where('members.account_holder_id', Auth::id())
                     ->get();
                 // dd($getMembers);
                 $view->with('team_members', $getMembers);
+
+                $xmembersaccess = DB::table('members')
+                ->leftJoin('users', 'members.account_holder_id', '=', 'users.id')
+                ->leftJoin('member_xaccount', 'members.account_holder_id', '=', 'member_xaccount.user_id')
+                ->select('users.*', 'members.*','member_xaccount.*')
+                ->where('members.account_holder_id', Auth::id())
+                ->get();
+
+            $view->with('xmembersaccess', $xmembersaccess);
 
                 $cntMembers = DB::table('members')
                     ->join('users', 'members.account_holder_id', '=', 'users.id')
@@ -317,6 +325,15 @@ class AppServiceProvider extends ServiceProvider
                     ->get();
 
                 $view->with('team_members', $getMembers);
+
+                $xmembersaccess = DB::table('members')
+                    ->leftJoin('users', 'members.account_holder_id', '=', 'users.id')
+                    ->leftJoin('member_xaccount', 'members.account_holder_id', '=', 'member_xaccount.user_id')
+                    ->select('users.*', 'members.*','member_xaccount.*')
+                    ->where('members.account_holder_id', $acct_hdid)
+                    ->get();
+
+                $view->with('xmembersaccess', $xmembersaccess);
 
 
 
