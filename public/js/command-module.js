@@ -1209,7 +1209,7 @@ function postWrapper(info, post_type) {
                 <div class="mosaic-posts-outer">
                     <div class="mosaic-watermark-wrap frosted">
                     {{-- // image depends on post type --}}
-                    <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="mosaic-watermark" />
+                    <img src="${APP_URL}/public/ui-images/icons/pg-x.svg" class="mosaic-watermark" />
                     <div class="mosaic-posts-inner">
 
                         <div class="global-twitter-profile-header">
@@ -1473,7 +1473,7 @@ function postWrapperBulk(info) {
 
     return ($template = `<div class="queued-single-post-wrapper queue-type-custom" status="active" queue-type="custom">
             <div class="queued-single-post-bulk" >
-                <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="queued-watermark">
+                <img src="${APP_URL}/public/ui-images/icons/pg-x.svg" class="queued-watermark">
 
                 <div class="queued-single-start-column">
                 <span class="mt-3">
