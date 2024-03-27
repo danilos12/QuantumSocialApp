@@ -435,7 +435,7 @@
                     <div class="menu-social-account-outer">
                       <div class="menu-social-account-inner">
 
-                      <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon menu-account-type-icon" />
+                      <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon menu-account-type-icon" />
 
                         <div class="global-twitter-profile-header">
                           <a href="#">
@@ -457,9 +457,10 @@
                         <span class="menu-account-icons">
                           <span class="menu-account-default" data-twitter_id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account. Page will reload after select" default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
                           @if ($selected_user->twitter_id === $acct->twitter_id)
-                          <img src="{{ asset('public/')}}/ui-images/icons/00j-twitter-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
-                          @else
-                          <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" onclick="deleteTwitterAccount(this)"/>
+                          <img src="{{ asset('public/')}}/ui-images/icons/00j-x-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
+                          <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
+                          @else 
+                          <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
                           @endif
                         </span>
 
@@ -474,7 +475,7 @@
 
               <div class="menu-social-add-accounts-section">
                 <div class="add-account add-twitter-account" id="link-twitter">
-                  <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon vertical-middle" />
+                  <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon vertical-middle" />
                       <span>+ Twitter</span>
                 </div>  <!-- END .add-twitter-account -->
               </div>  <!-- END .menu-social-add-accounts-section -->

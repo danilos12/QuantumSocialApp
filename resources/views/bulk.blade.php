@@ -40,15 +40,17 @@
                             <option value="null">Select a Promo Campaign...</option>
                             <option>All Promo Titles Here</option>
                         </select> --}}
-                        <input value="Schedule Your Posts" class="bulk-upload-submit" id="uploadCsv" />
+                        <input type="button" value="Schedule Your Posts" class="bulk-upload-submit" id="uploadCsv1"/>
+                        {{-- <button type="submit" class="bulk-upload-submit">Schedule your posts</button> --}}
                     </form>
 
                     {{-- to be back --}}
                   </div>  <!-- END .bulk-upload-section -->
-                  @if($errors->any())
+                 
+                  @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul>
-                            @foreach($errors->all() as $error)
+                            @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>

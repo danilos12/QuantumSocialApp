@@ -118,7 +118,7 @@
 
                             <div class="mosaic-post-controls">
                               <span class="mosaic-control-icon">
-                                <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
+                                <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon" /></span>
                               <span class="mosaic-control-icon">
                                 <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
                             </div>  <!-- END .mosaic-post-controls -->
@@ -190,7 +190,7 @@
 
                                           <div class="mosaic-post-controls">
                                             <span class="mosaic-control-icon">
-                                              <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" /></span>
+                                              <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon" /></span>
                                             <span class="mosaic-control-icon">
                                               <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
                                           </div>  <!-- END .mosaic-post-controls -->
