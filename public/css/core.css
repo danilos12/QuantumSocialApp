@@ -4799,3 +4799,13 @@ input#toggle_api {
     padding: 0.5em 0.75em;
     cursor: pointer;
 }
+
+
+.copyButton {
+    background-color: var(--frost-background);
+    width: 50%;
+    padding: 1em;
+    border: none;
+    border-radius: 1em;
+    margin-top: 1em;
+  }
