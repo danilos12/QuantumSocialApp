@@ -37,7 +37,7 @@ div[data-schedule="none"] {
 
             <div class="post-area-left primary-post-left">
               <div class="post-area-wrap primary-post-area-wrap">
-                <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="twitter-tweets"/>
+                <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator indicator-active" data-src="twitter-tweets"/>
                 <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon post-type-indicator" data-src="evergreen-tweets"/>
                 <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" data-src="promos-tweets" />
                 <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-tweets"/>
@@ -63,9 +63,9 @@ div[data-schedule="none"] {
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
                 </span>  <!-- END .primary-post-type-buttons -->
                 <span class="post-option-buttons primary-post-option-buttons">
-                  <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" />
-                  <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" />
-                  <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" data-select="0" data-type="retweet-timer-tweets" class="ui-icon post-tool-icon retweet-timer-icon" /> 
+                  {{-- <img src="{{ asset('public/')}}/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon post-tool-icon hashtags-option-icon" /> --}}
+                  {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-envelope.svg" class="ui-icon post-tool-icon dm-option-icon" /> --}}
+                  {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet-timer.svg" data-select="0" data-type="retweet-timer-tweets" class="ui-icon post-tool-icon retweet-timer-icon" />  --}}
                   <span class="post-counter">1/1</span>
                 </span>  <!-- END .primary-post-option-buttons -->
 

@@ -37,7 +37,7 @@
 
               <div class="post-area-left primary-post-left">
                 <div class="post-area-wrap primary-post-area-wrap">
-                  <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator" data-src="twitter-tweets"/>
+                  <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator" data-src="twitter-tweets"/>
                   <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon post-type-indicator" data-src="evergreen-tweets"/>
                   <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon post-type-indicator" data-src="promos-tweets" />
                   <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon post-type-indicator" data-src="tweet-storm-tweets"/>

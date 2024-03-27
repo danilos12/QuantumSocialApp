@@ -346,12 +346,42 @@ class CommandmoduleController extends Controller
     }
 
     public function getTagItems(Request $request) {
-        $twitterId = $request->input('twitter_id');
-        $tagId = $request->input('tag_id');
+        try {
+            $twitterId = $request->input('twitter_id');
+            $tagId = $request->input('tag_id');            
+            
+            if ($request->input('copy')) {
+                // Fetch tag items from the database
+                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get(); 
+                
+                // Count the number of tag items
+                $tagItemCount = $tagItems->count();
+                
+                $tags = ''; // Initialize variable to store tag items
+                
+                // Check if there are any tag items before looping
+                if ($tagItemCount > 0) {
+                    // Loop through each tag item and concatenate them into a string
+                    foreach ($tagItems as $tagItem) {
+                        $tags .= '#' . $tagItem->tag_meta_value . ' '; // Assuming tag_meta_value contains the tag value
+                    }
 
-        $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get();
-        return response()->json($tagItems);
-    }
+                    // Return response with tag items
+                    return response()->json(['tags' => $tags, 'message' => 'Tags are copy to your clipboard.', 'status' => 200]);
+                } else {
+                    // No tag items found, handle accordingly
+                    return response()->json(['message' => 'No tag items found.', 'status' => 402]);
+                }
+                
+            } else {
+                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get(); 
+                return response()->json($tagItems);
+            };
+
+        } catch (Exception $e) {
+            return response()->json(['status' => 500, 'message' => 'Error getting the tags']);
+        }
+    }     
 
     public function getUnselectedTwitterAccounts() {
 
@@ -834,41 +864,70 @@ class CommandmoduleController extends Controller
 
     public function upload(Request $request) {
 
-        // Validate the request data
-        $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt',
-        ]);
 
-        // Get the file
-        $file = $request->file('csv_file');
-
-        // Parse the CSV data
-        $csvData = $this->parse($file);
-
-        // Initialize an array to store validation errors
-        $errors = [];
-
-        $message = '';
-
-        // Validate each row of the CSV data
-        foreach ($csvData as $key => $data) {
-            $validator = Validator::make($data, [
-                'post_description' => 'required',
-                'year' => 'required|digits:4',
-                'month' => 'required|digits_between:1,2|between:1,12',
-                'day' => 'required|digits_between:1,2|between:1,31',
-                'hour' => 'required|digits_between:1,2|between:0,23',
-                'minute' => 'required|digits_between:1,2|between:0,59',
-                'link_url' => ['required', Rule::requiredIf(empty($data['image_url']))],
-                'image_url' => ['required', Rule::requiredIf(empty($data['link_url']))],
+        
+            // Validate the CSV file
+            $validator = Validator::make($request->all(), [
+                'csv_file' => 'required|file|mimes:csv,txt',
             ]);
-
+    
+            // If validation fails, return with errors
             if ($validator->fails()) {
-                $errors[] = [
-                    'row' => $key + 1,
-                    'errors' => $validator->errors()->all(),
-                ];
-            } else {
+                return back()->withErrors($validator);
+            }
+    
+            // Read and process the CSV file
+            $csvFile = $request->file('csv_file');
+            $rows = array_map('str_getcsv', file($csvFile));
+            $errors = [];
+
+    
+            foreach ($rows as $rowNumber => $row) {
+                // Validate each row
+                $validator = Validator::make($row, [
+                    'post_description' => 'required',
+                    'year' => 'required|digits:4',
+                    'month' => 'required|digits_between:1,2|between:1,12',
+                    'day' => 'required|digits_between:1,2|between:1,31',
+                    'hour' => 'required|digits_between:1,2|between:0,23',
+                    'minute' => 'required|digits_between:1,2|between:0,59',
+                    'link_url' => [
+                        'required',
+                        Rule::requiredIf(function () use ($row) {
+                            return empty($row['image_url']);
+                        }),
+                    ],
+                    'image_url' => [
+                        'required',
+                        Rule::requiredIf(function () use ($row) {
+                            return empty($row['link_url']);
+                        }),
+                    ],
+                ]);
+    
+                // If validation fails for a row, collect errors
+                if ($validator->fails()) {
+                    $errors[] = [
+                        'row' => $rowNumber + 1,
+                        'errors' => $validator->errors()->all(),
+                    ];
+                }
+            }
+
+            // dd($errors);
+    
+            // // If there are validation errors, return with error messages
+            // if (!empty($errors)) {
+            //     return response()->json('errors' , $errors);
+            // }
+    
+            // If validation passes, proceed with processing the CSV data
+            // Add your logic to process the CSV data here
+    
+            // Redirect with success message if processing is successful
+            // return response()->with('success', 'CSV file uploaded successfully.');
+        
+       
                 // // Validation passed, save the data to the database
                 // $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
                 // $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
@@ -898,15 +957,16 @@ class CommandmoduleController extends Controller
                 //         Bulk_meta::create($metaData);
                 //     }
                 // }
-                    $message = 'yow';
-            }
+       // If there are validation errors, return with error messages
+        if (!empty($errors)) {
+            return response()->json(['status' => 402, 'errors' => $errors]);
         }
 
-        if (!empty($errors)) {
-            return response()->json(['errors' => $errors], 422);
-        } else {
-            return response()->json(['message' => 'CSV data saved successfully' . $message], 200);
-        }
+    // If validation passes, proceed with processing the CSV data
+    // Add your logic to process the CSV data here
+
+    // Redirect with success message if processing is successful
+    return back()->with('success', 'CSV file uploaded successfully.');
 
 
     }

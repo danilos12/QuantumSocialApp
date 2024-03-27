@@ -177,12 +177,12 @@ function tweetInstance(value) {
     return ($template = `
          <div class="mosaic-posts-outer template">
             <div class="mosaic-watermark-wrap frosted">                
-                <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="mosaic-watermark"  />                
+                <img src="${APP_URL}/public/ui-images/icons/pg-x.svg" class="mosaic-watermark"  />                
             <div class="mosaic-posts-inner">
 
                 <div class="mosaic-post-controls">
                 <span class="mosaic-control-icon">
-                    <img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon" data-twitterlink="https://twitter.com/${TWITTER_USN}/status/${value.id}" /></span>
+                    <img src="${APP_URL}/public/ui-images/icons/pg-x.svg" class="ui-icon" data-twitterlink="https://twitter.com/${TWITTER_USN}/status/${value.id}" /></span>
                 <span class="mosaic-control-icon">
                     <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" /></span>
                 </div>  <!-- END .mosaic-post-controls -->
