@@ -81,7 +81,7 @@
               <div class="banner-twitter-settings">
               @if (Auth::guard('web')->check())
               @if($acct_twitter_count >  0)
-              <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" />
+              <img src="{{ asset('public/ui-images/icons/00j-x-settings.svg') }}" class="menu-icon launch-twitter-settings" data-id="modal" id="twitter-settings" />
               @endif
               @endif
               </div>
@@ -122,7 +122,7 @@
                               {{ '@' . $twitter->twitter_username}}
                             </div>
                           </div>
-                          <img src="{{ asset('public/ui-images/icons/00j-twitter-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" id="twitter-settings"/></a>
+                          <img src="{{ asset('public/ui-images/icons/00j-x-settings.svg') }} "class="menu-icon twitter-bar-settings-icon" id="twitter-settings"/></a>
                         </div>  <!-- END .twitter-account-item -->
                       </div>  <!-- END .twitter-account-select-bar -->
                       @endforeach

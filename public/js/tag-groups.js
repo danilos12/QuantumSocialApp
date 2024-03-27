@@ -30,11 +30,11 @@
    $('#tag-groups-content').on('click', '.tag-group-controller', async function() {
         $('.tag-container').empty()
         var tag_id = $(this).find('.tag-option-title').attr('id');
+        $('.copyButton').attr('data-tag-id', tag_id)
 
         try {
             const response = await fetch(APP_URL + "/cmd/get-tag-items?twitter_id=" + TWITTER_ID + '&tag_id=' + tag_id);
             const responseData = await response.json();
-            console.log(responseData)
 
             if (responseData.length > 0) {
                 $.each(responseData, function (index, k, value) {
@@ -47,7 +47,6 @@
                     );
                     $(".tag-container").append(template);
                 });
-                console.log(response);
             } else {
                 $(".tag-groups-right-column")
                     .removeClass("section-hide")
@@ -58,6 +57,72 @@
             console.error(err)
         }
     });    
+
+    $(document).on('click', '.copyButton', async function(e) {
+
+        try {
+            const response = await fetch(APP_URL + "/cmd/get-tag-items?copy=true&twitter_id=" + TWITTER_ID + '&tag_id=' + e.target.dataset.tagId);
+            const responseData = await response.json();
+            // console.log(responseData)
+
+            if (responseData.status === 200) {
+                // Create a temporary textarea element to hold the text to copy
+                var tempTextArea = $("<textarea>");
+                tempTextArea.val(responseData.tags);
+
+                // Append the textarea to the DOM
+                $("body").append(tempTextArea);
+
+                // Select the text within the textarea
+                tempTextArea.select();
+
+                // Copy the selected text to clipboard
+                document.execCommand("copy");
+
+                // Remove the temporary textarea
+                tempTextArea.remove();
+              alert(responseData.message);
+            } else {
+              alert('No tags available for this hashtag group.')
+            }
+        } catch (err) {
+            console.error(err)
+        }
+
+
+        // Get the count of span elements within the .tag-container
+        // var spanCount = $('.tag-container span').length;
+
+        // // Check if the count is greater than 1
+        // if (spanCount > 1) {
+           
+        //     $('.tag-container span').each(function(e, i) {
+        //         console.log(i.textContent);
+        //         tags += '#' + i.textContent + ' ';
+        //     });
+
+        //     // Create a temporary textarea element to hold the text to copy
+        //     var tempTextArea = $("<textarea>");
+        //     tempTextArea.val(tags);
+
+        //     // Append the textarea to the DOM
+        //     $("body").append(tempTextArea);
+
+        //     // Select the text within the textarea
+        //     tempTextArea.select();
+
+        //     // Copy the selected text to clipboard
+        //     document.execCommand("copy");
+
+        //     // Remove the temporary textarea
+        //     tempTextArea.remove();
+
+        //     // Alert the user
+        //     alert("Tags are copied to clipboard!");
+        // } else {
+        //     alert("No tags available to copy");
+        // }
+      });      
 
     // Add hashtags in the input fields
     var input, container, hashtagArray, t;
@@ -162,7 +227,8 @@
                                         <span class="tag-option-title" id="${data.tag_group_mkey}">${data.tag_group_mvalue}</span>
                                     </span> 
                                 </div> 
-                            </div> `;                
+                            </div> 
+                            `;                
     }
 
     function addNewTagTemplateItem(hashtag) {
