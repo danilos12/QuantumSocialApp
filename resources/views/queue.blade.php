@@ -47,7 +47,7 @@
             All (0)
           </li>
           <li id="non-campaign">
-            <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon" />
+            <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon" />
             Non-Campaign (0)
           </li>
           {{-- <li id="evergreen">

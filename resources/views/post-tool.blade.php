@@ -35,7 +35,7 @@
 
                                   <div class="post-area-left primary-post-left">
                                     <div class="post-area-wrap primary-post-area-wrap">
-                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" />
+                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator indicator-active" />
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" />
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" />
                                      <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon post-type-indicator" />
@@ -321,7 +321,7 @@
                                       <div class="new-post-wrap add-tweet-col">
                                         <div class="post-area-left new-post-left">
                                           <div class="post-area-wrap new-post-area-wrap">
-                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" />
+                                           <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator indicator-active" />
                                            <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" />
                                            <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" />
                                            <img src="{{ asset('public/')}}/ui-images/icons/pg-evergreen.svg" class="ui-icon post-type-indicator" />
