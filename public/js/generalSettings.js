@@ -652,7 +652,7 @@ $(document).ready(function () {
             toastr[responseData.stat](
                 `Warning! ${responseData.message}`
             );
-   
+
         }
     });
 
@@ -743,4 +743,8 @@ $(document).ready(function () {
 
         }
     });
+
+
+    
+
 });
