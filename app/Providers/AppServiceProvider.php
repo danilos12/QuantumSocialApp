@@ -64,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('refresh_token', $token->refresh_token ?? "");
                 }
 
+
                 $twitterID = $selectedUser->twitter_id ?? 0;
                 $view->with('twitter_id', $twitterID);
                 $view->with('twitter_name', $selectedUser->twitter_name ?? "");
@@ -144,10 +145,12 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 $getMembers = DB::table('members')
-                    ->join('users', 'members.account_holder_id', '=', 'users.id')
-                    ->select('users.*', 'members.*')
+                    ->leftJoin('users', 'members.account_holder_id', '=', 'users.id')
+                    ->leftJoin('member_xaccount', 'members.account_holder_id', '=', 'member_xaccount.user_id')
+                    ->select('users.*', 'members.*','member_xaccount.*')
                     ->where('members.account_holder_id', Auth::id())
                     ->get();
+                // dd($getMembers);
                 $view->with('team_members', $getMembers);
 
                 $cntMembers = DB::table('members')
@@ -162,10 +165,11 @@ class AppServiceProvider extends ServiceProvider
                     ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
                     ->where('post_type', 'regular-tweets')
                     ->exists();
-                    // dd($hasRegularTweetsInQueue);
+
                 $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
 
                 $checkRole = MembershipHelper::tier(Auth::id());
+
                 $view->with('product_id', $checkRole->subscription_id);
 
 
@@ -173,6 +177,8 @@ class AppServiceProvider extends ServiceProvider
                     ->where('user_id', Auth::id())
                     ->get();
                 $view->with('hasCustomSlot', $hasCustomSlot);
+
+
 
             }
 
@@ -291,7 +297,7 @@ class AppServiceProvider extends ServiceProvider
                 $membership = DB::table('users_meta')->where('user_id', $acct_hdid)
                         ->join('plans', 'users_meta.subscription_id', 'plans.subscription_id')
                         ->first();
-                // dd($membership);
+
                 $view->with('membership', $membership);
 
                 $toggle = DB::table('users_meta')->where('user_id', $acct_hdid)->first();
@@ -302,12 +308,17 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('toggle', 0);
                 }
 
+
                 $getMembers = DB::table('members')
-                    ->join('users', 'members.account_holder_id', '=', 'users.id')
-                    ->select('users.*', 'members.*')
+                    ->leftJoin('users', 'members.account_holder_id', '=', 'users.id')
+                    ->leftJoin('member_xaccount', 'members.account_holder_id', '=', 'member_xaccount.user_id')
+                    ->select('users.*', 'members.*','member_xaccount.*')
                     ->where('members.account_holder_id', $acct_hdid)
                     ->get();
+
                 $view->with('team_members', $getMembers);
+
+
 
                 $cntMembers = DB::table('members')
                     ->join('users', 'members.account_holder_id', '=', 'users.id')
@@ -331,6 +342,8 @@ class AppServiceProvider extends ServiceProvider
                     ->where('user_id', $acct_hdid)
                     ->get();
                 $view->with('hasCustomSlot', $hasCustomSlot);
+
+
 
             }
         });
