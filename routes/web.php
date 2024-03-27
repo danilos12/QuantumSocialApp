@@ -130,6 +130,7 @@ Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'tw
 Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
 Route::post('/twitter/{id}/tweet-now', [App\Http\Controllers\TwitterApi::class, 'tweetNow'])->name('tweet.now');
 Route::post('/twitter/{id}/tweet-schedule', [App\Http\Controllers\TwitterApi::class, 'tweetSchedule'])->name('tweet.filter');
+Route::post('/twitter/assignmember', [App\Http\Controllers\TwitterApi::class, 'addmemberxaccts'])->name('togglexmember');
 
 
 
