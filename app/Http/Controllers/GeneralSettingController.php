@@ -338,7 +338,7 @@ class GeneralSettingController extends Controller
 
 
     public function addNewMember(Request $request) {
-        try {
+
 
 
             // Your existing code for adding a new member and sending an email goes here...
@@ -402,25 +402,46 @@ class GeneralSettingController extends Controller
         if ($subs_id == 1 ) {
 
             if($memberCount < 0 && $relational['role'] === 'Member' ){
+                try{
+                    Mail::to($request->input('emails'));
+
 
                     $userMngt = DB::table('members')->insert($relational);
+
+
                     if ($userMngt) {
-                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+                        new TeamMemberReg($request->input('fullname'));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    }
+                } catch (Swift_TransportException $e) {
+
+                        return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
                     }
             }elseif($adminCount < 1 && $relational['role'] === 'Admin'){
+                try{
 
 
-                        $userMngt = DB::table('members')->insert($relational);
+                    DB::beginTransaction();
+                    $userMngt = DB::table('members')->insert($relational);
+
+
+
                     if ($userMngt) {
                         Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+                        DB::commit();
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
-                    } else {
+                    }
+                     else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
                     }
 
+                } catch (Swift_TransportException $e) {
+
+                    DB::rollback();
+                    return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
+                }
         }  else{
             return response()->json(['stat' => 'warning','status' => 403, 'message' => 'You have exceeded the numbers of member/admin', 'html' => $html]);
         }
@@ -434,26 +455,40 @@ class GeneralSettingController extends Controller
 if ($subs_id == 2 ) {
 
     if($memberCount < 5 && $relational['role'] === 'Member' ){
+            try{
 
-            $userMngt = DB::table('members')->insert($relational);
+                DB::beginTransaction();
+                $userMngt = DB::table('members')->insert($relational);
+                DB::commit();
 
-            if ($userMngt) {
-                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
-                return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
-            } else {
-                return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    if ($userMngt) {
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+                        return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+                    } else {
+                        return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    }
+            } catch (Swift_TransportException $e) {
+                DB::rollback();
+                return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
             }
         }elseif($adminCount < 3 && $relational['role'] === 'Admin'){
+            try{
 
-                    $userMngt = DB::table('members')->insert($relational);
+                DB::beginTransaction();
+                $userMngt = DB::table('members')->insert($relational);
+                DB::commit();
 
                 if ($userMngt) {
-
                     Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+
                     return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                 } else {
                     return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
                 }
+            } catch (Swift_TransportException $e) {
+                DB::rollback();
+                return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
+            }
 
         }else{
 
@@ -470,26 +505,38 @@ if ($subs_id == 2 ) {
         if ($subs_id == 3 ) {
 
             if($memberCount < 10 && $relational['role'] === 'Member' ){
+                try{
 
-                $userMngt = DB::table('members')->insert($relational);
-            if ($userMngt) {
-                Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
-                return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
-            } else {
-                return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
-            }
-        }
-        elseif($adminCount < 5 && $relational['role'] === 'Admin')
-        {
-
-
+                    DB::beginTransaction();
                     $userMngt = DB::table('members')->insert($relational);
+                    DB::commit();
                     if ($userMngt) {
                         Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
                     } else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
                     }
+                } catch (Swift_TransportException $e) {
+                    DB::rollback();
+                    return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
+                }
+        }
+        elseif($adminCount < 5 && $relational['role'] === 'Admin')
+        {
+                try{
+                    DB::beginTransaction();
+                    $userMngt = DB::table('members')->insert($relational);
+                    DB::commit();
+                    if ($userMngt) {
+                        Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
+                        return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
+                    } else {
+                        return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
+                    }
+                } catch (Swift_TransportException $e) {
+                    DB::rollback();
+                    return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
+                }
 
         }else
         {
@@ -503,10 +550,7 @@ if ($subs_id == 2 ) {
             }else{
                 return response()->json(['message' => 'You are not allowed to add members please ask permission to owner', 'stat' => 'warning']);
             }
-        } catch (Swift_TransportException $e) {
-            // Handle the Swift_TransportException
-            return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
-        }
+
 }
     public function _getedit(Request $request){
 

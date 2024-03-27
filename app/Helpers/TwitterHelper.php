@@ -20,7 +20,7 @@ class TwitterHelper
         if (Auth::guard('web')->check()) {
             return $this->defaultid = Auth::id();
         }
-        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+        if (Auth::guard('member')->check()) {
             return $this->defaultid = MembershipHelper::membercurrent();
         }
     }
