@@ -34,7 +34,6 @@
                     </div>  <!-- END .new-tag-group -->
                   </div>  <!-- END .new-tag-group-modal-wrap -->
 
-
                   <div class="tag-groups-tool-outer">
                     <div class="tag-groups-tool-inner">
 
@@ -54,15 +53,15 @@
                                     <form id="addTagForm">
                                       <input type="text" id="addTagForm_tags" name="addTagForm_tags" placeholder="Add a new tag here and press enter..." />
                                     </form>
-                                    <div class="tag-container"></div>
-                                  </div>  <!-- END .add-tag-to-tagset -->
+                                    <div class="tag-container"></div>    
+                                    <button class="copyButton" >Copy Tag items</button>                                
+                                  </div>  <!-- END .add-tag-to-tagset -->                                  
 
                                 </div>  <!-- END .tagset-wrap -->
 
                             </div>  <!-- END .tag-group-display -->
-                        </div>  <!-- END .tag-groups-right-column -->
-
-
+                        </div>  <!-- END .tag-groups-right-column -->                       
+                        
                         </div>  <!-- END .tag-groups-column-wrap -->
 
                     </div>  <!-- END .tag-groups-tool-inner -->
@@ -84,6 +83,7 @@
     border-bottom: 2px solid var(--frost-background);
     margin-bottom: 1em;
   } ,
+
   .xtag{
     pointer-events: none;
     background-color: #242424;
