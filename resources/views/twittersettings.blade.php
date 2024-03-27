@@ -20,29 +20,126 @@
             </div>  <!-- END .global-author-details -->
         </div>  <!-- END .global-twitter-profile-header -->
 
-    </div>  <!-- END .account-settings-header-wrap -->            
-    
+    </div>  <!-- END .account-settings-header-wrap -->
+
     <div class="modal-large-inner main-settings-inner twitter-settings-inner">
         <div class="menu-section-outer x-share-access-outer">
             <div class="menu-section-inner x-share-access-inner">
-    
+
                 <div class="menu-section-twirl-header-outer">
                     <div class="menu-section-twirl-header-inner">
-    
+
                     <span class="menu-section-header">
                         X Account Share access</span>
-    
+
                     <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg"
                         class="ui-icon menu-section-twirl-icon menu-section-preferences-twirl" data-toggle="collapse" data-target="#x-share-access-twirl" />
-    
+
                     </div>  <!-- END .menu-section-twirl-header-inner -->
                 </div>  <!-- END .menu-section-twirl-header-outer -->
-    
+
                 <div class="menu-section-twirl-section-outer collapse" id="x-share-access-twirl">
                     <div class="menu-section-twirl-section-inner">
-    
-                        fsasdfa
-    
+
+                        @foreach($team_members as $member)
+                        <div class="menu-team-account-outer">
+                          <div class="menu-team-account-inner">
+
+                              <img src="{{ asset('public/')}}/ui-images/icons/02-profile.svg" class="ui-icon watermark-rotate10" />
+
+                              <div class="global-team-profile-header">
+                              <div class="global-profile-details">
+                                  <div class="global-profile-name flex">
+
+                                  <a href="#">
+                                  {{$member->fullname}}
+                                  @auth('member')
+                                  @if(Auth::guard('member')->user()->id == $member->id)
+                                   (You)
+                                   @else
+
+                                  @endif
+                                  @endauth
+                                  </a>
+
+                                  </div>  <!-- END .global-profile-name -->
+                                  <div class="global-profile-subdata">
+                                  <span class="global-profile-email">
+                                      <a href="">{{$member->email}}</a>
+                                    </span>
+                                  </div>  <!-- END .global-post-date-wrap -->
+                              </div>  <!-- END .global-team-profile-details -->
+                              </div>
+
+                              @auth('member')
+
+
+                              <!-- END .global-team-profile-header -->
+                              @if(Auth::guard('member')->user()->id == $member->id)
+
+
+
+                              @else
+
+                              <div class="menu-social-account-options">
+                                <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+
+                                <div class="childs-cont-2">
+                                  <p class="childs-cont-p">Twitter ACCESS</p>
+                                  <p class="switchtexton">On</p>
+                                  <p class="switchtextoff">Off</p>
+                                  <div class="">
+
+
+                                    <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess" datas-xant="{{$selected_user->user_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_admin-{{$member->id}}" {{ $member->twitter_access == 1 ? 'checked' : '' }}>
+
+
+
+
+
+                                    </div>
+                                </div>
+
+
+
+
+                              </div>
+                                <!-- END .menu-social-account-options -->
+                              @endif
+                              @endauth
+                              @auth('web')
+
+
+
+
+                              <div class="menu-social-account-options">
+                                <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
+
+                                <div class="childs-cont-2">
+                                  <p class="childs-cont-p">Twitter ACCESS</p>
+                                  <p class="switchtexton">On</p>
+                                  <p class="switchtextoff">Off</p>
+                                  <div class="">
+
+
+                                      <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess" name="grant-x-access" data-twitter-id = "{{$selected_user->twitter_id}}"  id="toggle_taccess-{{$member->id}}" {{ $member->twitter_access == 1 ? 'checked' : '' }}>
+
+
+                                    </div>
+                                </div>
+
+
+
+
+
+                              </div>
+                                <!-- END .menu-social-account-options -->
+
+                              @endauth
+                          </div>  <!-- END .menu-social-account-inner -->
+                        </div>  <!-- END .menu-social-account-outer -->
+                      @endforeach
+
                     </div>  <!-- END .menu-section-twirl-section-inner -->
                 </div>  <!-- END .menu-section-twirl-section-outer -->
             </div>  <!-- END .x-share-access-inner -->
@@ -52,30 +149,30 @@
             <div class="menu-section-inner command-module-account-inner">
                 <div class="menu-section-twirl-header-outer">
                     <div class="menu-section-twirl-header-inner">
-    
+
                         <span class="menu-section-header">
                         Account Level - Command Module Settings</span>
-    
+
                         <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon menu-section-twirl-icon menu-section-command-twirl" data-toggle="collapse" data-target="#acct-menu-section-command-twirl" />
-    
+
                     </div>  <!-- END .menu-section-twirl-header-inner -->
                 </div>  <!-- END .menu-section-twirl-header-outer -->
-    
+
                 <div class="menu-section-twirl-section-outer collapse" id="acct-menu-section-command-twirl">
                     <div class="menu-section-twirl-section-inner">
-    
+
                         <div class="menu-twirl-option-outer">
                             <div class="menu-twirl-option-inner">
                                 <div class="menu-twirl-left">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                                     <span class="menu-twirl-option-text">
-                                    Automatically reply to mentions on all scheduled posts.</span> 
+                                    Automatically reply to mentions on all scheduled posts.</span>
                                 </div>  <!-- END .menu-twirl-left -->
                                 <div class="menu-twirl-right">
                                     <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_1" {{ isset($twitterSetting) ? ($twitterSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
                                 </div>  <!-- END .menu-twirl-right -->
                             </div>  <!-- END .menu-twirl-option-inner -->
-    
+
                             <!-- START auto-reply -->
                             <div class="menu-subTwirl-outer">
                                 <div class="subTwirl-header-wrap">
@@ -91,22 +188,22 @@
                                 </div>  <!-- END .auto-reply-button -->
                             </div>  <!-- END .menu-subTwirl-inner -->
                             <!-- END auto-reply -->
-    
+
                         </div>  <!-- END .menu-twirl-option-outer -->
-                        
+
                         <div class="menu-twirl-option-outer">
-    
+
                             <div class="menu-twirl-option-inner">
                                 <div class="menu-twirl-left">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-dots.svg" class="ui-icon menu-twirl-option-icon" />
                                     <span class="menu-twirl-option-text">
                                     Add a Thread Ender post to the end of threads asking them to follow and retweet the 1st tweet in your thread.</span>
                                 </div>  <!-- END .menu-twirl-left -->
-                                <div class="menu-twirl-right">                                    
+                                <div class="menu-twirl-right">
                                     <input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_2" {{ isset($twitterSetting) ? ($twitterSetting->toggle_2 === 1) ? 'checked' : '' : ''}}>
                                 </div>  <!-- END .menu-twirl-right -->
                             </div>  <!-- END .menu-twirl-option-inner -->
-    
+
                             <div class="menu-subTwirl-outer">
                                 <div class="subTwirl-header-wrap">
                                     <span class="subTwirl-header">
@@ -122,15 +219,15 @@
                                 </div>  <!-- END .thread-ender-button -->
                                 </div>  <!-- END .menu-subTwirl-inner -->
                             </div>  <!-- END .menu-subTwirl-outer -->
-    
+
                         </div>  <!-- END .menu-twirl-option-outer -->
-    
+
                     </div>  <!-- END .menu-section-twirl-section-inner -->
                 </div>  <!-- END .menu-section-twirl-section-outer -->
             </div>  <!-- END .command-module-inner -->
         </div>  <!-- END .command-module-outer -->
-    </div>  <!-- END .twitter-settings-inner -->    
- 
+    </div>  <!-- END .twitter-settings-inner -->
+
 
     <div class="menu-section-outer automated-retweet-settings-outer">
         <div class="menu-section-inner automated-retweet-settings-inner">
@@ -177,7 +274,7 @@
                                 </div>  <!-- END .subTwirl-evergreen-retweets-wrap -->
                                 <div class="subTwirl-evergreen-likes-wrap">
                                     <img src="{{ asset('public/')}}/ui-images/icons/pg-heart.svg" class="ui-icon subTwirl-option-icon" />
-                                    Retweet every 
+                                    Retweet every
                                     <input type="text" class="subTwirl-micro-input" id="eg_rt_likes" value="{{ isset($twitterSetting) ? $twitterSetting->eg_rt_likes : "" }}"/>
                                 likes.
                                 </div>  <!-- END .subTwirl-evergreen-likes-wrap -->
@@ -299,7 +396,7 @@
                         <div class="subTwirl-header-wrap">
                             <span class="subTwirl-header"></span>
                         </div>  <!-- END .subTwirl-header-wrap -->
-                                
+
                         <div class="menu-subTwirl-inner">
                             <div class="subTwirl-content">
                                 <div class="subTwirl-auto-retweet-wrap">
@@ -310,9 +407,9 @@
                                         @endfor
                                     </select>
                                     <select class="subTwirl-auto-retweet-frame" id="rt_auto_frame">
-                                    @php 
+                                    @php
                                         $timeframes = ['minutes', 'hours', 'days']
-                                    @endphp   
+                                    @endphp
 
                                     @foreach ($timeframes as $timeframe)
                                         <option value="{{ $timeframe }}" {{ isset($twitterSetting) ? ($twitterSetting->rt_auto_frame === $i) ? "selected" : "" : "" }} >{{ $timeframe }}</option>
@@ -351,7 +448,7 @@
                         <div class="subTwirl-header-wrap">
                             <span class="subTwirl-header"></span>
                         </div>  <!-- END .subTwirl-header-wrap -->
-                        
+
                         <div class="menu-subTwirl-inner">
 
                             <div class="subTwirl-content">
@@ -360,12 +457,12 @@
                                     <select class="subTwirl-remove-retweet-time" id="rt_auto_rm_time">
                                         @for($i=0; $i<=90; $i++)
                                         <option value="{{ $i }}" {{ isset($twitterSetting) ? ($twitterSetting->rt_auto_rm_time === $i) ? "selected" : "" : "" }} >{{ $i }}</option>
-                                        @endfor                                   
+                                        @endfor
                                     </select>
                                     <select class="subTwirl-remove-retweet-frame" id="rt_auto_rm_frame">
-                                        @php 
+                                        @php
                                             $timeframes = ['minutes', 'hours', 'days']
-                                        @endphp   
+                                        @endphp
                                         @foreach ($timeframes as $timeframe)
                                             <option value="{{ $timeframe }}" {{ isset($twitterSetting) ? ($twitterSetting->rt_auto_rm_frame === $i) ? "selected" : "" : "" }}  >{{ $timeframe }}</option>
                                         @endforeach
@@ -418,7 +515,7 @@
 
                         <div class="menu-subTwirl-outer">
                             <div class="subTwirl-header-wrap">
-                                <span class="subTwirl-header"> 
+                                <span class="subTwirl-header">
                                 Modify your viral post comment below:</span>
                             </div>  <!-- END .subTwirl-header-wrap -->
                             <div class="menu-subTwirl-inner">

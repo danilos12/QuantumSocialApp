@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Auth;
 
 class TwitterHelper
 {
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd40feb6e7de2b3f3457c0596b03d2228dd10ed4
     protected function setDefaultId()
     {
         if (Auth::guard('web')->check()) {
@@ -24,7 +27,10 @@ class TwitterHelper
             return $this->defaultid = MembershipHelper::membercurrent();
         }
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd40feb6e7de2b3f3457c0596b03d2228dd10ed4
     public static function refreshAccessToken($refreshToken)
     {
         $curl = curl_init();
@@ -158,7 +164,10 @@ class TwitterHelper
 
     public static function getActiveAPI($id) {
         $defaultId = (new self())->setDefaultId();
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd40feb6e7de2b3f3457c0596b03d2228dd10ed4
         $activeAPI = MasterTwitterApiCredentials::where('user_id', $defaultId)->first();
         return $activeAPI;
     }
