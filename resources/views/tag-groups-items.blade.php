@@ -51,7 +51,7 @@
         <div class="new-post-wrap add-tweet-col">
         <div class="post-area-left new-post-left">
             <div class="post-area-wrap new-post-area-wrap">
-            <img src="{{ asset('public/')}}/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="" />
+            <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator indicator-active" data-src="" />
             <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-type-icon" />
             <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comment-type-icon"/>
             <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg"  class="ui-icon post-type-indicator" data-src="evergreen-type-icon" />
@@ -173,7 +173,7 @@
 	// 					<div class="new-post-wrap add-tweet-col">
 	// 					<div class="post-area-left new-post-left">
 	// 						<div class="post-area-wrap new-post-area-wrap">
-	// 						<img src="http://www.quantumsocial.local/public/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active">
+	// 						<img src="http://www.quantumsocial.local/public/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator indicator-active">
 	// 						<img src="http://www.quantumsocial.local/public/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator">
 	// 						<img src="http://www.quantumsocial.local/public/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator">
 	// 						<img src="http://www.quantumsocial.local/public/ui-images/icons/pg-evergreen.svg" class="ui-icon post-type-indicator">
@@ -211,7 +211,7 @@
 	// 	$('.add-tweet-inner').after(innerText);
 	// })
 
-							<img src="${APP_URL}/public/ui-images/icons/pg-twitter.svg" class="ui-icon post-type-indicator indicator-active" data-src="" />
+							<img src="${APP_URL}/public/ui-images/icons/pg-x.svg" class="ui-icon post-type-indicator indicator-active" data-src="" />
 						<img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon post-type-indicator" data-src="retweet-type-icon" />
 						<img src="${APP_URL}/public/ui-images/icons/pg-comments.svg" class="ui-icon post-type-indicator" data-src="comment-type-icon"/>
 						<img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg"  class="ui-icon post-type-indicator" data-src="evergreen-type-icon" />
