@@ -79,7 +79,7 @@ select:focus {
     --body-text: var(--color-cosmic-purple);
     --foreground: var(--mode-dark);
     --background: var(--mode-light);
-    --logo-url: url("../ui-images/logo/gradient-mode-logo.svg");   
+    --logo-url: url("../ui-images/logo/gradient-mode-logo.svg");
 
     /* Light Mode Body Background 1
   --body-bg-1: rgb(248,248,248);
@@ -579,7 +579,7 @@ canvas {
   font-weight: 600;
   box-shadow: var(--banner-shadow);
   box-sizing: border-box;
-  z-index: 75; 
+  z-index: 75;
 }
 
 .banner-inner {
@@ -4156,6 +4156,7 @@ input#toggle_api {
     display: flex;
     width: 350px;
     align-items: center;
+    justify-content: flex-end;
 }
 .childs-cont-p {
     margin: 0 0 0px;

@@ -342,9 +342,9 @@
         </div>  <!-- END .team-account-outer -->
         <!--     END TEAM MEMBERS    -->
 {{-- for admin access only --}}
-@if (Auth::guard('web')->check()||Auth::guard('member')->user()->admin_access == 1)
+  @if (Auth::guard('web')->check())
 
-        @auth('member')
+        @auth('web')
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Twitter API Credential</span>
@@ -424,6 +424,87 @@
           </div>  <!-- END .social-accounts-inner -->
         </div>
         @endauth <!-- END .social-accounts-outer -->
+        @elseif(Auth::guard('member')->user()->api_access == 1)
+        @auth('member')
+        <div class="menu-section-outer social-accounts-outer">
+          <div class="menu-section-inner social-accounts-inner">
+            <span class="menu-section-header">Twitter API Credential</span>
+
+            <div class="menu-twirl-option-outer">
+              <div class="menu-twirl-option-inner">
+                <div class="menu-twirl-left">
+                    <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
+                    <span class="menu-twirl-option-text">
+                      Use this Master API for every Twitter account.</span>
+                </div>
+                <!-- END .menu-twirl-left -->
+                <div class="menu-twirl-right">
+
+                  <input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_1" {{ isset($generalSetting) ? ($generalSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
+                </div>  <!-- END .menu-twirl-right -->
+              </div>  <!-- END .menu-twirl-option-inner -->
+
+              <!-- START auto-reply -->
+              <div class="menu-subTwirl-outer">
+                <form id="master_api_form">
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">API Key:</span>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="api_key" name="api_key" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_key  : ''  }}"/>
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                      <span class="subTwirl-header">API Secret:</span>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">Bearer Token:</span>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="bearer_token" name="bearer_token" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->bearer_token : ''  }}"/>
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">OAuth 2.0 ID:</span>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="oauth_id" name="oauth_id" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_id : ''  }}"/>
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">OAuth 2.0 Secret:</span>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
+                  </div>
+                  <div class="subTwirl-header-wrap">
+                    <span class="subTwirl-header">Callback URL</span>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>
+                  </div>
+                  <div class="menu-subTwirl-inner">
+                    <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
+                  </div>
+                </form>
+              </div>
+
+              <div class="menu-twirl-option-inner">
+                <div class="menu-twirl-left">
+                    <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
+                    <span class="menu-twirl-option-text">
+                      Allow each Twitter account to have its own API <br>
+                      <span style="font-weight: 200; font-style: italic;">(Keeping this off forces all accounts to use the Master API, but activating it will give the choice on the account level in each Twitter account's settings.)</span>
+                    </span>
+                </div>  <!-- END .menu-twirl-left -->
+                <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_7" {{ isset($generalSetting) ? ($generalSetting->toggle_7 === 1) ? 'checked' : '' : ''}}>
+                </div>  <!-- END .menu-twirl-right -->
+              </div>  <!-- END .menu-twirl-option-inner -->
+            </div>  <!-- END .menu-twirl-option-outer -->
+
+          </div>  <!-- END .social-accounts-inner -->
+        </div>
+        @endauth
         @endif
 {{-- for admin access only end --}}
         <div class="menu-section-outer social-accounts-outer">

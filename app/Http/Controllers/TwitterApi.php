@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use App\Helpers\TwitterHelper;
-
+use App\Helpers\MembershipHelper;
 
 
 class TwitterApi extends Controller
@@ -20,8 +20,10 @@ class TwitterApi extends Controller
      *
      * @return void
      */
-    protected $defaultid;
-    public function __construct()
+
+
+     protected $defaultid;
+     public function __construct()
     {
         if (Auth::guard('web')->check()) {
             $this->middleware('auth');
@@ -33,23 +35,29 @@ class TwitterApi extends Controller
 
 
         }
+
+
     }
 
-    protected function setDefaultId()
-    {
-        if (Auth::guard('web')->check()) {
+     protected function setDefaultId()
+     {
+         if (Auth::guard('web')->check()) {
             return $this->defaultid = Auth::id();
-        }
-        if (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin') {
+         }
+         if (Auth::guard('member')->check()) {
             return $this->defaultid = MembershipHelper::membercurrent();
-        }
-    }
+         }
+     }
 
+     public function addmemberxaccts(Request $request){
+            
+            return response()->json(['servermid'=>$request->input('mid'),'twitter_id'=>$request->input('twitter_id'),'accounth_id'=>$request->input('user_id')]);
+     }
 
     public function getTweets($twitterId)
     {
         try {
-            $_ENV =  TwitterHelper::getActiveAPI(Auth::id())->bearer_token;
+            $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
@@ -101,7 +109,7 @@ class TwitterApi extends Controller
     public function getTweetFilters($twitterId, $type)
     {
         try {
-            $_ENV =  TwitterHelper::getActiveAPI(Auth::id())->bearer_token;
+            $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
@@ -267,19 +275,21 @@ class TwitterApi extends Controller
 
     public function switchedAccount(Request $request) {
         $title = "Profile";
+        $twitterId = str_replace('twitter-', '', $request->input('id'));
+
         try {
             $twitterId = str_replace('twitter-', '', $request->input('id'));
 
-            $updatedSelected = UT_AcctMngt::where('user_id', Auth::id())
+            $updatedSelected = UT_AcctMngt::where('user_id', $this->setDefaultId())
                 ->where('twitter_id', $twitterId)
                 ->update(['selected' => 1]);
 
             // check if the twitter linked is more than one
-            $countTwitterAcct = UT_AcctMngt::where('user_id', Auth::id())->count();
+            $countTwitterAcct = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
             $updatedRow = '';
             if ($countTwitterAcct > 1) {
                 // update the other twitter not equal to twitter id
-                $updatedSelected += UT_AcctMngt::where('user_id', Auth::id())
+                $updatedSelected += UT_AcctMngt::where('user_id', $this->setDefaultId())
                     ->where('twitter_id', '!=', $twitterId)
                     ->update(['selected' => 0]);
 
@@ -291,7 +301,7 @@ class TwitterApi extends Controller
                     ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                     ->select('twitter_accts.*', 'ut_acct_mngt.*')
                     ->where('ut_acct_mngt.selected', "=", 1) // selected
-                    ->where('ut_acct_mngt.user_id', "=", Auth::id())
+                    ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
                     ->where('twitter_accts.deleted', "=", 0)
                     ->first();
 
@@ -320,17 +330,17 @@ class TwitterApi extends Controller
 
 
             $id = $request->input('twitter_id');
-            $twitter = Twitter::where('twitter_id', $id)->where('user_id', Auth::id());
-            
+            $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+
             // Deleting the Twitter account
             $deletedTwitter = $twitter->delete();
 
             // Checking if the Twitter account deletion was successful
             if ($deletedTwitter) {
                 // Deleting associated Twitter meta
-                $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', Auth::id());
+                $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
                 $deletedMeta = $deleteTwitterMeta->delete();
-                
+
                 // If deletion of Twitter meta is successful
                 if ($deletedMeta) {
                     return response()->json([
@@ -352,9 +362,9 @@ class TwitterApi extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to delete Twitter account'
-                ], 500);           
+                ], 500);
             }
-            
+
             return response()->json(['success' => true, "deleted" => $twitter, 'message' => 'Twitter account is now deleted']);
 
         } else {
