@@ -2,7 +2,7 @@
         <li class="menu-item menu-margin">
             <a href="{{ route('dashboard') }}">
                 <img src = "{{ asset('public/ui-images/icons/01-dashboard.svg') }}" class="menu-icon" />Dashboard
-            </a>                  
+            </a>
         </li>
         <li class="menu-item menu-margin launch-command-module" data-id="modal" id="command-module">
             <img src = "{{ asset('public/ui-images/icons/pg-command.svg') }}" class="menu-icon" />
@@ -13,8 +13,8 @@
                 <img src = "{{ asset('public/ui-images/icons/02-profile.svg') }}" class="menu-icon" />Profile
             </a>
         </li>
-        
-        <li class="menu-item" data-toggle="collapse" data-target="#posting" aria-expanded="false">                    
+
+        <li class="menu-item" data-toggle="collapse" data-target="#posting" aria-expanded="false">
             <img src = "{{ asset('public/ui-images/icons/03-posting.svg') }}" class="menu-icon" />Posting
         </li>
         <ul class="sub-menu menu-margin" id="posting" aria-expanded="false">
@@ -37,14 +37,14 @@
                 </a>
             </li>
 
-            <li id="slot-scheduler">	
+            <li id="slot-scheduler">
                 <a href="{{ route('slot-scheduler') }}">
                     <img src = "{{asset('public/ui-images/icons/07-schedule.svg')}} " class="menu-icon" />
                     Slot Scheduler
                 </a>
             </li>
 
-            {{-- <li id="tweet-stormer">	
+            {{-- <li id="tweet-stormer">
                 <a href="{{ route('tweet-stormer') }}">
                     <img src = "{{asset('public/ui-images/icons/08-tweet-storm.svg')}} " class="menu-icon" />
                     Tweet Stormer
@@ -104,7 +104,7 @@
                 Campaigns
         </li>
         <ul class="sub-menu menu-margin" id="campaigns">
-            <li id="promo"> 
+            <li id="promo">
                 <a href="{{ route('promo-tweets') }}">
                     <img src = "{{asset('public/ui-images/icons/17-promos.svg')}} " class="menu-icon" />
                     Promo Tweets
@@ -117,17 +117,22 @@
                 </a>
             </li>
             <li id="tweet-storms">
-                <a href="{{ route('tweet-storms') }}"> 
+                <a href="{{ route('tweet-storms') }}">
                     <img src = "{{asset('public/ui-images/icons/pg-storms.svg')}} " class="menu-icon" />
                     Tweet Storms
                 </a>
             </li>
+            @if (Auth::guard('web')->check() || (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin'))
+
             <li id="tag-groups">
-                <a href="{{ route('tag-groups') }}"> 
-                    <img src = "{{asset('public/ui-images/icons/18-tag-groups.svg')}} " class="menu-icon" />
+                <a href="{{ route('tag-groups') }}">
+                    <img src="{{ asset('public/ui-images/icons/18-tag-groups.svg') }}" class="menu-icon" />
                     Tag Groups
                 </a>
             </li>
+
+        @endif
+
         </ul>
 
         {{-- <li class="menu-item">

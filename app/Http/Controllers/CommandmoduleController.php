@@ -82,7 +82,7 @@ class CommandmoduleController extends Controller
             ->count();
 
         // Add the limitation: run the code only if the count of posts is less than 5
-        if ($checkRole->mo_post_credits > $postCount) {                  
+        if ($checkRole->mo_post_credits > $postCount) {
             try {
                 $postData = $request->input('formData');
                 $user_id = $this->setDefaultId();
@@ -109,7 +109,7 @@ class CommandmoduleController extends Controller
                     'rt_ite' => $postData['iterations-custom-cm'] ?? null,
                     'promo_id' => $postData['promo-tweets-cmp'] ?? null,
                     'post_type_code' => rand(10000, 99999),
-                    'active' => $checkToggle->queue_switch, 
+                    'active' => $checkToggle->queue_switch,
                     'social_media' => $postData['social_media'] // 1 => twitter, 2 => facebook, 3= instagram
                 ];
 
@@ -224,7 +224,7 @@ class CommandmoduleController extends Controller
                                 $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
                             }
                         }
-                     
+
                     } else {
                         CommandModule::create($insertData);
                     }
@@ -239,7 +239,7 @@ class CommandmoduleController extends Controller
                             $crosstweetData['twitter_id'] = $crosstweetId;
                             $crosstweetData['crosstweets_accts'] = $key;
 
-                            $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();                           
+                            $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();
 
                             // Post tweet if scheduling option is "send-now"
                             if ($postData['scheduling-options'] === 'send-now') {
@@ -250,7 +250,7 @@ class CommandmoduleController extends Controller
 
                                     if ($responses->getOriginalContent()['status'] === 500) {
                                         return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
-                                    } else {                                       
+                                    } else {
                                         CommandModule::create($crosstweetData);
                                         $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
                                     }
@@ -768,12 +768,12 @@ class CommandmoduleController extends Controller
     // public function upload(Request $request)
     // {
 	// 	if ($request->hasFile('csv_file')) {
-            
+
     //         // Validate the uploaded file
     //         $validator = Validator::make($request->all(), [
     //             'csv_file' => 'required|file|mimes:csv,txt',
     //         ]);
-            
+
 
     //         // Handle validation errors
     //         if ($validator->fails()) {
@@ -782,7 +782,7 @@ class CommandmoduleController extends Controller
 
     //          // Process the CSV file
     //         $file = $request->file('csv_file');
-    //         $rows = array_map('str_getcsv', file($file));            
+    //         $rows = array_map('str_getcsv', file($file));
 
     //         $errorRows = [];
     //         foreach ($rows as $row) {
@@ -792,7 +792,7 @@ class CommandmoduleController extends Controller
     //                 'link_url' => 'required',
     //                 // Add more validation rules as needed
     //             ]);
-    
+
     //             // Check if validation failed for the current row
     //             if ($validator->fails()) {
     //                 // Store the error details along with the row data

@@ -83,8 +83,8 @@
     </div>  <!-- END .add-team-member-inner -->
   </div>  <!-- END .add-team-member-modal -->
 
-   <div class="change-pass-modal" style="display: none"> 
-      <div class="change-pass-inner frosted">         
+   <div class="change-pass-modal" style="display: none">
+      <div class="change-pass-inner frosted">
           <!-- BEGIN input copied from engage.html -->
           <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/>
           <div class="exit-button" >
@@ -92,23 +92,23 @@
           </div>
 
           <div class="menu-header font-white">Change Password</div>
-          <div class="global-input-email"> 
+          <div class="global-input-email">
             <form id="changePassForm">
-              <div class="global-input-text input-text">  
+              <div class="global-input-text input-text">
                 <input type="text" placeholder="Old Password" id="old_password" name="old_password"/>
               </div>
-              
-              <div class="global-input-text input-text">  
+
+              <div class="global-input-text input-text">
                 <input type="text" placeholder="New Password" id="new_password" name="new_password"/>
               </div>
 
               <input type="submit" value="Change Password" class="font-white">
-            </form>                  
+            </form>
           </div>
           <!-- END copied from engage.html -->
 
       </div>  <!-- END .add-team-member-inner -->
-    </div>  <!-- END .add-team-member-modal -->   
+    </div>  <!-- END .add-team-member-modal -->
 
     <div class="modal-large-outer main-settings-outer general-settings-outer frosted">
       <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" id="general-settings"/>
@@ -341,7 +341,10 @@
                                 <!-- END ADD TEAM MEMBER MODAL -->
         </div>  <!-- END .team-account-outer -->
         <!--     END TEAM MEMBERS    -->
+{{-- for admin access only --}}
+@if (Auth::guard('web')->check()||Auth::guard('member')->user()->admin_access == 1)
 
+        @auth('member')
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Twitter API Credential</span>
@@ -419,9 +422,10 @@
             </div>  <!-- END .menu-twirl-option-outer -->
 
           </div>  <!-- END .social-accounts-inner -->
-        </div>  <!-- END .social-accounts-outer -->
-
-
+        </div>
+        @endauth <!-- END .social-accounts-outer -->
+        @endif
+{{-- for admin access only end --}}
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Social Accounts</span>
