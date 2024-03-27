@@ -321,7 +321,7 @@ class TwitterApi extends Controller
 
             $id = $request->input('twitter_id');
             $twitter = Twitter::where('twitter_id', $id)->where('user_id', Auth::id());
-            
+
             // Deleting the Twitter account
             $deletedTwitter = $twitter->delete();
 
@@ -330,7 +330,7 @@ class TwitterApi extends Controller
                 // Deleting associated Twitter meta
                 $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', Auth::id());
                 $deletedMeta = $deleteTwitterMeta->delete();
-                
+
                 // If deletion of Twitter meta is successful
                 if ($deletedMeta) {
                     return response()->json([
@@ -352,9 +352,9 @@ class TwitterApi extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to delete Twitter account'
-                ], 500);           
+                ], 500);
             }
-            
+
             return response()->json(['success' => true, "deleted" => $twitter, 'message' => 'Twitter account is now deleted']);
 
         } else {
