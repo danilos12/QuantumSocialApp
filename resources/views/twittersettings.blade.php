@@ -23,6 +23,9 @@
     </div>  <!-- END .account-settings-header-wrap -->
 
     <div class="modal-large-inner main-settings-inner twitter-settings-inner">
+
+
+
         <div class="menu-section-outer x-share-access-outer">
             <div class="menu-section-inner x-share-access-inner">
 
@@ -41,7 +44,9 @@
                 <div class="menu-section-twirl-section-outer collapse" id="x-share-access-twirl">
                     <div class="menu-section-twirl-section-inner">
 
-                        @foreach($team_members as $member)
+
+
+                        @foreach($xmembersaccess as $member)
                         <div class="menu-team-account-outer">
                           <div class="menu-team-account-inner">
 
@@ -91,7 +96,7 @@
                                   <div class="">
 
 
-                                    <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess" datas-xant="{{$selected_user->user_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_admin-{{$member->id}}" {{ $member->twitter_access == 1 ? 'checked' : '' }}>
+                                    <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess"  data-trid="{{$selected_user->id}}" datas-xant="{{$member->account_holder_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_x-{{$member->id}}" {{ $member->twitter_access == 1 && $member->mtwitter_id == $selected_user->twitter_id ? 'checked' : '' }}>
 
 
 
@@ -121,8 +126,8 @@
                                   <p class="switchtextoff">Off</p>
                                   <div class="">
 
+                                    <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess" data-trid="{{$selected_user->id}}" datas-xant="{{$member->account_holder_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_x-{{$member->id}}" {{ $member->twitter_access == 1 && $member->mtwitter_id == $selected_user->twitter_id ? 'checked' : '' }}>
 
-                                      <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess" name="grant-x-access" data-twitter-id = "{{$selected_user->twitter_id}}"  id="toggle_taccess-{{$member->id}}" {{ $member->twitter_access == 1 ? 'checked' : '' }}>
 
 
                                     </div>
