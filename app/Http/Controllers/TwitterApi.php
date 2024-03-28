@@ -50,9 +50,31 @@ class TwitterApi extends Controller
      }
 
      public function addmemberxaccts(Request $request){
-            
-            return response()->json(['servermid'=>$request->input('mid'),'twitter_id'=>$request->input('twitter_id'),'accounth_id'=>$request->input('user_id')]);
-     }
+        if(Auth::guard('web') || Auth::guard('member')->user()->admin_access == 1){
+
+            $memberinfo = [
+                'member_id' => intval($request->input('mid')),
+                't_rid' => intval($request->input('twitterids')),
+                'mtwitter_id' => $request->input('twitter_id'),
+                'user_id' => intval($request->input('user_id')),
+                'twitter_access' => $request->input('xaccess')
+            ];
+            // return response()->json(['message'=>$memberinfo]);
+            if($memberinfo['twitter_access'] === false){
+                $deleted = DB::table('member_xaccount')->where('t_rid', $memberinfo['t_rid'])->delete();
+                if($deleted){
+                    return response()->json(['message'=>'Member cannot access this X account', 'stat'=>'success']);
+                }
+            }elseif($memberinfo['twitter_access'] === true){
+                $memberxadd = DB::table('member_xaccount')->insert($memberinfo);
+                if($memberxadd){
+                    return response()->json(['message'=>'Member can now access this X account', 'stat'=>'success']);
+                }
+            }
+        }else{
+            return response()->json(['message'=>'You are not allowed to access this, please ask permission from the owner', 'stat'=>'warning']);
+        }
+    }
 
     public function getTweets($twitterId)
     {

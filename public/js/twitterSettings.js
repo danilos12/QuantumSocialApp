@@ -296,16 +296,16 @@ $(document).ready(function() {
     var isChecked = $(this).is(":checked");
     var t_id = $(this).attr('data-twitter-id');
     var h_id = $(this).attr('datas-xant');
+    var trid = $(this).attr('data-trid');
 
     var data = {
         mid: id[1],
         xaccess: isChecked,
         twitter_id: t_id,
-        user_id:h_id
-
+        user_id:h_id,
+        twitterids:trid
     };
-
-
+console.log(data);
     const response = await fetch(
         APP_URL + "/twitter/assignmember",
         {
@@ -321,24 +321,24 @@ $(document).ready(function() {
     );
 
     const responseData = await response.json();
-    console.log(responseData);
-    // if (responseData.stat == 'success') {
 
-    //     toastr[responseData.stat](`Success! ${responseData.message}`);
-    // }
-    // if(responseData.stat == 'warning'){
-    //     if(isChecked){
-    //         $('#toggle_admin-' + id[1]).prop('checked', false);
-    //     }
-    //     if(!isChecked){
-    //         $('#toggle_admin-' + id[1]).prop('checked', true);
-    //     }
+    if (responseData.stat == 'success') {
+
+        toastr[responseData.stat](`Success! ${responseData.message}`);
+    }
+    if(responseData.stat == 'warning'){
+        if(isChecked){
+            $('#toggle_x-' + id[1]).prop('checked', false);
+        }
+        if(!isChecked){
+            $('#toggle_x-' + id[1]).prop('checked', true);
+        }
 
 
 
-    //     toastr[responseData.stat](`Warning! ${responseData.message}`);
+        toastr[responseData.stat](`Warning! ${responseData.message}`);
 
-    // }
+    }
 });
 
 });
