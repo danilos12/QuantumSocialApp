@@ -129,7 +129,7 @@
                 <div class="settings-item-data-wrap">
                   <span class="settings-item-data account-email">
                     @if(Auth::guard('member')->check())
-                        {{ $accthemail }}
+                        {{ Auth::guard('member')->user()->email }}
                     @else
                         {{ Auth::user()->email }}
                     @endif
@@ -540,7 +540,7 @@
                           @if ($selected_user->twitter_id === $acct->twitter_id)
                           <img src="{{ asset('public/')}}/ui-images/icons/00j-x-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
-                          @else 
+                          @else
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
                           @endif
                         </span>
