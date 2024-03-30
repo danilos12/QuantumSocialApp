@@ -228,9 +228,6 @@ class AppServiceProvider extends ServiceProvider
                 // $view->with('acct_idss', $acct_hdid);
                 // $view->with('memberid', $member_id);
 
-                $accntemail =  MembershipHelper::memberaccthemail();
-
-                $view->with('accthemail', $accntemail);
 
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => $acct_hdid, 'deleted' => 0])->count();
