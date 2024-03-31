@@ -99,11 +99,8 @@ $(document).ready(function () {
             const responseData = await response.json();
 
             var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            if (responseData.status === 200) {
-              $(this).after(div);
-            } else {
-              $(this).after(div);
-            }
+            $(this).after(div);
+            
 
             // remove the div after 3 seconds
             setTimeout(function() {
@@ -111,6 +108,21 @@ $(document).ready(function () {
             }, 3000);
         } catch(err) {
             console.log('Error fetching the data' + err)
+        }
+    })
+
+    // toggle api secrets 
+    $('.secrets').on('click', function(e) {
+        var input = $('input#' + e.target.id);    
+        var img = $(this);
+
+        // Toggle input type between password and text
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            img.attr('src', APP_URL + '/public/ui-images/icons/hide.png');
+        } else {
+            input.attr('type', 'password');
+            img.attr('src', APP_URL + '/public/ui-images/icons/view.png');
         }
     })
 
@@ -133,18 +145,11 @@ $(document).ready(function () {
                 },
                 body: JSON.stringify(formData) // Convert the object to JSON string
             });
-            // console.log(response);
-            const responseData = await response.json();
+            const responseData = await response.json();           
 
-            var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            if (responseData.status === 200) {
-              $(this).after(div);
-            } else {
-              $(this).after(div);
-            }
-            if(responseData.stat === 'danger'){
-                $(this).after(div);
-            }
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );  
 
             setTimeout(function() {
             location.reload();
@@ -326,6 +331,7 @@ $(document).ready(function () {
                 {
                     method: "POST",
                     headers: {
+                        "Content-Type": "application/json",
                         "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
                     },
                     body: JSON.stringify({ twitter_id: $(this).data("twitterid") }), // Use "body" instead of "data" to send the data
@@ -333,20 +339,22 @@ $(document).ready(function () {
             );
 
             const responseData = await response.json();    
-            console.log(responseData);           
 
-            var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            if (responseData.status === 200) {
-              $('.menu-social-add-accounts-section').after(div);
-            } else {
-              $('.menu-social-add-accounts-section').after(div);
-            }         
-
-            // remove the div after 3 seconds
-            setTimeout(function () {
-                div.remove();
+            // var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
+            // if (responseData.status === 200) {                
+            //     $(this).closest('.menu-social-account-outer').remove();
+            // } else {
+            //     console.log(responseData.message)
+            // }  
+            
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );           
+                
+            setTimeout(function() {
+                location.reload();
             }, 3000);
-        
+
         } catch(error) {
             console.log(error);
         }    
