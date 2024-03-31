@@ -115,7 +115,7 @@
       <div class="menu-header">General Settings</div>
 
       <div class="modal-large-inner main-settings-inner general-settings-inner">
-
+        <!--     BEGIN QUANTUM ACCOUNT   -->
         <div class="menu-section-outer quantum-settings-outer">
           <div class="menu-section-inner quantum-settings-inner" id="quantum_acct">
             <span class="menu-section-header">
@@ -169,7 +169,11 @@
 
           </div>  <!-- END .quantum-settings-inner -->
         </div>  <!-- END .quantum-settings-outer -->
+        <!--     END QUANTUM ACCOUNT   -->
 
+        {{-- for admin access only --}}
+        @if (Auth::guard('web')->check())
+        @auth('web')
         <!--     BEGIN TEAM MEMBERS   -->
         <div class="menu-section-outer team-account-outer">
           <div class="menu-section-inner team-account-inner">
@@ -293,34 +297,7 @@
                     </div>  <!-- END .menu-social-account-inner -->
                   </div>  <!-- END .menu-social-account-outer -->
                 @endforeach
-              {{-- @enderror --}}
-
-              {{-- <div class="edit-team-member-modal" >
-                <div class="edit-team-member-inner frosted" >
-
-                    <!-- BEGIN input copied from engage.html -->
-                    <div class="global-input-email">
-                    <form>
-                        <div class="global-input-text input-text">
-                        <input type="text" placeholder="First Name" id="newuser_fname"/>
-                        </div>
-
-                        <div class="global-input-text input-text">
-                        <input type="text" placeholder="Last Name" id="newuser_lname" />
-                        </div>
-
-                        <div class="global-input-text input-text">
-                        <input type="text" placeholder="Email address" id="newuser_email" />
-                        </div>
-
-                    </form>
-                    <span class="edit-team-button">
-                        Edit<span>
-                    </div>
-                    <!-- END copied from engage.html -->
-
-                </div>  <!-- END .edit-team-member-inner -->
-              </div>  <!-- END .edit-team-member-modal --> --}}
+              {{-- @enderror --}}            
 
               <div class="menu-team-members-add-accounts-section">
                 <div class="add-account add-team">
@@ -338,10 +315,8 @@
                                 <!-- END ADD TEAM MEMBER MODAL -->
         </div>  <!-- END .team-account-outer -->
         <!--     END TEAM MEMBERS    -->
-{{-- for admin access only --}}
-  @if (Auth::guard('web')->check())
 
-        @auth('web')
+      
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Twitter API Credential</span>
@@ -420,13 +395,16 @@
 
           </div>  <!-- END .social-accounts-inner -->
         </div>
+
         @endauth <!-- END .social-accounts-outer -->
         @elseif(Auth::guard('member')->user()->api_access == 1)
         @auth('member')
+
+        <!-- TWITTER API -->
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Twitter API Credential</span>
-
+            
             <div class="menu-twirl-option-outer">
               <div class="menu-twirl-option-inner">
                 <div class="menu-twirl-left">
@@ -501,10 +479,15 @@
 
           </div>  <!-- END .social-accounts-inner -->
         </div>
+        <!-- TWITTER API -->
+
         @endauth
         @endif
-{{-- for admin access only end --}}
-@auth('web')
+
+
+        @if (Auth::guard('web')->check())
+        @auth('web')
+        {{-- for admin access only end --}}
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Social Accounts</span>
@@ -538,7 +521,7 @@
                           @if ($selected_user->twitter_id === $acct->twitter_id)
                           <img src="{{ asset('public/')}}/ui-images/icons/00j-x-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
-                          @else
+                          @else 
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
                           @endif
                         </span>
@@ -553,16 +536,14 @@
               @endif
 
               <div class="menu-social-add-accounts-section">
-                <div class="add-account add-twitter-account" id="link-twitter">
+                <div class="add-account add-twitter-account" id="link-twitter" style="width: 15%">
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon vertical-middle" />
-                      <span>+ Twitter</span>
+                      <span>Add X account</span>
                 </div>  <!-- END .add-twitter-account -->
               </div>  <!-- END .menu-social-add-accounts-section -->
 
           </div>  <!-- END .social-accounts-inner -->
         </div>  <!-- END .social-accounts-outer -->
-        @endauth
-
 
 
         <div class="menu-section-outer command-module-outer">
@@ -685,8 +666,10 @@
               -->
 
           </div>  <!-- END .advanced-preferences-inner -->
-        </div>  <!-- END .advanced-preferences-outer -->
-
+        </div>  <!-- END .advanced-preferences-outer -->      
+        @endauth
+        @endif
+  
       </div>  <!-- END .general-settings-inner -->
     </div>  <!-- END .general-settings-outer -->
 
