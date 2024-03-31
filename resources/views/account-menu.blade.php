@@ -350,7 +350,7 @@
                   <div class="menu-subTwirl-inner input-group">
                     <input type="password" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
                     <div class="input-group-append">
-                      <span class="input-group-text"><img src="{{ asset('public')}}/ui-images/icons/view.png" alt="password" class="secrets" id="api_secret"></span>
+                      <span class="input-group-text"><img src="{{ asset('public')}}/ui-images/icons/eye-open.svg" alt="password" class="secrets" id="api_secret"></span>
                     </div>
                   </div>
                   <div class="subTwirl-header-wrap">
@@ -371,7 +371,7 @@
                   <div class="menu-subTwirl-inner input-group">
                     <input type="password" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
                     <div class="input-group-append">
-                      <span class="input-group-text"><img src="{{ asset('public')}}/ui-images/icons/view.png" alt="password" class="secrets" id="oauth_secret"></span>
+                      <span class="input-group-text"><img src="{{ asset('public')}}/ui-images/icons/eye-open.svg" alt="password" class="secrets" id="oauth_secret"></span>
                     </div>
                   </div>
                   <div class="subTwirl-header-wrap">
