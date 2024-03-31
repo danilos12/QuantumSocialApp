@@ -45,6 +45,7 @@ class MembershipHelper
 
         return $acct_hdid;
     }
+    
     public static function memberaccthemail() {
             $user = Auth::guard('member')->user();
             $member_id = $user->id;

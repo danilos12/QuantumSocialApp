@@ -198,7 +198,7 @@ class CommandmoduleController extends Controller
                     $insertData['post_description'] = $textarea;
                     $insertData['sched_method'] = $sched_method;
                     $insertData['sched_time'] = $sched_time;
-                    $insertData['post_type'] = 'tweet-storm-tweets';
+                    // $insertData['post_type'] = 'tweet-storm-tweets';
 
 
                     // Post tweet if scheduling option is "send-now"
@@ -581,7 +581,7 @@ class CommandmoduleController extends Controller
                     break;
                 case 'bulk-queue':
                     $tweets = DB::table('bulk_post')
-                        ->leftJoin('twitter_accts', 'bulk_post.user_id', '=', 'twitter_accts.user_id')
+                        ->leftJoin('twitter_accts', 'bulk_post.twitter_id', '=', 'twitter_accts.twitter_id')
                         ->leftJoin('bulk_meta', 'bulk_post.link_url', '=', 'bulk_meta.link_url')
                         ->select(
                             'bulk_post.*',
@@ -601,7 +601,7 @@ class CommandmoduleController extends Controller
                         ->orderBy('bulk_post.sched_time', 'ASC')
                         ->get();
 
-                        // dd($tweets);
+                        // dd($tweets->toSql());
                     break;
             }
 
@@ -863,112 +863,135 @@ class CommandmoduleController extends Controller
     // }
 
     public function upload(Request $request) {
+    
+        if ($request->hasFile('csv_file')) {
 
-
-        
-            // Validate the CSV file
             $validator = Validator::make($request->all(), [
-                'csv_file' => 'required|file|mimes:csv,txt',
+                'csv_file' => 'required|mimes:csv,txt|max:10240', // Adjust max file size as needed
             ]);
     
-            // If validation fails, return with errors
             if ($validator->fails()) {
-                return back()->withErrors($validator);
+                return redirect()->back()->withErrors($validator);
             }
     
-            // Read and process the CSV file
-            $csvFile = $request->file('csv_file');
-            $rows = array_map('str_getcsv', file($csvFile));
-            $errors = [];
-
+            $path = $request->file('csv_file')->getRealPath();
+            $csvData = file_get_contents($path);
+            $lines = explode("\n", $csvData);
+            $header = str_getcsv(array_shift($lines)); // Extract header
+            $errorRows = [];
+            $error= [];           
     
-            foreach ($rows as $rowNumber => $row) {
-                // Validate each row
-                $validator = Validator::make($row, [
+            foreach ($lines as $index => $line) {
+                $values = str_getcsv($line);
+                if (count($values) !== count($header)) {
+                    // Skip rows with mismatched number of columns
+                    $errorRows[] = $index + 1; // Record the row number with missing values
+                    continue;
+                }
+    
+                $record = array_combine($header, $values); // Combine header and data
+                // dd($header, $values, $record);
+                $validator = Validator::make($record, [
                     'post_description' => 'required',
                     'year' => 'required|digits:4',
-                    'month' => 'required|digits_between:1,2|between:1,12',
-                    'day' => 'required|digits_between:1,2|between:1,31',
-                    'hour' => 'required|digits_between:1,2|between:0,23',
-                    'minute' => 'required|digits_between:1,2|between:0,59',
-                    'link_url' => [
-                        'required',
-                        Rule::requiredIf(function () use ($row) {
-                            return empty($row['image_url']);
-                        }),
-                    ],
+                    'month' => 'required|digits_between:1,2|between:1,12', // Ensure month is between 1 and 12
+                    'day' => 'required',
+                    'hour' => 'required|digits:1|between:1,23', // Assuming hour is in 24-hour format, restrict between 1 and 23
+                    'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59
+                    // 'image_url' => [
+                    //     Rule::requiredIf(function () use ($record) {
+                    //         return empty($record['link_url']) && empty($record['image_url']); // image_url is required if both image_url and link_url are empty
+                    //     }),
+                    // ],
+                    // 'link_url' => [
+                    //     Rule::requiredIf(function () use ($record) {
+                    //         return empty($record['image_url']); // link_url is required if image_url is empty
+                    //     }),
+                    // ],
                     'image_url' => [
-                        'required',
-                        Rule::requiredIf(function () use ($row) {
-                            return empty($row['link_url']);
-                        }),
+                        'required_without_all:link_url',
+                        function ($attribute, $value, $fail) {
+                            if (!$this->endsWith($value, ['.png', '.jpg'])) {
+                                $fail("The $attribute must be a URL ending with .png or .jpg.");
+                            }
+                        },
                     ],
+                    'link_url' => [
+                        'required_without_all:image_url',
+                        function ($attribute, $value, $fail) use ($record) {
+                            if (!empty($record['image_url'])) {
+                                $fail("The $attribute must not have a value if image_url is provided.");
+                            }
+                        },
+                    ],
+                    
                 ]);
     
-                // If validation fails for a row, collect errors
                 if ($validator->fails()) {
-                    $errors[] = [
-                        'row' => $rowNumber + 1,
-                        'errors' => $validator->errors()->all(),
-                    ];
+                    // Handle validation errors for each row
+                    // For example, log errors or store them in an array to display later
+                    // $error[] = $validator->errors()->all();
+                    $error[$index + 1] = $validator->errors()->all();
                 }
             }
-
-            // dd($errors);
     
-            // // If there are validation errors, return with error messages
-            // if (!empty($errors)) {
-            //     return response()->json('errors' , $errors);
-            // }
-    
-            // If validation passes, proceed with processing the CSV data
-            // Add your logic to process the CSV data here
-    
-            // Redirect with success message if processing is successful
-            // return response()->with('success', 'CSV file uploaded successfully.');
-        
-       
-                // // Validation passed, save the data to the database
-                // $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
-                // $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
+            
+            if (!empty($error)) {
+                return response()->json(['status' => 402, 'errors' => $error]);
+            } else {
+                
+                $file = $request->file('csv_file');
+                $csvData = $this->parse($file);                
 
-                // $insertData = Bulk_post::create([
-                //     'user_id' => Auth::id(),
-                //     'twitter_id' => $request->input('twitter_id'),
-                //     'post_type' => 'regular-tweets',
-                //     'post_description' => $data['post_description'],
-                //     'sched_method' => 'bulk-queue',
-                //     'sched_time' => $formattedDateTime,
-                //     'link_url' => $data['link_url'],
-                //     'image_url' => $data['image_url'],
-                // ]);
-
-                // // Create Bulk_meta record if it doesn't exist
-                // if ($insertData) {
-                //     $findMeta = Bulk_meta::where('link_url', $data['link_url'])->first();
-                //     if (!$findMeta) {
-                //         $metaTags = $this->scrapeMetaTags($data['link_url']);
-                //         $metaData = [
-                //             'meta_title' => $metaTags['og:title'],
-                //             'meta_description' => $metaTags['og:description'],
-                //             'meta_image' => $metaTags['og:image'],
-                //             'link_url' => $data['link_url'],
-                //         ];
-                //         Bulk_meta::create($metaData);
-                //     }
-                // }
-       // If there are validation errors, return with error messages
-        if (!empty($errors)) {
-            return response()->json(['status' => 402, 'errors' => $errors]);
+                foreach ($csvData as $key => $data) {
+                   // Validation passed, save the data to the database
+                    $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
+                    $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
+            
+                    $insertData = Bulk_post::create([
+                        'user_id' => Auth::id(),
+                        'twitter_id' => $request->input('twitter_id'),
+                        'post_type' => 'regular-tweets',
+                        'post_description' => $data['post_description'],
+                        'sched_method' => 'bulk-queue',
+                        'sched_time' => $formattedDateTime,
+                        'link_url' => $data['link_url'],
+                        'image_url' => $data['image_url'],
+                    ]);
+            
+                    // Create Bulk_meta record if it doesn't exist
+                    if ($insertData['link_url'] !== '') {
+                        $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
+                        if (!$findMeta) {
+                            $metaTags = $this->scrapeMetaTags($data['link_url']);
+                            $metaData = [
+                                'meta_title' => $metaTags['og:title'],
+                                'meta_description' => $metaTags['og:description'],
+                                'meta_image' => $metaTags['og:image'],
+                                'link_url' => $data['link_url'],
+                            ];
+                            Bulk_meta::create($metaData);
+                        }                        
+                    }   
+                    
+                }
+                
+                return response()->json(['status' => 200, 'message' =>'Bulk posts and meta details are saved successfully.']);
+            }
+               
+        } else {
+            return  response()->json(['status' => 500, 'message' => 'No CSV file found']);
         }
 
-    // If validation passes, proceed with processing the CSV data
-    // Add your logic to process the CSV data here
+    }
 
-    // Redirect with success message if processing is successful
-    return back()->with('success', 'CSV file uploaded successfully.');
-
-
+    function endsWith($haystack, $needles) {
+        foreach ((array) $needles as $needle) {
+            if ($needle !== '' && substr($haystack, -strlen($needle)) === $needle) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function scrapeMeta(Request $request) {

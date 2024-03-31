@@ -26,25 +26,30 @@ $(document).ready(function(){
                 body: formData,
             });
             const responseData = await response.json();    
-            
-            console.log(responseData)
-    
+                
             if (responseData.status === 200) {
                 alert(responseData.message);
     
                 window.location.href = APP_URL + '/bulk-queue';
             } else if (responseData.status === 402) {
-
-                // Parse the JSON string to convert it into a JavaScript object
-                // var parsedResponse = JSON.parse(responseData.errors);
-
-                // Iterate through the array of objects and display the data
-                $ee = responseData.errors.forEach(function(item) {
-                    console.log("Row:", item.row);
-                    console.log("Errors:", item.errors.join(', ')); // Join error messages into a string
-                });
                 
-                alert($ee);
+                let errorsHtml = ''; // Variable to store the HTML content
+                $.each(responseData.errors, function(rowNumber, errors) {
+                    errorsHtml += "<p>Errors in Row " + rowNumber + ":</p>"; // Construct row number heading
+                    $.each(errors, function(index, error) {
+                        errorsHtml += "<p>- " + error + "</p>"; // Construct error message
+                    });
+                });
+                $('#errorContainer').append(errorsHtml); // Append errors to the div with id "errorContainer"
+                $('#errorContainer').addClass("alert alert-danger");
+                
+
+                setTimeout(function () {
+                    location.reload();
+                }, 5000); // Reload after 5 seconds (adjust the delay as needed)
+                
+            } else if (responseData.status === 500) {
+                alert(responseData.message);                                
             } else {
                 openUpgradeModal(responseData);
             }
