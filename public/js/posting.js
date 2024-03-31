@@ -65,7 +65,6 @@ $(document).ready(function() {
                 case 'promo': 
                     if (responseData.length > 0) {
                         $.each(responseData, (index, k) => {
-                            console.log(k)
                             const wrapper = postWrapperPromo(k);
 
                             $('.queued-posts-inner').append(wrapper)                       
