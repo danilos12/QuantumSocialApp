@@ -347,8 +347,11 @@
                   <div class="subTwirl-header-wrap">
                       <span class="subTwirl-header">API Secret:</span>
                   </div>
-                  <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
+                  <div class="menu-subTwirl-inner input-group">
+                    <input type="password" class="input-field" id="api_secret" name="api_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->api_secret  : ''  }}"/>
+                    <div class="input-group-append">
+                      <span class="input-group-text"><img src="{{ asset('public')}}/ui-images/icons/view.png" alt="password" class="secrets" id="api_secret"></span>
+                    </div>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">Bearer Token:</span>
@@ -365,8 +368,11 @@
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">OAuth 2.0 Secret:</span>
                   </div>
-                  <div class="menu-subTwirl-inner">
-                    <input type="text" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
+                  <div class="menu-subTwirl-inner input-group">
+                    <input type="password" class="input-field" id="oauth_secret" name="oauth_secret" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->oauth_secret : ''  }}"/>
+                    <div class="input-group-append">
+                      <span class="input-group-text"><img src="{{ asset('public')}}/ui-images/icons/view.png" alt="password" class="secrets" id="oauth_secret"></span>
+                    </div>
                   </div>
                   <div class="subTwirl-header-wrap">
                     <span class="subTwirl-header">Callback URL</span>
@@ -692,4 +698,27 @@
 /* .general-settings-outer, .twitter-settings-outer, .help-page-outer{display: none;} */
 
 .mt-2 { margin-top: 0.5em;}
+
+.input-group {
+  position: relative;
+  display: flex;
+}
+
+.input-group-append {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.input-group-text img {
+  width: 20px; /* Adjust the size as needed */
+  margin-right: 0.5em;
+}
+
+#reveal {
+  cursor: pointer;
+}
 </style>
