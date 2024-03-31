@@ -57,17 +57,30 @@ class TwitterApi extends Controller
                 't_rid' => intval($request->input('twitterids')),
                 'mtwitter_id' => $request->input('twitter_id'),
                 'user_id' => intval($request->input('user_id')),
-                'twitter_access' => $request->input('xaccess')
+                'twitter_access' => $request->input('xaccess'),
+                'selected' => true
             ];
             // return response()->json(['message'=>$memberinfo]);
             if($memberinfo['twitter_access'] === false){
+                $updatedSelected = 0;
+                $updatedSelected += DB::table('member_xaccount')
+                         ->where('member_id', $memberinfo['member_id'])
+                         ->where('mtwitter_id', '!=', $memberinfo['mtwitter_id'])
+                         ->update(['selected' => 1]);
+
                 $deleted = DB::table('member_xaccount')->where('t_rid', $memberinfo['t_rid'])->delete();
-                if($deleted){
+                if($deleted&&$updatedSelected){
                     return response()->json(['message'=>'Member cannot access this X account', 'stat'=>'success']);
                 }
             }elseif($memberinfo['twitter_access'] === true){
+                $updatedSelected = 0;
+
                 $memberxadd = DB::table('member_xaccount')->insert($memberinfo);
-                if($memberxadd){
+                $updatedSelected += DB::table('member_xaccount')
+                ->where('member_id', $memberinfo['member_id'])
+                ->where('mtwitter_id', '!=', $memberinfo['mtwitter_id'])
+                ->update(['selected' => 0]);
+                if($memberxadd && $updatedSelected){
                     return response()->json(['message'=>'Member can now access this X account', 'stat'=>'success']);
                 }
             }
@@ -300,37 +313,75 @@ class TwitterApi extends Controller
         $twitterId = str_replace('twitter-', '', $request->input('id'));
 
         try {
-            $twitterId = str_replace('twitter-', '', $request->input('id'));
+            if(Auth::guard('web')->check()){
+                $twitterId = str_replace('twitter-', '', $request->input('id'));
 
-            $updatedSelected = UT_AcctMngt::where('user_id', $this->setDefaultId())
-                ->where('twitter_id', $twitterId)
+                $updatedSelected = UT_AcctMngt::where('user_id', $this->setDefaultId())
+                    ->where('twitter_id', $twitterId)
+                    ->update(['selected' => 1]);
+
+                // check if the twitter linked is more than one
+                $countTwitterAcct = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
+                $updatedRow = '';
+                if ($countTwitterAcct > 1) {
+                    // update the other twitter not equal to twitter id
+                    $updatedSelected += UT_AcctMngt::where('user_id', $this->setDefaultId())
+                        ->where('twitter_id', '!=', $twitterId)
+                        ->update(['selected' => 0]);
+
+                    $updatedRow = $updatedSelected;
+                }
+
+                if ($updatedSelected > 0 && $updatedRow > 0) {
+                    $selectedUser = DB::table('twitter_accts')
+                        ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                        ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                        ->where('ut_acct_mngt.selected', "=", 1) // selected
+                        ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
+                        ->where('twitter_accts.deleted', "=", 0)
+                        ->first();
+
+                    return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
+                } else {
+                    return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
+                }
+            }
+            if(Auth::guard('member')->check()){
+                $title = "Profile";
+                $twitterId = str_replace('twitter-', '', $request->input('id'));
+
+
+
+
+                $updatedSelected = DB::table('member_xaccount')
+                ->where('member_id', Auth::guard('member')->user()->id)
                 ->update(['selected' => 1]);
+                $countTwitterAcct =  DB::table('member_xaccount')->where('member_id', Auth::guard('member')->user()->id)->count();
+                $updatedRow = '';
 
-            // check if the twitter linked is more than one
-            $countTwitterAcct = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
-            $updatedRow = '';
-            if ($countTwitterAcct > 1) {
-                // update the other twitter not equal to twitter id
-                $updatedSelected += UT_AcctMngt::where('user_id', $this->setDefaultId())
-                    ->where('twitter_id', '!=', $twitterId)
+                if ($countTwitterAcct > 1) {
+                    $updatedSelected += DB::table('member_xaccount')
+                    ->where('member_id', Auth::guard('member')->user()->id)
+                    ->where('mtwitter_id', '!=', $twitterId)
                     ->update(['selected' => 0]);
+                    $updatedRow = $updatedSelected;
 
-                $updatedRow = $updatedSelected;
+                }
+
+                if ($updatedSelected > 0 && $updatedRow > 0) {
+                    $selectedUser = DB::table('twitter_accts')
+                        ->join('member_xaccount', 'twitter_accts.user_id', '=', 'member_xaccount.user_id')
+                        ->select('twitter_accts.*', 'member_xaccount.*')
+                        ->where('member_xaccount.selected', "=", 1) // selected
+                        ->where('member_xaccount.member_id', "=", Auth::guard('member')->user()->id)
+                        ->first();
+
+                    return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
+                } else {
+                    return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
+                }
             }
 
-            if ($updatedSelected > 0 && $updatedRow > 0) {
-                $selectedUser = DB::table('twitter_accts')
-                    ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                    ->select('twitter_accts.*', 'ut_acct_mngt.*')
-                    ->where('ut_acct_mngt.selected', "=", 1) // selected
-                    ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
-                    ->where('twitter_accts.deleted', "=", 0)
-                    ->first();
-
-                return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
-            } else {
-                return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
-            }
 
         } catch (\Exception $e) {
 

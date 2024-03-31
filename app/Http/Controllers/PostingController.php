@@ -497,7 +497,7 @@ class PostingController extends Controller
 	public function switchFromQueue(Request $request, $switch, $id) {
 		try {
 			//update first the switch
-			QuantumAcctMeta::where('user_id', $this->setDefaultId())->update(['queue_switch' => ($switch === 'active' ? 1 : 0)]);
+			QuantumAcctMeta::where('user_id', $this->setDefaultId())->update([$request->input('method') . '_switch' => ($switch === 'active' ? 1 : 0)]);
 
 			switch ($request->method) {
 				case "queue" :

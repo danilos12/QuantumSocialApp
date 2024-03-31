@@ -24,8 +24,7 @@
     <div id="spinner" style="display: none;">
       Loading
     </div>
-    <div id="error" style="display: none;">
-
+    
     <div class="queued-posts-outer" id="queuePage" >
       <div class="queued-posts-inner">
         <div class="queue-day-wrapper page-wrapper">
@@ -50,4 +49,8 @@
   background-color: #f0f0f0;
 }
 </style>
+@endsection
+@section('scripts')
+<script type='text/javascript' src="{{asset('public/js/posting.js')}}"></script>
+<script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
 @endsection

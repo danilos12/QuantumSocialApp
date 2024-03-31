@@ -129,7 +129,7 @@
                 <div class="settings-item-data-wrap">
                   <span class="settings-item-data account-email">
                     @if(Auth::guard('member')->check())
-                        {{ $accthemail }}
+                        {{ Auth::guard('member')->user()->email }}
                     @else
                         {{ Auth::user()->email }}
                     @endif
@@ -221,12 +221,11 @@
 
                           <div class="childs-cont-2">
                             <p class="childs-cont-p">ADMIN ACCESS</p>
-                            <p class="switchtexton">On</p>
-                            <p class="switchtextoff">Off</p>
+
                             <div class="">
 
 
-                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+                                <input type="checkbox" class="menu-twirl-toggle adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
 
 
                               </div>
@@ -262,12 +261,11 @@
 
                           <div class="childs-cont-2">
                             <p class="childs-cont-p">ADMIN ACCESS</p>
-                            <p class="switchtexton">On</p>
-                            <p class="switchtextoff">Off</p>
+
                             <div class="">
 
 
-                                <input type="checkbox" class="menu-twirl-toggle forchecked adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
+                                <input type="checkbox" class="menu-twirl-toggle  adminaccess" name="grant-admin-access" id="toggle_admin-{{$member->id}}" <?php echo $member->admin_access == 1 ? 'checked' : ''; ?>>
 
 
                               </div>
@@ -276,11 +274,10 @@
                           <div class="childs-cont">
 
                             <p class="childs-cont-p">API ACCESS</p>
-                            <p class="switchtexton">On</p>
-                            <p class="switchtextoff">Off</p>
+
                             <div class="">
 
-                            <input  type="checkbox" class="menu-twirl-toggle forchecked apiaccess" name="grant-api-access" id="toggle_api-{{$member->id}}" <?php echo $member->api_access == 1 ? 'checked' :'';?>>
+                            <input  type="checkbox" class="menu-twirl-toggle  apiaccess" name="grant-api-access" id="toggle_api-{{$member->id}}" <?php echo $member->api_access == 1 ? 'checked' :'';?>>
                           </div>
                           </div>
 
@@ -507,6 +504,7 @@
         @endauth
         @endif
 {{-- for admin access only end --}}
+@auth('web')
         <div class="menu-section-outer social-accounts-outer">
           <div class="menu-section-inner social-accounts-inner">
             <span class="menu-section-header">Social Accounts</span>
@@ -540,7 +538,7 @@
                           @if ($selected_user->twitter_id === $acct->twitter_id)
                           <img src="{{ asset('public/')}}/ui-images/icons/00j-x-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
-                          @else 
+                          @else
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" />
                           @endif
                         </span>
@@ -563,6 +561,8 @@
 
           </div>  <!-- END .social-accounts-inner -->
         </div>  <!-- END .social-accounts-outer -->
+        @endauth
+
 
 
         <div class="menu-section-outer command-module-outer">

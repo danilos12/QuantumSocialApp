@@ -174,7 +174,8 @@ Route::post('/reload-meta/scrape',[App\Http\Controllers\CommandmoduleController:
 // Route::post('/cmd/post/duplicate/{id}',[App\Http\Controllers\CommandmoduleController::class, 'duplicateFromQueue'])->name('post.duplicate');
 // Route::put('/post/bulk_update/{id}',[App\Http\Controllers\PostingController::class, 'editBulkPost'])->name('post.bulk_update'); // update data in modal
 
-
+Route::get('/su/admin', [App\Http\Controllers\SuperAdminController::class, 'index'])->name('su-admin');
+Route::get('/su/admin/get', [App\Http\Controllers\SuperAdminController::class, 'getAllUsers'])->name('su-admin');
 
 
 Route::middleware(['web','guest','session_expired'])
