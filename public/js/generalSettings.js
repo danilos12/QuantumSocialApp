@@ -119,10 +119,10 @@ $(document).ready(function () {
         // Toggle input type between password and text
         if (input.attr('type') === 'password') {
             input.attr('type', 'text');
-            img.attr('src', APP_URL + '/public/ui-images/icons/hide.png');
+            img.attr('src', APP_URL + '/public/ui-images/icons/eye-closed.svg');
         } else {
             input.attr('type', 'password');
-            img.attr('src', APP_URL + '/public/ui-images/icons/view.png');
+            img.attr('src', APP_URL + '/public/ui-images/icons/eye-open.svg');
         }
     })
 
