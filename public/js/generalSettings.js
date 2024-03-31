@@ -318,35 +318,38 @@ $(document).ready(function () {
     });
 
     // delete twitter
-    $(".delete-account").click(function (event) {
-        $.ajax({
-            url: $(this).data("url"),
-            method: "POST",
-            data: {
-                twitter_id: $(this).data("twitterid"),
-            },
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            success: function (response) {
-                // Handle success
-                if (response.deleted === 1) {
-                    location.reload();
-                } else {
-                    console.log("error");
+    $(".delete-account").click(async function (event) { 
+
+        try {
+            const response = await fetch(
+                APP_URL + "/twitter/remove",
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
+                    },
+                    body: JSON.stringify({ twitter_id: $(this).data("twitterid") }), // Use "body" instead of "data" to send the data
                 }
+            );
 
+            const responseData = await response.json();    
+            console.log(responseData);           
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
+            var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
+            if (responseData.status === 200) {
+              $('.menu-social-add-accounts-section').after(div);
+            } else {
+              $('.menu-social-add-accounts-section').after(div);
+            }         
 
-                if (jqXHR.status === 403) {
-                    // Display a warning message to the user
-                    toastr[jqXHR.responseJSON.stat](jqXHR.responseJSON.message);
-                }
-
-            },
-        });
+            // remove the div after 3 seconds
+            setTimeout(function () {
+                div.remove();
+            }, 3000);
+        
+        } catch(error) {
+            console.log(error);
+        }    
     });
 
 
