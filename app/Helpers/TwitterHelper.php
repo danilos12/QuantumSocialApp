@@ -159,4 +159,61 @@ class TwitterHelper
         return $activeAPI;
     }
 
+    // API to post and retweet to twitter
+    function tweet2twitter($twitter_meta, $data, $endpoint) {
+
+        // check access token
+        $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);
+
+        // send tweet
+        $headers = array(
+            // 'Authorization: Bearer ' . 11,
+            'Authorization: Bearer ' . $checkIfTokenExpired['token'],
+            'Content-Type: application/json'
+        );
+
+        $data = json_encode($data);
+
+        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );
+
+        if ($sendTweetNow) {
+            return response()->json(['status' => 200, 'message' => 'Your tweet has been posted']);
+        } else {
+            return response()->json(['status' => 500, 'message' => 'Failed to send tweet', 'data' => $sendTweetNow]);
+        }
+    }
+
+
+    function apiRequest($url, $headers, $method, $data)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_ENCODING, '');
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 10);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 0);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+        if ($method === 'POST') {
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        } else {
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
+        }
+
+        $response = curl_exec($curl);
+        $info = curl_getinfo($curl);
+
+        curl_close($curl);
+
+        if ($info['http_code'] == 201) {
+            $data = json_decode($response);
+            return $data;
+        } else {
+            return curl_error($curl);
+        }
+    }
+
 }
