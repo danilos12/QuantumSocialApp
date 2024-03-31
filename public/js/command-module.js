@@ -895,8 +895,8 @@ $(function ($) {
 
         console.log(formData);
 
-        // form.find('input[type="submit"]').prop("disabled", true);
-        // form.find('input[type="submit"]').val("Please wait..");
+        form.find('input[type="submit"]').prop("disabled", true);
+        form.find('input[type="submit"]').val("Please wait..");
 
         try {
             const response = await fetch(APP_URL + "/cmd/save", {
@@ -919,7 +919,17 @@ $(function ($) {
                 location.reload();
             } else if (responseData.status === 200) {
                 alert(responseData.message);
-                window.location.href = APP_URL + '/posted';
+                console.log(responseData.tweet)
+                $getPostType = responseData.tweet.post_type        
+                
+                if ($getPostType.includes('regular')) {
+                    window.location.href = APP_URL + '/queue';
+                } else if ($getPostType.includes('evergreen')) {
+                    window.location.href = APP_URL + '/evergreen';
+                } else if ($getPostType.includes('promos')) {
+                    window.location.href = APP_URL + '/promo';
+                }
+
             } else {
                 // Handle the server response here
                 form.find('input[type="submit"]').val("Data Saved!");
@@ -1149,7 +1159,6 @@ function tweetInstance(items) {
 }
 
 function postWrapper(info, post_type) {
-    console.log(info)
     const dateTimeString = info.sched_time;
     const dateTime = new Date(dateTimeString);
     const month = dateTime.toLocaleString("default", { month: "short" });
