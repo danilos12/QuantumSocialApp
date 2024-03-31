@@ -64,7 +64,6 @@ class AppServiceProvider extends ServiceProvider
                     $view->with('refresh_token', $token->refresh_token ?? "");
                 }
 
-
                 $twitterID = $selectedUser->twitter_id ?? 0;
                 $view->with('twitter_id', $twitterID);
                 $view->with('twitter_name', $selectedUser->twitter_name ?? "");
@@ -145,37 +144,30 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 $getMembers = DB::table('members')
-                    ->join('users', 'members.account_holder_id', '=', 'users.id')
-                    ->select('users.*', 'members.*')
-                    ->where('members.account_holder_id', Auth::id())
-                    ->get();
-                // dd($getMembers);
+                ->join('users', 'members.account_holder_id', '=', 'users.id')
+                ->select('users.*', 'members.*')
+                ->where('members.account_holder_id', Auth::id())
+                ->get();
                 $view->with('team_members', $getMembers);
 
-                $xmembersaccess = DB::table('members')
-                ->leftJoin('member_xaccount', 'members.id', '=', 'member_xaccount.member_id')
-                ->select('members.id', 'members.fullname', 'members.email', 'members.account_holder_id', 'member_xaccount.mtwitter_id', 'member_xaccount.twitter_access')
-                ->where('members.account_holder_id', Auth::id())
-                ->get();
-                $xmembersaccessII = DB::table('members')
-                ->leftJoin('member_xaccount', 'members.id', '=', 'member_xaccount.member_id')
-                ->select( 'members.id','members.fullname','members.email','members.account_holder_id','member_xaccount.mtwitter_id','member_xaccount.twitter_access')
-                ->where('members.account_holder_id', Auth::id())
+
+
+
+            $xmembersaccess = DB::table('members')
+            ->select('members.*')
+            ->where('members.account_holder_id', Auth::id())
+            ->get();
+
+                $xmembersaccessII = DB::table('member_xaccount')
+                ->select('member_xaccount.*')
+                ->where('member_xaccount.user_id', Auth::id())
                 ->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id)
                 ->get();
-                if($xmembersaccessII->isEmpty()){
-
-                    // dd($xmembersaccess);
-                    $view->with('xmembersaccess', $xmembersaccess);
-                }else{
-
-
-                $view->with('xmembersaccess', $xmembersaccessII);
-                }
 
 
 
-
+                $view->with('xmembersaccess', $xmembersaccess);
+                $view->with('idscheck', $xmembersaccessII);
 
 
 
@@ -228,9 +220,6 @@ class AppServiceProvider extends ServiceProvider
                 // $view->with('acct_idss', $acct_hdid);
                 // $view->with('memberid', $member_id);
 
-                $accntemail =  MembershipHelper::memberaccthemail();
-
-                $view->with('accthemail', $accntemail);
 
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => $acct_hdid, 'deleted' => 0])->count();
@@ -243,16 +232,43 @@ class AppServiceProvider extends ServiceProvider
 
 
 
+                $myid = Auth::guard('member')->user()->id;
+
+                $memberxaccounts = DB::table('member_xaccount')
+                    ->select('member_xaccount.mtwitter_id', 'member_xaccount.selected')
+                    ->where('member_xaccount.member_id', $myid)
+                    ->get();
+
+                $mtwitterIds = $memberxaccounts->pluck('mtwitter_id')->toArray();
+                $selectedstatus = $memberxaccounts->pluck('selected')->toArray();
+
+                $twxaccts = DB::table('twitter_accts')
+                    ->select('twitter_accts.*')
+                    ->where('twitter_accts.user_id', $acct_hdid)
+                    ->whereIn('twitter_accts.twitter_id', $mtwitterIds)
+                    ->get();
+
+                // Combining selected status with twxaccts
+
+                $view->with('memberaccts', $twxaccts);
 
 
+                $selectedUserObject = [];
+                foreach ($twxaccts as $key => $twxacct) {
+                    if ($selectedstatus[$key] == 1) { // Check if selected status is 1
+                        $twxacct->selected = $selectedstatus[$key];
+                        $selectedUserObject[] = $twxacct;
+                    }
+                }
+                $selectedUser = reset($selectedUserObject);
+                // $selectedUser = DB::table('twitter_accts')
+                //     ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                //     ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                //     ->where('ut_acct_mngt.selected', "=", 1)
+                //     ->where('ut_acct_mngt.user_id', "=", $acct_hdid)
+                //     ->where('twitter_accts.deleted', "=", 0)
+                //     ->first();
 
-                $selectedUser = DB::table('twitter_accts')
-                    ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                    ->select('twitter_accts.*', 'ut_acct_mngt.*')
-                    ->where('ut_acct_mngt.selected', "=", 1) // selected
-                    ->where('ut_acct_mngt.user_id', "=", $acct_hdid)
-                    ->where('twitter_accts.deleted', "=", 0)
-                    ->first();
 
                 $view->with('selected_user', $selectedUser);
 
@@ -262,14 +278,35 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 $twitterID = $selectedUser->twitter_id ?? 0;
+
                 $view->with('twitter_id', $twitterID);
 
-                // dd($twitterID);
+
 
                 $view->with('twitter_name', $selectedUser->twitter_name ?? "");
                 $view->with('twitter_usn', $selectedUser->twitter_username ?? "");
                 $view->with('twitter_photo', $selectedUser->twitter_photo ?? "");
-                $view->with('user_id', $acct_hdid);
+                $view->with('user_id', Auth::guard('member')->user()->id);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 $individualTwitterApi = DB::table('settings_twitter_twapi')
                             ->select('*')
@@ -345,14 +382,12 @@ class AppServiceProvider extends ServiceProvider
 
 
                 $getMembers = DB::table('members')
-                    ->leftJoin('users', 'members.account_holder_id', '=', 'users.id')
-                    ->leftJoin('member_xaccount', 'members.account_holder_id', '=', 'member_xaccount.user_id')
-                    ->select('users.*', 'members.*','member_xaccount.*')
-                    ->where('members.account_holder_id', $acct_hdid)
-                    ->get();
-
-                $view->with('team_members', $getMembers);
-
+                ->join('users', 'members.account_holder_id', '=', 'users.id')
+                ->select('users.*', 'members.*')
+                ->where('members.account_holder_id', $acct_hdid)
+                ->get();
+            // dd($getMembers);
+            $view->with('team_members', $getMembers);
 
 
 
@@ -384,35 +419,41 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('hasCustomSlot', $hasCustomSlot);
 
                 $twitter = Twitter::where(['user_id' => $acct_hdid, 'deleted' => 0])->get();
-
                 // to loop all the twitter accts
                 $view->with('twitter_accts', $twitter);
 
-                $myid = Auth::guard('member')->user()->id;
-                $memberxaccounts = DB::table('member_xaccount')
-                ->leftJoin('twitter_accts', 'member_xaccount.t_rid','=','twitter_accts.id')
-                ->select( 'member_xaccount.*','twitter_accts.*')
-                ->where('member_xaccount.member_id', $myid)
-                ->get();
 
-                    // $membertwitter = DB::table('twitter_accts')
-                    // ->select('twitter_accts.*')
-                    // ->where('twitter_accts.twitter_id', $memberxaccounts->mtwitter_id)
-                    // ->where('twitter_accts.user_id', $memberxaccounts->user_id)
-                    // ->get();
-                    // dd($memberxaccounts);
-                    // dd($twitterID,$memberxaccounts);
-                    $view->with('memberaccts', $memberxaccounts);
+
+
+
+
+
+
+
 
                     $xmembersaccess = DB::table('members')
-                    ->leftJoin('member_xaccount', 'members.id', '=', 'member_xaccount.member_id')
-                    ->select( 'members.id','members.fullname','members.email','members.account_holder_id','member_xaccount.mtwitter_id','member_xaccount.twitter_access')
-                    ->where('members.account_holder_id', $acct_hdid)
-                    ->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id)
+            ->select('members.*')
+            ->where('members.account_holder_id', Auth::id())
+            ->get();
 
-                    ->get();
+
+            $xmembersaccessII = DB::table('member_xaccount')
+            ->select('member_xaccount.*')
+            ->where('member_xaccount.user_id', Auth::id())
+            ->when(isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
+                return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
+            }, function ($query) {
+                return $query->where('member_xaccount.mtwitter_id', 0); 
+            })
+            ->get();
+
+
+
+
 
                 $view->with('xmembersaccess', $xmembersaccess);
+                $view->with('idscheck', $xmembersaccessII);
+
 
 
 
