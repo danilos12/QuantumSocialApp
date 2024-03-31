@@ -4019,9 +4019,7 @@ input#file-upload-button {
 .menu-twirl-toggle:checked {
     background: var(--mode-accent-c);
 }
-.forchecked:checked {
-    background: var(--frost-background);
-}
+
 input#toggle_api {
     width: 50px;
     border-radius: 15px;
