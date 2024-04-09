@@ -230,6 +230,8 @@ class TwitterApi extends Controller
                     $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
                     $request = $this->curlGetHttpRequest($url, $headers, $data);
 
+                    // dd($request);                    
+
                     if (!empty($request->data)) {
                         // get images of the tweet
                         $filteredData = $request->data;
@@ -251,8 +253,11 @@ class TwitterApi extends Controller
                             }
                         }
                     }
-                    break;
+                    break;                               
+                   
             }
+
+            // dd($filteredData);
 
             if ($filteredData !== null) {
                 // return the modified data as a JSON response

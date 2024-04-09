@@ -53,12 +53,11 @@ Route::post('/change-password', [App\Http\Controllers\Auth\ChangePasswordControl
 // Routes accessible only to authenticated members
 
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
 
 
 // dashboard controller
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
+Route::get('/', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 
 
@@ -174,8 +173,13 @@ Route::post('/reload-meta/scrape',[App\Http\Controllers\CommandmoduleController:
 // Route::post('/cmd/post/duplicate/{id}',[App\Http\Controllers\CommandmoduleController::class, 'duplicateFromQueue'])->name('post.duplicate');
 // Route::put('/post/bulk_update/{id}',[App\Http\Controllers\PostingController::class, 'editBulkPost'])->name('post.bulk_update'); // update data in modal
 
-Route::get('/su/admin', [App\Http\Controllers\SuperAdminController::class, 'index'])->name('su-admin');
-Route::get('/su/admin/get', [App\Http\Controllers\SuperAdminController::class, 'getAllUsers'])->name('su-admin');
+Route::get('/su/admin', [App\Http\Controllers\SuperAdminController::class, 'index'])->name('superadmin');
+Route::get('/su/admin/users', [App\Http\Controllers\SuperAdminController::class, 'getAllOwners'])->name('su.users');
+Route::get('/su/admin/admins', [App\Http\Controllers\SuperAdminController::class, 'getAllAdmins'])->name('su.admins');
+Route::get('/su/admin/members', [App\Http\Controllers\SuperAdminController::class, 'getAllMembers'])->name('su.members');
+Route::get('/su/admin/plans', [App\Http\Controllers\SuperAdminController::class, 'getAllPlans'])->name('su.plans');
+// Add more routes as needed
+
 
 
 Route::middleware(['web','guest','session_expired'])
