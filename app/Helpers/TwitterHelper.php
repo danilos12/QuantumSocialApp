@@ -28,7 +28,7 @@ class TwitterHelper
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=' . TwitterHelper::getActiveAPI(Auth::id())->oauth_id,
+            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=dXd6Y2FLLTU2N09lbmEzNER2YWs6MTpjaQ',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -86,10 +86,10 @@ class TwitterHelper
 
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
 
+        // dd($expires_in + $created_at, time());
         if (($expires_in + $created_at) <= time()) {
             $d = TwitterHelper::refreshAccessToken($refresh_token);
             session()->put('token_details', $d);
-            // dd($d);
 
             // update token in database
             TwitterToken::where('twitter_id', $twitter_id)
@@ -142,8 +142,10 @@ class TwitterHelper
 
         $defaultId = (new self())->setDefaultId();
         $acctMeta = QuantumAcctMeta::where('user_id', $defaultId)->first();
-        $utc = Carbon::now($acctMeta->timezone);
+        $datetime = Carbon::now($acctMeta->timezone);
 
+        // Convert the datetime to UTC
+        $utc = $datetime->utc();
         return $utc;
     }
 
@@ -160,7 +162,7 @@ class TwitterHelper
     }
 
     // API to post and retweet to twitter
-    function tweet2twitter($twitter_meta, $data, $endpoint) {
+    public static function tweet2twitter($twitter_meta, $data, $endpoint) {
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);
@@ -172,19 +174,21 @@ class TwitterHelper
             'Content-Type: application/json'
         );
 
-        $data = json_encode($data);
+        $data = json_encode($data);        
 
-        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );
+        $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
 
-        if ($sendTweetNow) {
-            return response()->json(['status' => 200, 'message' => 'Your tweet has been posted']);
+        if ($sendTweetNow['status'] === 200) {
+            return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
+        } elseif ($sendTweetNow['status'] === 403) {
+            return response()->json(['status' => 403, 'message' => 'Failed to post tweet. ' . $sendTweetNow['data']->detail]);
         } else {
             return response()->json(['status' => 500, 'message' => 'Failed to send tweet', 'data' => $sendTweetNow]);
         }
     }
 
 
-    function apiRequest($url, $headers, $method, $data)
+    public static function apiRequest($url, $headers, $method, $data)
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -208,11 +212,20 @@ class TwitterHelper
 
         curl_close($curl);
 
-        if ($info['http_code'] == 201) {
-            $data = json_decode($response);
+        if ($info['http_code'] == 403) {
+            $data = [
+                "data" => json_decode($response),
+                "status" => 403
+            ];
+
             return $data;
         } else {
-            return curl_error($curl);
+            $data = [
+                "data" => json_decode($response),
+                "status" => 200
+            ];
+
+            return $data;
         }
     }
 

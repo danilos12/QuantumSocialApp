@@ -35,19 +35,65 @@ class SuperAdminController extends Controller
      */
     public function index(Request $request)
     {
-		$title = 'Super Admin';        
-        return view('super-admin')->with('title', $title);
-
+        
+        
+        $title = 'Super Admin Data';    
+        return view('super-admin')->with(['title' => $title]);
     }
 	
-	public function getAllUsers()
+    public function getAllOwners()
     {
-		try {
-            $getAll = User::find(Auth::id())->get();
-            dd($getAll);
-        } catch(Exception $e) {
-            return response()->json(200, ['error' => $e]);
-        }
+		
+        $title = 'Account Owners';      
+        
+        
+        $getAll = DB::table('users')
+        ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
+        ->join('plans', 'users_meta.subscription_id', '=', 'plans.subscription_id')
+        ->get();        
+
+        
+        return view('su-admin.owners')->with(['title' => $title, 'getAll' => $getAll]);
+    }
+	
+	public function getAllAdmins()
+    {
+        $title = 'Admins';      
+        
+        $getAll = DB::table('users')
+        ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
+        ->join('plans', 'users_meta.subscription_id', '=', 'plans.subscription_id')
+        ->get();        
+
+        
+        return view('su-admin.admin')->with(['title' => $title, 'getAll' => $getAll]);
+    }	
+
+	public function getAllMembers()
+    {
+        $title = 'Members';      
+        
+        $getAll = DB::table('members')
+        // ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
+        // ->join('plans', 'users_meta.subscription_id', '=', 'plans.subscription_id')
+        ->get();        
+
+        return view('su-admin.members', ['title' => $title, 'getAll' => $getAll]);
+        
+        // return view('super-admin')->with(['title' => $title, 'getAll' => $getAll]);
+    }	
+	
+    public function getAllPlans()
+    {
+        $title = 'Plans';      
+        
+        $getAll = DB::table('plans')
+        // ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
+        // ->join('plans', 'users_meta.subscription_id', '=', 'plans.subscription_id')
+        ->get();        
+
+        
+        return view('su-admin.plans')->with(['title' => $title, 'getAll' => $getAll]);
     }	
 
 }
