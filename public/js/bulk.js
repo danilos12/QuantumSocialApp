@@ -1,6 +1,5 @@
 $(document).ready(function(){
     $(document).on('click', '#uploadCsv1',  async function(e) {
-        console.log(1)
         e.preventDefault();
         var fileInput = $('#csvFileInput')[0].files[0];
 
@@ -9,15 +8,16 @@ $(document).ready(function(){
             return;
         }
 
-        console.log(fileInput);
 
         var formData = new FormData();
         formData.append('csv_file', fileInput, fileInput.name);
         formData.append('twitter_id', TWITTER_ID);
 
-        console.log(formData)
     
         try {
+            // Clear the error container
+            $('#errorContainer').empty();
+
             const response = await fetch(APP_URL + '/bulk/upload', {
                 method: 'POST',           
                 headers: {
@@ -40,13 +40,13 @@ $(document).ready(function(){
                         errorsHtml += "<p>- " + error + "</p>"; // Construct error message
                     });
                 });
-                $('#errorContainer').append(errorsHtml); // Append errors to the div with id "errorContainer"
-                $('#errorContainer').addClass("alert alert-danger");
+                 $('#errorContainer').addClass("alert alert-danger").html(errorsHtml); // Append errors to the div with id "errorContainer"
                 
 
+                // to be back
                 setTimeout(function () {
                     location.reload();
-                }, 5000); // Reload after 5 seconds (adjust the delay as needed)
+                }, 3000); // Reload after 5 seconds (adjust the delay as needed)
                 
             } else if (responseData.status === 500) {
                 alert(responseData.message);                                
