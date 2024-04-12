@@ -90,7 +90,8 @@ class CommandmoduleController extends Controller
                 $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
                 // $twitterMeta = $getToken->toArray();
                 $twitter_meta = $getToken->toArray();
-                $utc = TwitterHelper::now($user_id);
+                // $utc = TwitterHelper::now($user_id);
+                $utc = Carbon::now('UTC');
                 $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
                 $tweet_id = basename(parse_url($url, PHP_URL_PATH));
                 $checkToggle = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
@@ -147,17 +148,15 @@ class CommandmoduleController extends Controller
 
                         case 'custom-time':
                             // Refactor this section to reduce duplication
-                            // dd($postData);
-                            $formatted24hrTime = date('H:i', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
-                            $custom_time = $postData['ct-time-date'] . ' ' . $formatted24hrTime;
+                            $formatted24hrTime = date('H:i A', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
+                            $localDatetime = Carbon::createFromFormat('d-m-Y h:i A', $postData['ct-time-date'] . ' ' . $formatted24hrTime);
+                            
+                            // Convert the datetime to UTC timezone
+                            $utcDatetime = $localDatetime->setTimezone('UTC');
+                            
+                            // Format the UTC datetime as needed
+                            $sched_time = $utcDatetime->format('Y-m-d H:i:s');                                               
 
-                            // modify the UTC datetime object by adding the custom time
-                            $utc->modify($custom_time);
-
-                            // format the resulting datetime object as a string in the 'YYYY-MM-DD HH:MM:SS' format
-                            $custom_time = $utc->format('Y-m-d H:i:s');
-
-                            $sched_time = $custom_time;
                             break;
 
                         case 'custom-slot':
@@ -204,21 +203,25 @@ class CommandmoduleController extends Controller
                     // Post tweet if scheduling option is "send-now"
                     if ($postData['scheduling-options'] === 'send-now') {
                         if ($postData['post_type_tweets'] === "retweet-tweets") {
-                            $responses = $this->tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
-
+                            $responses = TwitterHelper::tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
+                            
                             if ($responses->getOriginalContent()['status'] === 500) {
                                 return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            } elseif ($responses->getOriginalContent()['status'] === 403) {
+                                return response()->json(['status' => 403, 'message' => $responses->getOriginalContent()['message']]);
                             } else {
                                 CommandModule::create($insertData);
 
                                 $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
                             }
                         }  else {
-                            $responses = $this->tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-
+                            $responses = TwitterHelper::tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                            
                             if ($responses->getOriginalContent()['status'] === 500) {
                                 return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
-                            } else {
+                            }  elseif ($responses->getOriginalContent()['status'] === 403) {
+                                return response()->json(['status' => 403, 'message' => $responses->getOriginalContent()['message']]);
+                            }else {
                                 CommandModule::create($insertData);
 
                                 $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
@@ -244,9 +247,9 @@ class CommandmoduleController extends Controller
                             // Post tweet if scheduling option is "send-now"
                             if ($postData['scheduling-options'] === 'send-now') {
                                 if ($postData['post_type_tweets'] === "retweet-tweets") {
-                                    $responses = $this->tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
+                                    $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
                                 } else {
-                                    $responses = $this->tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                                    $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
 
                                     if ($responses->getOriginalContent()['status'] === 500) {
                                         return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
@@ -451,7 +454,8 @@ class CommandmoduleController extends Controller
                             })
                             ->where('twitter_id', $id)
                             ->where('user_id', $this->setDefaultId())
-                            ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
+                            // ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
+                            ->where('sched_time', '>=', Carbon::now('UTC'))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
                             ->when($type, function ($query) use ($type, $request) {
@@ -649,7 +653,7 @@ class CommandmoduleController extends Controller
                 // $twitterMeta = $getToken->toArray();
 
                 // check access tokenW
-                $this->tweet2twitter($getToken, array('text' => urldecode($post->post_description)), "https://api.twitter.com/2/tweets");
+                TwitterHelper::tweet2twitter($getToken, array('text' => urldecode($post->post_description)), "https://api.twitter.com/2/tweets");
             }
 
             //get time now
@@ -722,7 +726,7 @@ class CommandmoduleController extends Controller
 
         $data = json_encode($data);
 
-        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );
+        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );    
 
         if ($sendTweetNow) {
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted']);

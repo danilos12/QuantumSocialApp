@@ -136,7 +136,7 @@
             </div>  <!-- END .banner-twitter-profile-wrap -->
           @else
           <div style="display:flex;align-items:center">
-            <a href="{{ route('register') }}">
+            <a href="https://quantumsocial.io">
             Register
             </a>
           </div>
