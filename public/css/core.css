@@ -4808,3 +4808,27 @@ input#toggle_api {
     border-radius: 1em;
     margin-top: 1em;
   }
+
+  /*buttons - change color */
+.btn-primary {
+    color: #fff;
+    background-color: var(--color-nova-75);
+    border: none;
+    }
+    
+.btn-primary:hover {
+    color: #fff;
+    background-color: var(--color-nova);
+    border: none
+    }
+    
+    
+/* login screen - change height*/
+.login-inner {
+    height: auto;
+}
+
+/* command module */
+.post-textarea {
+	font-size: 1.8rem;
+}

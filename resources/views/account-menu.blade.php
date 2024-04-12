@@ -721,4 +721,8 @@
 #reveal {
   cursor: pointer;
 }
+
+.global-input-email {
+  height: auto
+}
 </style>

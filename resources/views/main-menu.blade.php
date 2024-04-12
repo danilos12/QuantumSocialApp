@@ -65,7 +65,7 @@
             </li>
         </ul>
 
-        {{-- <li class="menu-item" data-toggle="collapse" data-target="#engagement">
+        <li class="menu-item" data-toggle="collapse" data-target="#engagement">
         <!-- <a href="{{ route('social-engage') }}"></a> -->
             <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />Engagement
         </li>
@@ -96,7 +96,7 @@
                     Hashtag Feeds
                 </a>
             </li>
-        </ul> --}}
+        </ul>
 
         <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
         <!-- <a href="{{ route('promo-tweets') }}"></a> -->
