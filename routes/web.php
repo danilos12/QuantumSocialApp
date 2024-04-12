@@ -37,7 +37,8 @@ Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::c
 Route::post('/logout/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'logout'])->name('memberlogout');
 
 
-Auth::routes();
+// Auth::routes();
+Auth::routes(['register' => false]);
 
 
 
@@ -46,11 +47,20 @@ Auth::routes();
 
 
 
-Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
-Route::post('/change-password', [App\Http\Controllers\Auth\ChangePasswordController::class, 'updatePassword'])->name('change.password');
+
+// Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 // Routes accessible only to authenticated members
+
+
+// Password reset routes
+Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/change-password', [App\Http\Controllers\Auth\ChangePasswordController::class, 'updatePassword'])->name('change.password');
+Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
+// Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+
+
 
 
 
@@ -127,6 +137,7 @@ Route::post('/twitter/switchUser', [App\Http\Controllers\TwitterApi::class, 'swi
 Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
 Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
+Route::get('/twitter/{id}/filter/{type}/get-more-tweets', [App\Http\Controllers\TwitterApi::class, 'getTweetMoreTweets'])->name('tweet.more');
 Route::post('/twitter/{id}/tweet-now', [App\Http\Controllers\TwitterApi::class, 'tweetNow'])->name('tweet.now');
 Route::post('/twitter/{id}/tweet-schedule', [App\Http\Controllers\TwitterApi::class, 'tweetSchedule'])->name('tweet.filter');
 Route::post('/twitter/assignmember', [App\Http\Controllers\TwitterApi::class, 'addmemberxaccts'])->name('togglexmember');
@@ -194,22 +205,11 @@ Route::middleware(['web','guest','session_expired'])
 
 
 
-    Route::post('/register',[RegisterController::class, 'register'])->name('submit.form');
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-	Route::get('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'showCustomRegister'])->name('custom-vr');
-	Route::post('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'wpRegisterUser']);
-
-
-
 
     Route::get('/team-registration', function () {
         return view('emails.team_members_registration');
     })->name('memberregistration');
     Route::post('/team-registration', [App\Http\Controllers\TeamMemberRegistration::class, 'team_member_reg'])->name('tocontroller');
-
-
-
-
 
 
 
