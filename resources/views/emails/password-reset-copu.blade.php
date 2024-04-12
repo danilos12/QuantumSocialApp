@@ -13,36 +13,49 @@
             RESET YOUR PASSWORD
         </div>
 
-        <form method="POST" action="{{ route('password.email') }}">
+        <form method="POST" action="{{ route('password.update') }}">
             @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
            
             <div class="row mb-3" syle="margin-top: 10em">
 
                 <div class="col-md-6">
-                    <input id="email" placeholder="Email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+                    <input id="email" type="email" placeholder="Email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
 
-                    @error('email')
+                    @error('errors')
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
                 </div>
             </div>
+            <div class="row mb-3" syle="margin-top: 10em">
+                <div class="col-md-6">
+                    <input id="password" type="password" placeholder="Password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror                    
+                </div>
+
+            </div>
+            <div class="row mb-3" syle="margin-top: 10em">
+
+                <div class="col-md-6">
+                    <input id="password-confirm" placeholder="Confirm Password" type="text" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                </div>
+            </div>
                       
             <div class="row mb-3">
 
                 <div class="col-md-12" style="text-align: center">                
-                    <button type="submit" class="btn btn-primary passwordlink">
-                        {{ __('Send Password Reset Link') }}
+                    <button type="submit" class="btn btn-primary ">
+                        {{ __('Reset Password') }}
                     </button>
                 </div>           
-                <div class="col-md-12 m1em" style="text-align: center">
-                    @if (Route::has('login'))
-                    <a class="btn btn-link p-0 backtologin" href="{{ route('login') }}">
-                        {{ __('Back to login') }}
-                    </a>
-                @endif
-                </div>
+                
             </div>
         </form>
         <div class="form p-135">
@@ -201,5 +214,30 @@ background: #FFF;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+}
+
+.mb-3 {
+    margin-bottom: 0.5em;
+}
+
+.input-group {
+  position: relative!important;
+  display: flex!important;
+}
+
+.input-group-append {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  z-index: 999;
+}
+
+
+.input-group-text img {
+  width: 20px; /* Adjust the size as needed */
+  margin-right: 0.5em;
 }
 </style>
