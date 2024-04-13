@@ -153,16 +153,23 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-            $xmembersaccess = DB::table('members')
+                $xmembersaccess = DB::table('members')
             ->select('members.*')
             ->where('members.account_holder_id', Auth::id())
             ->get();
 
-                $xmembersaccessII = DB::table('member_xaccount')
-                ->select('member_xaccount.*')
-                ->where('member_xaccount.user_id', Auth::id())
-                ->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id)
-                ->get();
+
+            $xmembersaccessII = DB::table('member_xaccount')
+            ->select('member_xaccount.*')
+            ->where('member_xaccount.user_id', Auth::id())
+            ->when(isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
+                return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
+            }, function ($query) {
+                return $query->where('member_xaccount.mtwitter_id', 0);
+            })
+            ->get();
+
+
 
 
 
@@ -443,7 +450,7 @@ class AppServiceProvider extends ServiceProvider
             ->when(isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
                 return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
             }, function ($query) {
-                return $query->where('member_xaccount.mtwitter_id', 0); 
+                return $query->where('member_xaccount.mtwitter_id', 0);
             })
             ->get();
 
