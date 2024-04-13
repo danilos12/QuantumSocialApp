@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Models\User;
 use App\Models\GeneralSettings;
 use App\Models\QuantumAcctMeta;
-
+use Illuminate\Support\Facades\Http;
 // use DateTime;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
@@ -47,27 +47,75 @@ Route::get('update-wp', function () {
 
 });
 
+
+
 Route::get('wp', function () {
 	$r = $_REQUEST;
 
-	if(isset( $r['wp_user_id'] ) ) {
+	if(isset( ($r['wp_user_id']) ) ) {
+		$response = Http::post('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
+		$wp_data = $response->json();
 
-		if( !is_numeric($r['wp_user_id'])  ) {
 
+		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
+						$secretkey = 'contigosandigoalternatibomathcoboxo~~~';
+						if ($wp_data['info']['product_name'] == "Solar") {
+							$value = 1;
+						} elseif ($wp_data['info']['product_name'] == "Galactic") {
+							$value = 2;
+						} elseif ($wp_data['info']['product_name'] == "Astral") {
+							$value = 3;
+						} else{
+							$value = null;
+						}
+
+
+					$wppassword = 	base64_decode($r['wp_password']);
+
+					$decryptedpass = decryptData($wppassword,$secretkey);
 				$user = User::create([
-				'firstname' => $r['wp_firstname'],
-				'lastname' => $r['wp_lastname'],
-				'email' => $r['wp_email'],
-				'password' => Hash::make($r['wp_password']),
+				'firstname' => base64_decode($r['wp_firstname']),
+				'lastname' => base64_decode($r['wp_lastname']),
+				'email' => base64_decode($r['wp_email']),
+				'password' => Hash::make($decryptedpass),
 				]);
 
 
-				if( $user->id ) {
+
+				QuantumAcctMeta::create([
+					'user_id' => $user->id,
+					'subscription_id' => $value,
+					'trial_counter'=>7,
+					'status'=>0,
+					'timezone' =>'+00:00',
+					'queue_switch'=>0,
+					'promo_switch'=>0,
+					'evergreen_switch'=>0
+
+				]);
+
+
+				$generalSettings = [
+					'user_id' => $user->id,
+					'toggle_1' => 0,
+					'toggle_2' => 0,
+					'toggle_3' => 0,
+					'toggle_4' => 0,
+					'toggle_5' => 0,
+					'toggle_6' => 0,
+					'toggle_7' => 0,
+				];
+
+
+				GeneralSettings::create($generalSettings);
+				if( $user ) {
 					DB::table('app_usermeta')->insert([
-						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => $r['wp_user_id']],
-						['user_id' => $user->id, 'meta_key' => 'id_subscription', 'meta_value' => $r['wp_subscription']],
-						['user_id' => $user->id, 'meta_key' => 'wp_subscription', 'meta_value' => $r['name_subscription']],
+						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => base64_decode($r['wp_user_id'])],
+						['user_id' => $user->id, 'meta_key' => 'id_subscription', 'meta_value' => base64_decode($r['wp_product_name'])],
+
 					]);
+
+
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
 
@@ -80,15 +128,27 @@ Route::get('wp', function () {
 			return response()->json(['status' =>'Bad Request']);
 		}
 
+	}else{
+		return response()->json(['status' =>'No record found']);
+
 	}
 
-	return response()->json(['status' =>'not available']);
 
 
 });
 
 Route::post('auth/register', RegisterController::class); // Define route using RegisterController method
-// Route::post('auth/register', RegisterController::class)->middleware('auth');
+
 
 Route::get('scrape/', [RegisterController::class, 'scrapeMetaTags']);
+
+
+function decryptData($data, $key) {
+    $cipher = "aes-256-cbc";
+    $data = base64_decode($data);
+    $ivLength = openssl_cipher_iv_length($cipher);
+    $iv = substr($data, 0, $ivLength);
+    $encrypted = substr($data, $ivLength);
+    return openssl_decrypt($encrypted, $cipher, $key, OPENSSL_RAW_DATA, $iv);
+}
 
