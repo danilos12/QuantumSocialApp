@@ -1,5 +1,14 @@
 @extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->user()->role == 'Admin' ? 'layouts.membersdashboard' : redirect()->route('memberhome'));
+?>
 
+@if(is_string($layout))
+    @extends($layout)
+@else
+    {{ $layout->send() }}
+@endif
 
 <style>
 
@@ -11,7 +20,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="card">
-            <!-- <div class="card-header">{{ ('Dashboard') }}</div>   -->               
+            <!-- <div class="card-header">{{ ('Dashboard') }}</div>   -->
 
             <div class="card-body">
                 @if (session('status'))
@@ -20,28 +29,28 @@
                     </div>
                 @endif
 
-                
+
                 <div class="first-row-container">
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
-                    
+
                             <img src="http://app.quantumsocial.local/public/ui-images/icons/planet.svg" class="planet">
-                    
+
                             <div class="queued-single-start">
-                                <span class="greeting">Hi,</span>                                
-                                <span class="name"> {{ $user->email }}!</span>                                
+                                <span class="greeting">Hi,</span>
+                                <span class="name"> {{ $user->email }}!</span>
                             </div>  <!-- END .queue-single-start -->
-                    
+
                             <div class="queued-single-end">
-                    
+
                             </div>  <!-- END .queued-single-end -->
-                    
+
                             </div>  <!-- END .queued-single-post -->
                         </div>
                         <div class="card-below">
                             <div class="card-item-50">
-                                <div class="a">                                                                                                                                        
+                                <div class="a">
                                     {{-- <svg width="200" height="200" viewBox="-31.25 -31.25 312.5 312.5" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
                                         <circle r="115" cx="125" cy="125" fill="transparent" stroke="#C8C8C8" stroke-width="10" stroke-dasharray="722.2px" stroke-dashoffset="0"></circle>
                                         <circle r="115" cx="125" cy="125" stroke="#43EBF1" stroke-width="10" stroke-linecap="butt" stroke-dashoffset="419px" fill="transparent" stroke-dasharray="722.2px"></circle>
@@ -49,14 +58,14 @@
                                     </svg>         --}}
                                     <span class="actual">{{ $countPosts}}</span>
                                     <span class="total">out of {{ $plan->mo_post_credits }} </span>
-                                
+
                                 </div>
                                 <div class="b">
                                     Monthly post credits
                                 </div>
                             </div>
                             <div class="card-item-50">
-                                <div class="a">                                                                                                                                                                            
+                                <div class="a">
                                     <span class="actual">{{ $countHashtagGroups }}</span>
                                     <span class="total">out of {{ $plan->hashtag_group }}
                                     </span>
@@ -71,27 +80,27 @@
                         <div class="queued-single-post-wrapper queue-type-promo" style="    width: 100%;
                         height: 100%;">
                             <div class="queued-single-post">
-                    
+
                             <img src="http://app.quantumsocial.local/public/ui-images/icons/planet.svg" class="planet" style="width: 133px height: 145px">
-                    
+
                             <div class="queued-single-start" style="flex-direction: column; width: 100%">
                                <span class="current-label">You are currently</span>
                                <span class="current-plan">{{ ucfirst($plan->subscription_name) }} </span>
                                <span class="current-uplabel">need more features?</span>
                                <button class="current-upgrade">Upgrade</button>
                             </div>  <!-- END .queue-single-start -->
-                    
+
                             <div class="queued-single-end">
-                    
+
                             </div>  <!-- END .queued-single-end -->
-                    
+
                             </div>  <!-- END .queued-single-post -->
                         </div>
                     </div>
                 </div>
                 <div class="second-row-container">
                     <div class="card-item-25">
-                        <div class="a card-col-a">                                                                                                                                                                            
+                        <div class="a card-col-a">
                             <span class="actual">{{ $countXaccts }}</span>
                         </div>
                         <div class="b card-col-b">
@@ -100,7 +109,7 @@
                         </div>
                     </div>
                     <div class="card-item-25">
-                        <div class="a card-col-a">                                                                                                                                                                            
+                        <div class="a card-col-a">
                             <span class="actual">{{ $countAdmin }}</span>
                         </div>
                         <div class="b card-col-b">
@@ -109,7 +118,7 @@
                         </div>
                     </div>
                     <div class="card-item-25">
-                        <div class="a card-col-a">                                                                                                                                                                            
+                        <div class="a card-col-a">
                             <span class="actual">{{ $countTeamMembers}}</span>
                         </div>
                         <div class="b card-col-b">
@@ -118,7 +127,7 @@
                         </div>
                     </div>
                     <div class="card-item-25">
-                        <div class="a card-col-a">                                                                                                                                                                            
+                        <div class="a card-col-a">
                             <span class="actual">{{ $countTrial }}</span>
                         </div>
                         <div class="b card-col-b">
@@ -126,10 +135,10 @@
                             <span class="card-description2">Trial </span>
                         </div>
                     </div>
-                </div>              
+                </div>
             </div>
         </div>
-      
+
     </div>
 </div>
 @endsection
@@ -141,7 +150,7 @@
     /* background-color: rgba(143, 116, 188, 0.1); */
 }
 .card-item-75 {
-    display: flex;  
+    display: flex;
     /* width: 740; */
     background: rgba(143, 116, 188, 0.4)
     margin: 2px;
@@ -153,7 +162,7 @@
     margin-bottom: 1em;
 }
 .card-item-50 {
-    display: flex;  
+    display: flex;
 
     width: 50%;
     /* background: #8F74BC; */
@@ -212,7 +221,7 @@ span.metrics-text {
 }
 
 .card-item-25 {
-    width: 25%;   
+    width: 25%;
 
     display: flex;
     flex-direction: row;
@@ -240,13 +249,13 @@ span.metrics-text {
 }
 
 .queued-single-start span.greeting {
-    font-size: 12px; 
+    font-size: 12px;
     font-family: Montserrat;
     text-transform: uppercase;
 }
 
 .queued-single-start span.name {
-    font-size: 20px; 
+    font-size: 20px;
     font-weight: bold;
     font-family: Montserrat;
     margin-left: 1em
