@@ -71,11 +71,11 @@
                         @endif
                     </div>
                     <div class="ml-auto p-2">
-                        @if (Route::has('register'))
-                            <a class="btn btn-link p-0 signup" href="{{ route('register') }}">
+                        {{-- @if (Route::has('register')) --}}
+                            <a class="btn btn-link p-0 signup" href="https://quantumsocial.io">
                                 {{ __('Sign up') }}
                             </a>
-                        @endif
+                        {{-- @endif --}}
                     </div>
                 </div>
             </div>

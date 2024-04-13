@@ -32,7 +32,7 @@ class ForgotPasswordController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function sendResetLinkEmail(Request $request)
-    {
+    {         
         $request->validate(['email' => 'required|email']);
 
         $user = User::where('email', $request->email)->first();
@@ -45,8 +45,9 @@ class ForgotPasswordController extends Controller
         // Customized email subject
         $subject = 'Quantum Social: Password Reset';       
 
-        $resetUrl = env('APP_URL') . '/reset-password' . '/' . $token;
-
+       
+        $resetUrl = env('APP_URL') . '/password/reset/' . $token;
+        // dd($resetUrl);
         // Generate the password reset token
         // $token = $this->broker()->createToken($request->only('email'));
 
