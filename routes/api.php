@@ -49,30 +49,67 @@ Route::get('update-wp', function () {
 
 
 
+
+    // trial counter trial_date - now()
+    // next payment next date new column
+    // status new column status number
+    //  1-wc-active
+    // 2- wc-on-hold
+    // 3- wc-cancelled
+    // 4- wc-expired
+    // 5 - wc-pending-cancel
+
 Route::get('wp', function () {
 	$r = $_REQUEST;
 
-	if(isset( ($r['wp_user_id']) ) ) {
-		$response = Http::post('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
+	if(isset( $r['wp_user_id'] ) ) {
+
+
+		$response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
 		$wp_data = $response->json();
 
 
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
-						$secretkey = 'contigosandigoalternatibomathcoboxo~~~';
-						if ($wp_data['info']['product_name'] == "Solar") {
-							$value = 1;
-						} elseif ($wp_data['info']['product_name'] == "Galactic") {
-							$value = 2;
-						} elseif ($wp_data['info']['product_name'] == "Astral") {
-							$value = 3;
-						} else{
-							$value = null;
-						}
 
 
-					$wppassword = 	base64_decode($r['wp_password']);
 
-					$decryptedpass = decryptData($wppassword,$secretkey);
+
+				if ($wp_data['info']['product_name'] == "Solar") {
+					$value = 1;
+				} elseif ($wp_data['info']['product_name'] == "Galactic") {
+					$value = 2;
+				} elseif ($wp_data['info']['product_name'] == "Astral") {
+					$value = 3;
+				} else{
+					$value = null;
+				}
+
+                switch ($wp_data['wc_status']) {
+                    case "wc-active":
+                        $status = 1;
+                        break;
+                    case "wc-on-hold":
+                        $status = 2;
+                        break;
+                    case "wc-cancelled":
+                        $status = 3;
+                        break;
+                    case "wc-expired":
+                        $status = 4;
+                        break;
+                    case "wc-pending-cancel":
+                        $status = 5;
+                        break;
+                    default:
+                        $status = null;
+                        break;
+                }
+				$secretkey = 'contigosandigoalternatibomathcoboxo~~~';
+
+				$wppassword = 	base64_decode($r['wp_password']);
+
+				$decryptedpass = decryptData($wppassword,$secretkey);
+
 				$user = User::create([
 				'firstname' => base64_decode($r['wp_firstname']),
 				'lastname' => base64_decode($r['wp_lastname']),
@@ -81,40 +118,43 @@ Route::get('wp', function () {
 				]);
 
 
-
-				QuantumAcctMeta::create([
-					'user_id' => $user->id,
-					'subscription_id' => $value,
-					'trial_counter'=>7,
-					'status'=>0,
-					'timezone' =>'+00:00',
-					'queue_switch'=>0,
-					'promo_switch'=>0,
-					'evergreen_switch'=>0
-
-				]);
-
-
-				$generalSettings = [
-					'user_id' => $user->id,
-					'toggle_1' => 0,
-					'toggle_2' => 0,
-					'toggle_3' => 0,
-					'toggle_4' => 0,
-					'toggle_5' => 0,
-					'toggle_6' => 0,
-					'toggle_7' => 0,
-				];
-
-
-				GeneralSettings::create($generalSettings);
-				if( $user ) {
+				if( $user->id ) {
 					DB::table('app_usermeta')->insert([
 						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => base64_decode($r['wp_user_id'])],
-						['user_id' => $user->id, 'meta_key' => 'id_subscription', 'meta_value' => base64_decode($r['wp_product_name'])],
+						['user_id' => $user->id, 'meta_key' => 'subscription_name', 'meta_value' => $wp_data['info']['product_name']],
+
 
 					]);
+					$now = strtotime(date("Y/m/d"));
+					$your_date = strtotime($wp_data['info']['trial_date']);
+					$datediff = $your_date - $now;
+					$days_diff = floor($datediff / (60 * 60 * 24));
 
+
+					DB::table('users_meta')->insert([
+						'user_id' => $user->id,
+						'subscription_id' => $value,
+						'trial_counter'=>$days_diff,
+						'next_payment'=>$wp_data['info']['next_payment'],
+						'status'=>$status,
+						'timezone' =>'+00:00',
+						'queue_switch'=>0,
+						'promo_switch'=>0,
+						'evergreen_switch'=>0
+					]);
+
+					$generalSettings = [
+						'user_id' => $user->id,
+						'toggle_1' => 0,
+						'toggle_2' => 0,
+						'toggle_3' => 0,
+						'toggle_4' => 0,
+						'toggle_5' => 0,
+						'toggle_6' => 0,
+						'toggle_7' => 0
+					];
+
+					DB::table('settings_general')->insert($generalSettings);
 
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
