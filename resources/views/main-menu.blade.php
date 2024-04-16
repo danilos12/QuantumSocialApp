@@ -1,6 +1,6 @@
 
 
-        @auth('web')
+      
 
 
         <li class="menu-item menu-margin">
@@ -8,7 +8,7 @@
                 <img src = "{{ asset('public/ui-images/icons/01-dashboard.svg') }}" class="menu-icon" />Dashboard
             </a>
         </li>
-        @endauth
+    
         <li class="menu-item menu-margin launch-command-module" data-id="modal" id="command-module">
             <img src = "{{ asset('public/ui-images/icons/pg-command.svg') }}" class="menu-icon" />
             Command Module
