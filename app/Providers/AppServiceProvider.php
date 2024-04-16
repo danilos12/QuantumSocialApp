@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
 
             if (Auth::guard('web')->check()) {
-
+              
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
                 $view->with('acct_twitter_count', $count);
@@ -162,7 +162,7 @@ class AppServiceProvider extends ServiceProvider
             $xmembersaccessII = DB::table('member_xaccount')
             ->select('member_xaccount.*')
             ->where('member_xaccount.user_id', Auth::id())
-            ->when(isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
+            ->when(isset($selectedUser) && isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
                 return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
             }, function ($query) {
                 return $query->where('member_xaccount.mtwitter_id', 0);
@@ -170,7 +170,7 @@ class AppServiceProvider extends ServiceProvider
             ->get();
 
 
-
+                // dd($xmembersaccess,$selectedUser);
 
 
                 $view->with('xmembersaccess', $xmembersaccess);
@@ -196,7 +196,8 @@ class AppServiceProvider extends ServiceProvider
 
                 $checkRole = MembershipHelper::tier(Auth::id());
 
-                $view->with('product_id', $checkRole->subscription_id);
+                //$view->with('product_id', $checkRole->subscription_id);
+				$view->with('product_id', 0);
 
 
                 $hasCustomSlot = DB::table('schedule')
