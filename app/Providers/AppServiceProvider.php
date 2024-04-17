@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
 
             if (Auth::guard('web')->check()) {
-
+              
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
                 $view->with('acct_twitter_count', $count);
@@ -165,7 +165,7 @@ class AppServiceProvider extends ServiceProvider
             ->when(isset($selectedUser) && isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
                 return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
             }, function ($query) {
-                return $query->where('member_xaccount.mtwitter_id', 0); 
+                return $query->where('member_xaccount.mtwitter_id', 0);
             })
             ->get();
 
@@ -451,7 +451,7 @@ class AppServiceProvider extends ServiceProvider
             ->when(isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
                 return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
             }, function ($query) {
-                return $query->where('member_xaccount.mtwitter_id', 0); 
+                return $query->where('member_xaccount.mtwitter_id', 0);
             })
             ->get();
 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 // use DateTime;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 
 
@@ -63,7 +64,7 @@ Route::get('wp', function () {
 	$r = $_REQUEST;
 
 	if(isset( $r['wp_user_id'] ) ) {
-				
+
 
 		$response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
 		$wp_data = $response->json();
@@ -72,7 +73,7 @@ Route::get('wp', function () {
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
 
-			
+
 
 				if ($wp_data['info']['product_name'] == "Solar") {
 					$value = 1;
@@ -117,19 +118,19 @@ Route::get('wp', function () {
 				'password' => Hash::make($decryptedpass),
 				]);
 
-			
+
 				if( $user->id ) {
 					DB::table('app_usermeta')->insert([
 						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => base64_decode($r['wp_user_id'])],
 						['user_id' => $user->id, 'meta_key' => 'subscription_name', 'meta_value' => $wp_data['info']['product_name']],
-				
-				
+
+
 					]);
-					$now = strtotime(date("Y/m/d")); 
+					$now = strtotime(date("Y/m/d"));
 					$your_date = strtotime($wp_data['info']['trial_date']);
 					$datediff = $your_date - $now;
 					$days_diff = floor($datediff / (60 * 60 * 24));
-		
+
 
 					DB::table('users_meta')->insert([
 						'user_id' => $user->id,
