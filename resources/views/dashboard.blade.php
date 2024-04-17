@@ -1,4 +1,11 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
 
 
 <style>
@@ -48,8 +55,11 @@
                                         <text x="102px" y="140px" fill="#fafafa" font-family="Montserrat" font-size="48px" font-weight="bold" style="transform:rotate(90deg) translate(0px, -246px)">42</text>
                                     </svg>         --}}
                                     <span class="actual">{{ $countPosts}}</span>
+									@if( !empty($plan) ) 
                                     <span class="total">out of {{ $plan->mo_post_credits }} </span>
-                                
+									@else
+									 <span class="total">Contact you administrator </span>	
+									@endif
                                 </div>
                                 <div class="b">
                                     Monthly post credits
@@ -58,7 +68,12 @@
                             <div class="card-item-50">
                                 <div class="a">                                                                                                                                                                            
                                     <span class="actual">{{ $countHashtagGroups }}</span>
+									@if( !empty($plan) ) 
                                     <span class="total">out of {{ $plan->hashtag_group }}
+									@else
+									 <span class="total">Contact you administrator </span>	
+									@endif
+                                   
                                     </span>
                                 </div>
                                 <div class="b">
@@ -74,11 +89,19 @@
                     
                             <img src="http://app.quantumsocial.local/public/ui-images/icons/planet.svg" class="planet" style="width: 133px height: 145px">
                     
-                            <div class="queued-single-start" style="flex-direction: column; width: 100%">
+                            <div class="queued-single-start" style="flex-direction: column; width: 100%;">
                                <span class="current-label">You are currently</span>
-                               <span class="current-plan">{{ ucfirst($plan->subscription_name) }} </span>
+							   	@if( !empty($plan) ) 
+								  <span class="current-plan">{{ ucfirst($plan->subscription_name) }} </span>
+								@else
+								  <span class="current-plan">Contact you administrator </span>	
+								@endif
+                  
+                                
+                         
                                <span class="current-uplabel">need more features?</span>
                                <button class="current-upgrade">Upgrade</button>
+                               
                             </div>  <!-- END .queue-single-start -->
                     
                             <div class="queued-single-end">
@@ -95,7 +118,12 @@
                             <span class="actual">{{ $countXaccts }}</span>
                         </div>
                         <div class="b card-col-b">
-                            <span class="card-description1">out of {{ $plan->member_count }} </span>
+							 	@if( !empty($plan) ) 
+								 <span class="card-description1">out of {{ $plan->member_count }} </span>
+								@else
+								  <span class="card-description1">Contact you administrator </span>	
+								@endif
+                           
                             <span class="card-description2">X accounts </span>
                         </div>
                     </div>
@@ -104,7 +132,12 @@
                             <span class="actual">{{ $countAdmin }}</span>
                         </div>
                         <div class="b card-col-b">
-                            <span class="card-description1">out of {{ $plan->admin_count }} </span>
+								@if( !empty($plan) ) 
+								  <span class="card-description1">out of {{ $plan->admin_count }} </span>
+								@else
+								  <span class="card-description1">Contact you administrator </span>	
+								@endif
+                          
                             <span class="card-description2">Admin </span>
                         </div>
                     </div>
@@ -113,7 +146,12 @@
                             <span class="actual">{{ $countTeamMembers}}</span>
                         </div>
                         <div class="b card-col-b">
-                            <span class="card-description1">out of {{ $plan->tm_count }} </span>
+								@if( !empty($plan) ) 
+								   <span class="card-description1">out of {{ $plan->tm_count }} </span>
+								@else
+								    <span class="card-description1">Contact you administrator </span>	
+								@endif
+                           
                             <span class="card-description2">Team Members </span>
                         </div>
                     </div>
@@ -122,7 +160,12 @@
                             <span class="actual">{{ $countTrial }}</span>
                         </div>
                         <div class="b card-col-b">
-                            <span class="card-description1">out of {{ $plan->trial_counter }} </span>
+							@if( !empty($plan) ) 
+							    <span class="card-description1">out of {{ $plan->trial_counter }} </span>
+							@else
+								<span class="card-description1">Contact you administrator </span>	
+							@endif
+                           
                             <span class="card-description2">Trial </span>
                         </div>
                     </div>

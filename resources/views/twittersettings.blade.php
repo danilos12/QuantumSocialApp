@@ -125,8 +125,8 @@
 
                                   <div class="">
 
+                                    <input type="checkbox" class="menu-twirl-toggle twitteraccess" data-trid="{{ $selected_user ? $selected_user->id : '' }}" datas-xant="{{ $member->account_holder_id }}" name="grant-x-access" data-twitter-id="{{ $selected_user ? $selected_user->twitter_id : '' }}" id="toggle_x-{{ $member->id }}" {{ $selected_user && $idscheck->contains('member_id', $member->id) && $idscheck->contains('mtwitter_id', $selected_user->twitter_id) ? 'checked' : '' }}>
 
-                                    <input type="checkbox" class="menu-twirl-toggle twitteraccess" data-trid="{{$selected_user->id}}" datas-xant="{{$member->account_holder_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_x-{{$member->id}}" {{$idscheck->contains('member_id',$member->id) && $idscheck->contains('mtwitter_id',$selected_user->twitter_id) ? 'checked' : '' }}>
 
 
 

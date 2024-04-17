@@ -24,9 +24,28 @@ class dashboardController extends Controller
      */
     public function __construct()
     {
+      if (Auth::guard('web')->check()) {
         $this->middleware('auth');
+
+    }
+    if(Auth::guard('member')->check()) {
+
+        $this->middleware('member-access');
+
+
+    }
 	
 
+    }
+
+    protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check()) {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
     }
 
     /**
@@ -42,15 +61,15 @@ class dashboardController extends Controller
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
 
 		
-		$user = User::find(Auth::id());	
+		$user = User::find($this->setDefaultId());	
 		
-		$countPosts = CommandModule::where('user_id', Auth::id())->count();
-		$countHashtagGroups = Tag_groups::where('user_id', Auth::id())->count();		
-		$countXaccts = UT_AcctMngt::where('user_id', Auth::id())->count();
-		$countTeamMembers = Members::where('account_holder_id', Auth::id())->where('role', 'Member')->count();	
-		$countAdmin = Members::where('account_holder_id', Auth::id())->where('role', 'Admin')->count();
-		$countTrial = QuantumAcctMeta::where('user_id', Auth::id())->first();
-		
+		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->count();
+		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();		
+		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
+		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();	
+		$countAdmin = Members::where('account_holder_id',$this->setDefaultId())->where('role', 'Admin')->count();
+		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
+		// dd($checkRole);
         return view('dashboard')->with([
 			'title' => $title, 
 			'plan' => $checkRole, 

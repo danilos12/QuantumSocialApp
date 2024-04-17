@@ -166,11 +166,11 @@ class GeneralSettingController extends Controller
         else
         {
             $html = null;
-        }
+        // }
 
         return $html;
     }
-
+    }
     public function saveTwitterApi(Request $request, $twitter_id) {
 
         try {
@@ -182,8 +182,8 @@ class GeneralSettingController extends Controller
             $saveTwitterApi->bearer_token = $request->input('bearer_token');
             $saveTwitterApi->access_token = $request->input('access_token');
             $saveTwitterApi->token_secret = $request->input('token_secret');
-            $saveTwitterApi->save();
-
+          
+         
             if ($saveTwitterApi) {
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Credentials are updated']);
             } else {
@@ -199,35 +199,32 @@ class GeneralSettingController extends Controller
         }
 
     }
+    
 
-    public function twitterApiCredentials(Request $request, $id) {
+    public function twitterApiCredentials(Request $request, $id)
+    {
         try {
 
+            $api = MasterTwitterApiCredentials::firstOrCreate(['user_id' => $this->setDefaultId()]);
+    
 
-
-                $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => $this->setDefaultId()]);
-
-
-            if(Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1) ){
-
-            if ($api) {
-                $api->update($request->all());
-                return response()->json(['status' => 200, 'stat' => 'success' ,'message' => 'Master API Credentials are successfully updated']);
-            } else {
-                $api = new MasterTwitterApiCredentials($request->all());
-                $api->user_id = $this->setDefaultId();
+            if (Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1)) {
+          
+                $api->fill($request->all());
+    
+     
                 $api->save();
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
+    
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully ' . ($api->wasRecentlyCreated ? 'saved' : 'updated')]);
+            } else {
+                // Unauthorized user
+                return response()->json(['stat' => 'danger', 'message' => 'You are not allowed to modify this']);
             }
-        }else{
-            return response()->json([ 'stat' => 'danger', 'message' => 'You are not allowed to modify this']);
-        }
-
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            // Handle exceptions
             $trace = $e->getTrace();
             $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
+    
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
@@ -311,27 +308,32 @@ class GeneralSettingController extends Controller
 
     public function twitterSettingsMeta(Request $request, $twitter_id) {
         try {
-            $settings = [];
-            foreach ($request->request as $parameter) {
-                $key = $parameter['key'];
-                $value = $parameter['value'];
-
-                $settings = TwitterSettingsMeta::where('twitter_id', $twitter_id)->update([$key => $value]);
-            }
-
-            if ($settings) {
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Data is updated']);
+            $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => $this->setDefaultId()]);
+        
+            if (Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1)) {
+                if (!$api->exists) {
+                    $api->api_key = $request->input('api_key', '')??'';
+                    $api->api_secret = $request->input('api_secret', '')??'';
+                    $api->bearer_token = $request->input('bearer_token')??'';
+                    $api->oauth_id = $request->input('oauth_id')??'';
+                    $api->oauth_secret = $request->input('oauth_secret')?? '';
+                    $api->callback_url = $request->input('callback_url') ?? ''; 
+                    $api->user_id = $this->setDefaultId();
+                    $api->save();
+                    return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
+                } else {
+                    $api->update($request->all());
+                    return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully updated']);
+                }
             } else {
-                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update.']);
+                return response()->json(['stat' => 'danger', 'message' => 'You are not allowed to modify this']);
             }
-
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
+        
     }
 
 

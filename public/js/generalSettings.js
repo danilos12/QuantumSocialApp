@@ -153,7 +153,7 @@ $(document).ready(function () {
 
             setTimeout(function() {
             location.reload();
-            }, 3000); // Reload after 5 seconds (adjust the delay as needed)
+            }, 3000); 
         } catch(err) {
             console.log('Error fetching the data' + err)
         }
