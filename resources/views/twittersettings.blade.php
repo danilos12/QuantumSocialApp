@@ -1,4 +1,4 @@
- <div class="modal-large-outer main-settings-outer twitter-settings-outer frosted">
+<div class="modal-large-outer main-settings-outer twitter-settings-outer frosted">
     <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" id="twitter-settings"/>
 
     <div class="account-settings-header-wrap">

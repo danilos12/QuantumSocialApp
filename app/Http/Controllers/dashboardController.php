@@ -14,6 +14,7 @@ use App\Models\Members;
 use App\Models\QuantumAcctMeta;
 use App\Models\Tag_groups;
 use App\Models\UT_AcctMngt;
+use Illuminate\Support\Facades\Session;
 
 class dashboardController extends Controller
 {
@@ -22,19 +23,29 @@ class dashboardController extends Controller
      *
      * @return void
      */
+    protected $defaultid;
     public function __construct()
     {
-      if (Auth::guard('web')->check()) {
-        $this->middleware('auth');
+        if (Auth::guard('web')->check()) {
+            $this->middleware('auth');
 
-    }
-    if(Auth::guard('member')->check()) {
+        }
+        if(Auth::guard('member')->check()) {
 
-        $this->middleware('member-access');
+            $this->middleware('member-access');
 
 
-    }
-	
+        }
+        if(!Session::has('user_id') || !Session::has('user_email')) {
+
+            $this->middleware('auth');
+
+
+        }
+
+
+
+
 
     }
 
@@ -55,28 +66,28 @@ class dashboardController extends Controller
      */
     public function index()
     {
-		$title = 'Dashboard page';		
-		
-		
+		$title = 'Dashboard page';
+
+
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
 
-		
-		$user = User::find($this->setDefaultId());	
-		
+
+		$user = User::find($this->setDefaultId());
+
 		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->count();
-		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();		
+		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
 		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
-		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();	
+		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
 		$countAdmin = Members::where('account_holder_id',$this->setDefaultId())->where('role', 'Admin')->count();
 		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
-		// dd($checkRole);
+        // dd($checkRole,$user);
         return view('dashboard')->with([
-			'title' => $title, 
-			'plan' => $checkRole, 
-			'user' => $user, 
-			'countPosts' => $countPosts, 
-			'countXaccts' => $countXaccts, 
-			'countHashtagGroups' => $countHashtagGroups, 
+			'title' => $title,
+			'plan' => $checkRole,
+			'user' => $user,
+			'countPosts' => $countPosts,
+			'countXaccts' => $countXaccts,
+			'countHashtagGroups' => $countHashtagGroups,
 			'countAdmin' => $countAdmin,
 			'countTeamMembers' => $countTeamMembers,
 			'countTrial' => $countTrial->trial_counter

@@ -26,4 +26,9 @@ class HomeController extends Controller
 		$title = 'Home page';
 		return view('home')->with('title', $title);
     }
+    public function upgrademodal()
+    {
+        $html = view('modals.upgrade')->render();
+        return response()->json(['stat' => 'upgrade?', 'html' => $html]);
+    }
 }
