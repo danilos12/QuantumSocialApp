@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             // update columns in users meta 
 
             if (Auth::guard('web')->check()) {
-
+              
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
                 $view->with('acct_twitter_count', $count);
@@ -173,17 +173,24 @@ class AppServiceProvider extends ServiceProvider
 
 
 
-            $xmembersaccess = DB::table('members')
+                $xmembersaccess = DB::table('members')
             ->select('members.*')
             ->where('members.account_holder_id', Auth::id())
             ->get();
 
-                $xmembersaccessII = DB::table('member_xaccount')
-                ->select('member_xaccount.*')
-                ->where('member_xaccount.user_id', Auth::id())
-                ->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id)
-                ->get();
 
+            $xmembersaccessII = DB::table('member_xaccount')
+            ->select('member_xaccount.*')
+            ->where('member_xaccount.user_id', Auth::id())
+            ->when(isset($selectedUser) && isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
+                return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
+            }, function ($query) {
+                return $query->where('member_xaccount.mtwitter_id', 0);
+            })
+            ->get();
+
+
+                // dd($xmembersaccess,$selectedUser);
 
 
                 $view->with('xmembersaccess', $xmembersaccess);
@@ -209,7 +216,8 @@ class AppServiceProvider extends ServiceProvider
 
                 $checkRole = MembershipHelper::tier(Auth::id());
 
-                $view->with('product_id', $checkRole->subscription_id);
+                //$view->with('product_id', $checkRole->subscription_id);
+				$view->with('product_id', 0);
 
 
                 $hasCustomSlot = DB::table('schedule')
@@ -463,7 +471,7 @@ class AppServiceProvider extends ServiceProvider
             ->when(isset($selectedUser->twitter_id), function ($query) use ($selectedUser) {
                 return $query->where('member_xaccount.mtwitter_id', $selectedUser->twitter_id);
             }, function ($query) {
-                return $query->where('member_xaccount.mtwitter_id', 0); 
+                return $query->where('member_xaccount.mtwitter_id', 0);
             })
             ->get();
 
