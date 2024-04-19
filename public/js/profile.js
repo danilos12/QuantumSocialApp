@@ -107,10 +107,10 @@ $(document).ready(function() {
     
     $('.lower-area-inner').on('scroll', function() {
         var $this = $(this);
-        console.log($this)
+
         // Calculate the sum of scrollTop and clientHeight
         var scrollBottom = $this.scrollTop() + $this.innerHeight();
-        console.log(scrollBottom)
+
         // Check if scrollBottom equals scrollHeight
         if (scrollBottom >= $this[0].scrollHeight) {
             // You have scrolled to the bottom
@@ -132,8 +132,8 @@ $(document).ready(function() {
             });
             const responseData = await response.json();  
             $(".profileSection").show();
-            console.log(responseData);
-            console.log(responseData.more_tweets);
+            // console.log(responseData);
+            // console.log(responseData.more_tweets);
             
             if (responseData.status === 200) {
 

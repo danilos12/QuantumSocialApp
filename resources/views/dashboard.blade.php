@@ -122,8 +122,8 @@
                             <span class="actual">{{ $countTrial }}</span>
                         </div>
                         <div class="b card-col-b">
-                            <span class="card-description1">out of {{ $plan->trial_counter }} </span>
-                            <span class="card-description2">Trial </span>
+                            <span class="card-description1">days left in your</span>
+                            <span class="card-description2">Free Trial </span>
                         </div>
                     </div>
                 </div>              
