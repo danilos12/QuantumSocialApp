@@ -33,9 +33,9 @@
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
-
-                            <img src="http://app.quantumsocial.local/public/ui-images/icons/planet.svg" class="planet">
-
+                    
+                            <img src="{{ asset('/public/ui-images/icons/planet.svg') }}" class="planet">
+                    
                             <div class="queued-single-start">
                                 <span class="greeting">Hi,</span>
                                 <span class="name"> {{ $user->email }}!</span>
@@ -87,10 +87,10 @@
                         <div class="queued-single-post-wrapper queue-type-promo" style="    width: 100%;
                         height: 100%;">
                             <div class="queued-single-post">
-
-                            <img src="http://app.quantumsocial.local/public/ui-images/icons/planet.svg" class="planet" style="width: 133px height: 145px">
-
-                            <div class="queued-single-start" style="flex-direction: column; width: 100%;">
+                    
+                            <img src="{{ asset('/public/ui-images/icons/planet.svg') }}" class="planet" style="width: 133px height: 145px">
+                    
+                            <div class="queued-single-start" style="flex-direction: column; width: 100%">
                                <span class="current-label">You are currently</span>
 							   	@if( !empty($plan) )
 								  <span class="current-plan">{{ ucfirst($plan->subscription_name) }} </span>
