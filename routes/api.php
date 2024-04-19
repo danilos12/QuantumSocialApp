@@ -193,4 +193,3 @@ function decryptData($data, $key) {
     $encrypted = substr($data, $ivLength);
     return openssl_decrypt($encrypted, $cipher, $key, OPENSSL_RAW_DATA, $iv);
 }
-
