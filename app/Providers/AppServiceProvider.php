@@ -44,14 +44,23 @@ class AppServiceProvider extends ServiceProvider
             
             if ($usersMeta) {
                 $api = MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $usersMeta->wp_user_id);                
+                $jsonStart = strpos($api, '{');
+
+                // Extract JSON data
+                $jsonData = substr($api, $jsonStart);
                 
-                if ($api->n === 'valid') {
+                // Parse JSON
+                $parsedData = json_decode($jsonData, true);
+
+                $status = config('wp.status_labels');
+                if ($parsedData['n'] === 'valid') {
                     $now = strtotime(date("Y/m/d"));
-					$your_date = strtotime($api->info->trial_date);
+					$your_date = strtotime($parsedData['info']['trial_date']);
 					$datediff = $your_date - $now;
 					$days_diff = floor($datediff / (60 * 60 * 24));
                     QuantumAcctMeta::where('user_id', auth()->id())->update([
-                        'trial_counter' => $days_diff
+                        'trial_counter' => $days_diff,
+                        'status' => $status[$parsedData['wc_status']],
                     ]);
                 }                
             }

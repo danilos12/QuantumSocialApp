@@ -41,8 +41,7 @@ class dashboardController extends Controller
 		
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
 
-		
-		$user = User::find(Auth::id());	
+    $user = User::find($checkRole->user_id);	
 		
 		$countPosts = CommandModule::where('user_id', Auth::id())->count();
 		$countHashtagGroups = Tag_groups::where('user_id', Auth::id())->count();		

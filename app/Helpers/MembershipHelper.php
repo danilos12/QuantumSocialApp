@@ -29,7 +29,7 @@ class MembershipHelper
             ->join('plans', 'users_meta.subscription_id', 'plans.subscription_id')
             ->where('users_meta.user_id', $usersid)
             ->first();
-
+        // dd($subscription);
         return $subscription;
 
     }
@@ -78,10 +78,9 @@ class MembershipHelper
         ));
 
         $response = curl_exec($curl);
-
         curl_close($curl);
                 
-        return json_decode($response);
+        return $response;
     }
 
 }
