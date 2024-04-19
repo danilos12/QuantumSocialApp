@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\testingapi;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -69,6 +69,7 @@ Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordControlle
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
 Route::get('/', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
+Route::get('/get-upgrade-modal', [App\Http\Controllers\HomeController::class, 'upgrademodal'])->name('upgradecheckout');
 
 
 // Profile controller
@@ -220,7 +221,7 @@ Route::middleware(['web','guest','session_expired'])
     Route::middleware('member-access')->group(function(){
 
         Route::get('/member/home',function()
-        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome');
+        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome')->withoutMiddleware(['session_expired']);;
         Route::get('/member/promo',function(){
 
             return view('promo-tweets')->with('title','Promo');});
