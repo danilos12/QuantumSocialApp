@@ -135,11 +135,7 @@ Route::get('wp', function () {
 					DB::table('users_meta')->insert([
 						'user_id' => $user->id,
 						'subscription_id' => $value,
-<<<<<<< HEAD
-						'wp_subscription_id' => base64_decode($r['wp_user_id']),
-=======
 						'wp_subscription_id'=>base64_decode($r['wp_user_id']),
->>>>>>> main
 						'trial_counter'=>$days_diff,
 						'next_payment'=>$wp_data['info']['next_payment'],
 						'status'=>$status,
@@ -197,7 +193,3 @@ function decryptData($data, $key) {
     $encrypted = substr($data, $ivLength);
     return openssl_decrypt($encrypted, $cipher, $key, OPENSSL_RAW_DATA, $iv);
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> main

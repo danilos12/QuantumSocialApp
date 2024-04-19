@@ -71,25 +71,6 @@ class dashboardController extends Controller
 
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
 
-<<<<<<< HEAD
-		
-		$user = User::find(Auth::id());	
-		
-		$countPosts = CommandModule::where('user_id', Auth::id())->count();
-		$countHashtagGroups = Tag_groups::where('user_id', Auth::id())->count();		
-		$countXaccts = UT_AcctMngt::where('user_id', Auth::id())->count();
-		$countTeamMembers = Members::where('account_holder_id', Auth::id())->where('role', 'Member')->count();	
-		$countAdmin = Members::where('account_holder_id', Auth::id())->where('role', 'Admin')->count();
-		$countTrial = QuantumAcctMeta::where('user_id', Auth::id())->first();
-		
-    return view('dashboard')->with([
-			'title' => $title, 
-			'plan' => $checkRole ?? '', 
-			'user' => $user, 
-			'countPosts' => $countPosts, 
-			'countXaccts' => $countXaccts, 
-			'countHashtagGroups' => $countHashtagGroups, 
-=======
 
 		$user = User::find($this->setDefaultId());
 
@@ -107,7 +88,6 @@ class dashboardController extends Controller
 			'countPosts' => $countPosts,
 			'countXaccts' => $countXaccts,
 			'countHashtagGroups' => $countHashtagGroups,
->>>>>>> main
 			'countAdmin' => $countAdmin,
 			'countTeamMembers' => $countTeamMembers,
 			'countTrial' => $countTrial->trial_counter
