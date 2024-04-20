@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
+use Illuminate\Support\Facades\Cache;
 
 
 class TwitterApi extends Controller
@@ -57,17 +58,30 @@ class TwitterApi extends Controller
                 't_rid' => intval($request->input('twitterids')),
                 'mtwitter_id' => $request->input('twitter_id'),
                 'user_id' => intval($request->input('user_id')),
-                'twitter_access' => $request->input('xaccess')
+                'twitter_access' => $request->input('xaccess'),
+                'selected' => true
             ];
             // return response()->json(['message'=>$memberinfo]);
             if($memberinfo['twitter_access'] === false){
+                $updatedSelected = 0;
+                $updatedSelected += DB::table('member_xaccount')
+                         ->where('member_id', $memberinfo['member_id'])
+                         ->where('mtwitter_id', '!=', $memberinfo['mtwitter_id'])
+                         ->update(['selected' => 1]);
+
                 $deleted = DB::table('member_xaccount')->where('t_rid', $memberinfo['t_rid'])->delete();
-                if($deleted){
+                if($deleted&&$updatedSelected){
                     return response()->json(['message'=>'Member cannot access this X account', 'stat'=>'success']);
                 }
             }elseif($memberinfo['twitter_access'] === true){
+                $updatedSelected = 0;
+
                 $memberxadd = DB::table('member_xaccount')->insert($memberinfo);
-                if($memberxadd){
+                $updatedSelected += DB::table('member_xaccount')
+                ->where('member_id', $memberinfo['member_id'])
+                ->where('mtwitter_id', '!=', $memberinfo['mtwitter_id'])
+                ->update(['selected' => 0]);
+                if($memberxadd && $updatedSelected){
                     return response()->json(['message'=>'Member can now access this X account', 'stat'=>'success']);
                 }
             }
@@ -128,124 +142,279 @@ class TwitterApi extends Controller
         }
     }
 
+    // public function getTweetFilters($twitterId, $type)
+    // {
+    //     try {
+
+    //         $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+
+    //         $headers = array(
+    //             "Authorization: Bearer " . $_ENV
+    //         );
+
+    //         $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";        
+    //         $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
+    //         $request = $this->curlGetHttpRequest($url, $headers, $data);
+            
+
+    //         if (!empty($request->data)) {
+    //             // get images of the tweet
+    //             $filteredData['data'] = $request->data;
+
+    //             foreach ($request->data as $v) {
+    //                 if (property_exists($v, "attachments")) {
+    //                     // call cURL request for API
+    //                     $data = "expansions=attachments.media_keys&media.fields=url";
+    //                     $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
+
+    //                     if (property_exists($getAttachment, 'includes')) {
+    //                         $getAttachmentURL = $getAttachment->includes->media;
+    //                         foreach ($getAttachmentURL as $media) {
+    //                             if (property_exists($media, 'url')) {
+    //                                 $v->image = $media->url;
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+
+    //             $filteredData['original'] = $request->meta;
+    //         }
+
+
+    //         if ($filteredData !== null) {
+    //             // return the modified data as a JSON response
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'tweets' => $filteredData,
+    //             ]);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 201,
+    //                 'message' => 'Tweets not found',
+    //             ]);
+    //         }
+
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'status' => 500,
+    //             'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
+    //         ]);
+    //     }
+    // }
+
+
     public function getTweetFilters($twitterId, $type)
     {
         try {
+            
+            $type = 'tweets';
+
+            // Check if cached data exists
+            $cachedData = Cache::get('tweets_' . $twitterId);     
+            // dd($cachedData); 
+            
+            if ($cachedData) {
+                // Return cached data if available
+                return response()->json([
+                    'status' => 200,
+                    'tweets' => $cachedData,                    
+                    'message' => 'Tweets retrieved from cache',
+                ]);
+            } else {
+                // If cached data doesn't exist, fetch tweets from Twitter API
+                $_ENV = TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+                $headers = ["Authorization: Bearer " . $_ENV];
+                $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
+                $data = null;
+                $filteredData = null;
+    
+    
+                switch ($type) {
+                    case "retweet":
+                        $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=30";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+    
+                        if (!empty($request->data)) {
+                            $filteredData = array_filter($request->data, function ($item) {
+                                if (isset($item->referenced_tweets)) {
+                                    foreach ($item->referenced_tweets as $referencedTweet) {
+                                        if ($referencedTweet->type === 'retweeted') {
+                                            return true;
+                                        }
+                                    }
+                                }
+                                return false;
+                            });
+                        }
+                        break;
+    
+                    case "quote":
+                        $data = "";
+                        break;
+    
+                    case "comments":
+                        echo "hi";
+                        break;
+    
+                    case "replies":
+                        $data = "exclude=retweets&tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+    
+                        if (!empty($request->data)) {
+                            $filteredData = $request->data;
+                        }
+                        break;
+    
+                    case "image" :
+                        $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+    
+                        if (!empty($request->data)) {
+                            $filteredData = array_filter($request->data, function ($item) {
+                                return isset($item->attachments);
+                            });
+    
+                            foreach ($filteredData as $tweet) {
+                                $data1 = "expansions=attachments.media_keys&media.fields=url";
+                                $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $tweet->id, array("Authorization: Bearer " . $_ENV), $data1);
+    
+                                if (property_exists($getAttachment, 'includes')) {
+                                    $attachmentData = $getAttachment->includes->media;
+    
+                                    foreach ($attachmentData as $media) {
+                                        if (property_exists($media, 'url')) {
+                                            $tweet->image = $media->url;
+                                        }
+                                    }
+                                }
+                            }
+    
+                        }
+                        break;
+    
+                    case "links";
+                        echo "hi";
+                        break;
+    
+                    case "no-links";
+                        echo "hi";
+                        break;
+    
+                    default:
+                        $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+                            
+                        if (!empty($request->data)) {
+                            // get images of the tweet
+                            $filteredData['data'] = $request->data;
+    
+                            foreach ($request->data as $v) {
+                                if (property_exists($v, "attachments")) {
+                                    // call cURL request for API
+                                    $data = "expansions=attachments.media_keys&media.fields=url";
+                                    $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
+    
+                                    if (property_exists($getAttachment, 'includes')) {
+                                        $getAttachmentURL = $getAttachment->includes->media;
+                                        foreach ($getAttachmentURL as $media) {
+                                            if (property_exists($media, 'url')) {
+                                                $v->image = $media->url;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            $filteredData['original'] = $request->meta;
+                        }
+                    break;                               
+                        
+                }
+
+                if ($filteredData !== null) {
+                    // Cache the fetched tweets
+                    Cache::put('tweets_' . $twitterId, $filteredData, now()->addMinutes(30));
+
+                    // return the modified data as a JSON response
+                    return response()->json([
+                        'status' => 200,
+                        'tweets' => $filteredData,
+                        'message' => 'Tweets retrieved from Twitter API',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 201,
+                        'message' => 'Tweets not found',
+                    ]);
+                }
+                             
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
+            ]);
+        }
+    }
+
+
+    public function getTweetMoreTweets(Request $request, $twitterId) {
+        // Check if cached data exists
+        $cachedData = Cache::get('next_tweets_' . $twitterId);     
+
+        if ($cachedData) {
+            // Return cached data if available
+            return response()->json([
+                'status' => 200,
+                'more_tweets' => $cachedData,                    
+                'message' => 'Tweets retrieved from cache',
+            ]);
+        } else { 
             $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
             );
-
+    
             $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
-            $data = null;
+            $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&" . "pagination_token=" . $request->input('paginationToken');
+            $request = $this->curlGetHttpRequest($url, $headers, $data);            
             $filteredData = null;
+                            
+            if (!empty($request->data)) {
+                // get images of the tweet
+                $filteredData['data'] = $request->data;
 
+                foreach ($request->data as $v) {
+                    if (property_exists($v, "attachments")) {
+                        // call cURL request for API
+                        $data = "expansions=attachments.media_keys&media.fields=url";
+                        $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
 
-            switch ($type) {
-                case "retweet":
-                    $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=30";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        $filteredData = array_filter($request->data, function ($item) {
-                            if (isset($item->referenced_tweets)) {
-                                foreach ($item->referenced_tweets as $referencedTweet) {
-                                    if ($referencedTweet->type === 'retweeted') {
-                                        return true;
-                                    }
-                                }
-                            }
-                            return false;
-                        });
-                    }
-                    break;
-
-                case "quote":
-                    $data = "";
-                    break;
-
-                case "comments":
-                    echo "hi";
-                    break;
-
-                case "replies":
-                    $data = "exclude=retweets&tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        $filteredData = $request->data;
-                    }
-                    break;
-
-                case "image" :
-                    $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        $filteredData = array_filter($request->data, function ($item) {
-                            return isset($item->attachments);
-                        });
-
-                        foreach ($filteredData as $tweet) {
-                            $data1 = "expansions=attachments.media_keys&media.fields=url";
-                            $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $tweet->id, array("Authorization: Bearer " . $_ENV), $data1);
-
-                            if (property_exists($getAttachment, 'includes')) {
-                                $attachmentData = $getAttachment->includes->media;
-
-                                foreach ($attachmentData as $media) {
-                                    if (property_exists($media, 'url')) {
-                                        $tweet->image = $media->url;
-                                    }
+                        if (property_exists($getAttachment, 'includes')) {
+                            $getAttachmentURL = $getAttachment->includes->media;
+                            foreach ($getAttachmentURL as $media) {
+                                if (property_exists($media, 'url')) {
+                                    $v->image = $media->url;
                                 }
                             }
                         }
+                    } 
+                }
 
-                    }
-                    break;
-
-                case "links";
-                    echo "hi";
-                    break;
-
-                case "no-links";
-                    echo "hi";
-                    break;
-
-                default:
-                    $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        // get images of the tweet
-                        $filteredData = $request->data;
-
-                        foreach ($request->data as $v) {
-                            if (property_exists($v, "attachments")) {
-                                // call cURL request for API
-                                $data = "expansions=attachments.media_keys&media.fields=url";
-                                $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
-
-                                if (property_exists($getAttachment, 'includes')) {
-                                    $getAttachmentURL = $getAttachment->includes->media;
-                                    foreach ($getAttachmentURL as $media) {
-                                        if (property_exists($media, 'url')) {
-                                            $v->image = $media->url;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
+                $filteredData['original'] = $request->meta;
             }
-
+            
             if ($filteredData !== null) {
+                // Cache the fetched tweets
+                Cache::put('next_tweets_' . $twitterId, $filteredData, now()->addMinutes(30));
+
                 // return the modified data as a JSON response
                 return response()->json([
                     'status' => 200,
-                    'data' => $filteredData,
+                    'more_tweets' => $filteredData,
+                    'message' => 'Tweets retrieved from Twitter API',
                 ]);
             } else {
                 return response()->json([
@@ -253,13 +422,11 @@ class TwitterApi extends Controller
                     'message' => 'Tweets not found',
                 ]);
             }
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 500,
-                'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
-            ]);
+            
         }
+
+
+        // dd($request);
     }
 
     public function tweetNow(Request $request, $id) {
@@ -285,7 +452,7 @@ class TwitterApi extends Controller
             // $getLikes = $this->curlGetHttpRequest('https://api.twitter.com/2/users/' . $id . '/likes', $headers, array('tweet_id' => $like[1]));
             $commandModule = new CommandmoduleController();
             $getLikes = $commandModule->apiRequest('https://api.twitter.com/2/users/' . $id . '/likes', $headers, 'POST', $data);
-            dd($getLikes);
+            // dd($getLikes);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 500,
@@ -300,37 +467,72 @@ class TwitterApi extends Controller
         $twitterId = str_replace('twitter-', '', $request->input('id'));
 
         try {
-            $twitterId = str_replace('twitter-', '', $request->input('id'));
+            if(Auth::guard('web')->check()){
+                $twitterId = str_replace('twitter-', '', $request->input('id'));
 
-            $updatedSelected = UT_AcctMngt::where('user_id', $this->setDefaultId())
-                ->where('twitter_id', $twitterId)
+                $updatedSelected = UT_AcctMngt::where('user_id', $this->setDefaultId())
+                    ->where('twitter_id', $twitterId)
+                    ->update(['selected' => 1]);
+
+                // check if the twitter linked is more than one
+                $countTwitterAcct = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
+                $updatedRow = '';
+                if ($countTwitterAcct > 1) {
+                    // update the other twitter not equal to twitter id
+                    $updatedSelected += UT_AcctMngt::where('user_id', $this->setDefaultId())
+                        ->where('twitter_id', '!=', $twitterId)
+                        ->update(['selected' => 0]);
+
+                    $updatedRow = $updatedSelected;
+                }
+
+                if ($updatedSelected > 0 && $updatedRow > 0) {
+                    $selectedUser = DB::table('twitter_accts')
+                        ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                        ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                        ->where('ut_acct_mngt.selected', "=", 1) // selected
+                        ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
+                        ->where('twitter_accts.deleted', "=", 0)
+                        ->first();
+
+                    return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
+                } else {
+                    return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
+                }
+            }
+            if(Auth::guard('member')->check()){
+                $title = "Profile";
+                $twitterId = str_replace('twitter-', '', $request->input('id'));
+
+                $updatedSelected = DB::table('member_xaccount')
+                ->where('member_id', Auth::guard('member')->user()->id)
                 ->update(['selected' => 1]);
+                $countTwitterAcct =  DB::table('member_xaccount')->where('member_id', Auth::guard('member')->user()->id)->count();
+                $updatedRow = '';
 
-            // check if the twitter linked is more than one
-            $countTwitterAcct = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
-            $updatedRow = '';
-            if ($countTwitterAcct > 1) {
-                // update the other twitter not equal to twitter id
-                $updatedSelected += UT_AcctMngt::where('user_id', $this->setDefaultId())
-                    ->where('twitter_id', '!=', $twitterId)
+                if ($countTwitterAcct > 1) {
+                    $updatedSelected += DB::table('member_xaccount')
+                    ->where('member_id', Auth::guard('member')->user()->id)
+                    ->where('mtwitter_id', '!=', $twitterId)
                     ->update(['selected' => 0]);
+                    $updatedRow = $updatedSelected;
 
-                $updatedRow = $updatedSelected;
+                }
+
+                if ($updatedSelected > 0 && $updatedRow > 0) {
+                    $selectedUser = DB::table('twitter_accts')
+                        ->join('member_xaccount', 'twitter_accts.user_id', '=', 'member_xaccount.user_id')
+                        ->select('twitter_accts.*', 'member_xaccount.*')
+                        ->where('member_xaccount.selected', "=", 1) // selected
+                        ->where('member_xaccount.member_id', "=", Auth::guard('member')->user()->id)
+                        ->first();
+
+                    return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
+                } else {
+                    return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
+                }
             }
 
-            if ($updatedSelected > 0 && $updatedRow > 0) {
-                $selectedUser = DB::table('twitter_accts')
-                    ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                    ->select('twitter_accts.*', 'ut_acct_mngt.*')
-                    ->where('ut_acct_mngt.selected', "=", 1) // selected
-                    ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
-                    ->where('twitter_accts.deleted', "=", 0)
-                    ->first();
-
-                return response()->json(['success' => true, 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
-            } else {
-                return response()->json(['success' => false, 'message' => 'Accounts are not updated']);
-            }
 
         } catch (\Exception $e) {
 
@@ -350,44 +552,59 @@ class TwitterApi extends Controller
     {
         if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1) {
 
-
             $id = $request->input('twitter_id');
-            $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
 
-            // Deleting the Twitter account
-            $deletedTwitter = $twitter->delete();
+            // check if id is selected in the UT_ACCT_MNGT table
+            $selectedTwitter = UT_AcctMngt::where('twitter_id', $id)->first();
 
-            // Checking if the Twitter account deletion was successful
-            if ($deletedTwitter) {
-                // Deleting associated Twitter meta
-                $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
-                $deletedMeta = $deleteTwitterMeta->delete();
+            if ($selectedTwitter->selected === 1) {
+                return response()->json([
+                    'stat' => 'warning',
+                    'message' => 'Unable to delete. This twitter account is currently selected.', 
+                    'status' => 500,
+                ]);
+            } else {
 
-                // If deletion of Twitter meta is successful
-                if ($deletedMeta) {
-                    return response()->json([
-                        'success' => true,
-                        'deleted_twitter' => $twitter, // Sending deleted Twitter account details
-                        'deleted_meta' => $deleteTwitterMeta, // Sending deleted Twitter meta details
-                        'message' => 'Twitter account and associated meta data are now deleted'
-                    ]);
+                $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+                
+                // Deleting the Twitter account
+                $deletedTwitter = $twitter->delete();
+    
+                // Checking if the Twitter account deletion was successful
+                if ($deletedTwitter) {
+                    // Deleting associated Twitter meta
+                    $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+                    $deletedMeta = $deleteTwitterMeta->delete();
+    
+                    // If deletion of Twitter meta is successful
+                    if ($deletedMeta) {
+                        return response()->json([
+                            'success' => 200,
+                            'deleted_twitter' => $twitter, // Sending deleted Twitter account details
+                            'deleted_meta' => $deleteTwitterMeta, // Sending deleted Twitter meta details
+                            'message' => 'Twitter account and associated meta data are now deleted',
+                            'stat' => 'success',
+                        ]);
+                    } else {
+                        // If deletion of Twitter meta fails
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Failed to delete associated Twitter meta data',
+                            'stat' => 'danger',
+                        ], 500);
+                    }
+    
                 } else {
-                    // If deletion of Twitter meta fails
+                    // If deletion of Twitter account fails
                     return response()->json([
                         'success' => false,
-                        'message' => 'Failed to delete associated Twitter meta data'
+                        'message' => 'Failed to delete Twitter account',
+                        'stat' => 'danger',
                     ], 500);
                 }
-
-            } else {
-                // If deletion of Twitter account fails
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to delete Twitter account'
-                ], 500);
-            }
-
-            return response()->json(['success' => true, "deleted" => $twitter, 'message' => 'Twitter account is now deleted']);
+    
+                return response()->json(['stat' => 'success', 'status' => 200, 'message' => 'Twitter account is now deleted']);
+            }  
 
         } else {
                 return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to delete X account, please ask permission to the owner'],403);

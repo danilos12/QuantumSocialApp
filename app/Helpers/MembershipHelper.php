@@ -45,7 +45,7 @@ class MembershipHelper
 
         return $acct_hdid;
     }
-    
+
     public static function memberaccthemail() {
             $user = Auth::guard('member')->user();
             $member_id = $user->id;
@@ -60,6 +60,28 @@ class MembershipHelper
             ->value('email');
 
         return $acctemail;
+    }
+    
+    // wp api connection
+    public static function apiGetCurl($url) {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+                
+        return json_decode($response);
     }
 
 }

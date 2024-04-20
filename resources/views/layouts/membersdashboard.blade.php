@@ -74,7 +74,7 @@
                 <div class="banner-twitter-profile-inner">
                   <img src="{{ $twitter_photo ?: asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                   <span class="twitter-profile-name">
-                    {{ isset($selected_user) ? $selected_user->twitter_name: 'Quantum User' }}
+                    {{ $selected_user && $selected_user->twitter_name ? $selected_user->twitter_name : 'No twitter assigned' }}
                   </span>
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
@@ -99,12 +99,12 @@
                         <div class="twitter-stat">
                           <img src="{{ asset('public/ui-images/icons/00g-following.svg') }}" class="menu-icon" />
                           <span class="stat-title">Following</span>
-                          <span class="stat-count count-following">{{ isset($selected_user) ? $selected_user->twitter_followingCount : 0 }}</span></div>
+                          <span class="stat-count count-following">{{ $selected_user ? $selected_user->twitter_followingCount : 0 }}</span></div>
 
                         <div class="twitter-stat twitter-stat-center">
                           <img src="{{ asset('public/ui-images/icons/00h-followers.svg') }} " class="menu-icon" />
                           <span class="stat-title">Followers</span>
-                          <span class="stat-count count-followers">{{ isset($selected_user) ? $selected_user->twitter_followersCount  : 0 }}</span></div>
+                          <span class="stat-count count-followers">{{ $selected_user ? $selected_user->twitter_followersCount  : 0 }}</span></div>
 
                         <div class="twitter-stat">
                           <img src="{{ asset('public/ui-images/icons/00i-unfollows.svg') }}" class="menu-icon" />
@@ -253,6 +253,7 @@
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
+  <script type='text/javascript' src="{{asset('public/js/dashboard.js')}}"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 

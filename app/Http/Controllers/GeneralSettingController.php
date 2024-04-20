@@ -36,16 +36,7 @@ class GeneralSettingController extends Controller
     protected $defaultid;
     public function __construct()
     {
-        if (Auth::guard('web')->check()) {
-            $this->middleware('auth');
-
-        }
-        if(Auth::guard('member')->check()) {
-
-            $this->middleware('member-access');
-
-
-        }
+        $this->middleware('unauthorized');
 
 
     }
@@ -166,11 +157,11 @@ class GeneralSettingController extends Controller
         else
         {
             $html = null;
-        }
+        // }
 
         return $html;
     }
-
+    }
     public function saveTwitterApi(Request $request, $twitter_id) {
 
         try {
@@ -182,7 +173,7 @@ class GeneralSettingController extends Controller
             $saveTwitterApi->bearer_token = $request->input('bearer_token');
             $saveTwitterApi->access_token = $request->input('access_token');
             $saveTwitterApi->token_secret = $request->input('token_secret');
-            $saveTwitterApi->save();
+
 
             if ($saveTwitterApi) {
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Credentials are updated']);
@@ -200,34 +191,31 @@ class GeneralSettingController extends Controller
 
     }
 
-    public function twitterApiCredentials(Request $request, $id) {
+
+    public function twitterApiCredentials(Request $request, $id)
+    {
         try {
 
+            $api = MasterTwitterApiCredentials::firstOrCreate(['user_id' => $this->setDefaultId()]);
 
 
-                $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => $this->setDefaultId()]);
+            if (Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1)) {
+
+                $api->fill($request->all());
 
 
-            if(Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1) ){
-
-            if ($api) {
-                $api->update($request->all());
-                return response()->json(['status' => 200, 'stat' => 'success' ,'message' => 'Master API Credentials are successfully updated']);
-            } else {
-                $api = new MasterTwitterApiCredentials($request->all());
-                $api->user_id = $this->setDefaultId();
                 $api->save();
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
-            }
-        }else{
-            return response()->json([ 'stat' => 'danger', 'message' => 'You are not allowed to modify this']);
-        }
 
-        } catch (Exception $e) {
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully ' . ($api->wasRecentlyCreated ? 'saved' : 'updated')]);
+            } else {
+                // Unauthorized user
+                return response()->json(['stat' => 'danger', 'message' => 'You are not allowed to modify this']);
+            }
+        } catch (\Exception $e) {
+            // Handle exceptions
             $trace = $e->getTrace();
             $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
+
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
     }
@@ -311,27 +299,32 @@ class GeneralSettingController extends Controller
 
     public function twitterSettingsMeta(Request $request, $twitter_id) {
         try {
-            $settings = [];
-            foreach ($request->request as $parameter) {
-                $key = $parameter['key'];
-                $value = $parameter['value'];
+            $api = MasterTwitterApiCredentials::firstOrNew(['user_id' => $this->setDefaultId()]);
 
-                $settings = TwitterSettingsMeta::where('twitter_id', $twitter_id)->update([$key => $value]);
-            }
-
-            if ($settings) {
-                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Data is updated']);
+            if (Auth::guard('web')->check() || (Auth::guard('member')->user()->admin_access == 1)) {
+                if (!$api->exists) {
+                    $api->api_key = $request->input('api_key', '')??'';
+                    $api->api_secret = $request->input('api_secret', '')??'';
+                    $api->bearer_token = $request->input('bearer_token')??'';
+                    $api->oauth_id = $request->input('oauth_id')??'';
+                    $api->oauth_secret = $request->input('oauth_secret')?? '';
+                    $api->callback_url = $request->input('callback_url') ?? '';
+                    $api->user_id = $this->setDefaultId();
+                    $api->save();
+                    return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully saved']);
+                } else {
+                    $api->update($request->all());
+                    return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Master API Credentials are successfully updated']);
+                }
             } else {
-                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update.']);
+                return response()->json(['stat' => 'danger', 'message' => 'You are not allowed to modify this']);
             }
-
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'stat' => 'danger', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
         }
+
     }
 
 
@@ -376,7 +369,7 @@ class GeneralSettingController extends Controller
             if ($existingUser) {
                 return response()->json(['message' => 'Email already exists','stat'=> 'warning']);
             }
-            $hasaccess;
+            $hasaccess = null;
             $randomPassword = Str::random(10);
             if($request->input('Admin')==='Admin'){
                 $hasaccess = true;
@@ -425,7 +418,8 @@ class GeneralSettingController extends Controller
                              Mail::to($request->input('emails'))->send(new TeamMemberReg($request->input('fullname')));
                              DB::commit();
                         return response()->json(['subscription'=>'galactic_member','message' => 'New member is added', 'stat' => 'success']);
-                    } else {
+                    }
+                     else {
                         return response()->json(['message' => 'New member is not added', 'stat' => 'warning']);
                     }
                 } catch (Swift_TransportException $e) {
@@ -670,13 +664,19 @@ if ($subs_id == 2 ) {
         try {
 
         if(Auth::guard('web')->check()||Auth::guard('member')->user()->admin_access == 1){
-
+            DB::beginTransaction();
             $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['api_access' => $request->input('api_access')]);
+            $roleaccess = DB::table('members')->where('id', $request->input('id'))->value('role');
 
-            if ($apiaccess && $request->input('api_access')=== true) {
-                return response()->json(['stat' => 'success', 'message' => 'Member is allowed to access api']);
-            } else {
-                return response()->json(['stat' => 'success', 'message' => 'Member is not allowed to access api']);
+            if ($apiaccess && $request->input('api_access')=== true && $roleaccess == 'Admin' ) {
+                DB::commit();
+                return response()->json(['stat' => 'success', 'message' => 'Admin is allowed to access api']);
+            } elseif ($apiaccess && $request->input('api_access')=== false && $roleaccess == 'Admin' ){
+                DB::commit();
+                return response()->json(['stat' => 'success', 'message' => 'Admin is not allowed to access api']);
+            }
+             else {
+                return response()->json(['stat' => 'warning', 'message' => 'Member is not allowed to access api']);
             }
         }else{
             return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to update this please ask permission to owner']);
@@ -696,12 +696,16 @@ if ($subs_id == 2 ) {
             if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
 
 
-            $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['admin_access' => $request->input('admin_access')]);
+            $apiaccess = DB::table('members')->where('id', $request->input('id'))->update(['admin_access' => $request->input('admin_access'),'role'=>'Admin']);
 
             if ($apiaccess && $request->input('admin_access') === true) {
                 return response()->json(['stat' => 'success', 'message' => 'Admin Access Successful']);
             } else {
-                return response()->json(['stat' => 'success', 'message' => 'Admin Access is now updated']);
+               $updates= DB::table('members')->where('id', $request->input('id'))->update(['admin_access' => $request->input('admin_access'),'role'=>'Member','api_access'=>0]);
+               if($updates){
+                return response()->json(['stat' => 'success','api_access'=>false, 'message' => 'Admin Access is now updated']);
+               }
+
             }
         }else{
             return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to modify this']);

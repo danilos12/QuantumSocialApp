@@ -13,7 +13,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('unauthorized');
     }
 
     /**
@@ -25,5 +25,10 @@ class HomeController extends Controller
     {
 		$title = 'Home page';
 		return view('home')->with('title', $title);
+    }
+    public function upgrademodal()
+    {
+        $html = view('modals.upgrade')->render();
+        return response()->json(['stat' => 'upgrade?', 'html' => $html]);
     }
 }

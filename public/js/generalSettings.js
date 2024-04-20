@@ -99,11 +99,8 @@ $(document).ready(function () {
             const responseData = await response.json();
 
             var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            if (responseData.status === 200) {
-              $(this).after(div);
-            } else {
-              $(this).after(div);
-            }
+            $(this).after(div);
+
 
             // remove the div after 3 seconds
             setTimeout(function() {
@@ -111,6 +108,21 @@ $(document).ready(function () {
             }, 3000);
         } catch(err) {
             console.log('Error fetching the data' + err)
+        }
+    })
+
+    // toggle api secrets
+    $('.secrets').on('click', function(e) {
+        var input = $('input#' + e.target.id);
+        var img = $(this);
+
+        // Toggle input type between password and text
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            img.attr('src', APP_URL + '/public/ui-images/icons/eye-closed.svg');
+        } else {
+            input.attr('type', 'password');
+            img.attr('src', APP_URL + '/public/ui-images/icons/eye-open.svg');
         }
     })
 
@@ -133,18 +145,11 @@ $(document).ready(function () {
                 },
                 body: JSON.stringify(formData) // Convert the object to JSON string
             });
-            // console.log(response);
             const responseData = await response.json();
 
-            var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            if (responseData.status === 200) {
-              $(this).after(div);
-            } else {
-              $(this).after(div);
-            }
-            if(responseData.stat === 'danger'){
-                $(this).after(div);
-            }
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
 
             setTimeout(function() {
             location.reload();
@@ -318,35 +323,41 @@ $(document).ready(function () {
     });
 
     // delete twitter
-    $(".delete-account").click(function (event) {
-        $.ajax({
-            url: $(this).data("url"),
-            method: "POST",
-            data: {
-                twitter_id: $(this).data("twitterid"),
-            },
-            headers: {
-                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-            },
-            success: function (response) {
-                // Handle success
-                if (response.deleted === 1) {
-                    location.reload();
-                } else {
-                    console.log("error");
+    $(".delete-account").click(async function (event) {
+
+        try {
+            const response = await fetch(
+                APP_URL + "/twitter/remove",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
+                    },
+                    body: JSON.stringify({ twitter_id: $(this).data("twitterid") }), // Use "body" instead of "data" to send the data
                 }
+            );
 
+            const responseData = await response.json();
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
+            // var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
+            // if (responseData.status === 200) {
+            //     $(this).closest('.menu-social-account-outer').remove();
+            // } else {
+            //     console.log(responseData.message)
+            // }
 
-                if (jqXHR.status === 403) {
-                    // Display a warning message to the user
-                    toastr[jqXHR.responseJSON.stat](jqXHR.responseJSON.message);
-                }
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
 
-            },
-        });
+            setTimeout(function() {
+                location.reload();
+            }, 3000);
+
+        } catch(error) {
+            console.log(error);
+        }
     });
 
 
@@ -470,6 +481,14 @@ $(document).ready(function () {
             roles: selectedRole,
             api_access: isChecked,
         };
+        console.log(data);
+        if(selectedRole == 'Member'){
+            if(isChecked){
+                $('#toggle_api').prop('checked', false);
+                toastr['warning']('Warning! Memberssssss12 are not allowed to access API, only Admin role');
+            }
+
+        }else{
 
         try {
             const response = await fetch(APP_URL + "/settings/_add_new", {
@@ -504,6 +523,7 @@ $(document).ready(function () {
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
+    }
     });
 
     $(document).on("click", ".edit-team-button", async function (e) {
@@ -705,7 +725,7 @@ $(document).ready(function () {
         var targetId = e.target.id;
         var id = targetId.split("-"); // Corrected the split method call
         var isChecked = $(this).is(":checked");
-
+        var apiaccess = $('input[name="grant-api-access"]').is(':checked');
         var data = {
             id: id[1],
             admin_access: isChecked,
@@ -728,7 +748,11 @@ $(document).ready(function () {
         const responseData = await response.json();
 
         if (responseData.stat == 'success') {
+            if(responseData.api_access == false){
+                $('#toggle_api-' + id[1]).prop('checked', false);
+                    console.log(apiaccess);
 
+            }
             toastr[responseData.stat](`Success! ${responseData.message}`);
         }
         if(responseData.stat == 'warning'){

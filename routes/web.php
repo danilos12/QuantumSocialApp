@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\testingapi;
-
+use Illuminate\Support\Facades\Auth;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,7 +37,8 @@ Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::c
 Route::post('/logout/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'logout'])->name('memberlogout');
 
 
-Auth::routes();
+// Auth::routes();
+Auth::routes(['register' => false]);
 
 
 
@@ -46,20 +47,29 @@ Auth::routes();
 
 
 
-Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('/reset-password/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
-Route::post('/change-password', [App\Http\Controllers\Auth\ChangePasswordController::class, 'updatePassword'])->name('change.password');
+
+// Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 // Routes accessible only to authenticated members
 
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Password reset routes
+Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::post('/change-password', [App\Http\Controllers\Auth\ChangePasswordController::class, 'updatePassword'])->name('change.password');
+Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
+// Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+
+
+
 
 
 
 // dashboard controller
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
+Route::get('/', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
+Route::get('/get-upgrade-modal', [App\Http\Controllers\HomeController::class, 'upgrademodal'])->name('upgradecheckout');
 
 
 // Profile controller
@@ -128,6 +138,7 @@ Route::post('/twitter/switchUser', [App\Http\Controllers\TwitterApi::class, 'swi
 Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
 Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
+Route::get('/twitter/{id}/filter/{type}/get-more-tweets', [App\Http\Controllers\TwitterApi::class, 'getTweetMoreTweets'])->name('tweet.more');
 Route::post('/twitter/{id}/tweet-now', [App\Http\Controllers\TwitterApi::class, 'tweetNow'])->name('tweet.now');
 Route::post('/twitter/{id}/tweet-schedule', [App\Http\Controllers\TwitterApi::class, 'tweetSchedule'])->name('tweet.filter');
 Route::post('/twitter/assignmember', [App\Http\Controllers\TwitterApi::class, 'addmemberxaccts'])->name('togglexmember');
@@ -174,6 +185,13 @@ Route::post('/reload-meta/scrape',[App\Http\Controllers\CommandmoduleController:
 // Route::post('/cmd/post/duplicate/{id}',[App\Http\Controllers\CommandmoduleController::class, 'duplicateFromQueue'])->name('post.duplicate');
 // Route::put('/post/bulk_update/{id}',[App\Http\Controllers\PostingController::class, 'editBulkPost'])->name('post.bulk_update'); // update data in modal
 
+Route::get('/su/admin', [App\Http\Controllers\SuperAdminController::class, 'index'])->name('superadmin');
+Route::get('/su/admin/users', [App\Http\Controllers\SuperAdminController::class, 'getAllOwners'])->name('su.users');
+Route::get('/su/admin/admins', [App\Http\Controllers\SuperAdminController::class, 'getAllAdmins'])->name('su.admins');
+Route::get('/su/admin/members', [App\Http\Controllers\SuperAdminController::class, 'getAllMembers'])->name('su.members');
+Route::get('/su/admin/plans', [App\Http\Controllers\SuperAdminController::class, 'getAllPlans'])->name('su.plans');
+Route::get('/su/admin/phpinfo', [App\Http\Controllers\SuperAdminController::class, 'phpInfo']);
+// Add more routes as needed
 
 
 
@@ -189,13 +207,6 @@ Route::middleware(['web','guest','session_expired'])
 
 
 
-    Route::post('/register',[RegisterController::class, 'register'])->name('submit.form');
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-	Route::get('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'showCustomRegister'])->name('custom-vr');
-	Route::post('/custom-vr', [App\Http\Controllers\Auth\RegbnmController::class, 'wpRegisterUser']);
-
-
-
 
     Route::get('/team-registration', function () {
         return view('emails.team_members_registration');
@@ -207,14 +218,10 @@ Route::middleware(['web','guest','session_expired'])
 
 
 
-
-
-
-
     Route::middleware('member-access')->group(function(){
 
         Route::get('/member/home',function()
-        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome');
+        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome')->withoutMiddleware(['session_expired']);;
         Route::get('/member/promo',function(){
 
             return view('promo-tweets')->with('title','Promo');});

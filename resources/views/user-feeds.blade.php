@@ -1,4 +1,13 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : redirect()->route('memberhome'));
+?>
+
+@if(is_string($layout))
+    @extends($layout)
+@else
+    {{ $layout->send() }}
+@endif
 
 @section('content')
 

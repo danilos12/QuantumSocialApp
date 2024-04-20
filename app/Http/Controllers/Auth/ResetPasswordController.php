@@ -36,7 +36,8 @@ class ResetPasswordController extends Controller
 
     public function showResetForm($token)
     {
-        return view('emails.password-reset', ['token' => $token]);
+        // return view('emails.password-reset', ['token' => $token]);
+        return view('emails.password-reset-copu', ['token' => $token]);
     }
 
     public function resetPassword(Request $request)
@@ -57,7 +58,7 @@ class ResetPasswordController extends Controller
             return redirect()->route('login')->with('success', 'Your password has been reset successfully.');
         } else {
             // Password update failed
-            return redirect()->back()->withErrors(['email' => 'Failed to reset password. Please try again.']);
+            return redirect()->back()->withErrors(['errors' => 'Failed to reset password. Please try again.']);
         }
     }
 
@@ -66,7 +67,7 @@ class ResetPasswordController extends Controller
         $status = Password::reset($credentials, function ($user, $password) {
             $user->forceFill([
                 'password' => Hash::make($password),
-            ])->setRememberToken(Str::random(60));
+            ])->setRememberToken(Str::random(60));            
 
             $user->save();
         });

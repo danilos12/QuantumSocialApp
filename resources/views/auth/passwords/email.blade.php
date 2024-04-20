@@ -13,7 +13,7 @@
             RESET YOUR PASSWORD
         </div>
 
-        <form method="POST" action="{{ route('register') }}">
+        <form method="POST" action="{{ route('password.email') }}">
             @csrf
            
             <div class="row mb-3" syle="margin-top: 10em">
