@@ -37,7 +37,6 @@ class GeneralSettingController extends Controller
     public function __construct()
     {
         $this->middleware('unauthorized');
-   
 
 
     }

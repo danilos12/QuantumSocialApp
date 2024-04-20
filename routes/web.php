@@ -192,6 +192,7 @@ Route::get('/su/admin/users', [App\Http\Controllers\SuperAdminController::class,
 Route::get('/su/admin/admins', [App\Http\Controllers\SuperAdminController::class, 'getAllAdmins'])->name('su.admins');
 Route::get('/su/admin/members', [App\Http\Controllers\SuperAdminController::class, 'getAllMembers'])->name('su.members');
 Route::get('/su/admin/plans', [App\Http\Controllers\SuperAdminController::class, 'getAllPlans'])->name('su.plans');
+Route::get('/su/admin/phpinfo', [App\Http\Controllers\SuperAdminController::class, 'phpInfo']);
 // Add more routes as needed
 
 

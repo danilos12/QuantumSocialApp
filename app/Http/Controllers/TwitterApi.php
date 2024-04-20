@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
+use Illuminate\Support\Facades\Cache;
 
 
 class TwitterApi extends Controller
@@ -141,129 +142,279 @@ class TwitterApi extends Controller
         }
     }
 
+    // public function getTweetFilters($twitterId, $type)
+    // {
+    //     try {
+
+    //         $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+
+    //         $headers = array(
+    //             "Authorization: Bearer " . $_ENV
+    //         );
+
+    //         $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";        
+    //         $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
+    //         $request = $this->curlGetHttpRequest($url, $headers, $data);
+            
+
+    //         if (!empty($request->data)) {
+    //             // get images of the tweet
+    //             $filteredData['data'] = $request->data;
+
+    //             foreach ($request->data as $v) {
+    //                 if (property_exists($v, "attachments")) {
+    //                     // call cURL request for API
+    //                     $data = "expansions=attachments.media_keys&media.fields=url";
+    //                     $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
+
+    //                     if (property_exists($getAttachment, 'includes')) {
+    //                         $getAttachmentURL = $getAttachment->includes->media;
+    //                         foreach ($getAttachmentURL as $media) {
+    //                             if (property_exists($media, 'url')) {
+    //                                 $v->image = $media->url;
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+
+    //             $filteredData['original'] = $request->meta;
+    //         }
+
+
+    //         if ($filteredData !== null) {
+    //             // return the modified data as a JSON response
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'tweets' => $filteredData,
+    //             ]);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 201,
+    //                 'message' => 'Tweets not found',
+    //             ]);
+    //         }
+
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'status' => 500,
+    //             'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
+    //         ]);
+    //     }
+    // }
+
+
     public function getTweetFilters($twitterId, $type)
     {
         try {
+            
+            $type = 'tweets';
+
+            // Check if cached data exists
+            $cachedData = Cache::get('tweets_' . $twitterId);     
+            // dd($cachedData); 
+            
+            if ($cachedData) {
+                // Return cached data if available
+                return response()->json([
+                    'status' => 200,
+                    'tweets' => $cachedData,                    
+                    'message' => 'Tweets retrieved from cache',
+                ]);
+            } else {
+                // If cached data doesn't exist, fetch tweets from Twitter API
+                $_ENV = TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+                $headers = ["Authorization: Bearer " . $_ENV];
+                $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
+                $data = null;
+                $filteredData = null;
+    
+    
+                switch ($type) {
+                    case "retweet":
+                        $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=30";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+    
+                        if (!empty($request->data)) {
+                            $filteredData = array_filter($request->data, function ($item) {
+                                if (isset($item->referenced_tweets)) {
+                                    foreach ($item->referenced_tweets as $referencedTweet) {
+                                        if ($referencedTweet->type === 'retweeted') {
+                                            return true;
+                                        }
+                                    }
+                                }
+                                return false;
+                            });
+                        }
+                        break;
+    
+                    case "quote":
+                        $data = "";
+                        break;
+    
+                    case "comments":
+                        echo "hi";
+                        break;
+    
+                    case "replies":
+                        $data = "exclude=retweets&tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+    
+                        if (!empty($request->data)) {
+                            $filteredData = $request->data;
+                        }
+                        break;
+    
+                    case "image" :
+                        $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+    
+                        if (!empty($request->data)) {
+                            $filteredData = array_filter($request->data, function ($item) {
+                                return isset($item->attachments);
+                            });
+    
+                            foreach ($filteredData as $tweet) {
+                                $data1 = "expansions=attachments.media_keys&media.fields=url";
+                                $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $tweet->id, array("Authorization: Bearer " . $_ENV), $data1);
+    
+                                if (property_exists($getAttachment, 'includes')) {
+                                    $attachmentData = $getAttachment->includes->media;
+    
+                                    foreach ($attachmentData as $media) {
+                                        if (property_exists($media, 'url')) {
+                                            $tweet->image = $media->url;
+                                        }
+                                    }
+                                }
+                            }
+    
+                        }
+                        break;
+    
+                    case "links";
+                        echo "hi";
+                        break;
+    
+                    case "no-links";
+                        echo "hi";
+                        break;
+    
+                    default:
+                        $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
+                        $request = $this->curlGetHttpRequest($url, $headers, $data);
+                            
+                        if (!empty($request->data)) {
+                            // get images of the tweet
+                            $filteredData['data'] = $request->data;
+    
+                            foreach ($request->data as $v) {
+                                if (property_exists($v, "attachments")) {
+                                    // call cURL request for API
+                                    $data = "expansions=attachments.media_keys&media.fields=url";
+                                    $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
+    
+                                    if (property_exists($getAttachment, 'includes')) {
+                                        $getAttachmentURL = $getAttachment->includes->media;
+                                        foreach ($getAttachmentURL as $media) {
+                                            if (property_exists($media, 'url')) {
+                                                $v->image = $media->url;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            $filteredData['original'] = $request->meta;
+                        }
+                    break;                               
+                        
+                }
+
+                if ($filteredData !== null) {
+                    // Cache the fetched tweets
+                    Cache::put('tweets_' . $twitterId, $filteredData, now()->addMinutes(30));
+
+                    // return the modified data as a JSON response
+                    return response()->json([
+                        'status' => 200,
+                        'tweets' => $filteredData,
+                        'message' => 'Tweets retrieved from Twitter API',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 201,
+                        'message' => 'Tweets not found',
+                    ]);
+                }
+                             
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 500,
+                'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
+            ]);
+        }
+    }
+
+
+    public function getTweetMoreTweets(Request $request, $twitterId) {
+        // Check if cached data exists
+        $cachedData = Cache::get('next_tweets_' . $twitterId);     
+
+        if ($cachedData) {
+            // Return cached data if available
+            return response()->json([
+                'status' => 200,
+                'more_tweets' => $cachedData,                    
+                'message' => 'Tweets retrieved from cache',
+            ]);
+        } else { 
             $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
             );
-
+    
             $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
-            $data = null;
+            $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&" . "pagination_token=" . $request->input('paginationToken');
+            $request = $this->curlGetHttpRequest($url, $headers, $data);            
             $filteredData = null;
+                            
+            if (!empty($request->data)) {
+                // get images of the tweet
+                $filteredData['data'] = $request->data;
 
+                foreach ($request->data as $v) {
+                    if (property_exists($v, "attachments")) {
+                        // call cURL request for API
+                        $data = "expansions=attachments.media_keys&media.fields=url";
+                        $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
 
-            switch ($type) {
-                case "retweet":
-                    $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=30";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        $filteredData = array_filter($request->data, function ($item) {
-                            if (isset($item->referenced_tweets)) {
-                                foreach ($item->referenced_tweets as $referencedTweet) {
-                                    if ($referencedTweet->type === 'retweeted') {
-                                        return true;
-                                    }
-                                }
-                            }
-                            return false;
-                        });
-                    }
-                    break;
-
-                case "quote":
-                    $data = "";
-                    break;
-
-                case "comments":
-                    echo "hi";
-                    break;
-
-                case "replies":
-                    $data = "exclude=retweets&tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        $filteredData = $request->data;
-                    }
-                    break;
-
-                case "image" :
-                    $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=100";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    if (!empty($request->data)) {
-                        $filteredData = array_filter($request->data, function ($item) {
-                            return isset($item->attachments);
-                        });
-
-                        foreach ($filteredData as $tweet) {
-                            $data1 = "expansions=attachments.media_keys&media.fields=url";
-                            $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $tweet->id, array("Authorization: Bearer " . $_ENV), $data1);
-
-                            if (property_exists($getAttachment, 'includes')) {
-                                $attachmentData = $getAttachment->includes->media;
-
-                                foreach ($attachmentData as $media) {
-                                    if (property_exists($media, 'url')) {
-                                        $tweet->image = $media->url;
-                                    }
+                        if (property_exists($getAttachment, 'includes')) {
+                            $getAttachmentURL = $getAttachment->includes->media;
+                            foreach ($getAttachmentURL as $media) {
+                                if (property_exists($media, 'url')) {
+                                    $v->image = $media->url;
                                 }
                             }
                         }
+                    } 
+                }
 
-                    }
-                    break;
-
-                case "links";
-                    echo "hi";
-                    break;
-
-                case "no-links";
-                    echo "hi";
-                    break;
-
-                default:
-                    $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
-                    $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                    // dd($request);                    
-
-                    if (!empty($request->data)) {
-                        // get images of the tweet
-                        $filteredData = $request->data;
-
-                        foreach ($request->data as $v) {
-                            if (property_exists($v, "attachments")) {
-                                // call cURL request for API
-                                $data = "expansions=attachments.media_keys&media.fields=url";
-                                $getAttachment = $this->curlGetHttpRequest("https://api.twitter.com/2/tweets/" . $v->id, array("Authorization: Bearer " . $_ENV), $data);
-
-                                if (property_exists($getAttachment, 'includes')) {
-                                    $getAttachmentURL = $getAttachment->includes->media;
-                                    foreach ($getAttachmentURL as $media) {
-                                        if (property_exists($media, 'url')) {
-                                            $v->image = $media->url;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;                               
-                   
+                $filteredData['original'] = $request->meta;
             }
-
-            // dd($filteredData);
-
+            
             if ($filteredData !== null) {
+                // Cache the fetched tweets
+                Cache::put('next_tweets_' . $twitterId, $filteredData, now()->addMinutes(30));
+
                 // return the modified data as a JSON response
                 return response()->json([
                     'status' => 200,
-                    'data' => $filteredData,
+                    'more_tweets' => $filteredData,
+                    'message' => 'Tweets retrieved from Twitter API',
                 ]);
             } else {
                 return response()->json([
@@ -271,13 +422,11 @@ class TwitterApi extends Controller
                     'message' => 'Tweets not found',
                 ]);
             }
-
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 500,
-                'message' => $th->getMessage()  . ' in ' . $th->getFile() . ' on line ' . $th->getLine()
-            ]);
+            
         }
+
+
+        // dd($request);
     }
 
     public function tweetNow(Request $request, $id) {
@@ -303,7 +452,7 @@ class TwitterApi extends Controller
             // $getLikes = $this->curlGetHttpRequest('https://api.twitter.com/2/users/' . $id . '/likes', $headers, array('tweet_id' => $like[1]));
             $commandModule = new CommandmoduleController();
             $getLikes = $commandModule->apiRequest('https://api.twitter.com/2/users/' . $id . '/likes', $headers, 'POST', $data);
-            dd($getLikes);
+            // dd($getLikes);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => 500,
