@@ -38,7 +38,7 @@
 
                             <div class="queued-single-start">
                                 <span class="greeting">Hi,</span>
-                                <span class="name"> {{ $user->email }}!</span>
+                                <span class="name">{{ $user ? $user->email : 'Guest' }}</span>
                             </div>  <!-- END .queue-single-start -->
 
                             <div class="queued-single-end">
