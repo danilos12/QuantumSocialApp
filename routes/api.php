@@ -11,10 +11,7 @@ use Illuminate\Support\Facades\Http;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Auth\LoginController;
 
-use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------

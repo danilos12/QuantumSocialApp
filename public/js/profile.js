@@ -1,63 +1,29 @@
 // Fetch the existing tag groups when the page loads
-$(document).ready(function() {        
+$(document).ready(function() {         
 
-    // $.ajax({
-    //     type: "GET",
-    //     url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets",
-    //     beforeSend: function () {
-    //         $("#spinner").show();
-    //         // $("#getting-tweets").show();
-    //     },
-    //     success: function (response) {
-    //         $(".profileSection").show();
-            
-    //         if (response.status === 200) {
-    //             var cardSection = $(".profile-posts-inner");
-    //             var numItems = 0;
-                
-    //             if (response.data.length > 0) {
-    //                 $.each(response.data, function (index, value) {     
-    //                     renderProfileCards(cardSection, index, value, numItems);                                  
-    
-    //                     numItems++;
-    //                 });        
-    //             } else {
-    //                 $(".profile-posts-inner").text('No tweets found');
-    //             }
-    //         } else {
-    //             $(".profile-posts-inner").text('No tweets found');
-    //         }
-    //     },
-    //     error: function (xhr, status, error) {
-    //         console.log(
-    //             "An error occurred while fetching the tweets: " + error
-    //         );
-    //     },
-    //     complete: function () {
-    //         $("#spinner").hide();
-    //         // $("#getting-tweets").hide();
-    //     },
-    // });
+    async function fetchTweets() {      
 
-    async function fetchTweets() {
+        // show spinner before sending the fetch request
+        $("#spinner").show();
+
         try {
-            const response = await $.ajax({
-                type: "GET",
-                url: APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets",
-                beforeSend: function () {
-                    $("#spinner").show();
-                    // $("#getting-tweets").show();
-                }
+            const response = await fetch(APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets", {
+                method: 'GET',                         
             });
-    
+            const responseData = await response.json();  
+
+            console.log(responseData.message);
+            
             $(".profileSection").show();
     
-            if (response.status === 200) {
+            if (responseData.status === 200) {
+
+                $("#paginationToken").val(responseData.tweets.original.next_token);
                 var cardSection = $(".profile-posts-inner");
                 var numItems = 0;
     
-                if (response.data.length > 0) {
-                    $.each(response.data, function (index, value) {
+                if (responseData.tweets.data.length > 0) {
+                    $.each(responseData.tweets.data, function (index, value) {
                         renderProfileCards(cardSection, index, value, numItems);
                         numItems++;
                     });
@@ -65,13 +31,12 @@ $(document).ready(function() {
                     $(".profile-posts-inner").text('No tweets found');
                 }
             } else {
-                $(".profile-posts-inner").text('No tweets found');
+                $(".profile-posts-inner").text(responseData.message);
             }
         } catch (error) {
             console.log("An error occurred while fetching the tweets: " + error);
         } finally {
             $("#spinner").hide();
-            // $("#getting-tweets").hide();
         }
     }
     
@@ -138,8 +103,63 @@ $(document).ready(function() {
                 window.open(func.twitterlink, '_blank');
                 break;
         }
-    })    
+    })      
     
+    $('.lower-area-inner').on('scroll', function() {
+        var $this = $(this);
+        console.log($this)
+        // Calculate the sum of scrollTop and clientHeight
+        var scrollBottom = $this.scrollTop() + $this.innerHeight();
+        console.log(scrollBottom)
+        // Check if scrollBottom equals scrollHeight
+        if (scrollBottom >= $this[0].scrollHeight) {
+            // You have scrolled to the bottom
+            console.log("Scrolled to the bottom");
+            $('.profile-posts-inner').append('<div class="loadMore">Load more tweets...</div>');
+            loadMoreTweets();
+
+        }
+    });
+
+    // Function to load more tweets
+    async function loadMoreTweets() {
+        // Get the pagination token
+        var paginationToken = $('#paginationToken').val();
+
+        try {
+            const response = await fetch(APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets/get-more-tweets?paginationToken=" + paginationToken, {
+                method: 'GET',                         
+            });
+            const responseData = await response.json();  
+            $(".profileSection").show();
+            console.log(responseData);
+            console.log(responseData.more_tweets);
+            
+            if (responseData.status === 200) {
+
+                $("#paginationToken").val(responseData.more_tweets.original.next_token);
+                var cardSection = $(".profile-posts-inner");
+                var numItems = $(".profile-posts-inner .template").length - 1;
+    
+                if (responseData.more_tweets.data.length > 0) {
+                    console.log(responseData.more_tweets.data.length)
+                    $.each(responseData.more_tweets.data, function (index, value) {
+                        renderProfileCards(cardSection, index, value, numItems);
+                        numItems++;
+                    });
+
+                    $('.loadMore').remove();
+                } else {
+                    $(".profile-posts-inner").text('No tweets found');
+                }
+            } else {
+                $(".profile-posts-inner").text(responseData.message);
+            }
+        } catch(error) {
+            console.error('Error loading more tweets:', error);
+        }
+      
+    }
 });
 
 
@@ -208,36 +228,10 @@ function tweetInstance(value) {
                     </div>  <!-- END .mosaic-post-text -->            
                 </div>  <!-- END .mosaic-post-data -->
 
-                <div class="mosaic-post-scheduling" id="cardfunctions">
-                    <div class="mosaic-scheduling mosaic-scheduling-now">
-
-                        <span class="mosaic-label mosaic-now-label">
-                            <img src="${APP_URL}/public/ui-images/icons/pg-command.svg" class="ui-icon" />Now
-                        </span>
-                        <span class="mosaic-sched-buttons mosaic-now-buttons">
-                            <img src="${APP_URL}/public/ui-images/icons/pg-heart.svg" class="ui-icon" data-now="like-${value.id}"/>
-                            <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon comment-now-icon" data-now="comment-${value.id}"/>
-                            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" data-now="retweet-${value.id}"/>
-                        </span>
-
-                    </div>  <!-- END .mosaic-scheduling-now -->
-
-                    <div class="mosaic-scheduling mosaic-scheduling-future">
-
-                        <span class="mosaic-label mosaic-future-label">
-                            <img src="${APP_URL}/public/ui-images/icons/04-queue.svg" class="ui-icon" />
-                            Schedule
-                        </span>
-                        <span class="mosaic-sched-buttons mosaic-future-buttons">
-                            <img src="${APP_URL}/public/ui-images/icons/pg-comment.svg" class="ui-icon" data-schedule="comment-${value.id}"/>
-                            <img src="${APP_URL}/public/ui-images/icons/pg-retweet.svg" class="ui-icon" data-schedule="retweet-${value.id}"/>
-                            <img src="${APP_URL}/public/ui-images/icons/16-evergreen.svg" class="ui-icon" data-schedule="evergreen-${value.id}"/>
-                        </span>
-
-                    </div>  <!-- END .mosaic-scheduling-future -->
+                <div class="mosaic-post-scheduling" id="cardfunctions">                    
 
                     <div class="mosaic-scheduling mosaic-post-analytics">
-
+                        
                         <span class="mosaic-label mosaic-analytics-label">
                             <img src="${APP_URL}/public/ui-images/icons/pg-analytics.svg" class="ui-icon" />
                             Analytics

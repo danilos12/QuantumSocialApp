@@ -33,8 +33,7 @@ class PostingController extends Controller
       protected $defaultid;
     public function __construct()
     {
-		$this->middleware('unauthorized');
-   
+        $this->middleware('unauthorized');
     }
 	protected function setDefaultId()
     {

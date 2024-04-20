@@ -16,7 +16,7 @@ class EngagementController extends Controller
         $this->middleware('unauthorized');
     }
 
-  
+
     /**
      * Show the application dashboard.
      *

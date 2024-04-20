@@ -24,13 +24,10 @@ class dashboardController extends Controller
      * @return void
      */
     protected $defaultid;
+
     public function __construct()
     {
-        $this->middleware('unauthorized');
-    
-
-
-
+            $this->middleware('unauthorized');
 
     }
 
@@ -43,49 +40,51 @@ class dashboardController extends Controller
             return $this->defaultid = MembershipHelper::membercurrent();
         }
     }
-   
 
     /**
      * Show the application dashboard.
      *
      * @return \Illuminate\Contracts\Support\Renderable
-     */public function index(Request $request)
-{
- 
+     */
+    public function index()
+    {
+		$title = 'Dashboard page';
 
-    $title = 'Dashboard page';
 
-    Auth::loginUsingId($request->user_id);
-    $checkRole = MembershipHelper::tier($this->setDefaultId());
+		$checkRole = MembershipHelper::tier($this->setDefaultId());
 
-    $user = User::find($this->setDefaultId());
-    $session = Session::get('user_id');
-    $countPosts = CommandModule::where('user_id', $this->setDefaultId())->count();
-    $countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
-    $countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
-    $countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
-    $countAdmin = Members::where('account_holder_id',$this->setDefaultId())->where('role', 'Admin')->count();
-    $countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
+        if(Auth::guard('member')->check()){
+            $user = Members::find(Auth::guard('member')->user()->id);
 
-    return view('dashboard')->with([
-        'title' => $title,
-        'plan' => $checkRole,
-        'user' => $user,
-        'countPosts' => $countPosts,
-        'countXaccts' => $countXaccts,
-        'countHashtagGroups' => $countHashtagGroups,
-        'countAdmin' => $countAdmin,
-        'countTeamMembers' => $countTeamMembers,
-        'countTrial' => $countTrial->trial_counter
-    ]);
-}
+        }else{
+            $user = User::find($this->setDefaultId());
+        }
 
+
+		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->count();
+		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
+		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
+		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
+		$countAdmin = Members::where('account_holder_id',$this->setDefaultId())->where('role', 'Admin')->count();
+		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
+        // dd($user->email);
+        return view('dashboard')->with([
+			'title' => $title,
+			'plan' => $checkRole,
+			'user' => $user,
+			'countPosts' => $countPosts,
+			'countXaccts' => $countXaccts,
+			'countHashtagGroups' => $countHashtagGroups,
+			'countAdmin' => $countAdmin,
+			'countTeamMembers' => $countTeamMembers,
+			'countTrial' => $countTrial->trial_counter
+		]);
+    }
 
     public function help()
     {
 		$title = 'Help page';
         return view('help')->with('title', $title);
     }
-  
 
 }

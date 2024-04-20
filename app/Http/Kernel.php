@@ -73,7 +73,7 @@ class Kernel extends HttpKernel
         'member-access' => \App\Http\Middleware\MemberAuth::class,
         'unauthorized' => \App\Http\Middleware\Unauthenticated::class,
 
-     
+
 
     ];
 }
