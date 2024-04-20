@@ -69,6 +69,8 @@ Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordControlle
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
 Route::get('/', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
+// Route::get('/testing',function(){return view('testpage');})->name('memberbanner')->name('testpage')->middleware('auth');
+
 Route::get('/get-upgrade-modal', [App\Http\Controllers\HomeController::class, 'upgrademodal'])->name('upgradecheckout');
 
 

@@ -288,16 +288,16 @@ class CommandmoduleController extends Controller
 
 
     public function addTagGroup(Request $request) {
-        $checkRole = MembershipHelper::tier(Auth::id());
+        $checkRole = MembershipHelper::tier($this->setDefaultId());
 
         $tagCount = DB::table('tag_groups_meta')
-            ->where('user_id', Auth::id())
+            ->where('user_id', $this->setDefaultId())
             ->count();
 
         if ($checkRole->hashtag_group > $tagCount ) {
             try {
                 $insert = Tag_groups::create([
-                    'user_id' => Auth::id(),
+                    'user_id' => $this->setDefaultId(),
                     'twitter_id' => $request->input('twitter_id'),
                     'tag_group_mkey' => "_" . strtolower(str_replace(' ', '_', $request->input('myInput'))), //add underscore in the beginner always
                     'tag_group_mvalue' => $request->input('myInput'),
@@ -322,7 +322,7 @@ class CommandmoduleController extends Controller
     public function addTagItem(Request $request) {
         try {
             $insert = Tag_items::create([
-                'user_id' => Auth::id(),
+                'user_id' => $this->setDefaultId(),
                 'twitter_id' => $request->input('twitter_id'),
                 'tag_meta_key' => $request->input('tag_id'),
                 'tag_meta_value' => $request->input('hashtag'),
@@ -340,7 +340,7 @@ class CommandmoduleController extends Controller
 
     public function getTagGroups($id) {
         try {
-            $tagGroups = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
+            $tagGroups = Tag_groups::where(['user_id' => $this->setDefaultId(), 'twitter_id' => $id])->get();
 
             return response()->json($tagGroups);
         }  catch (Exception $e) {
@@ -392,7 +392,7 @@ class CommandmoduleController extends Controller
                 ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                 ->select('twitter_accts.*', 'ut_acct_mngt.*')
                 ->where('ut_acct_mngt.selected', "=", 0) // selected
-                ->where('ut_acct_mngt.user_id', "=", Auth::id())
+                ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
                 ->where('twitter_accts.deleted', "=", 0)
                 ->get();
 
@@ -407,7 +407,7 @@ class CommandmoduleController extends Controller
             $getCustomSlot = DB::table('schedule')
                             ->join('days', 'days.day', '=', 'schedule.slot_day')
                             ->select('schedule.*', 'days.*')
-                            ->where('user_id', Auth::id())
+                            ->where('user_id', $this->setDefaultId())
                             ->where('schedule.post_type', $request->post_type)
                             ->orderBy('days.id', 'ASC')
                             ->get();
@@ -657,7 +657,7 @@ class CommandmoduleController extends Controller
             }
 
             //get time now
-            $utc = TwitterHelper::now(Auth::id());
+            $utc = TwitterHelper::now($this->setDefaultId());
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
 
             // Update the desired fields with the request data
@@ -687,7 +687,7 @@ class CommandmoduleController extends Controller
 
             $nearestPost = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])
                 ->where('twitter_id', $request->twitter_id)
-                ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                ->where('sched_time', '>', TwitterHelper::now($this->setDefaultId()))
                 ->orderBy('sched_time', 'ASC')
                 ->first();
 

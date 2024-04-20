@@ -554,6 +554,8 @@ class TwitterApi extends Controller
 
             $id = $request->input('twitter_id');
 
+            $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+
             // check if id is selected in the UT_ACCT_MNGT table
             $selectedTwitter = UT_AcctMngt::where('twitter_id', $id)->first();
 
