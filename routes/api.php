@@ -11,11 +11,10 @@ use Illuminate\Support\Facades\Http;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\LoginController;
 
-
-
-
-
+use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +36,7 @@ Route::get('update-wp', function () {
         ['meta_value' => $r['membership_plan_id']]
 		);
 
-		DB::table('app_usermeta')->updateOrInsert(
+		$user = DB::table('app_usermeta')->updateOrInsert(
         ['user_id' => $r['wp_user_id'], 'meta_key' => 'wp_subscription'],
         ['meta_value' => $r['name_subscription']]
 		);
@@ -49,6 +48,37 @@ Route::get('update-wp', function () {
 });
 
 
+
+	Route::get('dsboard', function () {
+    $r = $_REQUEST;
+    if(isset( $r['sss'] ) ) {
+        $decoded = base64_decode($r['sss']);
+        $decoded_email = base64_decode($r['kslae']);
+        $decryption = substr($decoded, 27, -13);
+        $wp_originalid = $decryption  - 215;
+
+        $compareid = DB::table('users')
+            ->where('email', $decoded_email)
+            ->value('id');
+
+        $laravelid = DB::table('users_meta')
+            ->where('user_id', $compareid)
+            ->value('wp_subscription_id');
+        $laraveliddecryption = substr($laravelid, 27, -13);
+        $lrv_originalid = $laraveliddecryption  - 215;
+
+        if ($lrv_originalid == $wp_originalid) {
+			// $user = \App\Models\User::find($compareid);
+			// Auth::login($user);
+			$user = User::find($compareid);
+						return redirect()->route('dashboard',['user_id'=>$user->id]);
+             
+        
+        }
+    }
+	 	
+ 
+});
 
 
     // trial counter trial_date - now()
@@ -126,16 +156,16 @@ Route::get('wp', function () {
 
 
 					]);
-					$now = strtotime(date("Y/m/d"));
-					$your_date = strtotime($wp_data['info']['trial_date']);
-					$datediff = $your_date - $now;
-					$days_diff = floor($datediff / (60 * 60 * 24));
 
+					$now = date("Y-m-d");
+					$your_date = $wp_data['info']['trial_date'];
+					$datediff = strtotime($your_date) - strtotime($now);
+					$days_diff = floor($datediff / (60 * 60 * 24));
 
 					DB::table('users_meta')->insert([
 						'user_id' => $user->id,
 						'subscription_id' => $value,
-						'wp_subscription_id'=>base64_decode($r['wp_user_id']),
+						'wp_user_id'=>base64_decode($r['wp_user_id']),
 						'trial_counter'=>$days_diff,
 						'next_payment'=>$wp_data['info']['next_payment'],
 						'status'=>$status,

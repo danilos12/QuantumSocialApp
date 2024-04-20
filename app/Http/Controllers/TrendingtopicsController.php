@@ -13,16 +13,7 @@ class TrendingtopicsController extends Controller
      */
     public function __construct()
     {
-        if (Auth::guard('web')->check()) {
-            $this->middleware('auth');
-
-        }
-        if(Auth::guard('member')->check()) {
-
-            $this->middleware('member-access');
-
-
-        }
+        $this->middleware('unauthorized');
     }
 
     /**
