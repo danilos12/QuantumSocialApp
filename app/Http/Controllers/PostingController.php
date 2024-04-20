@@ -19,7 +19,7 @@ use App\Models\Twitter;
 use App\Models\User;
 use Exception;
 use App\Http\Controllers\CommandmoduleController;
-
+use Illuminate\Support\Facades\Session;
 
 use Carbon\Carbon;
 
@@ -30,18 +30,10 @@ class PostingController extends Controller
      *
      * @return void
      */
+      protected $defaultid;
     public function __construct()
     {
-		if (Auth::guard('web')->check()) {
-            $this->middleware('auth');
-
-        }
-        if(Auth::guard('member')->check()) {
-
-            $this->middleware('member-access');
-
-
-        }
+        $this->middleware('unauthorized');
     }
 	protected function setDefaultId()
     {
@@ -497,7 +489,7 @@ class PostingController extends Controller
 	public function switchFromQueue(Request $request, $switch, $id) {
 		try {
 			//update first the switch
-			QuantumAcctMeta::where('user_id', $this->setDefaultId())->update(['queue_switch' => ($switch === 'active' ? 1 : 0)]);
+			QuantumAcctMeta::where('user_id', $this->setDefaultId())->update([$request->input('method') . '_switch' => ($switch === 'active' ? 1 : 0)]);
 
 			switch ($request->method) {
 				case "queue" :

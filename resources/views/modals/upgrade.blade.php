@@ -53,7 +53,8 @@
         display: flex;
         justify-content: space-between;
         padding: 0 10em; /* Adjust this value to increase or decrease the space */
-        margin-top: 3.5em
+        margin-top: 3.5em;
+
     }
 
     .upgrade-page-outer .card {
@@ -68,7 +69,7 @@
     .upgrade-page-outer .card:first-child,
     .upgrade-page-outer .card:last-child {
         color: #5B1C55;
-        height: 400px;
+        height: 430px;
         margin-top: 3em;
         background: #ffffff;
     }
@@ -85,6 +86,7 @@
     .upgrade-page-outer .card:last-child .card-cta {
         background: #701B65;
         color: #ffffff;
+
     }
 
     .upgrade-page-outer .card-header {
@@ -138,6 +140,67 @@
         border-radius: 10px;
         box-sizing: border-box;
     }
+    .card-features{
+        width:100%;
+    }
+    .feature-item{
+
+        display: flex;
+        justify-content: center;
+        width:100%;
+
+    }
+    .text-grey{
+        color:#9F9F9F;
+    }
+    .bg-red{
+        background-color: red;
+    }
+    .bg-blue{
+        background-color: blue;
+    }
+    .bg-green{
+        background-color: green;
+    }
+    .flex{
+        display: flex;
+    }
+    .space-x-4{
+        margin-left: 1rem;
+    }
+    .space-y-3{
+        margin-top: 0.75rem;
+    }
+    .justify-center{
+        justify-content: center;
+    }
+    .items-center{
+        align-items: center;
+    }
+    .w-25{
+        width: 25%;
+    }
+    .w-50{
+        width: 55%;
+    }
+    .w-auto{
+        widows: auto;
+    }
+    .w-100{
+        widows: 100%;
+    }
+    .w-8{
+        width: 2rem;
+    }
+    .text-center{
+        text-align: center;
+    }
+    .text-right{
+        text-align: right;
+    }
+    .ml-4{
+        margin-left: 1rem;
+    }
 </style>
 
 <div class="modal-large-anchor-upgrade">
@@ -162,51 +225,149 @@
 
                 <div class="card-container">
                     <div class="card">
-                        <div class="card-header">Solar</div>
+                        <div class="card-header">SOLAR</div>
                         <div class="card-price-description">
-                            <div class="price-text">$12</div>
+                            <div class="price-text">$49</div>
                             per user participant
                         </div>
                         <div class="sub-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. </div>
                         <div class="card-features">
-                            <div class="feature-item">1</div>
-                            <div class="feature-item">2</div>
-                            <div class="feature-item">3</div>
-                            <div class="feature-item">4</div>
+                            <div class="feature-item">
+                                <div class="">
+                                <div class="flex items-center ">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4 text-center">7 days trial</span>
+                                </div>
+                                <div class="flex items-cente space-y-3">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can add 1 Administrator</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can add 0 Members</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8 ">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can link 3 X accounts</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8 ">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4 ">Monthly Post Credits 200</span>
+                                </div>
+                            </div>
+                            </div>
+
+
+
+
+
                         </div>
                         @if (Auth::guard('web')->check())
                         <input type="button" class="card-cta" value="{{ ($product_id === 61) ? "Your Plan" : "Upgrade Now" }}" data-product-id="61" {{ ($product_id === 61) ? 'disabled' : "" }} >
                         @endif
                     </div>
                     <div class="card">
-                        <div class="card-header">Galactic</div>
+                        <div class="card-header">ASTRAL</div>
                         <div class="card-price-description">
-                            <div class="price-text">$12</div>
+                            <div class="price-text">$89</div>
                             per user participant
                         </div>
-                        <div class="sub-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. </div>
+                        <div class="sub-description text-grey">For large organization that wants to post thousands of contents on multiple accounts </div>
                         <div class="card-features">
-                            <div class="feature-item">1</div>
-                            <div class="feature-item">2</div>
-                            <div class="feature-item">3</div>
-                            <div class="feature-item">4</div>
+                            <div class="feature-item">
+                                <div class="">
+                                <div class="flex items-center ">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4 text-center">7 days trial</span>
+                                </div>
+                                <div class="flex items-cente space-y-3">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can add 5 Administrator</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can add 10 Members</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8 ">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can link 25 X accounts</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8 ">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4 ">Monthly Post Credits Unlimited</span>
+                                </div>
+                            </div>
+                            </div>
+
                         </div>
                         @if (Auth::guard('web')->check())
                         <input type="button" class="card-cta" value="{{ ($product_id === 62) ? "Your Plan" : "Upgrade Now" }}" data-product-id="62" {{ ($product_id === 62) ? 'disabled' : "" }} >
                         @endif
                     </div>
                     <div class="card">
-                        <div class="card-header">Astral</div>
+                        <div class="card-header">GALACTIC</div>
                         <div class="card-price-description">
-                            <div class="price-text">$12</div>
+                            <div class="price-text">$119</div>
                             per user participant
                         </div>
                         <div class="sub-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. </div>
                         <div class="card-features">
-                            <div class="feature-item">1</div>
-                            <div class="feature-item">2</div>
-                            <div class="feature-item">3</div>
-                            <div class="feature-item">4</div>
+                            <div class="feature-item">
+                                <div class="">
+                                <div class="flex items-center ">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <div class="flex justify-center">
+                                    <span class="ml-4 text-center">7 days trial</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-cente space-y-3">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can add 3 Administrator</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can add 5 Members</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8 ">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4">Can link 15 X accounts</span>
+                                </div>
+                                <div class="flex items-center space-y-3">
+                                    <div class="w-8 ">
+                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                                    </div>
+                                    <span class="ml-4 ">Monthly Post Credits 2500</span>
+                                </div>
+                            </div>
+                            </div>
                         </div>
                         @if (Auth::guard('web')->check())
                         <input type="button" class="card-cta" value="{{ ($product_id === 63) ? "Your Plan" : "Upgrade Now" }}" data-product-id="63" {{ ($product_id === 63) ? 'disabled' : "" }} >

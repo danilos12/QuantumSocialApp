@@ -1,20 +1,20 @@
- <div class="modal-large-outer main-settings-outer twitter-settings-outer frosted">
+<div class="modal-large-outer main-settings-outer twitter-settings-outer frosted">
     <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-twitter-settings" id="twitter-settings"/>
 
     <div class="account-settings-header-wrap">
         <div class="menu-header">Social Account Settings</div>
         <div class="global-twitter-profile-header profile-header-left">
             <a href="#">
-                <img src="{{ isset($selected_user) ? $selected_user->twitter_photo : asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}"
+                <img src="{{ $selected_user ? $selected_user->twitter_photo : asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}"
                 class="global-profile-image" />
             </a>
             <div class="global-profile-details">
                 <div class="global-profile-name text-right">
-                    {{ isset($selected_user) ? $selected_user->twitter_name : Auth::user()->name }}
+                    {{ $selected_user ? $selected_user->twitter_name : 'No twitter linked' }}
                 </div>  <!-- END .global-author-name -->
                 <div class="global-profile-subdata">
                     <span class="global-profile-handle">
-                        <a href="">{{ isset($selected_user) ? "@" .$selected_user->twitter_username : "" }}</a>
+                        <a href="">{{ $selected_user ? "@" .$selected_user->twitter_username : "" }}</a>
                     </span>
                 </div>  <!-- END .global-post-date-wrap -->
             </div>  <!-- END .global-author-details -->
@@ -91,12 +91,12 @@
 
                                 <div class="childs-cont-2">
                                   <p class="childs-cont-p">Twitter ACCESS</p>
-                                  <p class="switchtexton">On</p>
-                                  <p class="switchtextoff">Off</p>
+
                                   <div class="">
 
 
-                                    <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess"  data-trid="{{$selected_user->id}}" datas-xant="{{$member->account_holder_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_x-{{$member->id}}" {{ $member->twitter_access == 1 && $member->mtwitter_id == $selected_user->twitter_id ? 'checked' : '' }}>
+
+                                    <input type="checkbox" class="menu-twirl-toggle  twitteraccess" data-trid="{{$selected_user->id}}" datas-xant="{{$member->account_holder_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_x-{{$member->id}}" {{$idscheck->contains('member_id',$member->id) && $idscheck->contains('mtwitter_id',$selected_user->twitter_id) ? 'checked' : '' }}>
 
 
 
@@ -122,11 +122,11 @@
 
                                 <div class="childs-cont-2">
                                   <p class="childs-cont-p">Twitter ACCESS</p>
-                                  <p class="switchtexton">On</p>
-                                  <p class="switchtextoff">Off</p>
+
                                   <div class="">
 
-                                    <input type="checkbox" class="menu-twirl-toggle forchecked twitteraccess" data-trid="{{$selected_user->id}}" datas-xant="{{$member->account_holder_id}}" name="grant-x-access" data-twitter-id="{{$selected_user->twitter_id}}" id="toggle_x-{{$member->id}}" {{ $member->twitter_access == 1 && $member->mtwitter_id == $selected_user->twitter_id ? 'checked' : '' }}>
+                                    <input type="checkbox" class="menu-twirl-toggle twitteraccess" data-trid="{{ $selected_user ? $selected_user->id : '' }}" datas-xant="{{ $member->account_holder_id }}" name="grant-x-access" data-twitter-id="{{ $selected_user ? $selected_user->twitter_id : '' }}" id="toggle_x-{{ $member->id }}" {{ $selected_user && $idscheck->contains('member_id', $member->id) && $idscheck->contains('mtwitter_id', $selected_user->twitter_id) ? 'checked' : '' }}>
+
 
 
 

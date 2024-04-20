@@ -15,9 +15,9 @@ class MemberAuth
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */  public function handle(Request $request, Closure $next)
     {
-        $user = Auth::guard('member')->user();
+        $user = Auth::guard('member')->user()||Auth::guard('web')->user();
 
-        if ($user && ($user->role === 'Member' || $user->role === 'Admin')) {
+        if ($user) {
             return $next($request);
         }
 

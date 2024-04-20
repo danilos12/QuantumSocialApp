@@ -19,6 +19,8 @@
                     </div>  <!-- END .head-left-wrap -->
                   </div>  <!-- END .page-head-n-sort -->
 
+                  <div id="errorContainer"></div>
+
                   <div class="bulk-flex-column">
                   {{-- <div class="bulk-upload-section">
                     <span class="bulk-upload-title">Advance Uploader:
@@ -47,16 +49,7 @@
                     {{-- to be back --}}
                   </div>  <!-- END .bulk-upload-section -->
                  
-                  @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                  @endif
-                  </div>
+                </div>               
 
                   <div class="uploader-tips">
 

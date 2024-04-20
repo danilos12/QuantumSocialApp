@@ -65,7 +65,6 @@ $(document).ready(function() {
                 case 'promo': 
                     if (responseData.length > 0) {
                         $.each(responseData, (index, k) => {
-                            console.log(k)
                             const wrapper = postWrapperPromo(k);
 
                             $('.queued-posts-inner').append(wrapper)                       
@@ -100,15 +99,16 @@ $(document).ready(function() {
                     }  
                     break;
                 case 'bulk-queue': 
+                
                     if (responseData.length > 0) {
-                       console.log(responseData);
+
                         // Group cards by date
                         var groupedCards = responseData.reduce(function (acc, card) {
                             acc[card.sched_time] = acc[card.sched_time] || [];
                             acc[card.sched_time].push(card);
                             return acc;
                         }, {});
-
+                        
 
                         for (var date in groupedCards) {
                             if (groupedCards.hasOwnProperty(date)) {

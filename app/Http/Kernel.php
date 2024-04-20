@@ -71,7 +71,9 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'session_expired' => \App\Http\Middleware\CheckSessionExpiration::class,
         'member-access' => \App\Http\Middleware\MemberAuth::class,
-        'weborauth' => \App\Http\Middleware\WeborMember::class,
+        'unauthorized' => \App\Http\Middleware\Unauthenticated::class,
+
+
 
     ];
 }

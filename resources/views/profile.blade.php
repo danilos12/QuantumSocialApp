@@ -1,4 +1,12 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
+
 
 @section('content')
 <div class="page-outer profile-outer">
@@ -17,3 +25,14 @@
 @section('scripts')
 <script type='text/javascript' src="{{asset('public/js/profile.js')}}"></script>
 @endsection
+
+<style>
+  .profile-posts-inner {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-gap: 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 32px;
+  }
+</style>
