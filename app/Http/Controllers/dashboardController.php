@@ -24,9 +24,7 @@ class dashboardController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-	
-
+        $this->middleware('auth');	
     }
 
     /**
@@ -40,15 +38,26 @@ class dashboardController extends Controller
 		
 		
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
-
     $user = User::find($checkRole->user_id);	
+
+    // check if subscription is active
+    // if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
+		// 	$message = 'Your account is inactive. Please update your payment to continue using the features.';
+		// 	return view('dashboard', compact('message', 'title', 'user', 'countPosts', 'countXaccts', 'countHashtagGroups', 'countAdmin', 'countTeamMembers', 'countTrial'));
+    //         // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
+    // }
+
 		
-		$countPosts = CommandModule::where('user_id', Auth::id())->count();
-		$countHashtagGroups = Tag_groups::where('user_id', Auth::id())->count();		
-		$countXaccts = UT_AcctMngt::where('user_id', Auth::id())->count();
-		$countTeamMembers = Members::where('account_holder_id', Auth::id())->where('role', 'Member')->count();	
-		$countAdmin = Members::where('account_holder_id', Auth::id())->where('role', 'Admin')->count();
-		$countTrial = QuantumAcctMeta::where('user_id', Auth::id())->first();
+		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->whereMonth('created_at', now()->month)->count();
+		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();		
+		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
+		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();	
+		$countAdmin = DB::table('users')
+            ->join('members', 'members.account_holder_id', '=', 'users.id')
+            ->where('members.account_holder_id', $this->setDefaultId())
+            ->count();         
+            
+		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
 		
     return view('dashboard')->with([
 			'title' => $title, 
@@ -57,7 +66,7 @@ class dashboardController extends Controller
 			'countPosts' => $countPosts, 
 			'countXaccts' => $countXaccts, 
 			'countHashtagGroups' => $countHashtagGroups, 
-			'countAdmin' => $countAdmin,
+			'countAdmin' => ($countAdmin === 0) ? 1 : $countAdmin + 1,
 			'countTeamMembers' => $countTeamMembers,
 			'countTrial' => $countTrial->trial_counter
 		]);
@@ -65,7 +74,7 @@ class dashboardController extends Controller
 
     public function help()
     {
-		$title = 'Help page';
+      $title = 'Help page';
         return view('help')->with('title', $title);
     }
 

@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeZone;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
+use App\Models\CommandModule;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterSettings;
 use Illuminate\Support\Facades\Route;
@@ -39,35 +40,18 @@ class AppServiceProvider extends ServiceProvider
     {                    
         
         // share to all views
-        View::composer('*', function ($view) {            
-            $usersMeta = QuantumAcctMeta::where('user_id', auth()->id())->first();
-            
-            if ($usersMeta) {
-                $api = MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $usersMeta->wp_user_id);                
-                $jsonStart = strpos($api, '{');
+        View::composer('*', function ($view) {                       
+            if (Auth::guard('web')->check()) {                
 
-                // Extract JSON data
-                $jsonData = substr($api, $jsonStart);
-                
-                // Parse JSON
-                $parsedData = json_decode($jsonData, true);
-
-                $status = config('wp.status_labels');
-                if ($parsedData['n'] === 'valid') {
-                    $now = strtotime(date("Y/m/d"));
-					$your_date = strtotime($parsedData['info']['trial_date']);
-					$datediff = $your_date - $now;
-					$days_diff = floor($datediff / (60 * 60 * 24));
-                    QuantumAcctMeta::where('user_id', auth()->id())->update([
-                        'trial_counter' => $days_diff,
-                        'status' => $status[$parsedData['wc_status']],
-                    ]);
-                }                
-            }
-
-            // update columns in users meta 
-
-            if (Auth::guard('web')->check()) {
+                $checkRole = MembershipHelper::tier(Auth::id());
+        
+                // // check if subscription is active
+                if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {			
+                    $message = config('helpers.account_inactive.message');
+                    // return view('queue', compact('message', 'title'));
+                    $view->with('message', $message);
+                    // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
+                }
 
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();

@@ -204,7 +204,14 @@
                   {{ session('alert') }}
               </div>
             @endif
+
+            @if(isset($message))
+            <div class="alert alert-warning" role="alert">
+                {{ $message }}
+            </div>
+            @else 
             @yield('content')
+            @endif
           </div>
         </div>
     </div>  <!-- END .interface-inner -->
@@ -252,14 +259,14 @@
 
   <script>
      $(document).ready(function() {
-            // Alert
-      var alert = $('.alert ');
+      // // Alert
+      // var alert = $('.alert ');
 
-      if(alert.length == 1) {
-        setTimeout(function(){
-          alert.fadeOut('slow');
-        }, 5000);
-      }
+      // if(alert.length == 1) {
+      //   setTimeout(function(){
+      //     alert.fadeOut('slow');
+      //   }, 5000);
+      // }
 
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {

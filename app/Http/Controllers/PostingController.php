@@ -67,13 +67,8 @@ class PostingController extends Controller
 
 	public function queue()
 	{
-		$title = 'Queue';
-		$userId = Auth::id(); //To check current user loggedin User ID dria
-        // $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
-        // ->where('sched_method', 'add-queue')
-        // ->where('post_type', 'regular-tweets')
-        // ->exists();
-		// return view('queue', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+		$title = 'Queue';       		
+		
 		return view('queue')->with('title', $title);
 	}
 
@@ -81,26 +76,16 @@ class PostingController extends Controller
 	 public function drafts()
     {
 		$title = 'Drafts page';
-		$userId = Auth::id(); //To check current user loggedin User ID dria
-        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
-        ->where('sched_method', 'add-queue')
-        ->where('post_type', 'regular-tweets')
-        ->exists();
-		return view('drafts', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
-		// return view('drafts')->with('title', $title);
+		
+		return view('drafts')->with('title', $title);
 
     }
 
 	 public function posted()
     {
 		$title = 'Posted';
-		$userId = Auth::id(); //To check current user loggedin User ID dria
-        $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
-        ->where('sched_method', 'add-queue')
-        ->where('post_type', 'regular-tweets')
-        ->exists();
-		return view('posted', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
-        // return view('posted')->with('title', $title);
+	
+        return view('posted')->with('title', $title);
     }
 
 	public function slot_scheduler()
@@ -257,42 +242,55 @@ class PostingController extends Controller
     }
 
 	public function bulk_queue() {
+		$title = 'Bulk Queue';
 
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
+        
+        // check if subscription is active
+        if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
+			$message = 'Your account is inactive. Please update your payment to continue using the features.';
+			return view('bulk-queue', compact('message', 'title'));
+            // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
+        }
 
-		$title = 'Bulk Queue';
-		if ($checkRole->basic_bulk_uploader === 1) {
+		if ($checkRole->basic_bulk_uploader !== 1) {
 			// $userId = Auth::id(); //To check current user loggedin User ID dria
 			// $hasRegularTweetsInQueue = CommandModule::where('user_id', $userId)
 			// ->where('sched_method', 'add-queue')
 			// ->where('post_type', 'regular-tweets')
 			// ->exists();
 
-			return view('bulk-queue')->with('title', $title);
-		} else {
-
 			$modalContent = view('modals.upgrade')->render();
 			return view('bulk-queue', compact('modalContent', 'title'));
-			// Return a response indicating that the limitation has been reached
-			// return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
-		}
+		} 
+
+		return view('bulk-queue')->with('title', $title);
+
+		// Return a response indicating that the limitation has been reached
+		// return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
 	}
 
 	public function bulk_uploader()
     {
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
-
 		$title = 'Bulk Uploader';
 		$hasRegularTweetsInQueue = CommandModule::where('sched_method', 'add-queue')
 		->where('post_type', 'regular-tweets')
 		->exists();
 
-		if ($checkRole->basic_bulk_uploader === 1) {
-			return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
-		} else {
+		if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
+			$message = 'Your account is inactive. Please update your payment to continue using the features.';
+			return view('bulk-queue', compact('message', 'title'));
+            // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
+        }
+
+		if ($checkRole->basic_bulk_uploader !== 1) {
 			$modalContent = view('modals.upgrade')->render();
 			return view('bulk-queue', compact('modalContent', 'title'));
-		}
+		} 
+	
+		return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
+		
     }
 
 	public function editPost(Request $request, $id) {
