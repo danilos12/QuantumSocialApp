@@ -26,7 +26,7 @@ class MembershipHelper
         }
 
         $subscription = DB::table('users_meta')
-            ->join('plans', 'users_meta.subscription_id', 'plans.subscription_id')
+            ->join('plans', 'users_meta.subscription_id', 'plans.id')
             ->where('users_meta.user_id', $usersid)
             ->first();
         // dd($subscription);

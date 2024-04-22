@@ -10,12 +10,10 @@ $(document).ready(function() {
             const response = await fetch(APP_URL + "/twitter/" + TWITTER_ID + "/filter/tweets", {
                 method: 'GET',                         
             });
-            const responseData = await response.json();  
-
-            console.log(responseData.message);
+            const responseData = await response.json();              
             
             $(".profileSection").show();
-    
+            console.log(responseData);
             if (responseData.status === 200) {
 
                 $("#paginationToken").val(responseData.tweets.original.next_token);
@@ -31,7 +29,8 @@ $(document).ready(function() {
                     $(".profile-posts-inner").text('No tweets found');
                 }
             } else {
-                $(".profile-posts-inner").text(responseData.message);
+                $(".page-inner.profile-inner").css('display', 'none');
+                $(".profileSection").html(responseData.html)
             }
         } catch (error) {
             console.log("An error occurred while fetching the tweets: " + error);
