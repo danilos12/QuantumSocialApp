@@ -1,10 +1,12 @@
 <?php
   $layout = Auth::guard('web')->check() ? 'layouts.app' :
-          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : redirect()->route('memberhome'));
 ?>
 
-@if($layout)
+@if(is_string($layout))
     @extends($layout)
+@else
+    {{ $layout->send() }}
 @endif
 
 @section('content')

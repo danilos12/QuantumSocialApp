@@ -24,28 +24,10 @@ class dashboardController extends Controller
      * @return void
      */
     protected $defaultid;
+
     public function __construct()
     {
-        if (Auth::guard('web')->check()) {
-            $this->middleware('auth');
-
-        }
-        if(Auth::guard('member')->check()) {
-
-            $this->middleware('member-access');
-
-
-        }
-        if(!Session::has('user_id') || !Session::has('user_email')) {
-
-            $this->middleware('auth');
-
-
-        }
-
-
-
-
+            $this->middleware('unauthorized');
 
     }
 
