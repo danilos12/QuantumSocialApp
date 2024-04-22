@@ -483,7 +483,7 @@ $closeTwitterSettings = $(".close-twitter-settings");
 
 let currentModal = null;
 
-$('[data-id="modal"]').click(function (event) {
+$(document).on('click', '[data-id="modal"]',function (event) {
     $target = event.target.id;
     openModal($target);
     console.log($target, "id");

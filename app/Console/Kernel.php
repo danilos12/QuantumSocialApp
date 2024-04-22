@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('process:scheduled-posts')->everyMinute();
+        $schedule->command('subscription:update')->dailyAt('00:00');
         // $schedule->job(new SchedulePosts)->everyMinute();
     }
 

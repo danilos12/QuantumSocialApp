@@ -161,13 +161,8 @@
                             <span class="actual">{{ $countTrial }}</span>
                         </div>
                         <div class="b card-col-b">
-							@if( !empty($plan) )
-							    <span class="card-description1">out of {{ $plan->trial_counter }} </span>
-							@else
-								<span class="card-description1">Contact you administrator </span>
-							@endif
-
-                            <span class="card-description2">Trial </span>
+                            <span class="card-description1">days left in your</span>
+                            <span class="card-description2">Free Trial </span>
                         </div>
                     </div>
                 </div>
