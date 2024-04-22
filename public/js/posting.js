@@ -29,7 +29,12 @@ $(document).ready(function() {
                             : '?' ;
 
             const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method + param);
-            const responseData = await response.json();     
+            const responseData = await response.json();    
+            
+            // if (responseData.status === 500) {
+            //     $alert = `<div class="alert alert-warning" role="alert">${responseData.message}</div>`;
+            //     $('.content-inner').html($alert);
+            // }
 
             switch (method) {
                 case 'queue':          
