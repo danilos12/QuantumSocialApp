@@ -202,6 +202,8 @@
             });
             const responseData = await response.json();
 
+            console.log(responseData);
+
             if (responseData.status === 200) {
                 var template = tagGrptemplateItem(responseData.data);
                 // $(template).appendTo('#tag-groups-content');
@@ -209,7 +211,13 @@
 
                 alert(responseData.message);
                 location.reload();
-            } else {
+            } else if (responseData.status === 500) {    
+
+                toastr[responseData.stat](
+                    `Success! ${responseData.message}`
+                );
+                
+            }  else {
                 openUpgradeModal(responseData);
             }
 

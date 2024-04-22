@@ -2,7 +2,27 @@
  * Authors: Faith Hidalgo
  *
  */
-$(function ($) {
+// $(function ($) {
+$(document).ready(function () {
+
+    toastr.options = {
+        closeButton: false,
+        debug: false,
+        newestOnTop: true,
+        progressBar: false,
+        positionClass: "toast-top-center",
+        preventDuplicates: false,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "300",
+        timeOut: "5000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut",
+    };
+
     /** emoji */
     // $("#emojionearea").emojioneArea({
     //     // container: "#primary_post_text_area", // by selector
@@ -893,8 +913,6 @@ $(function ($) {
         formData["twitter_id"] = TWITTER_ID;
         formData["social_media"] = 'twitter'
 
-        console.log(formData);
-
         form.find('input[type="submit"]').prop("disabled", true);
         form.find('input[type="submit"]').val("Please wait..");
 
@@ -911,25 +929,39 @@ $(function ($) {
             });
 
             const responseData = await response.json();
-
+            
             if (responseData.status == 403) {
                 openUpgradeModal(responseData);
             } else if (responseData.status === 500) {
-                alert(responseData.message);
-                location.reload();
-            } else if (responseData.status === 200) {
-                alert(responseData.message);
-                console.log(responseData.tweet)
-                $getPostType = responseData.tweet.post_type        
-                
-                if ($getPostType.includes('regular')) {
-                    window.location.href = APP_URL + '/queue';
-                } else if ($getPostType.includes('evergreen')) {
-                    window.location.href = APP_URL + '/evergreen';
-                } else if ($getPostType.includes('promos')) {
-                    window.location.href = APP_URL + '/promo';
-                }
+                toastr[responseData.stat](
+                    `Warning! ${responseData.message}`
+                );
 
+                  // Wait for toastr to fade out and then reload the page
+                setTimeout(function() {
+                    location.reload();
+                }, 3000); // Adjust the time according to toastr fadeOut duration
+                
+            } else if (responseData.status === 200) {
+                toastr[responseData.stat](
+                    `Success! ${responseData.message}`
+                );
+                
+                
+
+                // Wait for toastr to fade out and then reload the page
+                setTimeout(function() {
+                    $getPostType = responseData.tweet.post_type        
+                
+                    if ($getPostType.includes('regular')) {
+                        window.location.href = APP_URL + '/queue';
+                    } else if ($getPostType.includes('evergreen')) {
+                        window.location.href = APP_URL + '/evergreen';
+                    } else if ($getPostType.includes('promos')) {
+                        window.location.href = APP_URL + '/promo';
+                    }
+                    // location.reload();
+                }, 3000); // Adjust the time according to toastr fadeOut duration
             } else {
                 // Handle the server response here
                 form.find('input[type="submit"]').val("Data Saved!");
@@ -976,6 +1008,7 @@ $(function ($) {
 
                 form.find('input[type="submit"]').val("Beam me up scotty!");
             }
+           
         } catch (error) {
             console.error("Error fetching data:", error);
         }
