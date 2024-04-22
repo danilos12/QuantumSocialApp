@@ -1,4 +1,12 @@
-@extends('layouts.app')
+<?php
+  $layout = Auth::guard('web')->check() ? 'layouts.app' :
+          (Auth::guard('member')->check() ? 'layouts.membersdashboard' : null);
+?>
+
+@if($layout)
+    @extends($layout)
+@endif
+
 
 @section('content')
 <div class="page-outer profile-outer">

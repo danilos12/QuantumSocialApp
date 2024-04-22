@@ -27,7 +27,7 @@ class MemberLoginController extends Controller
 
             Session::put('user_id', Auth::guard('member')->user()->id);
             Session::put('user_email', Auth::guard('member')->user()->email);
-            // Add more data to session as needed
+
 
             return redirect()->route('memberhome');
         }else {
