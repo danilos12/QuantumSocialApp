@@ -24,28 +24,10 @@ class dashboardController extends Controller
      * @return void
      */
     protected $defaultid;
+
     public function __construct()
     {
-        if (Auth::guard('web')->check()) {
-            $this->middleware('auth');
-
-        }
-        if(Auth::guard('member')->check()) {
-
-            $this->middleware('member-access');
-
-
-        }
-        if(!Session::has('user_id') || !Session::has('user_email')) {
-
-            $this->middleware('auth');
-
-
-        }
-
-
-
-
+            $this->middleware('unauthorized');
 
     }
 
@@ -71,8 +53,13 @@ class dashboardController extends Controller
 
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
 
+        if(Auth::guard('member')->check()){
+            $user = Members::find(Auth::guard('member')->user()->id);
 
-		$user = User::find($this->setDefaultId());
+        }else{
+            $user = User::find($this->setDefaultId());
+        }
+
 
 		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->count();
 		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
@@ -80,7 +67,7 @@ class dashboardController extends Controller
 		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
 		$countAdmin = Members::where('account_holder_id',$this->setDefaultId())->where('role', 'Admin')->count();
 		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
-        // dd($checkRole,$user);
+        // dd($user->email);
         return view('dashboard')->with([
 			'title' => $title,
 			'plan' => $checkRole,

@@ -96,4 +96,8 @@ class SuperAdminController extends Controller
         return view('su-admin.plans')->with(['title' => $title, 'getAll' => $getAll]);
     }	
 
+    public function phpInfo() {
+        dd(phpinfo());
+    }
+
 }
