@@ -14,6 +14,7 @@ use App\Models\Members;
 use App\Models\QuantumAcctMeta;
 use App\Models\Tag_groups;
 use App\Models\UT_AcctMngt;
+use Illuminate\Support\Facades\Session;
 
 class dashboardController extends Controller
 {
@@ -22,9 +23,40 @@ class dashboardController extends Controller
      *
      * @return void
      */
+    protected $defaultid;
     public function __construct()
     {
-        $this->middleware('auth');	
+        if (Auth::guard('web')->check()) {
+            $this->middleware('auth');
+
+        }
+        if(Auth::guard('member')->check()) {
+
+            $this->middleware('member-access');
+
+
+        }
+        if(!Session::has('user_id') || !Session::has('user_email')) {
+
+            $this->middleware('auth');
+
+
+        }
+
+
+
+
+
+    }
+
+    protected function setDefaultId()
+    {
+        if (Auth::guard('web')->check()) {
+            return $this->defaultid = Auth::id();
+        }
+        if (Auth::guard('member')->check()) {
+            return $this->defaultid = MembershipHelper::membercurrent();
+        }
     }
 
     /**
@@ -34,9 +66,9 @@ class dashboardController extends Controller
      */
     public function index()
     {
-		$title = 'Dashboard page';		
-		
-		
+		$title = 'Dashboard page';
+
+
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
     $user = User::find($checkRole->user_id);	
 

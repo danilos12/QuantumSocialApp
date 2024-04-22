@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 // use DateTime;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 
 
