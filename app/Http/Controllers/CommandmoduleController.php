@@ -75,7 +75,7 @@ class CommandmoduleController extends Controller
     public function create(Request $request) {
 
         $checkRole = MembershipHelper::tier($this->setDefaultId());
-        
+
         // check if subscription is active
         if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
             return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
@@ -86,11 +86,11 @@ class CommandmoduleController extends Controller
             ->whereMonth('created_at', now()->month)
             ->count();
 
-        if ($checkRole->mo_post_credits <= $postCount) {              
+        if ($checkRole->mo_post_credits <= $postCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
-        }         
-            
+        }
+
         try {
             $postData = $request->input('formData');
             $user_id = $this->setDefaultId();
@@ -158,12 +158,12 @@ class CommandmoduleController extends Controller
                         // Refactor this section to reduce duplication
                         $formatted24hrTime = date('H:i A', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
                         $localDatetime = Carbon::createFromFormat('d-m-Y h:i A', $postData['ct-time-date'] . ' ' . $formatted24hrTime);
-                        
+
                         // Convert the datetime to UTC timezone
                         $utcDatetime = $localDatetime->setTimezone('UTC');
-                        
+
                         // Format the UTC datetime as needed
-                        $sched_time = $utcDatetime->format('Y-m-d H:i:s');                                               
+                        $sched_time = $utcDatetime->format('Y-m-d H:i:s');
 
                         break;
 
@@ -212,7 +212,7 @@ class CommandmoduleController extends Controller
                 if ($postData['scheduling-options'] === 'send-now') {
                     if ($postData['post_type_tweets'] === "retweet-tweets") {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
-                        
+
                         if ($responses->getOriginalContent()['status'] === 500) {
                             return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                         } elseif ($responses->getOriginalContent()['status'] === 403) {
@@ -224,7 +224,7 @@ class CommandmoduleController extends Controller
                         }
                     }  else {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-                        
+
                         if ($responses->getOriginalContent()['status'] === 500) {
                             return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                         }  elseif ($responses->getOriginalContent()['status'] === 403) {
@@ -297,9 +297,9 @@ class CommandmoduleController extends Controller
         if ($checkRole->status !== 1 || $checkRole->trial_counter < 1) {
             return response()->json(['status' => 500,  'stat' => 'danger', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
-    
+
         $tagCount = DB::table('tag_groups_meta')->where('user_id', $this->setDefaultId())->count();
-    
+
         if ($checkRole->hashtag_group <= $tagCount ) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
@@ -321,13 +321,13 @@ class CommandmoduleController extends Controller
         } catch (Exception $e) {
             return response()->json(['status' => '400', 'message' => $e]);
         }
-       
+
     }
 
     public function addTagItem(Request $request) {
         try {
             $insert = Tag_items::create([
-                'user_id' => Auth::id(),
+                'user_id' => $this->setDefaultId(),
                 'twitter_id' => $request->input('twitter_id'),
                 'tag_meta_key' => $request->input('tag_id'),
                 'tag_meta_value' => $request->input('hashtag'),
@@ -343,7 +343,7 @@ class CommandmoduleController extends Controller
 
     }
 
-    public function getTagGroups($id) {        
+    public function getTagGroups($id) {
         try {
             $checkRole = MembershipHelper::tier($id);
             $tagGroupsPerX = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
@@ -351,7 +351,7 @@ class CommandmoduleController extends Controller
 
             if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
                 return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
-            }; 
+            };
 
             return response()->json(['tagGroups' => $tagGroups, 'status' => 200]);
         }  catch (Exception $e) {
@@ -362,17 +362,17 @@ class CommandmoduleController extends Controller
     public function getTagItems(Request $request) {
         try {
             $twitterId = $request->input('twitter_id');
-            $tagId = $request->input('tag_id');            
-            
+            $tagId = $request->input('tag_id');
+
             if ($request->input('copy')) {
                 // Fetch tag items from the database
-                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get(); 
-                
+                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get();
+
                 // Count the number of tag items
                 $tagItemCount = $tagItems->count();
-                
+
                 $tags = ''; // Initialize variable to store tag items
-                
+
                 // Check if there are any tag items before looping
                 if ($tagItemCount > 0) {
                     // Loop through each tag item and concatenate them into a string
@@ -386,16 +386,16 @@ class CommandmoduleController extends Controller
                     // No tag items found, handle accordingly
                     return response()->json(['message' => 'No tag items found.', 'status' => 402]);
                 }
-                
+
             } else {
-                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get(); 
+                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get();
                 return response()->json($tagItems);
             };
 
         } catch (Exception $e) {
             return response()->json(['status' => 500, 'message' => 'Error getting the tags']);
         }
-    }     
+    }
 
     public function getUnselectedTwitterAccounts() {
 
@@ -403,7 +403,7 @@ class CommandmoduleController extends Controller
                 ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                 ->select('twitter_accts.*', 'ut_acct_mngt.*')
                 ->where('ut_acct_mngt.selected', "=", 0) // selected
-                ->where('ut_acct_mngt.user_id', "=", Auth::id())
+                ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
                 ->where('twitter_accts.deleted', "=", 0)
                 ->get();
 
@@ -418,7 +418,7 @@ class CommandmoduleController extends Controller
             $getCustomSlot = DB::table('schedule')
                             ->join('days', 'days.day', '=', 'schedule.slot_day')
                             ->select('schedule.*', 'days.*')
-                            ->where('user_id', Auth::id())
+                            ->where('user_id', $this->setDefaultId())
                             ->where('schedule.post_type', $request->post_type)
                             ->orderBy('days.id', 'ASC')
                             ->get();
@@ -675,7 +675,7 @@ class CommandmoduleController extends Controller
             }
 
             //get time now
-            $utc = TwitterHelper::now(Auth::id());
+            $utc = TwitterHelper::now($this->setDefaultId());
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
 
             // Update the desired fields with the request data
@@ -705,7 +705,7 @@ class CommandmoduleController extends Controller
 
             $nearestPost = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])
                 ->where('twitter_id', $request->twitter_id)
-                ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
+                ->where('sched_time', '>', TwitterHelper::now($this->setDefaultId()))
                 ->orderBy('sched_time', 'ASC')
                 ->first();
 
@@ -744,7 +744,7 @@ class CommandmoduleController extends Controller
 
         $data = json_encode($data);
 
-        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );    
+        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );
 
         if ($sendTweetNow) {
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted']);
@@ -787,24 +787,24 @@ class CommandmoduleController extends Controller
     }
 
     public function upload(Request $request) {
-    
+
         if ($request->hasFile('csv_file')) {
 
             $validator = Validator::make($request->all(), [
                 'csv_file' => 'required|mimes:csv,txt|max:10240', // Adjust max file size as needed
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator);
             }
-    
+
             $path = $request->file('csv_file')->getRealPath();
             $csvData = file_get_contents($path);
             $lines = explode("\n", $csvData);
             $header = str_getcsv(array_shift($lines)); // Extract header
             $errorRows = [];
-            $error= [];           
-    
+            $error= [];
+
             foreach ($lines as $index => $line) {
                 $values = str_getcsv($line);
                 if (count($values) !== count($header)) {
@@ -812,7 +812,7 @@ class CommandmoduleController extends Controller
                     $errorRows[] = $index + 1; // Record the row number with missing values
                     continue;
                 }
-    
+
                 $record = array_combine($header, $values); // Combine header and data
                 // dd($header, $values, $record);
                 $validator = Validator::make($record, [
@@ -848,9 +848,9 @@ class CommandmoduleController extends Controller
                             }
                         },
                     ],
-                    
+
                 ]);
-    
+
                 if ($validator->fails()) {
                     // Handle validation errors for each row
                     // For example, log errors or store them in an array to display later
@@ -858,20 +858,20 @@ class CommandmoduleController extends Controller
                     $error[$index + 1] = $validator->errors()->all();
                 }
             }
-    
-            
+
+
             if (!empty($error)) {
                 return response()->json(['status' => 402, 'errors' => $error]);
             } else {
-                
+
                 $file = $request->file('csv_file');
-                $csvData = $this->parse($file);                
+                $csvData = $this->parse($file);
 
                 foreach ($csvData as $key => $data) {
                    // Validation passed, save the data to the database
                     $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
                     $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
-            
+
                     $insertData = Bulk_post::create([
                         'user_id' => Auth::id(),
                         'twitter_id' => $request->input('twitter_id'),
@@ -882,7 +882,7 @@ class CommandmoduleController extends Controller
                         'link_url' => $data['link_url'],
                         'image_url' => $data['image_url'],
                     ]);
-            
+
                     // Create Bulk_meta record if it doesn't exist
                     if ($insertData['link_url'] !== '') {
                         $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
@@ -895,14 +895,14 @@ class CommandmoduleController extends Controller
                                 'link_url' => $data['link_url'],
                             ];
                             Bulk_meta::create($metaData);
-                        }                        
-                    }   
-                    
+                        }
+                    }
+
                 }
-                
+
                 return response()->json(['status' => 200, 'message' =>'Bulk posts and meta details are saved successfully.']);
             }
-               
+
         } else {
             return  response()->json(['status' => 500, 'message' => 'No CSV file found']);
         }

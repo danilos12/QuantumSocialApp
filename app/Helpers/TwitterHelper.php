@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 
 class TwitterHelper
 {
+
     protected function setDefaultId()
     {
         if (Auth::guard('web')->check()) {
@@ -23,6 +24,7 @@ class TwitterHelper
             return $this->defaultid = MembershipHelper::membercurrent();
         }
     }
+
     public static function refreshAccessToken($refreshToken)
     {
         $curl = curl_init();
@@ -124,6 +126,7 @@ class TwitterHelper
 
     public static function executeAfterFiveHoursFromLastUpdate($lastUpdated)
     {
+
         // Convert the last update time to a Carbon object
         $lastUpdated = Carbon::parse($lastUpdated);
 
@@ -157,6 +160,7 @@ class TwitterHelper
 
     public static function getActiveAPI($id) {
         $defaultId = (new self())->setDefaultId();
+
         $activeAPI = MasterTwitterApiCredentials::where('user_id', $defaultId)->first();
         return $activeAPI;
     }
