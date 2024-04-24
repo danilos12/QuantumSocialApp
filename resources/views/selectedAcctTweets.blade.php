@@ -49,6 +49,10 @@
         <div class="profile-posts-inner" id="primaryPostTemplate">   
 
         </div>  <!-- END .profile-posts-inner -->
+
+        <!-- Your HTML template -->
+
+        <input type="hidden" id="paginationToken" value="{{ isset($initialPaginationToken) ? $initialPaginationToken : '' }}">
     </div>
 
 </div>  <!-- END .pr-->
