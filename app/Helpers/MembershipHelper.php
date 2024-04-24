@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\DB;
 class MembershipHelper
 {
     public static function tier($id) {
-     
+
         $subscription = DB::table('users_meta')
             ->join('plans', 'users_meta.subscription_id', 'plans.id')
             ->where('users_meta.user_id', $id)
             ->first();
-     
+        // dd($subscription);
         return $subscription;
 
     }
@@ -52,7 +52,7 @@ class MembershipHelper
 
         return $acctemail;
     }
-    
+
     // wp api connection
     public static function apiGetCurl($url) {
         $curl = curl_init();
@@ -71,7 +71,7 @@ class MembershipHelper
         $response = curl_exec($curl);
 
         curl_close($curl);
-                
+
         return json_decode($response);
     }
 

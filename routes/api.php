@@ -60,7 +60,7 @@ Route::get('update-wp', function () {
 
         $laravelid = DB::table('users_meta')
             ->where('user_id', $compareid)
-            ->value('wp_subscription_id');
+            ->value('wp_user_id');
         $laraveliddecryption = substr($laravelid, 27, -13);
         $lrv_originalid = $laraveliddecryption  - 215;
 
@@ -69,12 +69,12 @@ Route::get('update-wp', function () {
 			// Auth::login($user);
 			$user = User::find($compareid);
 						return redirect()->route('dashboard',['user_id'=>$user->id]);
-             
-        
+
+
         }
     }
-	 	
- 
+
+
 });
 
 
