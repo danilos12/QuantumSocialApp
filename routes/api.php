@@ -162,7 +162,7 @@ Route::get('wp', function () {
 					DB::table('users_meta')->insert([
 						'user_id' => $user->id,
 						'subscription_id' => $value,
-						'wp_user_id'=>base64_decode($r['wp_user_id']),
+						'wp_user_id' => base64_decode($r['wp_user_id']),
 						'trial_counter'=>$days_diff,
 						'next_payment'=>$wp_data['info']['next_payment'],
 						'status'=>$status,

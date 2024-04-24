@@ -305,7 +305,7 @@ class TwitterApi extends Controller
                         $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
                         $request = $this->curlGetHttpRequest($url, $headers, $data);
                             
-                        if (!empty($request->data)) {
+                        if (isset($request->data)) {
                             // get images of the tweet
                             $filteredData['data'] = $request->data;
     
@@ -327,12 +327,19 @@ class TwitterApi extends Controller
                             }
 
                             $filteredData['original'] = $request->meta;
-                        }
+                            $filteredData['status'] = 200;
+                        } else {
+                             // Error response
+                            $filteredData['data'] = "Error: Failed to retrieve data.";
+                            $filteredData['status'] = 500; // Internal Server Error
+                        }             
                     break;                               
                         
                 }
 
-                if ($filteredData !== null) {
+                // dd($filteredData);
+
+                if ($filteredData['status'] === 200) {
                     // Cache the fetched tweets
                     Cache::put('tweets_' . $twitterId, $filteredData, now()->addMinutes(30));
 
@@ -343,9 +350,11 @@ class TwitterApi extends Controller
                         'message' => 'Tweets retrieved from Twitter API',
                     ]);
                 } else {
+                    $bladeContent = view('profile_free_tier')->render();
                     return response()->json([
-                        'status' => 201,
+                        'status' => 500,
                         'message' => 'Tweets not found',
+                        'html' =>  $bladeContent // Replace 'your-blade-template' with the name of your Blade template file
                     ]);
                 }
                              
@@ -627,7 +636,12 @@ class TwitterApi extends Controller
         if ($info['http_code'] == 200) {
             $data = json_decode($response);
             return $data;
-        } else {
+        } elseif ($info['http_code'] == 403) {
+            $data = json_decode($response);
+            return $data;
+        }
+        
+        else {
             return curl_error($curl);
         }
 

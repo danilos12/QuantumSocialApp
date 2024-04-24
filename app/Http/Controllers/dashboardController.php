@@ -52,30 +52,35 @@ class dashboardController extends Controller
 
 
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
+    $user = User::find($checkRole->user_id);	
 
-        if(Auth::guard('member')->check()){
-            $user = Members::find(Auth::guard('member')->user()->id);
+    // check if subscription is active
+    // if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
+		// 	$message = 'Your account is inactive. Please update your payment to continue using the features.';
+		// 	return view('dashboard', compact('message', 'title', 'user', 'countPosts', 'countXaccts', 'countHashtagGroups', 'countAdmin', 'countTeamMembers', 'countTrial'));
+    //         // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
+    // }
 
-        }else{
-            $user = User::find($this->setDefaultId());
-        }
-
-
-		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->count();
-		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
+		
+		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->whereMonth('created_at', now()->month)->count();
+		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();		
 		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
-		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
-		$countAdmin = Members::where('account_holder_id',$this->setDefaultId())->where('role', 'Admin')->count();
+		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();	
+		$countAdmin = DB::table('users')
+            ->join('members', 'members.account_holder_id', '=', 'users.id')
+            ->where('members.account_holder_id', $this->setDefaultId())
+            ->count();         
+            
 		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
-        // dd($user->email);
-        return view('dashboard')->with([
-			'title' => $title,
-			'plan' => $checkRole,
-			'user' => $user,
-			'countPosts' => $countPosts,
-			'countXaccts' => $countXaccts,
-			'countHashtagGroups' => $countHashtagGroups,
-			'countAdmin' => $countAdmin,
+		
+    return view('dashboard')->with([
+			'title' => $title, 
+			'plan' => $checkRole ?? '', 
+			'user' => $user, 
+			'countPosts' => $countPosts, 
+			'countXaccts' => $countXaccts, 
+			'countHashtagGroups' => $countHashtagGroups, 
+			'countAdmin' => ($countAdmin === 0) ? 1 : $countAdmin + 1,
 			'countTeamMembers' => $countTeamMembers,
 			'countTrial' => $countTrial->trial_counter
 		]);
@@ -83,7 +88,7 @@ class dashboardController extends Controller
 
     public function help()
     {
-		$title = 'Help page';
+      $title = 'Help page';
         return view('help')->with('title', $title);
     }
 
