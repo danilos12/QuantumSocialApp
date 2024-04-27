@@ -18,7 +18,7 @@ use App\Models\QuantumAcctMeta;
 use App\Models\TwitterSettings;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Cache;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -41,21 +41,6 @@ class AppServiceProvider extends ServiceProvider
 
         // share to all views
         View::composer('*', function ($view) {
-            $usersMeta = QuantumAcctMeta::where('user_id', auth()->id())->first();
-
-            if ($usersMeta) {
-                $api = MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $usersMeta->wp_user_id);
-
-                if ($api->n === 'valid') {
-                    $now = strtotime(date("Y/m/d"));
-					$your_date = strtotime($api->info->trial_date);
-					$datediff = $your_date - $now;
-					$days_diff = floor($datediff / (60 * 60 * 24));
-                    QuantumAcctMeta::where('user_id', auth()->id())->update([
-                        'trial_counter' => $days_diff
-                    ]);
-                }
-            }
 
             // update columns in users meta
 

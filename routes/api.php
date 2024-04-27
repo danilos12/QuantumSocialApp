@@ -2,15 +2,20 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Auth\RegisterController;
+
+
+
 use App\Models\User;
 use App\Models\GeneralSettings;
 use App\Models\QuantumAcctMeta;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 // use DateTime;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 
 /*
@@ -46,36 +51,14 @@ Route::get('update-wp', function () {
 
 
 
-	Route::get('dsboard', function () {
-    $r = $_REQUEST;
-    if(isset( $r['sss'] ) ) {
-        $decoded = base64_decode($r['sss']);
-        $decoded_email = base64_decode($r['kslae']);
-        $decryption = substr($decoded, 27, -13);
-        $wp_originalid = $decryption  - 215;
+Route::get('dsboard', function (Request $request) {
+			if(Auth::check()){
+				return redirect()->route('dashboard');
 
-        $compareid = DB::table('users')
-            ->where('email', $decoded_email)
-            ->value('id');
+			}
 
-        $laravelid = DB::table('users_meta')
-            ->where('user_id', $compareid)
-            ->value('wp_user_id');
-        $laraveliddecryption = substr($laravelid, 27, -13);
-        $lrv_originalid = $laraveliddecryption  - 215;
+})->middleware('unauthorized');
 
-        if ($lrv_originalid == $wp_originalid) {
-			// $user = \App\Models\User::find($compareid);
-			// Auth::login($user);
-			$user = User::find($compareid);
-						return redirect()->route('dashboard',['user_id'=>$user->id]);
-
-
-        }
-    }
-
-
-});
 
 
     // trial counter trial_date - now()
@@ -206,10 +189,9 @@ Route::get('wp', function () {
 
 });
 
-Route::post('auth/register', RegisterController::class); // Define route using RegisterController method
 
 
-Route::get('scrape/', [RegisterController::class, 'scrapeMetaTags']);
+
 
 
 function decryptData($data, $key) {
