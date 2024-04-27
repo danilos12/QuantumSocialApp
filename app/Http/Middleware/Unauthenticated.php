@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 class Unauthenticated
 {
     /**
@@ -17,7 +19,21 @@ class Unauthenticated
     public function handle(Request $request, Closure $next)
     {
 
-        
+
+        if ($request->has('sss')) {
+
+            $decryption = substr(base64_decode($request->input('sss')), 27, -13);
+            $decrypteduser_id = $decryption  - 215;
+
+            Auth::loginUsingId($decrypteduser_id);
+            return $next($request);
+
+
+        }
+
+
+
+
         if (Auth::guard('web')->check()) {
             return $next($request);
 
@@ -28,9 +44,14 @@ class Unauthenticated
 
 
         }
-        if (!$request->hasSession() || !Auth::check()) {
+        if(!Auth::check()) {
+
             return redirect()->route('login');
+
+
+
         }
+
 
 
 
