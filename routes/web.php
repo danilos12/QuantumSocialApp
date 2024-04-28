@@ -29,6 +29,8 @@ Route::get('/login/member', function () {
     // Redirect authenticated users to member home
     if(Auth::guard('member')->check()) {
         return redirect()->route('memberhome');
+    }elseif(Auth::guard('web')->check()) {
+        return redirect()->route('dashboard');
     }
     return view('auth.memberlogin');
 })->name('tomemberauth');
@@ -223,7 +225,7 @@ Route::middleware(['web','guest','session_expired'])
     Route::middleware('member-access')->group(function(){
 
         Route::get('/member/home',function()
-        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome')->withoutMiddleware(['session_expired']);;
+        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome');
         Route::get('/member/promo',function(){
 
             return view('promo-tweets')->with('title','Promo');});

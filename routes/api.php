@@ -76,7 +76,7 @@ Route::get('wp', function () {
 	if(isset( $r['wp_user_id'] ) ) {
 
 
-		$response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
+		$response = Http::get('http://quantumsocial.local/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
 		$wp_data = $response->json();
 
 
