@@ -43,8 +43,29 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
 
             // update columns in users meta
-
+            
+            
             if (Auth::guard('web')->check()) {
+    
+                $checkRole = MembershipHelper::tier(auth()->id());                	
+                // check if subscription is not active
+                if ($checkRole->status === 0 && $checkRole->trial_counter < 1) {		
+                    $message = 'Your account is inactive. Please update your payment to continue using the features.';
+                    $view->with('message', $message);
+                }
+    
+                // upgrade modal content
+                $plans = DB::table('feature_content')                
+                    ->get();
+                    
+                $organizedPlans = [];
+                foreach ($plans as $plan) {
+                    $organizedPlans[$plan->subscription_id][] = $plan;
+                }              
+    
+                $view->with('plans', $organizedPlans);
+
+                $view->with('product_id', $checkRole->subscription_id);
 
                 // to show no tweets found if 0 in general settings
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
@@ -198,13 +219,7 @@ class AppServiceProvider extends ServiceProvider
                     ->where('post_type', 'regular-tweets')
                     ->exists();
 
-                $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);
-
-                $checkRole = MembershipHelper::tier(Auth::id());
-
-                //$view->with('product_id', $checkRole->subscription_id);
-				$view->with('product_id', 0);
-
+                $view->with('hasRegularTweetsInQueue', $hasRegularTweetsInQueue);        
 
                 $hasCustomSlot = DB::table('schedule')
                     ->where('user_id', Auth::id())

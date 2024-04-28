@@ -315,13 +315,28 @@ class CommandmoduleController extends Controller
 
             if ($insert) {
                 // Return success response
-                return response()->json(['status' => 200, 'data' => $insert, 'message' => 'Tag group added successfully']);
+                return response()->json(['status' => 200,  'stat' => 'danger', 'data' => $insert, 'message' => 'Tag group added successfully']);
             }
 
         } catch (Exception $e) {
             return response()->json(['status' => '400', 'message' => $e]);
         }
 
+    }
+
+    public function removeTagGroup(Request $request)
+    {        
+        $tagGroupId = $request->input('tag_group_id');
+
+        $tagGroup = Tag_groups::find($tagGroupId);
+
+        if (!$tagGroup) {
+            return response()->json([ 'stat' => 'warning', 'message' => 'Tag group not found'], 404);
+        }
+
+        $tagGroup->delete();
+
+        return response()->json([ 'stat' => 'warning', 'message' => 'Tag group removed successfully'], 200);    
     }
 
     public function addTagItem(Request $request) {
@@ -344,23 +359,27 @@ class CommandmoduleController extends Controller
     }
 
     public function getTagGroups($id) {
+        $checkRole = MembershipHelper::tier($this->setDefaultId()); 
+
+        $tagGroups = Tag_groups::where('user_id', $this->setDefaultId())->get();
+        $tagGroupsPerX = Tag_groups::where(['user_id' => $this->setDefaultId(), 'twitter_id' => $id])->get();
+        // dd($checkRole->hashtag_group,                   
+        
+        
+        // 2 < 2 && 1 < 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        $tagGroups, $tagGroupsPerX);
+        if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
+            return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
+        };
+
         try {
-            $checkRole = MembershipHelper::tier($id);
-            $tagGroupsPerX = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
-            $tagGroups = Tag_groups::where('user_id', Auth::id())->get();
-
-            if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
-                return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
-            };
-
-            return response()->json(['tagGroups' => $tagGroups, 'status' => 200]);
+            return response()->json(['tagGroups' => $tagGroupsPerX, 'status' => 200]);
         }  catch (Exception $e) {
-            return response()->json(['status' => '400', 'message' => $e]);
+            return response()->json(['status' => 400, 'message' => $e]);
         }
     }
 
     public function getTagItems(Request $request) {
-        try {
+        try {            
             $twitterId = $request->input('twitter_id');
             $tagId = $request->input('tag_id');
 
@@ -381,10 +400,10 @@ class CommandmoduleController extends Controller
                     }
 
                     // Return response with tag items
-                    return response()->json(['tags' => $tags, 'message' => 'Tags are copy to your clipboard.', 'status' => 200]);
+                    return response()->json(['stat' => 'success', 'tags' => $tags, 'message' => 'Tags are copied to your clipboard.', 'status' => 200]);
                 } else {
                     // No tag items found, handle accordingly
-                    return response()->json(['message' => 'No tag items found.', 'status' => 402]);
+                    return response()->json(['stat' => 'warning', 'message' => 'No tag items found.', 'status' => 402]);
                 }
 
             } else {
