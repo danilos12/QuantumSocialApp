@@ -53,15 +53,7 @@ class dashboardController extends Controller
 
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
     $user = User::find($checkRole->user_id);	
-
-    // check if subscription is active
-    // if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
-		// 	$message = 'Your account is inactive. Please update your payment to continue using the features.';
-		// 	return view('dashboard', compact('message', 'title', 'user', 'countPosts', 'countXaccts', 'countHashtagGroups', 'countAdmin', 'countTeamMembers', 'countTrial'));
-    //         // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
-    // }
-
-		
+  		
 		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->whereMonth('created_at', now()->month)->count();
 		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();		
 		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
@@ -90,6 +82,12 @@ class dashboardController extends Controller
     {
       $title = 'Help page';
         return view('help')->with('title', $title);
+    }
+    
+    public function privacyPolicy()
+    {
+      $title = 'Privacy Policy';
+        return view('privacy')->with('title', $title);
     }
 
 }
