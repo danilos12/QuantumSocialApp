@@ -215,9 +215,13 @@
                 var template = tagGrptemplateItem(responseData.data);
                 // $(template).appendTo('#tag-groups-content');
                 $('#tag-groups-content').append(template);
+                toastr[responseData.stat](
+                    `Success! ${responseData.message}`
+                );
 
-                alert(responseData.message);
-                location.reload();
+                setTimeout(function() {
+                    location.reload();
+                    }, 3000); 
             } else if (responseData.status === 500) {    
 
                 toastr[responseData.stat](
@@ -251,23 +255,46 @@
             });
             const responseData = await response.json();
 
-            if (responseData.length > 0) {
-                $.each(responseData, function (index, k, value) {
-                    $(".tag-groups-right-column")
-                        .removeClass("section-hide")
-                        .find("input")
-                        .attr("data-id", tag_id);
-                    var template = addNewTagTemplateItem(
-                        this
-                    );
-                    $(".tag-container").append(template);
-                });
-            } else {
-                $(".tag-groups-right-column")
-                    .removeClass("section-hide")
-                    .find("input")
-                    .attr("data-id", tag_id);
-            }
+            
+            
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
+
+            setTimeout(function() {
+                location.reload();
+                }, 3000); 
+
+           
+        } catch (err) {
+            console.error(err)
+        }
+    })
+
+    // remove tagItem
+    $(document).on('click', '[data-id="remove-tag-item"]', async function(e) {
+        const tag_group_id = e.target.id;       
+
+        try {
+            const response = await fetch(APP_URL + "/cmd/remove-tag-item", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                body: JSON.stringify({ // Convert the data to JSON string
+                    tag_group_id, 
+                    twitter_id: TWITTER_ID 
+                })
+            });
+            const responseData = await response.json();
+            $('.tag-container').find(`img#${responseData.item_removed}`).closest('span').remove()
+                    
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
+
+            
         } catch (err) {
             console.error(err)
         }
@@ -286,14 +313,16 @@
                                 </div> 
                             </div>
                             <div class="remove" style="cursor: pointer">
-                                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" id="removeTag-${data.id}" data-id="remove-tag">
+                                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" tooltip="" id="removeTag-${data.id}" data-id="remove-tag" title="Delete">
                             </div> 
                             </div>
                             `;                
     }
 
     function addNewTagTemplateItem(hashtag) {
-        return $template = `<span class="existing-tag"><i class="xtag">X</i>${hashtag.tag_meta_value}</span>`        
+        return $template = `<span class="existing-tag"><i class="xtag">
+            <img src="${APP_URL}/public/ui-images/icons/pg-close.svg" class="ui-icon" data-id="remove-tag-item" id="${hashtag.tag_meta_value}">
+        </i>${hashtag.tag_meta_value}</span>`        
     }
 });
 
