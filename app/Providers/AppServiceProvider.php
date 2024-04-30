@@ -147,11 +147,7 @@ class AppServiceProvider extends ServiceProvider
                         ->select('*')
                         ->where('users.id', Auth::id())
                         ->first();
-                $view->with('twitterApiIndiv', $twitterApiIndiv);
-
-                // membership
-                $membership = DB::table('users_meta')->where('user_id', Auth::id())->first();
-                $view->with('membership', $membership);
+                $view->with('twitterApiIndiv', $twitterApiIndiv);               
 
                 $toggle = DB::table('users_meta')->where('user_id', Auth::id())->first();
 
