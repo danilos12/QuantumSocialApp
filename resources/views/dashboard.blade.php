@@ -57,7 +57,7 @@
                                     </svg>         --}}
                                     <span class="actual">{{ $countPosts}}</span>
 									@if( $plan )
-                                    <span class="total">out of {{ $plan->mo_post_credits }} </span>
+                                    <span class="total">out of {{ $plan->mo_post_credits === 0 ? 'Unlimited' : $plan->mo_post_credits }} </span>
 									@else
 									 <span class="total">Contact you administrator </span>
 									@endif
@@ -70,7 +70,7 @@
                                 <div class="a">
                                     <span class="actual">{{ $countHashtagGroups }}</span>
 									@if( !empty($plan) )
-                                    <span class="total">out of {{ $plan->hashtag_group }}
+                                    <span class="total">out of {{ $plan->hashtag_group === 0 ? 'Unlimited' : $plan->hashtag_group }}
 									@else
 									 <span class="total">Contact you administrator </span>
 									@endif
