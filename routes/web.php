@@ -69,6 +69,7 @@ Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordControlle
 
 // dashboard controller
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
+Route::get('/privacy-policy', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
 Route::get('/', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 // Route::get('/testing',function(){return view('testpage');})->name('memberbanner')->name('testpage')->middleware('auth');
@@ -103,6 +104,7 @@ Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, '
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
 Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+// Route::delete('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::get('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // retrieve modal
 Route::put('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // update data in modal
 Route::post('/post/duplicate/{id}',[App\Http\Controllers\PostingController::class, 'duplicatePost'])->name('post.duplicate');
@@ -172,7 +174,9 @@ Route::post('/settings/members/_adminaccess', [App\Http\Controllers\GeneralSetti
 Route::get('/command-module', [App\Http\Controllers\CommandmoduleController::class, 'index'])->name('command-module');
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
+Route::delete('/cmd/remove-tag', [App\Http\Controllers\CommandmoduleController::class, 'removeTagGroup'])->name('cmd.remove_tag');
 Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
+Route::delete('/cmd/remove-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'removeTagItem'])->name('cmd.remove_tag_item');
 Route::post('/cmd/post/tweet-now',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
 Route::post('/cmd/post/move-to-top',[App\Http\Controllers\CommandmoduleController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
