@@ -153,7 +153,7 @@ $(document).ready(function () {
 
             setTimeout(function() {
             location.reload();
-            }, 3000); 
+            }, 3000);
         } catch(err) {
             console.log('Error fetching the data' + err)
         }
@@ -485,10 +485,11 @@ $(document).ready(function () {
         if(selectedRole == 'Member'){
             if(isChecked){
                 $('#toggle_api').prop('checked', false);
-                toastr['warning']('Warning! Memberssssss12 are not allowed to access API, only Admin role');
-            }
+                toastr['warning']('Warning! Members are not allowed to access API, only Admin role');
+            }else{
 
-        }else{
+
+
 
         try {
             const response = await fetch(APP_URL + "/settings/_add_new", {
@@ -499,7 +500,7 @@ $(document).ready(function () {
                         "content"
                     ),
                 },
-                body: JSON.stringify(data), // Convert the object to JSON string
+                body: JSON.stringify(data),
             });
             const responseData = await response.json();
 
@@ -519,7 +520,44 @@ $(document).ready(function () {
                 }
             }
 
-            // Reload after 5 seconds (adjust the delay as needed)
+
+        } catch (err) {
+            console.log("Error fetching the data" + err);
+        }
+    }
+    }
+
+    if(selectedRole == 'Admin'){
+        try {
+            const response = await fetch(APP_URL + "/settings/_add_new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                body: JSON.stringify(data),
+            });
+            const responseData = await response.json();
+
+            if (responseData) {
+                if (responseData.stat == "success") {
+                    toastr[responseData.stat](
+                        `Success, ${responseData.message}`
+                    );
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                } else if (responseData.stat == "warning") {
+                    toastr[responseData.stat](
+                        `Warning! ${responseData.message}`
+                    );
+                    openUpgradeModal(responseData);
+                }
+            }
+
+
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
@@ -536,6 +574,13 @@ $(document).ready(function () {
             roles: selectedRole,
             api_access: isChecked,
         };
+        if(selectedRole == 'Member'){
+            if(isChecked){
+                $('#toggle_api').prop('checked', false);
+                toastr['warning']('Warning! Members are not allowed to access API, only Admin role');
+            }else{
+
+
 
         try {
             const response = await fetch(APP_URL + "/settings/members/_edit", {
@@ -568,6 +613,42 @@ $(document).ready(function () {
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
+    }}
+    if(selectedRole == 'Admin'){
+
+        try {
+            const response = await fetch(APP_URL + "/settings/members/_edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                body: JSON.stringify(data), // Convert the object to JSON string
+            });
+            const responseData = await response.json();
+
+            if (responseData.stat == "success") {
+                toastr[responseData.stat](
+                    `${responseData.status_m}, ${responseData.message}`
+                );
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            } else if (responseData.stat == "warning") {
+                toastr[responseData.stat](
+                    `${responseData.status_m}, ${responseData.message}`
+                );
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            }
+        } catch (err) {
+            console.log("Error fetching the data" + err);
+        }
+
+    }
     });
 
     // edit
