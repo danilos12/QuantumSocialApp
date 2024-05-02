@@ -209,7 +209,11 @@
         margin-left: 1rem;
     }
 </style>
+@php
+use App\Http\Controllers\EncryptionDecryption;
 
+
+@endphp
 <div class="modal-large-anchor-upgrade">
     <div class="modal-large-backdrop-upgrade">
         <div class="modal-large-outer-upgrade  upgrade-page-outer frosted">
@@ -230,9 +234,9 @@
                 @endif
 
 
-                <div class="card-container">                    
-                    @foreach ($plans as $subscriptionId => $features) 
-                    
+                <div class="card-container">
+                    @foreach ($plans as $subscriptionId => $features)
+
                     <div class="card">
                         @php
                             $product_name = '';
@@ -253,7 +257,7 @@
                          <div class="card-features flex justify-center">
                             @foreach ($features as $f)
                                 @if (strpos($f->meta_key, 'feature_') === 0)
-                                    <div class="feature-item">                                        
+                                    <div class="feature-item">
                                         <div class="">
                                             <div class="flex items-center ">
                                                 <div class="w-8">
@@ -262,19 +266,50 @@
                                                 <div class="flex justify-center">
                                                     <span class="ml-4 text-center">{{ $f->meta_value }}</span>
                                                 </div>
-                                            </div>   
-                                        </div>                                                                       
+                                            </div>
+                                        </div>
                                     </div>
                                 @endif
                             @endforeach
                         </div>
-                       
+
                         @if (Auth::guard('web')->check())
-                            <input type="button" class="card-cta" value="{{ ($product_id === $feature->subscription_id) ? "Your Plan" : "Upgrade Now" }}" data-product-id="61" {{ ($product_id === $feature->subscription_id) ? 'disabled' : "" }} >
+                            @php
+                                $encrypted = EncryptionDecryption::encrypt((string)Auth::id());
+                                $value = null;
+                                $pr_name = '';
+                                switch ($feature->subscription_id) {
+                                    case 1:
+                                        $value=59;
+                                        $pr_name = 'solar';
+                                        break;
+                                    case 2:
+                                        $value=61;
+                                        $pr_name = 'galactic';
+                                        break;
+                                    case 3:
+                                        $value = 66;
+                                        $pr_name = 'astral';
+                                        break;
+
+
+                                }
+                                $encryptedproduct =EncryptionDecryption::encrypt($value);
+                                $encryptprname =EncryptionDecryption::encrypt($pr_name);
+                            @endphp
+                        <form action="http://quantumsocial.local/checkout" method="post">
+                            @csrf
+                            <input type="hidden" name="prdt" value={{ $encryptedproduct }}>
+                            <input type="hidden" name="klase" value={{ $encryptprname }}>
+                            <input type="hidden" name="awsg" value={{$encrypted}}>
+                            <!-- Other form fields -->
+                            <input type="submit" class="card-cta" value="{{ ($product_id === $feature->subscription_id) ? "Your Plan" : "Upgrade Now" }}" {{ ($product_id === $feature->subscription_id) ? 'disabled' : "" }} >
+                          </form>
+
                         @endif
                     </div>
                     @endforeach
-                   
+
                 </div>
             </div>
         </div>  <!-- END .twitter-settings-outer -->
@@ -284,12 +319,7 @@
 <script>
     $(document).ready(function(e) {
         // $('upgrade-outer-page').closest('.modal-large-outer').attr('style', '')
-        $('.card-cta').on('click', function(e) {
-            const prod_id = e.target.dataset.productId;
-            console.log(prod_id);
 
-            window.location.href = "https://quantumsocial.io/wp-json/plan/login/subscription";
-        })
 
         $('.close-upgrade-page').on('click', function(e) {
             // Sub Menu

@@ -52,26 +52,23 @@ class dashboardController extends Controller
 
 
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
-    $user = User::find($checkRole->user_id);	
-  		
+    $user = User::find($checkRole->user_id);
+
 		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->whereMonth('created_at', now()->month)->count();
-		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();		
+		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
 		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
-		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();	
-		$countAdmin = DB::table('users')
-            ->join('members', 'members.account_holder_id', '=', 'users.id')
-            ->where('members.account_holder_id', $this->setDefaultId())
-            ->count();         
-            
+		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
+		$countAdmin = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Admin')->count();
+
 		$countTrial = QuantumAcctMeta::where('user_id', $this->setDefaultId())->first();
-		
+
     return view('dashboard')->with([
-			'title' => $title, 
-			'plan' => $checkRole ?? '', 
-			'user' => $user, 
-			'countPosts' => $countPosts, 
-			'countXaccts' => $countXaccts, 
-			'countHashtagGroups' => $countHashtagGroups, 
+			'title' => $title,
+			'plan' => $checkRole ?? '',
+			'user' => $user,
+			'countPosts' => $countPosts,
+			'countXaccts' => $countXaccts,
+			'countHashtagGroups' => $countHashtagGroups,
 			'countAdmin' => ($countAdmin === 0) ? 1 : $countAdmin + 1,
 			'countTeamMembers' => $countTeamMembers,
 			'countTrial' => $countTrial->trial_counter
@@ -83,7 +80,7 @@ class dashboardController extends Controller
       $title = 'Help page';
         return view('help')->with('title', $title);
     }
-    
+
     public function privacyPolicy()
     {
       $title = 'Privacy Policy';

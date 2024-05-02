@@ -59,6 +59,7 @@
   @endif
 </head>
 <body class="{{ Route::has('login') ? 'darkmode' : '' }}">
+ 
   <canvas></canvas>
   <div class="interface-outer">
     <div class="interface-inner">
@@ -209,7 +210,7 @@
             <div class="alert alert-warning" role="alert">
               {{ $message }}
             </div>
-            @else 
+            @else
             @yield('content')
             @endif
           </div>
