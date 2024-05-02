@@ -369,12 +369,12 @@ class GeneralSettingController extends Controller
             if ($existingUser) {
                 return response()->json(['message' => 'Email already exists','stat'=> 'warning']);
             }
-            $hasaccess = null;
+            $adminaccess = null;
             $randomPassword = Str::random(10);
-            if($request->input('Admin')==='Admin'){
-                $hasaccess = true;
+            if($request->input('roles')=="Admin"){
+                $adminaccess = true;
             }else{
-                $hasaccess= false;
+                $adminaccess= false;
             }
             $relational = [
                 'account_holder_id' => $userId,
@@ -382,7 +382,7 @@ class GeneralSettingController extends Controller
                 'email' => $request->input('emails'),
                 'role' => $request->input('roles'),
                 'api_access' => $request->input('api_access'),
-                'admin_access' => $hasaccess,
+                'admin_access' => $adminaccess,
                 'password' => $randomPassword,
                 'isverified' => false,
                 'tokens' => ''
@@ -409,7 +409,7 @@ class GeneralSettingController extends Controller
                     // Handle the Swift_TransportException
                     return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
                 }
-            }elseif($adminCount < 1 && $relational['role'] === 'Admin'){
+            }elseif($adminCount < 0 && $relational['role'] === 'Admin'){
                 try{
 
                             DB::beginTransaction();
@@ -439,7 +439,7 @@ class GeneralSettingController extends Controller
 
 if ($subs_id == 2 ) {
 
-    if($memberCount < 5 && $relational['role'] === 'Member' ){
+    if($memberCount < 4 && $relational['role'] === 'Member' ){
         try{
             DB::beginTransaction();
             $userMngt = DB::table('members')->insert($relational);
@@ -455,7 +455,7 @@ if ($subs_id == 2 ) {
             // Handle the Swift_TransportException
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
-        }elseif($adminCount < 3 && $relational['role'] === 'Admin'){
+        }elseif($adminCount < 2 && $relational['role'] === 'Admin'){
             try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -485,7 +485,7 @@ if ($subs_id == 2 ) {
 
         if ($subs_id == 3 ) {
 
-            if($memberCount < 10 && $relational['role'] === 'Member' ){
+            if($memberCount < 9 && $relational['role'] === 'Member' ){
                 try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -501,7 +501,7 @@ if ($subs_id == 2 ) {
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
         }
-        elseif($adminCount < 5 && $relational['role'] === 'Admin')
+        elseif($adminCount < 4 && $relational['role'] === 'Admin')
         {
             try{
 
@@ -574,19 +574,28 @@ if ($subs_id == 2 ) {
     public function _editMember(Request $request) {
 
         if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
-
+            $adminaccess = null;
+            if(  $request->input('roles')=='Admin'){
+                    $adminaccess = true;
+            }else{
+                $adminaccess = false;
+            }
 
         $editdataverified = [
             'fullname'=>$request->input('fullname'),
             'role'=>$request->input('roles'),
             'api_access'=>$request->input('api_access'),
+            'admin_access'=>$adminaccess
         ];
+
 
         $editdatanotverified = [
             'fullname'=>$request->input('fullname'),
             'role'=>$request->input('roles'),
             'api_access'=>$request->input('api_access'),
+            'admin_access'=>$adminaccess
         ];
+
         $member_id = $request->input('user_id');
         $isverified = DB::table('members')->where('email',$request->input('emails'))->value('isverified');
 
