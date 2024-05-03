@@ -426,7 +426,7 @@ $(document).ready(function () {
                 .popover({
                     html: true,
                     content:
-                        '<span class="selected-popover">Twitter account is selected</span>',
+                        '<span class="selected-popover">X account is selected</span>',
                 })
                 .popover("show");
         } else {
