@@ -99,7 +99,7 @@ $(document).ready(function () {
             } else {
                 $(".posting-tool-columns")
                     .find(".cross-tweet-profiles-outer")
-                    .append("<div>No other twitter accounts linked</div>");
+                    .append("<div>No other X accounts linked</div>");
             }
         },
         error: function(xhr, status, error) {
@@ -1137,7 +1137,7 @@ function updateItemInfo(action, clss) {
 /** new tweet instance template */
 function tweetInstance(items) {
     // console.log(items)
-    var times = ["seconds", "mins", "hours", "days"];
+    var times = ["mins", "hours", "days"];
     var option = "";
     for (var i = 0; i < 59; i++) {
         option += `<option value="${i}">${i}</option>`;
