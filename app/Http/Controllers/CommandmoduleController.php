@@ -298,9 +298,11 @@ class CommandmoduleController extends Controller
             return response()->json(['status' => 500,  'stat' => 'danger', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
 
-        $tagCount = DB::table('tag_groups_meta')->where('user_id', $this->setDefaultId())->count();
+        $tagGroup = $checkRole->hashtag_group === 0 ? 'unli' : $checkRole->hashtag_group; 
+    
+        $tagCount = DB::table('tag_groups_meta')->where('user_id', $this->setDefaultId())->count();        
 
-        if ($checkRole->hashtag_group <= $tagCount ) {
+        if (is_int($tagGroup) && $checkRole->hashtag_group <= $tagCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
