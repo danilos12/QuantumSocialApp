@@ -104,21 +104,21 @@ $(document).ready(function() {
         }
     })      
     
-    $('.lower-area-inner').on('scroll', function() {
-        var $this = $(this);
+    // $('.lower-area-inner').on('scroll', function() {
+    //     var $this = $(this);
 
-        // Calculate the sum of scrollTop and clientHeight
-        var scrollBottom = $this.scrollTop() + $this.innerHeight();
+    //     // Calculate the sum of scrollTop and clientHeight
+    //     var scrollBottom = $this.scrollTop() + $this.innerHeight();
 
-        // Check if scrollBottom equals scrollHeight
-        if (scrollBottom >= $this[0].scrollHeight) {
-            // You have scrolled to the bottom
-            console.log("Scrolled to the bottom");
-            $('.profile-posts-inner').append('<div class="loadMore">Load more tweets...</div>');
-            loadMoreTweets();
+    //     // Check if scrollBottom equals scrollHeight
+    //     if (scrollBottom >= $this[0].scrollHeight) {
+    //         // You have scrolled to the bottom
+    //         console.log("Scrolled to the bottom");
+    //         $('.profile-posts-inner').append('<div class="loadMore">Load more tweets...</div>');
+    //         loadMoreTweets();
 
-        }
-    });
+    //     }
+    // });
 
     // Function to load more tweets
     async function loadMoreTweets() {

@@ -20,7 +20,7 @@
     <p>
         Click here: 
         <button class="primary launch-general-settings"  data-id="modal" id="general-settings">Open General Settings</button>
-        to add your API credentials in the Twitter API Credential section: 
+        to add your API credentials in the X API Credential section: 
     </p>
     
     
