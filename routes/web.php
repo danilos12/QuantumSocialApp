@@ -103,11 +103,12 @@ Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'get
 Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
-Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
-// Route::delete('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+// Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+Route::delete('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::get('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // retrieve modal
 Route::put('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // update data in modal
 Route::post('/post/duplicate/{id}',[App\Http\Controllers\PostingController::class, 'duplicatePost'])->name('post.duplicate');
+Route::post('/post/move-to-top/{id}',[App\Http\Controllers\PostingController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');
 
 
@@ -141,7 +142,8 @@ Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, '
 Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
 Route::get('/twitter/accts', [App\Http\Controllers\TwitterApi::class, 'getTwitterAccts']);
 Route::post('/twitter/switchUser', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
-Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
+// Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
+Route::delete('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
 Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
 Route::get('/twitter/{id}/filter/{type}/get-more-tweets', [App\Http\Controllers\TwitterApi::class, 'getTweetMoreTweets'])->name('tweet.more');
@@ -178,7 +180,6 @@ Route::delete('/cmd/remove-tag', [App\Http\Controllers\CommandmoduleController::
 Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
 Route::delete('/cmd/remove-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'removeTagItem'])->name('cmd.remove_tag_item');
 Route::post('/cmd/post/tweet-now',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
-Route::post('/cmd/post/move-to-top',[App\Http\Controllers\CommandmoduleController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/get-tag-items-json',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
