@@ -138,12 +138,16 @@ $(function() {
             });
             const responseData = await response.json();
 
-            if (responseData.status === 200) {
-                alert(responseData.message);
+            
+            toastr[responseData.stat](
+                ` ${responseData.message}`
+            );
+
+
+            // remove the div after 3 seconds
+            setTimeout(function() {
                 location.reload();
-            } else {
-                $(".errorMessage").text(responseData.message);
-            }
+            }, 3000);
         } catch (error) {
             console.log("An error occurred while fetching the slots: " + error);
         }   

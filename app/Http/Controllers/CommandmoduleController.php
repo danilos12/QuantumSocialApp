@@ -76,17 +76,15 @@ class CommandmoduleController extends Controller
 
         $checkRole = MembershipHelper::tier($this->setDefaultId());
 
-        // check if subscription is active
-        if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
-            return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
-        }
+        $postCredit = $checkRole->mo_post_credits === -1 ? 'unli' : $checkRole->mo_post_credits; 
 
         $postCount = DB::table('posts')
             ->where('user_id', $this->setDefaultId())
             ->whereMonth('created_at', now()->month)
             ->count();
 
-        if ($checkRole->mo_post_credits <= $postCount) {
+
+        if (is_int($postCredit) && $checkRole->mo_post_credits <= $postCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
@@ -96,9 +94,8 @@ class CommandmoduleController extends Controller
             $user_id = $this->setDefaultId();
             $main_twitter_id = $postData['twitter_id'];
             $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
-            // $twitterMeta = $getToken->toArray();
-            $twitter_meta = $getToken->toArray();
-            // $utc = TwitterHelper::now($user_id);
+            $twitter_meta = $getToken;
+
             $utc = Carbon::now('UTC');
             $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
             $tweet_id = basename(parse_url($url, PHP_URL_PATH));
@@ -122,7 +119,6 @@ class CommandmoduleController extends Controller
                 'social_media' => $postData['social_media'] // 1 => twitter, 2 => facebook, 3= instagram
             ];
 
-            // dd($insertData);
 
             // Determine the scheduling method and time based on the user's selected option
             if (isset($postData['scheduling-options'])) {
@@ -156,8 +152,8 @@ class CommandmoduleController extends Controller
 
                     case 'custom-time':
                         // Refactor this section to reduce duplication
-                        $formatted24hrTime = date('H:i A', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
-                        $localDatetime = Carbon::createFromFormat('d-m-Y h:i A', $postData['ct-time-date'] . ' ' . $formatted24hrTime);
+                        $formatted24hrTime = date('H:i', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
+                        $localDatetime = Carbon::createFromFormat('d-m-Y H:i', $postData['ct-time-date'] . ' ' . $formatted24hrTime);
 
                         // Convert the datetime to UTC timezone
                         $utcDatetime = $localDatetime->setTimezone('UTC');
@@ -277,7 +273,7 @@ class CommandmoduleController extends Controller
             $lastSavedData = CommandModule::latest()->first();
 
             // Return success response
-            return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Data has been created. ' . $messages, 'tweet' => $lastSavedData]);
+            return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Post has been created. ' . $messages, 'tweet' => $lastSavedData]);
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
@@ -298,7 +294,7 @@ class CommandmoduleController extends Controller
             return response()->json(['status' => 500,  'stat' => 'danger', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
 
-        $tagGroup = $checkRole->hashtag_group === 0 ? 'unli' : $checkRole->hashtag_group; 
+        $tagGroup = $checkRole->hashtag_group === -1 ? 'unli' : $checkRole->hashtag_group; 
     
         $tagCount = DB::table('tag_groups_meta')->where('user_id', $this->setDefaultId())->count();        
 
@@ -386,15 +382,23 @@ class CommandmoduleController extends Controller
     }
 
     public function getTagGroups($id) {
+
+        
+        // for hashtag Groups no twitter linked
+        $checkTwitter = MembershipHelper::twitterAcct(auth()->id()); 
+        if ($checkTwitter < 1) {
+            return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'Your account is not linked to any X accounts, please add one in the general settings to proceed.' ]);
+        }
+
         $checkRole = MembershipHelper::tier($this->setDefaultId()); 
 
-        $tagGroups = Tag_groups::where('user_id', $this->setDefaultId())->get();
+        $tagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
         $tagGroupsPerX = Tag_groups::where(['user_id' => $this->setDefaultId(), 'twitter_id' => $id])->get();        
         
-        // 2 < 2 && 1 < 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        $tagGroups, $tagGroupsPerX);
-        if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
-            return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
-        };
+        // // 2 < 2 && 1 < 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        $tagGroups, $tagGroupsPerX);
+        // if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
+        //     return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
+        // };
 
         try {
             return response()->json(['tagGroups' => $tagGroupsPerX, 'status' => 200]);
@@ -451,8 +455,6 @@ class CommandmoduleController extends Controller
                 ->where('twitter_accts.deleted', "=", 0)
                 ->get();
 
-            // dd($getUnselectedTwitter);
-
         return response()->json($getUnselectedTwitter);
     }
 
@@ -480,12 +482,6 @@ class CommandmoduleController extends Controller
 
     public function getTweetsUsingPostTypes(Request $request, $id, $post_type) {
 
-        $checkRole = MembershipHelper::tier($this->setDefaultId());
-
-        if ($checkRole->status !== 1 || $checkRole->trial_counter < 1) {
-            return response()->json(['status' => 500,  'stat' => 'danger', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
-        }
-
         try {
             $tweets = '';
             $type = ($request->input('category')) ? (($request->input('category') === 'type') ? 'type' : 'month') : '';
@@ -496,9 +492,10 @@ class CommandmoduleController extends Controller
                     $tweets = DB::table('posts')
                         ->where('twitter_id', $id)
                         // ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
-                        ->where('active', 1)
+                        // ->where('active', 1)
                         ->where('sched_method', 'send-now')
                         ->get();
+
                     break;
 
                 case 'save-draft':
@@ -509,100 +506,103 @@ class CommandmoduleController extends Controller
 
                     $posts = DB::table('posts')
                             ->select('*')
-                            ->whereIn('id', function ($query) {
-                                $query->select(DB::raw('MIN(id)'))
-                                ->from('posts')
-                                ->groupBy('post_type_code');
-                            })
+                            // ->whereIn('id', function ($query) {
+                            //     $query->select(DB::raw('MIN(id)'))
+                            //     ->from('posts')
+                            //     ->groupBy('post_type_code');
+                            // })
                             ->where('twitter_id', $id)
                             ->where('user_id', $this->setDefaultId())
                             // ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
-                            ->where('sched_time', '>=', Carbon::now('UTC'))
+                            // ->where('sched_time', '>=', Carbon::now('UTC'))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
-                            ->when($type, function ($query) use ($type, $request) {
-                                if ($type === 'month') {
-                                    return $query->whereRaw("DATE_FORMAT(sched_time, '%b-%Y') = ?", $request->input('type'));
-                                } else {
-                                    return $query->whereRaw("posts.post_type = ?", $request->input('type'));
-                                }
+                            // ->when($type, function ($query) use ($type, $request) {
+                            //     if ($type === 'month') {
+                            //         return $query->whereRaw("DATE_FORMAT(sched_time, '%b-%Y') = ?", $request->input('type'));
+                            //     } else {
+                            //         return $query->whereRaw("posts.post_type = ?", $request->input('type'));
+                            //     }
 
-                                return $query;
-                            })
+                            //     return $query;
+                            // })
                             ->orderBy('sched_time', 'ASC')
                             ->orderBy('sched_method', 'DESC')
                             ->get();
 
+                            // dd($posts, $id, $this->setDefaultId());
+
                     $schedules = Schedule::where('user_id', $this->setDefaultId())->get();
 
-                    $recurringDates = [];
-                    $r = [];
-                    $currentMonth = now()->month;
-                    $currentYear = now()->year;
-                    // dd($posts, $r, $currentMonth, $currentYear);
+                    // if (count($schedules) > 0) {
 
-                    foreach ($schedules as $schedule) {
-                        $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
-                        $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
-
-                        // $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth()->subMonths(2);
-                        // $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
-                        $startDate = Carbon::now()->startOfMonth();
-                        $endDate = Carbon::now()->addMonths(1)->endOfMonth();
-                        $currentDate = $startDate->copy();
-
-                        while ($currentDate->lte($endDate)) {
-                            if ($currentDate->dayOfWeek === $dayOfWeek) {
-                                $recurringDates[] = [
-                                    'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
-                                    'post_type' => $schedule->post_type,
-                                    'sched_method' => 'slot_sched'
-                                ];
+                        $recurringDates = [];
+    
+                        foreach ($schedules as $schedule) {
+                            $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
+                            $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
+    
+                            // $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth()->subMonths(2);
+                            // $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+                            $startDate = Carbon::now()->startOfMonth();
+                            $endDate = Carbon::now()->addMonths(1)->endOfMonth();
+                            $currentDate = $startDate->copy();
+    
+                            while ($currentDate->lte($endDate)) {
+                                if ($currentDate->dayOfWeek === $dayOfWeek) {
+                                    $recurringDates[] = [
+                                        'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
+                                        'post_type' => $schedule->post_type,
+                                        'sched_method' => 'slot_sched'
+                                    ];
+                                }
+    
+                                $currentDate->addDay();
                             }
-
-                            $currentDate->addDay();
                         }
-                    }
-
-                    $object = collect($recurringDates)->map(function ($item) {
-                        return (object) $item;
-                    });
-
-                    $objects = $object->sortBy('sched_time');
-
-                    $objects->transform(function ($item) {
-                        $item->sched_time = (string) $item->sched_time; // Convert specific property to string
-                        return $item;
-                    });
-
-                    $mergedData = $objects->merge($posts);
-                    // dd($mergedData);
-                    $currentDateTime = Carbon::now();
-                    $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
-                        $tweetDateTime = Carbon::parse($tweet->sched_time);
-
-                        // dd($tweet->sched_time);
-                        return $tweetDateTime->greaterThan($currentDateTime);
-                    });
-
-
-                    $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();
-                    // dd($tweets);
+    
+                        $object = collect($recurringDates)->map(function ($item) {
+                            return (object) $item;
+                        });
+    
+                        $objects = $object->sortBy('sched_time');
+    
+                        $objects->transform(function ($item) {
+                            $item->sched_time = (string) $item->sched_time; // Convert specific property to string
+                            return $item;
+                        });
+    
+                        $mergedData = $objects->merge($posts);
+                        // dd($mergedData);
+                        $currentDateTime = Carbon::now('utc');
+                        $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
+                            $tweetDateTime = Carbon::parse($tweet->sched_time);
+    
+                           
+                            return $tweetDateTime->greaterThan($currentDateTime);
+                        });
+    
+                        
+                        $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();
+                        // dd($tweets);
+                    // } else {
+                    //     $tweets = $posts;
+                    // }
 
                     break;
 
                 case 'evergreen':
                     $tweets = DB::table('posts')
                         ->select('*')
-                        ->whereIn('id', function ($query) {
-                            $query->select(DB::raw('MIN(id)'))
-                            ->from('posts')
-                            ->groupBy('post_type_code');
-                        })
                         ->where('twitter_id', $id)
+                        // ->whereIn('id', function ($query) {
+                        //     $query->select(DB::raw('MIN(id)'))
+                        //     ->from('posts')
+                        //     ->groupBy('post_type_code');
+                        // })
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                        ->where('post_type', '=','evergreen-tweets')
                         // ->where('active', $checkToggle->queue_switch)
+                        ->where('post_type', '=','evergreen-tweets')
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -610,18 +610,19 @@ class CommandmoduleController extends Controller
                         ->get();
                         break;
 
+
                 case 'promo':
                     $tweets = DB::table('posts')
                         ->select('*')
-                        ->whereIn('id', function ($query) {
-                            $query->select(DB::raw('MIN(id)'))
-                            ->from('posts')
-                            ->groupBy('post_type_code');
-                        })
                         ->where('twitter_id', $id)
+                        // ->whereIn('id', function ($query) {
+                        //     $query->select(DB::raw('MIN(id)'))
+                        //     ->from('posts')
+                        //     ->groupBy('post_type_code');
+                        // })
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                        ->where('post_type', '=','promos-tweets')
                         // ->where('active', $checkToggle->queue_switch)
+                        ->where('post_type', '=','promos-tweets')
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -729,49 +730,17 @@ class CommandmoduleController extends Controller
             // // Save the changes to the database
             $post->save();
 
-            return response()->json(['status' => 200, 'message' => 'Post tweeted successfully!']);
+            return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Post tweeted successfully!']);
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'stat' => 'warning', 'error' => $trace, 'internal_message' => $message, 'message' => 'Error when posting to Twitter']);
         }
 
     }
-
-    public function moveTopFromQueue(Request $request, $id) {
-        try {
-            // dd($id);
-            $post_id = str_replace('move-top-', '', $id);
-            $post = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])->findOrFail($post_id);
-
-            $nearestPost = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])
-                ->where('twitter_id', $request->twitter_id)
-                ->where('sched_time', '>', TwitterHelper::now($this->setDefaultId()))
-                ->orderBy('sched_time', 'ASC')
-                ->first();
-
-            if ($nearestPost) {
-                // dd($nearestPost->sched_time, $nearestPost->sched_method);
-                $post->sched_time = $nearestPost->sched_time;
-                $post->sched_method = 'rush-queue';
-                $post->save();
-            }
-
-            // Return a response indicating success
-            return response()->json(['status' => 200, 'message' => 'Sched time updated successfully']);
-
-        } catch (Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
-        }
-    }
-
 
     // API to post and retweet to twitter
     function tweet2twitter($twitter_meta, $data, $endpoint) {
@@ -858,7 +827,6 @@ class CommandmoduleController extends Controller
                 }
 
                 $record = array_combine($header, $values); // Combine header and data
-                // dd($header, $values, $record);
                 $validator = Validator::make($record, [
                     'post_description' => 'required',
                     'year' => 'required|digits:4',

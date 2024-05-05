@@ -13,6 +13,7 @@ use App\Helpers\MembershipHelper;
 use App\Models\Members;
 use App\Models\QuantumAcctMeta;
 use App\Models\Tag_groups;
+use App\Models\Twitter;
 use App\Models\UT_AcctMngt;
 use Illuminate\Support\Facades\Session;
 
@@ -55,8 +56,11 @@ class dashboardController extends Controller
     $user = User::find($checkRole->user_id);
 
 		$countPosts = CommandModule::where('user_id', $this->setDefaultId())->whereMonth('created_at', now()->month)->count();
+    // $countPosts = 20000;
+    // $countPosts = strlen((string)$countPosts);
+    // dd($countPosts);
 		$countHashtagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
-		$countXaccts = UT_AcctMngt::where('user_id', $this->setDefaultId())->count();
+		$countXaccts = Twitter::where('user_id', $this->setDefaultId())->count();
 		$countTeamMembers = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Member')->count();
 		$countAdmin = Members::where('account_holder_id', $this->setDefaultId())->where('role', 'Admin')->count();
 

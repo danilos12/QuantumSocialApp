@@ -329,7 +329,7 @@ $(document).ready(function () {
             const response = await fetch(
                 APP_URL + "/twitter/remove",
                 {
-                    method: "POST",
+                    method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
@@ -339,13 +339,6 @@ $(document).ready(function () {
             );
 
             const responseData = await response.json();
-
-            // var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            // if (responseData.status === 200) {
-            //     $(this).closest('.menu-social-account-outer').remove();
-            // } else {
-            //     console.log(responseData.message)
-            // }
 
             toastr[responseData.stat](
                 `${responseData.message}`
@@ -396,6 +389,11 @@ $(document).ready(function () {
                         response.twitter_id +
                         '"]'
                 ).addClass("active");
+
+                toastr[response.stat](
+                    `Success, ${response.message}`
+                );
+
 
                 setTimeout(function () {
                     location.reload();

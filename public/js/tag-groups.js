@@ -5,7 +5,13 @@
         try {
             const response = await fetch(APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID);
             const responseData = await response.json(); 
-            console.log(responseData.tagGroups);
+            console.log(responseData);
+
+            if (responseData.status === 500) {
+                $('.content-inner').html(`<div class="alert alert-${responseData.stat}" role="alert">
+                ${responseData.message}
+              </div>`)
+            }
             if (responseData.tagGroups.length > 0) {
             
                 $.each(responseData.tagGroups, function (index, k, value) {
