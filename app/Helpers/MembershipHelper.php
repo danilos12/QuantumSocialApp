@@ -53,6 +53,11 @@ class MembershipHelper
         return $acctemail;
     }
 
+    public static function twitterAcct($id) {
+        $twitter = Twitter::where('user_id', $id)->count();
+        return $twitter;
+    }
+
     // wp api connection
     public static function apiGetCurl($url) {
         $curl = curl_init();
