@@ -16,6 +16,7 @@ use App\Helpers\MembershipHelper;
 use App\Models\CommandModule;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterSettings;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -47,9 +48,12 @@ class AppServiceProvider extends ServiceProvider
 
             if (Auth::guard('web')->check()) {
 
+                // $time = Carbon::now('UTC');
+                // $view->with('time', $time);
+
                 $checkRole = MembershipHelper::tier(auth()->id());
                 // check if subscription is not active
-                if ($checkRole->status === 0 && $checkRole->trial_counter < 1) {
+                if ($checkRole->status !== 1  && $checkRole->trial_counter < 1) {
                     $message = 'Your account is inactive. Please update your payment to continue using the features.';
                     $view->with('message', $message);
                 }

@@ -60,23 +60,22 @@ class MembershipHelper
 
     // wp api connection
     public static function apiGetCurl($url) {
-        $curl = curl_init();
+        // Initialize cURL session
+        $ch = curl_init($url);
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
-        $response = curl_exec($curl);
-        curl_close($curl);
+        // Execute cURL session
+        $response = curl_exec($ch);
 
-        return $response;
+        // Get the HTTP status code
+        $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        // Close cURL session
+        curl_close($ch);
+
+        return ['response' => $response, 'httpStatusCode' => $httpStatusCode];
     }
-
 }

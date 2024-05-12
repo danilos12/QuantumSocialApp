@@ -94,7 +94,7 @@ class CommandmoduleController extends Controller
             $user_id = $this->setDefaultId();
             $main_twitter_id = $postData['twitter_id'];
             $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
-            $twitter_meta = $getToken;
+            $twitter_meta = json_decode(json_encode($getToken), true); 
 
             $utc = Carbon::now('UTC');
             $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
@@ -143,10 +143,10 @@ class CommandmoduleController extends Controller
                         $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
 
                         // modify the UTC datetime object by adding the countdown time
-                        $utcFormat = $utc->modify($countDownWithWords);
-
+                        $utcDatetime = $utc->modify($countDownWithWords);
+                        
                         // format the resulting datetime object as a string in the  'YYYY-MM-DD HH:MM:SS' format
-                        $scheduled_time = $utcFormat->format('Y-m-d H:i:s');
+                        $scheduled_time = $utcDatetime->format('Y-m-d H:i:s');
                         $sched_time = $scheduled_time;
                         break;
 
@@ -156,11 +156,10 @@ class CommandmoduleController extends Controller
                         $localDatetime = Carbon::createFromFormat('d-m-Y H:i', $postData['ct-time-date'] . ' ' . $formatted24hrTime);
 
                         // Convert the datetime to UTC timezone
-                        $utcDatetime = $localDatetime->setTimezone('UTC');
+                        $utcDatetime = $utc->modify($localDatetime);
 
                         // Format the UTC datetime as needed
                         $sched_time = $utcDatetime->format('Y-m-d H:i:s');
-
                         break;
 
                     case 'custom-slot':
@@ -210,9 +209,9 @@ class CommandmoduleController extends Controller
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
 
                         if ($responses->getOriginalContent()['status'] === 500) {
-                            return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                         } elseif ($responses->getOriginalContent()['status'] === 403) {
-                            return response()->json(['status' => 403, 'message' => $responses->getOriginalContent()['message']]);
+                            return response()->json(['status' => 403, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         } else {
                             CommandModule::create($insertData);
 
@@ -222,9 +221,9 @@ class CommandmoduleController extends Controller
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
 
                         if ($responses->getOriginalContent()['status'] === 500) {
-                            return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                         }  elseif ($responses->getOriginalContent()['status'] === 403) {
-                            return response()->json(['status' => 403, 'message' => $responses->getOriginalContent()['message']]);
+                            return response()->json(['status' => 403, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         }else {
                             CommandModule::create($insertData);
 
@@ -256,7 +255,7 @@ class CommandmoduleController extends Controller
                                 $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
 
                                 if ($responses->getOriginalContent()['status'] === 500) {
-                                    return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                                    return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                                 } else {
                                     CommandModule::create($crosstweetData);
                                     $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
@@ -488,10 +487,10 @@ class CommandmoduleController extends Controller
 
             switch ($post_type) {
                 case 'posted':
-                    // dd(TwitterHelper::now(Auth::id()));
+
                     $tweets = DB::table('posts')
                         ->where('twitter_id', $id)
-                        // ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
+                        ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
                         // ->where('active', 1)
                         ->where('sched_method', 'send-now')
                         ->get();
@@ -503,6 +502,10 @@ class CommandmoduleController extends Controller
                     break;
 
                 case 'queue':
+                    $timezoned = DB::table('users_meta')
+                                ->where('user_id', $this->setDefaultId())
+                                ->first();
+                    // dd(TwitterHelper::now($this->setDefaultId()));
 
                     $posts = DB::table('posts')
                             ->select('*')
@@ -513,8 +516,7 @@ class CommandmoduleController extends Controller
                             // })
                             ->where('twitter_id', $id)
                             ->where('user_id', $this->setDefaultId())
-                            // ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
-                            // ->where('sched_time', '>=', Carbon::now('UTC'))
+                            ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
                             // ->when($type, function ($query) use ($type, $request) {
@@ -574,16 +576,34 @@ class CommandmoduleController extends Controller
     
                         $mergedData = $objects->merge($posts);
                         // dd($mergedData);
-                        $currentDateTime = Carbon::now('utc');
+                        $currentDateTime = Carbon::now($timezoned->timezone);
+                        // dd($currentDateTime);
                         $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
-                            $tweetDateTime = Carbon::parse($tweet->sched_time);
+                            // dd($currentDateTime->timezone);
+                            $dateTime = Carbon::createFromFormat('Y-m-d H:i:s', $tweet->sched_time, 'UTC')->setTimezone($currentDateTime->timezone);
+                            $tweetDateTime = Carbon::parse($dateTime);
+                            // dd($tweetDateTime);
     
                            
                             return $tweetDateTime->greaterThan($currentDateTime);
                         });
+        
+
+                        $tweets = $tweetSorted->map(function($tweet) use($timezoned) {
+                            
+                            // Convert sched_time to +08:00 timezone
+                            if ($tweet->sched_method === 'set-countdown' || $tweet->sched_method === 'rush-queue') {
+                                $tweet->sched_time = Carbon::createFromFormat('Y-m-d H:i:s', $tweet->sched_time, 'UTC')
+                                                            ->setTimezone($timezoned->timezone)
+                                                            ->format('Y-m-d H:i:s');
+                                return $tweet; 
+                            } else {
+                                return $tweet;
+                            }
+                        })->sortBy('sched_time')->values()->toArray();
     
                         
-                        $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();
+                        // $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();
                         // dd($tweets);
                     // } else {
                     //     $tweets = $posts;
