@@ -10,6 +10,7 @@ use App\Models\MasterTwitterApiCredentials;
 use App\Models\Twitter;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 
 class TwitterHelper
@@ -25,12 +26,12 @@ class TwitterHelper
         }
     }
 
-    public static function refreshAccessToken($refreshToken)
+    public static function refreshAccessToken($refreshToken, $client_id)
     {
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=dXd6Y2FLLTU2N09lbmEzNER2YWs6MTpjaQ',
+            CURLOPT_URL => 'https://api.twitter.com/2/oauth2/token?refresh_token=' . $refreshToken  . '&grant_type=refresh_token&client_id=' . $client_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -88,13 +89,15 @@ class TwitterHelper
 
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
 
-        // dd($expires_in + $created_at, time());
         if (($expires_in + $created_at) <= time()) {
-            $d = TwitterHelper::refreshAccessToken($refresh_token);
+            $defaultId = (new self())->setDefaultId();
+            $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id; 
+            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
             session()->put('token_details', $d);
 
             // update token in database
             TwitterToken::where('twitter_id', $twitter_id)
+                ->where('user_id', $defaultId)
                 ->update([
                     'access_token' => $d->access_token,
                     'refresh_token' => $d->refresh_token
@@ -110,14 +113,14 @@ class TwitterHelper
 
     public static function getTwitterToken($twitter_id) {
         $defaultId = (new self())->setDefaultId();
-        $findActiveTwitter = Twitter::join('twitter_meta', 'twitter_accts.twitter_id', '=', 'twitter_meta.twitter_id')
-            ->join('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
-            ->select('twitter_accts.*', 'twitter_meta.*', 'ut_acct_mngt.selected')
+        $findActiveTwitter = DB::table('twitter_accts')
+            ->leftjoin('twitter_meta', 'twitter_accts.twitter_id', '=', 'twitter_meta.twitter_id')
+            ->leftJoin('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
+            ->select('twitter_meta.*', 'ut_acct_mngt.selected')
             ->where('twitter_accts.twitter_id', '=', $twitter_id)
-            ->where('twitter_accts.deleted', '=', 0)
             ->where('twitter_accts.user_id', '=', $defaultId)
             ->where('ut_acct_mngt.selected', '=', 1)
-            ->where('twitter_meta.active', '=',   1)
+            // ->where('twitter_meta.active', '=',   1)
             ->first();
 
         return $findActiveTwitter;
@@ -169,8 +172,7 @@ class TwitterHelper
     public static function tweet2twitter($twitter_meta, $data, $endpoint) {
 
         // check access token
-        $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);
-
+        $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);        
         // send tweet
         $headers = array(
             // 'Authorization: Bearer ' . 11,
@@ -179,8 +181,11 @@ class TwitterHelper
         );
 
         $data = json_encode($data);        
+        // dd($data);
 
         $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
+
+        Log::info('Response: ', $sendTweetNow);
 
         if ($sendTweetNow['status'] === 200) {
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);

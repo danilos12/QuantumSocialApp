@@ -142,7 +142,8 @@ Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, '
 Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
 Route::get('/twitter/accts', [App\Http\Controllers\TwitterApi::class, 'getTwitterAccts']);
 Route::post('/twitter/switchUser', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
-// Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
+Route::post('/twitter/default/accounts', [App\Http\Controllers\TwitterApi::class, 'setDefaultxAcct'])->name('twitter.setDefault');
+Route::get('/twitter/unselected/accounts', [App\Http\Controllers\TwitterApi::class, 'getUnselectedTwitterAccounts']);
 Route::delete('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
 Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
