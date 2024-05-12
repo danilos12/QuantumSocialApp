@@ -39,6 +39,7 @@ $(document).ready(function() {
                                 
                     // Assuming the response data is an array of posts
                     data = responseData; // Add the new posts to the existing array
+                    console.log(data);
 
                     if (data.length > 0) {
                         // Check if the initial data has been loaded
@@ -150,6 +151,8 @@ $(document).ready(function() {
                 var k = data[i];
                 var currentDate = new Date();
                 var dataDate = new Date(k.sched_time);
+
+                console.log(dataDate, currentDate);
                 // Create the post element and append it to the container
                 if (dataDate > currentDate) {
 
