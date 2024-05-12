@@ -75,40 +75,76 @@ $(document).ready(function () {
     // });
   
 
-    /** Pull selected twitter account */
-    $.ajax({
-        type: "GET",
-        url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
-        data: {
-            twitter_id: TWITTER_ID,
-        },
-        success: function(response) {
+    /** Pull unselected twitter account for Cross tweet */
+    // $.ajax({
+    //     type: "GET",
+    //     url: APP_URL + "/cmd/unselected", // Use the URL of your server-side script here
+    //     data: {
+    //         twitter_id: TWITTER_ID,
+    //     },
+    //     success: function(response) {
 
-            // console.log(response)
-            // Add the existing tag groups to the page
-            if (response.length > 0) {
-                $.each(response, function(index, k) {
-                    var img = $("<img>")
-                        .addClass("cross-tweet-profile-image")
-                        .attr("src", k.twitter_photo)
-                        .attr("id", "twitterId-" + k.twitter_id)
-                        .attr("name", 'cross_tweet_acct[]')
+    //         // console.log(response)
+    //         // Add the existing tag groups to the page
+    //         if (response.length > 0) {
+    //             $.each(response, function(index, k) {
+    //                 var img = $("<img>")
+    //                     .addClass("cross-tweet-profile-image")
+    //                     .attr("src", k.twitter_photo)
+    //                     .attr("id", "twitterId-" + k.twitter_id)
+    //                     .attr("name", 'cross_tweet_acct[]')
+    //                     .attr("status", k.is_default_ctAcct === 1 ? 'active' : 'inactive')
 
-                    $(img).appendTo($(".cross-tweet-profiles-inner.cmd"));
+    //                 $(img).appendTo($(".cross-tweet-profiles-inner.cmd"));
+    //                 $(img).appendTo($(".cross-tweet-profiles-inner.x-settings"));
+    //             });
+    //         } else {
+    //             $(".posting-tool-columns")
+    //                 .find(".cross-tweet-profiles-outer")
+    //                 .append("<div>No other X accounts linked</div>");
+    //         }
+    //     },
+    //     error: function(xhr, status, error) {
+    //         console.log(
+    //             "An error occurred while fetching the existing tag groups: " +
+    //             error
+    //         );
+    //     },
+    // });
+
+    async function getUnselectedTwitter() {
+        try {
+            const response = await fetch(APP_URL + '/twitter/unselected/accounts?twitter=' + TWITTER_ID, {
+                method: 'GET',
+            });
+            const responseData = await response.json(); 
+            const $cmdInner = $(".cross-tweet-profiles-inner.cmd");
+            const $xSettingsInner = $(".cross-tweet-profiles-inner.x-settings");
+            
+            if (responseData.length > 0) {
+                responseData.forEach(k => {
+                    const img = $("<img>", {
+                        "class": "cross-tweet-profile-image",
+                        "src": k.twitter_photo,
+                        "id": "twitterId-" + k.twitter_id,
+                        "name": 'cross_tweet_acct[]',
+                        "status": k.is_default_ctAcct === 1 ? 'active' : 'inactive'
+                    });
+                    img.appendTo($cmdInner);
+                    img.clone().appendTo($xSettingsInner);
                 });
+
             } else {
                 $(".posting-tool-columns")
                     .find(".cross-tweet-profiles-outer")
                     .append("<div>No other X accounts linked</div>");
             }
-        },
-        error: function(xhr, status, error) {
-            console.log(
-                "An error occurred while fetching the existing tag groups: " +
-                error
-            );
-        },
-    });
+        } catch(err) {
+            console.log(err);
+        }
+    }
+    
+    getUnselectedTwitter();
 
     /** Post type and BgIcon */
     const $postPanels = $("div[data-post]");
@@ -740,7 +776,7 @@ $(document).ready(function () {
     });
 
     /** select tweet profiles cross tweet */
-    $(".cross-tweet-profiles-inner").on(
+    $(".cross-tweet-profiles-inner.cmd").on(
         "click",
         "img.cross-tweet-profile-image",
         function (e) {
@@ -753,6 +789,37 @@ $(document).ready(function () {
             }
         }
     );
+
+    $(".cross-tweet-profiles-inner.x-settings").on(
+        "click",
+        "img.cross-tweet-profile-image", async function(e) {
+        const twitter_id = this.id; 
+        
+        try {
+            const response = await fetch(APP_URL + '/twitter/default/accounts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify({ twitter_id : twitter_id.split('-')[1]}),
+            });
+            const responseData = await response.json();
+
+            // console.log(responseData);
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
+
+            $(this).attr("status", responseData.setActive === 1 ? 'active' : 'inactive');
+            
+            // Update status of corresponding image in other div element
+            const $relatedImage = $('.cross-tweet-profiles-inner.cmd > #twitterid-' + twitter_id.split('-')[1]);
+            $relatedImage.attr('status', responseData.setActive === 1 ? 'active' : 'inactive');
+        } catch(err) {
+            console.log(err);
+        }
+    })
 
     async function getCustomSlot(post_type) {
         console.log(post_type);
@@ -888,6 +955,8 @@ $(document).ready(function () {
         e.preventDefault();
         // console.log(e)
         const form = $(this);
+
+        console.log(form)
 
         var crossTweet = [];
         $(".cross-tweet-profiles-inner.cmd img").each(function () {

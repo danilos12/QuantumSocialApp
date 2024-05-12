@@ -160,7 +160,8 @@ class Controller extends BaseController
                     $selectedAcct = UT_AcctMngt::firstOrCreate([
                         'user_id' => $userid,
                         'twitter_id' => $twitterId->id,
-                        'selected' => Twitter::where('user_id', $userid)->count() === 1 ? 1 : 0
+                        'selected' => Twitter::where('user_id', $userid)->count() === 1 ? 1 : 0,
+                        'is_default_ctAcct' => 0
                     ]);
 
                     TwitterSettings::create([

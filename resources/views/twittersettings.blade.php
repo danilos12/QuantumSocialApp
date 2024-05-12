@@ -10,7 +10,7 @@
             </a>
             <div class="global-profile-details">
                 <div class="global-profile-name text-right">
-                    {{ $selected_user ? $selected_user->twitter_name : 'No twitter linked' }}
+                    {{ $selected_user ? $selected_user->twitter_name : 'No X account linked' }}
                 </div>  <!-- END .global-author-name -->
                 <div class="global-profile-subdata">
                     <span class="global-profile-handle">
@@ -90,7 +90,7 @@
                                 <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
 
                                 <div class="childs-cont-2">
-                                  <p class="childs-cont-p">Twitter ACCESS</p>
+                                  <p class="childs-cont-p">X ACCESS</p>
 
                                   <div class="">
 
@@ -121,7 +121,7 @@
                                 <span class="menu-qaccount-default" tool-tip="Set default account." default="active"></span>
 
                                 <div class="childs-cont-2">
-                                  <p class="childs-cont-p">Twitter ACCESS</p>
+                                  <p class="childs-cont-p">X ACCESS</p>
 
                                   <div class="">
 
@@ -356,25 +356,7 @@
 
                                         <div class="cross-tweet-profiles-outer subTwirl-profiles-outer">
                                             <div class="cross-tweet-header"></div>
-                                            <div class="cross-tweet-profiles-inner">
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                            <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" />
-                                                <img src="{{ asset('public/')}}/temp-images/imgpsh_fullsize_anim (1).png" class="cross-tweet-profile-image" status="active" />
+                                            <div class="cross-tweet-profiles-inner x-settings">
                                             </div>  <!-- END .cross-tweet-profiles-inner -->
                                         </div>  <!-- END .cross-tweet-profiles-outer -->
 
