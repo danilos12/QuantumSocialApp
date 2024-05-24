@@ -51,3 +51,4 @@ bootstrap/cache/*.php
 # Ignore Composer and NPM lock files if they should be managed by the deployment system
 composer.lock
 package-lock.json
+.gitignore
