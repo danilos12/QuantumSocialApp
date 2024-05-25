@@ -9,7 +9,7 @@
 *.debugbar.*
 
 # Ignore compiled source files
-vendor/
+vendor
 node_modules/
 npm-debug.log
 yarn-error.log
