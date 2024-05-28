@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
         // share to all views
         View::composer('*', function ($view) {
-                            
+
 
             if (Auth::guard('web')->check()) {
 
@@ -114,33 +114,33 @@ class AppServiceProvider extends ServiceProvider
                 $mainUser = DB::table('users')
                             ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
                             ->where('users.id', Auth::id())->first();
-                $view->with('mainUser', $mainUser);             
+                $view->with('mainUser', $mainUser);
 
                 // modal togglers
                 $generalSettings = DB::table('settings_toggler_general')->where('user_id', Auth::id())->first();
-                $view->with('generalSetting', $generalSettings);              
+                $view->with('generalSetting', $generalSettings);
 
                 // twitter settings modal
                 $twitterSettings = DB::table('settings_twitter')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', '=', auth()->id())
-                    ->pluck('meta_value', 'meta_key')->toArray();       
-                    $twitterSettings = 0;             
+                    ->pluck('meta_value', 'meta_key')->toArray();
+                    $twitterSettings = 0;
                 $view->with('twitterSetting', $twitterSettings);
 
                 // show twitter settings in UI
                 $showTwitterSettings = DB::table('settings_twitter')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', '=', auth()->id())
-                    ->pluck('showSettings', 'meta_key')->toArray();       
-                // $showTwitterSettings = 1;    
+                    ->pluck('showSettings', 'meta_key')->toArray();
+                // $showTwitterSettings = 1;
                 $view->with('showTwitterSettings', $showTwitterSettings);
 
                 $twitterSettingsToggler = DB::table('settings_toggler_twitter')
                     ->select('*')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', auth()->id())
-                    ->first();            
+                    ->first();
                 $view->with('twitterSettingToggler', $twitterSettingsToggler);
 
                 // API inside General settings
@@ -253,30 +253,30 @@ class AppServiceProvider extends ServiceProvider
                 $user = Auth::guard('member')->user();
                 $member_id = $user->id;
 
-                
+
                 // modal togglers
                 $generalSettings = DB::table('settings_toggler_general')->where('user_id', Auth::id())->first();
-                $view->with('generalSetting', $generalSettings);              
+                $view->with('generalSetting', $generalSettings);
 
                 // twitter settings modal
                 $twitterSettings = DB::table('settings_twitter')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', '=', auth()->id())
-                    ->pluck('meta_value', 'meta_key')->toArray();                    
+                    ->pluck('meta_value', 'meta_key')->toArray();
                 $view->with('twitterSetting', $twitterSettings);
 
                 // show twitter settings in UI
                 $showTwitterSettings = DB::table('settings_twitter')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', '=', auth()->id())
-                    ->pluck('showSettings', 'meta_key')->toArray();                    
+                    ->pluck('showSettings', 'meta_key')->toArray();
                 $view->with('showTwitterSettings', $showTwitterSettings);
 
                 $twitterSettingsToggler = DB::table('settings_toggler_twitter')
                     ->select('*')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', auth()->id())
-                    ->first();            
+                    ->first();
                 $view->with('twitterSettingToggler', $twitterSettingsToggler);
 
 
