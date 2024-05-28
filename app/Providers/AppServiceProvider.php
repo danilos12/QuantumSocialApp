@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
 
                 // $time = Carbon::now('UTC');
                 // $view->with('time', $time);
-            
+
                 $checkRole = MembershipHelper::tier(auth()->id());
                 // check if subscription is not active
                 if ($checkRole->status !== 1  && $checkRole->trial_counter < 1) {

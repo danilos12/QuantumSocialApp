@@ -107,15 +107,10 @@ class UpdateSubscriptionStatus extends Command
                         $status = config('wp.status_labels');
 
                         if ($parsedData['n'] === 'valid') {
-
-
                             $now = strtotime(date("Y/m/d"));
-
                             $your_date = strtotime($parsedData['info']['trial_date']);
                             $datediff = $your_date - $now;
-
-                            $days_diff = max(floor($datediff / (60 * 60 * 24)), 0);
-
+                            $days_diff = floor($datediff / (60 * 60 * 24));
                             $updateResult = QuantumAcctMeta::where('user_id', $user['id'])->update([
                                 'trial_counter' => $days_diff,
                                 'status' => $status[$parsedData['wc_status']],
