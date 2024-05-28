@@ -389,12 +389,16 @@ class GeneralSettingController extends Controller
             ];
 
 
+            $plans1 =  DB::table('plans')->where('id', 1)->first();
+            $plans2 =  DB::table('plans')->where('id', 2)->first();
+            $plans3 =  DB::table('plans')->where('id', 3)->first();
+            $plans4 =  DB::table('plans')->where('id', 4)->first();
 
             // Check the subscription type and count limits
             // solar subscription
         if ($subs_id == 1 ) {
 
-            if($memberCount < 0 && $relational['role'] === 'Member' ){
+            if($memberCount < $plans1->tm_count && $relational['role'] === 'Member' ){
                 try{
                         DB::beginTransaction();
                         $userMngt = DB::table('members')->insert($relational);
@@ -409,7 +413,7 @@ class GeneralSettingController extends Controller
                     // Handle the Swift_TransportException
                     return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
                 }
-            }elseif($adminCount < 0 && $relational['role'] === 'Admin'){
+            }elseif($adminCount < $plans1->admin_count && $relational['role'] === 'Admin'){
                 try{
 
                             DB::beginTransaction();
@@ -439,7 +443,8 @@ class GeneralSettingController extends Controller
 
 if ($subs_id == 2 ) {
 
-    if($memberCount < 4 && $relational['role'] === 'Member' ){
+
+    if($memberCount < $plans2->tm_count && $relational['role'] === 'Member' ){
         try{
             DB::beginTransaction();
             $userMngt = DB::table('members')->insert($relational);
@@ -455,7 +460,7 @@ if ($subs_id == 2 ) {
             // Handle the Swift_TransportException
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
-        }elseif($adminCount < 2 && $relational['role'] === 'Admin'){
+        }elseif($adminCount < $plans2->admin_count && $relational['role'] === 'Admin'){
             try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -485,7 +490,7 @@ if ($subs_id == 2 ) {
 
         if ($subs_id == 3 ) {
 
-            if($memberCount < 9 && $relational['role'] === 'Member' ){
+            if($memberCount < $plans3->tm_count && $relational['role'] === 'Member' ){
                 try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -501,7 +506,7 @@ if ($subs_id == 2 ) {
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
         }
-        elseif($adminCount < 4 && $relational['role'] === 'Admin')
+        elseif($adminCount < $plans3->admin_count && $relational['role'] === 'Admin')
         {
             try{
 
