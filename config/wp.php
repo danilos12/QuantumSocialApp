@@ -6,6 +6,7 @@
             'wc-cancelled' => 3,
             'wc-expired' => 4,
             'wc-pending-cancel' => 5,
-        ],      
+            'trash'=>6
+        ],
     ]
 ?>
