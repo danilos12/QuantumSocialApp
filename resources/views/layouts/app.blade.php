@@ -58,7 +58,11 @@
   @endauth
   @endif
 
+@php
+    use App\Helpers\TrialCountdown;
 
+    $checkStatus = TrialCountdown::wp_status_and_wp_trialperiod();
+@endphp
 
 {{-- pusher start --}}
   {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
@@ -192,8 +196,10 @@
 
                 <div class="settings-bar-outer">
                   <div class="settings-bar-inner">
+
                       @if (Auth::guard('web')->check())
-                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+
+                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" statusCheck="{{$checkStatus['status']  }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
                       @endif
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
@@ -297,7 +303,7 @@
   <script>
      $(document).ready(function() {
       // // Alert
-      var alert = $('.alert ');
+      var alert = $('.warning-sign ');
 
       if(alert.length == 1) {
         setTimeout(function(){

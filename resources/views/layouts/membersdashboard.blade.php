@@ -277,7 +277,7 @@
   <script>
      $(document).ready(function() {
             // Alert
-      var alert = $('.alert ');
+      var alert = $('.warning-sign ');
 
       if(alert.length == 1) {
         setTimeout(function(){

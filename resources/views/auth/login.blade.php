@@ -12,7 +12,7 @@
 
 
         @if (session()->has('login_error'))
-        <div class="alert alert-danger">{{ session('login_error') }}</div>
+        <div class="alert alert-danger warning-sign">{{ session('login_error') }}</div>
         @endif
 
 
