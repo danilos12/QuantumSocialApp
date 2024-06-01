@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -57,9 +57,30 @@
   <script> var QUANTUM_ID = `{{ $user_id }}`; </script>
   @endauth
   @endif
+
+
+
+{{-- pusher start --}}
+  {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  <script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+    var pusher = new Pusher('25f52777301a06d4cde3', {
+      cluster: 'us2'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+      alert(JSON.stringify(data));
+    });
+    </script> --}}
+{{-- pusher end --}}
+
 </head>
 <body class="{{ Route::has('login') ? 'darkmode' : '' }}">
- 
+
   <canvas></canvas>
   <div class="interface-outer">
     <div class="interface-inner">
@@ -152,7 +173,7 @@
             <img src = "{{ asset('public/ui-images/icons/00f-moon.svg') }}"
               class="menu-icon dark-mode-toggle"
               id="dark-mode-toggle" />
-            </span>           
+            </span>
           @else
             @endauth
           @endif
@@ -220,7 +241,7 @@
           <span id="api-banner">
             Facebook and Instagram coming soon!
         </span>
-      </div>  
+      </div>
     </div>  <!-- END .interface-inner -->
   </div>  <!-- END .interface-outer -->
 	@if (Route::has('login'))
@@ -276,13 +297,13 @@
   <script>
      $(document).ready(function() {
       // // Alert
-      // var alert = $('.alert ');
+      var alert = $('.alert ');
 
-      // if(alert.length == 1) {
-      //   setTimeout(function(){
-      //     alert.fadeOut('slow');
-      //   }, 5000);
-      // }
+      if(alert.length == 1) {
+        setTimeout(function(){
+          alert.fadeOut('slow');
+        }, 5000);
+      }
 
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
@@ -312,7 +333,7 @@
           }
           var li = $(this).find('li');
         });
-      })      
+      })
 
       // var timeDisplay = document.getElementById("time");
 
@@ -326,6 +347,10 @@
       // setInterval(refreshTime, 1000);
     });
   </script>
+
+
+
+
 
 </body>
 </html>

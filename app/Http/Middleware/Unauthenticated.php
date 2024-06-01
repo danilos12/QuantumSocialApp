@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+
 class Unauthenticated
 {
     /**
@@ -34,16 +37,12 @@ class Unauthenticated
 
 
 
-        if (Auth::guard('web')->check()) {
+        if (Auth::guard('web')->check() || Auth::guard('member')->check()) {
             return $next($request);
 
         }
-        if(Auth::guard('member')->check()) {
-
-            return $next($request);
 
 
-        }
         if(!Auth::check()) {
 
             return redirect()->route('login');
@@ -51,7 +50,6 @@ class Unauthenticated
 
 
         }
-
 
 
 
