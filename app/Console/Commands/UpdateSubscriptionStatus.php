@@ -50,7 +50,8 @@ class UpdateSubscriptionStatus extends Command
         try {
 
             // Connect to the database
-            $pdo = new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
+
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // // Prepare the SQL statement to get posts
@@ -87,8 +88,15 @@ class UpdateSubscriptionStatus extends Command
                     // Log the user meta
                     \Log::info('Processing user meta: ' . json_encode($userMeta));
 
+                    \Log::info('subscription_id: ' . $userMeta['subscription_id']);
+
                     // Call the API
-                    $apiResult = MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']);
+
+                    if($userMeta['subscription_id'] != 4){
+
+                        $apiResult = env("APP_URL") == 'http://app.quantumsocial.local'? MembershipHelper::apiGetCurl('http://quantumsocial.local/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']):MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']);
+
+
 
                     // Get the HTTP status code of the API response
                     $httpStatusCode = $apiResult['httpStatusCode'];
@@ -103,7 +111,7 @@ class UpdateSubscriptionStatus extends Command
                         $jsonData = substr($apiResult['response'], $jsonStart);
                         $parsedData = json_decode($jsonData, true);
 
-                        // Add the user ID to the list of processed user IDs
+
                         $status = config('wp.status_labels');
 
                         if ($parsedData['n'] === 'valid') {
@@ -111,6 +119,7 @@ class UpdateSubscriptionStatus extends Command
                             $your_date = strtotime($parsedData['info']['trial_date']);
                             $datediff = $your_date - $now;
                             $days_diff = floor($datediff / (60 * 60 * 24));
+                            $days_diff = max(0, $days_diff);
                             $updateResult = QuantumAcctMeta::where('user_id', $user['id'])->update([
                                 'trial_counter' => $days_diff,
                                 'status' => $status[$parsedData['wc_status']],
@@ -140,6 +149,9 @@ class UpdateSubscriptionStatus extends Command
                         ];
                     }
 
+                }else{
+                    \Log::info('subscription_id_skipped: ' . $userMeta['subscription_id']);
+                }
                 }
             }
 

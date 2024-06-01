@@ -3,7 +3,9 @@
 <div class="modal-large-anchor">
     <div class="modal-large-backdrop">
 
-
+        @php
+            use App\Helpers\TrialCountdown;
+        @endphp
      <div class="add-team-member-modal">
       <div class="add-team-member-inner montserrat " style="color: white">
         <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/>
@@ -175,10 +177,21 @@
           @if (Auth::guard('web')->check() || Auth::guard('member')->check())
 
           <!--     BEGIN TEAM MEMBERS   -->
+          @php
+
+              $checkStatus = TrialCountdown::wp_status_and_wp_trialperiod();
+              $message = 'Your account is inactive. Please update your payment to continue using the features.';
+          @endphp
+
           <div class="menu-section-outer team-account-outer">
             <div class="menu-section-inner team-account-inner">
               <span class="menu-section-header">Team Members </span>
+                @if($checkStatus['status']!== 'wc-active')
+                    <div class="alert alert-warning" role="alert">
+                        {{ $message }}
+                    </div>
 
+                    @else
                 {{-- @if ($cntmembers > 0) --}}
                   @foreach($team_members as $member)
                     <div class="menu-team-account-outer">
@@ -305,8 +318,9 @@
                       + Add New Member
                   </div>  <!-- END .add-twitter-account -->
                 </div>  <!-- END .menu-social-add-accounts-section -->
-
+                @endif
             </div>  <!-- END .social-accounts-inner -->
+
 
 
 
@@ -316,11 +330,15 @@
           </div>  <!-- END .team-account-outer -->
           <!--     END TEAM MEMBERS    -->
 
-
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
               <span class="menu-section-header">X API Credential</span>
+              @if($checkStatus['status']!== 'wc-active')
+              <div class="alert alert-warning" role="alert">
+                  {{ $message }}
+              </div>
 
+              @else
               <div class="menu-twirl-option-outer">
                 <div class="menu-twirl-option-inner">
                   <div class="menu-twirl-left">
@@ -400,6 +418,7 @@
               </div>  <!-- END .menu-twirl-option-outer -->
 
             </div>  <!-- END .social-accounts-inner -->
+            @endif
           </div>
 
        <!-- END .social-accounts-outer -->
@@ -501,6 +520,12 @@
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
               <span class="menu-section-header">Social Accounts</span>
+              @if($checkStatus['status']!== 'wc-active')
+              <div class="alert alert-warning" role="alert">
+                  {{ $message }}
+              </div>
+
+              @else
                 @if ($acct_twitter_count > 0)
                       @foreach($twitter_accts as $acct)
                       <!-- BEGIN .menu-social-account Instance -->
@@ -544,7 +569,7 @@
                 @else
                     <p>No accounts found</p>
                 @endif
-                
+
                 {{-- @if ($checkRole->status === 1 && $checkRole->trial_counter > 0)  --}}
                 <div class="menu-social-add-accounts-section">
                   <div class="add-account add-twitter-account" id="link-twitter" style="width: 15%">
@@ -553,8 +578,9 @@
                   </div>  <!-- END .add-twitter-account -->
                 </div>  <!-- END .menu-social-add-accounts-section -->
                 {{-- @endif --}}
-
+                @endif
             </div>  <!-- END .social-accounts-inner -->
+
           </div>  <!-- END .social-accounts-outer -->
 
 

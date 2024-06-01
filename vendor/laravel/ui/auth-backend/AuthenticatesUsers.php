@@ -6,7 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Session;
 trait AuthenticatesUsers
 {
     use RedirectsUsers, ThrottlesLogins;
@@ -142,6 +142,7 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
+
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
         ]);

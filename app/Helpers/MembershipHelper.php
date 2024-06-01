@@ -20,7 +20,7 @@ class MembershipHelper
             ->join('plans', 'users_meta.subscription_id', 'plans.id')
             ->where('users_meta.user_id', $id)
             ->select(
-                'users_meta.*', 
+                'users_meta.*',
                 'plans.*',
             )
             ->first();
@@ -62,7 +62,7 @@ class MembershipHelper
         return $twitter;
     }
 
-   
+
 
     // wp api connection
     public static function apiGetCurl($url) {

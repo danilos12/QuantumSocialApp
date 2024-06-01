@@ -42,49 +42,14 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function showLoginForm()
-    {
-        return view('auth.login');
-    }
-
-
-
-
-
-
-
-
-
-
 
 
     protected function sendFailedLoginResponse(Request $request)
     {
-        // Session::flash('error', trans('auth.failed'));
-        // $request->session()->flash('error', true);
+        Session::flash('login_error', 'Invalid email or password. Please try again.');
 
-        // return redirect()->route('login')->withInput($request->only($this->username(), 'remember'));
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
+        return view('auth.login');
     }
-   
 
-    // public function login(Request $request)
-    // {
-    //     $this->validateLogin($request);
 
-    //     if ($this->attemptLogin($request)) {
-    //         if ($request->hasSession()) {
-    //             $request->session()->put('auth.password_confirmed_at', time());
-    //         }
-    //         return $this->sendLoginResponse($request);
-    //     }
-
-    //     // If the login attempt was unsuccessful, flash the input data and error message to the session
-    //     Session::flashInput($request->input());
-    //     Session::flash('error', trans('auth.failed'));
-
-    //     return redirect()->route('login');
-    // }
 }

@@ -87,7 +87,6 @@ Route::get('wp', function () {
 
 
 
-
 				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
 					$value = 1;
 				} elseif ($wp_data['info']['product_name'] == "Membership Level - Galactic") {

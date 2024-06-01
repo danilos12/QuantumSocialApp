@@ -396,6 +396,7 @@ class GeneralSettingController extends Controller
 
             // Check the subscription type and count limits
             // solar subscription
+
         if ($subs_id == 1 ) {
 
             if($memberCount < $plans1->tm_count && $relational['role'] === 'Member' ){
@@ -413,7 +414,7 @@ class GeneralSettingController extends Controller
                     // Handle the Swift_TransportException
                     return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
                 }
-            }elseif($adminCount < $plans1->admin_count && $relational['role'] === 'Admin'){
+            }elseif($adminCount + 1 < $plans1->admin_count && $relational['role'] === 'Admin'){
                 try{
 
                             DB::beginTransaction();
@@ -443,8 +444,7 @@ class GeneralSettingController extends Controller
 
 if ($subs_id == 2 ) {
 
-
-    if($memberCount < $plans2->tm_count && $relational['role'] === 'Member' ){
+    if($memberCount < $plans2->tm_count    && $relational['role'] === 'Member' ){
         try{
             DB::beginTransaction();
             $userMngt = DB::table('members')->insert($relational);
@@ -460,7 +460,7 @@ if ($subs_id == 2 ) {
             // Handle the Swift_TransportException
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
-        }elseif($adminCount < $plans2->admin_count && $relational['role'] === 'Admin'){
+        }elseif($adminCount + 1 < $plans2->admin_count && $relational['role'] === 'Admin'){
             try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -506,7 +506,7 @@ if ($subs_id == 2 ) {
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
         }
-        elseif($adminCount < $plans3->admin_count && $relational['role'] === 'Admin')
+        elseif($adminCount + 1 < $plans3->admin_count && $relational['role'] === 'Admin')
         {
             try{
 
