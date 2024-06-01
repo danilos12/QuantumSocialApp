@@ -355,9 +355,7 @@ $(document).ready(function () {
 
 
 
-    $('img.ui-icon[data-icon="twitter-settings"]').on(
-        "click",
-        function (event) {
+    $('img.ui-icon[data-icon="twitter-settings"]').on("click",function (event) {
             $(".general-settings-outer").hide();
             $(".twitter-settings-outer").show();
         }

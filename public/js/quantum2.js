@@ -486,11 +486,17 @@ $closeTwitterSettings = $(".close-twitter-settings");
 
 let currentModal = null;
 
-$(document).on('click', '[data-id="modal"]',function (event) {
-    $target = event.target.id;
+$(document).on('click', '[data-id="modal"]', function(event) {
+    var $target = event.target.id;
+    var statusCheck = $('#general-settings').attr('statuscheck');
+
+        openModal($target,statusCheck);
+
     openModal($target);
-    // console.log($target, "id");
+    console.log($target, "id");
+
 });
+
 
 $(".modal-large-close").click(function (event) {
     $target = event.target.id;
@@ -519,13 +525,16 @@ $(document).ready(function () {
 });
 
 // Open modal
-function openModal(modalId) {
+function openModal(modalId,status) {
     // console.log(modalId, currentModal);
 
     // Close any open modal
     if (currentModal !== null) {
         closeModal(currentModal);
     }
+    if(status !== 'wc-active'){
+        console.log('must pay first');
+    }else{
 
     $modalLargeAnchor.show();
 
@@ -535,7 +544,7 @@ function openModal(modalId) {
     setTimeout(function () {
         $(`.${modalId}-outer`).toggle("slide", { direction: "up" }, 700);
     }, 225);
-
+}
     // Keep track of the current modal
     currentModal = modalId;
 }
