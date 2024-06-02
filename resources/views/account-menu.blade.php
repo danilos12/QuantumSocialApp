@@ -544,7 +544,7 @@
                 @else
                     <p>No accounts found</p>
                 @endif
-                
+
                 {{-- @if ($checkRole->status === 1 && $checkRole->trial_counter > 0)  --}}
                 <div class="menu-social-add-accounts-section">
                   <div class="add-account add-twitter-account" id="link-twitter" style="width: 15%">
