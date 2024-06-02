@@ -80,7 +80,7 @@ class TrialCountdown
 
         $items = [];
         $items['status'] = $getstatus[0]->post_status;
-
+      
         return $items;
     }
 }

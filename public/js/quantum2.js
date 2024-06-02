@@ -488,7 +488,7 @@ let currentModal = null;
 
 $(document).on('click', '[data-id="modal"]', function(event) {
     var $target = event.target.id;
-    var statusCheck = $('#general-settings').attr('statuscheck');
+    var statusCheck = $('#general-settings').attr('statusdata');
 
         openModal($target,statusCheck);
 
