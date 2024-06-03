@@ -29,6 +29,10 @@
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
+
+                    @if ($errors->any())
+  dsadsa
+@endif
                 </div>
             </div>
 

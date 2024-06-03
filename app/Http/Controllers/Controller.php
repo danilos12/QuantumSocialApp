@@ -92,16 +92,16 @@ class Controller extends BaseController
     public function twitterOAuthCallback(Request $request) {
         try {
 
-            // if (isset($_GET['error'])) {
-            //     // return redirect('/');
-            //     // If there was an error saving data, redirect back to the previous page with an error message
-            //     return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
+            if (isset($_GET['error'])) {
+                // return redirect('/');
+                // If there was an error saving data, redirect back to the previous page with an error message
+                return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
 
-            // } else {
+            } else {
 
 
                 $userid =  $this->setDefaultId();
-                $codeVerifier = session()->get('code_verifier');
+                $codeVerifier = session()->pull('code_verifier');
                 $url = 'https://api.twitter.com/2/oauth2/token';
                 $data = array(
                     'code' => $request->input('code'),
@@ -217,7 +217,7 @@ class Controller extends BaseController
                     }
 
                 }
-            // }
+            }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
@@ -318,8 +318,7 @@ class Controller extends BaseController
 
     }
 
-
-    function base64url_encode($data) {
+    protected function base64url_encode($data) {
         $encoded = base64_encode($data);
         $encoded = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
         return $encoded;

@@ -492,7 +492,7 @@ $(document).on('click', '[data-id="modal"]', function(event) {
 
         openModal($target,statusCheck);
 
-    openModal($target);
+    // openModal($target);
     console.log($target, "id");
 
 });
@@ -534,6 +534,9 @@ function openModal(modalId,status) {
     }
     if(status !== 'wc-active'){
         console.log('must pay first');
+        toastr['warning'](
+            `Account is inactive`
+        );
     }else{
 
     $modalLargeAnchor.show();

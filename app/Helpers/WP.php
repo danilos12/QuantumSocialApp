@@ -6,8 +6,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use Exception;
+use PDOException;
 
-class TrialCountdown
+class WP
 {
     public static function decrypted_user_id_v1($data)
     {
@@ -45,6 +46,7 @@ class TrialCountdown
 
     public static function wp_status_and_wp_trialperiod()
     {
+        // dd(env('APP_URL'));
         $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_wp', 'root', '') : new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_wp', 'quantumsocialio', '%T%2dN4s');
 
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -82,5 +84,62 @@ class TrialCountdown
         $items['status'] = $getstatus[0]->post_status;
 
         return $items;
+    }   
+
+    public static function external_db_connection()
+    {
+        $db = 'quantum_wp';
+        $host = env('APP_URL') === 'http://app.quantumsocial.local' ? '127.0.0.1' : 'quantumapp.quantumsocial.io';
+        $user = env('APP_URL') === 'http://app.quantumsocial.local' ? 'root' : 'quantumsocialio';
+        $pass = env('APP_URL') === 'http://app.quantumsocial.local' ? '' : '%T%2dN4s';
+        $charset = 'utf8mb4';
+
+        $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+        $options = [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ];
+
+        try {
+            return new PDO($dsn, $user, $pass, $options);
+        } catch (\PDOException $e) {
+            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+        }
+    }
+
+    public static function getUserSubscription($email) {
+        try {
+            $dbConnection = WP::external_db_connection();
+            $table_prefix = 'wp_ftvis8_';
+    
+            // Prepare a SELECT query
+            $stmt = $dbConnection->prepare("SELECT * FROM {$table_prefix}users WHERE user_email = :email");
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);  
+            $stmt->execute();
+    
+            // Fetch the first row as an associative array
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            if (!$user) {
+                return null; // Return null if no user found
+            }
+
+    
+            // SELECT post join with postmeta
+            // $subscription = $dbConnection->prepare("SELECT post_status FROM {$table_prefix}posts JOIN {$table_prefix}postmeta WHERE meta_value= :id AND post_type = shop_subscription DESC LIMIT 1");
+            $subscription = $dbConnection->prepare("SELECT * FROM {$table_prefix}posts JOIN {$table_prefix}postmeta WHERE meta_value= :id AND post_type = 'shop_subscription' ORDER BY ID DESC");
+            $subscription->bindParam(':id', $user['ID'], PDO::PARAM_INT);  
+            $subscription->execute();
+    
+            // Fetch the first row as an associative array
+            $subscription = $subscription->fetch(PDO::FETCH_ASSOC);    
+    
+            return $subscription;
+        } catch (PDOException $e) {
+            // Log the error and return null
+            error_log('Database query error: ' . $e->getMessage());
+            return null;
+        }
     }
 }
