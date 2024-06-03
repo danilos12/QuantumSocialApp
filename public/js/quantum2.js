@@ -472,6 +472,7 @@ $TagGroupModalClose.click(function () {
 $modalLargeAnchor = $(".modal-large-anchor");
 $modalLargeBackdrop = $(".modal-large-backdrop");
 
+
 $launchCommandModule = $(".launch-command-module");
 $postingToolOuter = $(".posting-tool-outer");
 $closePostingTool = $(".posting-tool-close");
@@ -485,18 +486,31 @@ $twitterSettingsOuter = $(".twitter-settings-outer");
 $closeTwitterSettings = $(".close-twitter-settings");
 
 let currentModal = null;
-
+$contentmodal = $("#showinactive");
+var h1Value = $contentmodal.find("h1").text();
 $(document).on('click', '[data-id="modal"]', function(event) {
     var $target = event.target.id;
     var statusCheck = $('#general-settings').attr('statusdata');
 
-        openModal($target,statusCheck);
 
+    if(statusCheck !== 'wc-active'){
+        openInactiveBox();
+
+        console.log('must pay first');
+    }else{
     openModal($target);
     console.log($target, "id");
-
+    console.log(statusCheck, "status");
+}
 });
 
+
+function openInactiveBox($contentmodals) {
+    $(".onboard").append(responseData.html);
+    $modalLargeAnchor.html($contentmodals.html());
+
+    console.log($contentmodals);
+}
 
 $(".modal-large-close").click(function (event) {
     $target = event.target.id;
@@ -504,6 +518,7 @@ $(".modal-large-close").click(function (event) {
 });
 
 $(document).ready(function () {
+
     $('img.ui-icon[data-icon="twitter-settings"]').on(
         "click",
         function (event) {
@@ -511,7 +526,7 @@ $(document).ready(function () {
             openTwitterModal($target);
         }
     );
-
+    openInactiveBox($contentmodal);
     $("img.twitter-bar-settings-icon").on("click", function (event) {
         $target = event.target.id;
         openTwitterModal($target);
@@ -525,16 +540,13 @@ $(document).ready(function () {
 });
 
 // Open modal
-function openModal(modalId,status) {
+function openModal(modalId) {
     // console.log(modalId, currentModal);
 
     // Close any open modal
     if (currentModal !== null) {
         closeModal(currentModal);
     }
-    if(status !== 'wc-active'){
-        console.log('must pay first');
-    }else{
 
     $modalLargeAnchor.show();
 
@@ -544,7 +556,7 @@ function openModal(modalId,status) {
     setTimeout(function () {
         $(`.${modalId}-outer`).toggle("slide", { direction: "up" }, 700);
     }, 225);
-}
+
     // Keep track of the current modal
     currentModal = modalId;
 }

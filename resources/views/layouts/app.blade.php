@@ -195,7 +195,7 @@
 
                       @if (Auth::guard('web')->check())
 
-                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}"  class="menu-icon launch-general-settings" data-id="modal"  id="general-settings"/>
+                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" statusdata={{ $statuses }} class="menu-icon launch-general-settings" data-id="modal"  id="general-settings"/>
                       @endif
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
@@ -257,6 +257,7 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
+
       <div class="upgrade">
         @if(isset($modalContent))
             <!-- Render the modal content -->
