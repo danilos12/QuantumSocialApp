@@ -239,7 +239,7 @@
               <span style="align-content: center">
               {{ $message }}
               </span>
-              <button onclick="window.location.href='/update-payment'" style="background: #43ebf1; border: none; color: white; font-weight: 700;text-transform: uppercase;
+              <button onclick="window.location.href='/#'" style="background: #43ebf1; border: none; color: white; font-weight: 700;text-transform: uppercase;
               padding: 0.5em 1em;
               border-radius: 5px;">Update Payment</button>
             </div>
