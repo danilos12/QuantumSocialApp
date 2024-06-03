@@ -58,11 +58,7 @@
   @endauth
   @endif
 
-@php
-    use App\Helpers\WP;
 
-    $checkStatus = WP::wp_status_and_wp_trialperiod();
-@endphp
 
 {{-- pusher start --}}
   {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
@@ -199,7 +195,7 @@
 
                       @if (Auth::guard('web')->check())
 
-                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" statusCheck="{{$checkStatus['status']  }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" statusdata={{ $statuses }} class="menu-icon launch-general-settings" data-id="modal"  id="general-settings"/>
                       @endif
                       <a href="https://quantumsocial.io/help/" target="new">
                         <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" id="help"  />
@@ -266,6 +262,7 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
+
       <div class="upgrade">
         @if(isset($modalContent))
             <!-- Render the modal content -->

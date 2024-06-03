@@ -2,7 +2,7 @@
 <div class="modal-large-anchor faith-test">
     <div class="modal-large-backdrop">
 
-        <div class="content-modal">
+        <div id="showinactive" class="content-modals">
             <h1>aklhjdkhjaklwhdjkajkwhdjkh</h1>
         </div>
 

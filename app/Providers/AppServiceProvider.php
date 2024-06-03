@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
 
                 $checkAccess = WP::wp_status_and_wp_trialperiod();
 
-
+                $view->with('statuses', $checkAccess['status']);
                 if ($checkAccess['status'] !== 'wc-active') {
                     $accountActive = 1;
                     $view->with('accountActive', $accountActive);
