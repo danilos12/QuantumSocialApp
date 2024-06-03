@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Session;
+use App\Helpers\WP;
 trait AuthenticatesUsers
 {
     use RedirectsUsers, ThrottlesLogins;
@@ -83,9 +84,21 @@ trait AuthenticatesUsers
      */
     protected function attemptLogin(Request $request)
     {
-        return $this->guard()->attempt(
-            $this->credentials($request), $request->boolean('remember')
-        );
+        
+        $credentials = $this->credentials($request);
+        $subscriptionDetails = WP::getUserSubscription($request->email);       
+        
+        // return Auth::attempt($credentials, $request->filled('remember'));
+        if ($subscriptionDetails && $subscriptionDetails['post_status'] == 'wc-active') {
+            // return $this->guard()->attempt(
+            //     $this->credentials($request), $request->boolean('remember')
+            // );
+            // Attempt to authenticate the user if the subscription is active
+            return Auth::attempt($credentials, $request->boolean('remember'));
+        } 
+        
+        // If the subscription is not active, do not attempt to login
+        return false;
     }
 
     /**
@@ -146,6 +159,19 @@ trait AuthenticatesUsers
         throw ValidationException::withMessages([
             $this->username() => [trans('auth.failed')],
         ]);
+
+        // $user = \App\Models\User::where('email', $request->email)->first();
+
+        // $dbConnection = WP::getUserSubscription($request->email);         
+
+        // if ($user && $dbConnection->post_status == 'wc-cancelled') {
+        //     return redirect()->route('login')->withErrors([
+        //         'email' => [trans('auth.subscription_cancelled')],
+        //     ]);
+            
+        // }
+
+        // return parent::sendFailedLoginResponse($request);
     }
 
     /**

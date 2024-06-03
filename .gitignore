@@ -9,7 +9,6 @@
 *.debugbar.*
 
 # Ignore compiled source files
-vendor/
 node_modules/
 npm-debug.log
 yarn-error.log
@@ -49,5 +48,3 @@ bootstrap/cache/*.php
 *.swo
 
 # Ignore Composer and NPM lock files if they should be managed by the deployment system
-composer.lock
-package-lock.json

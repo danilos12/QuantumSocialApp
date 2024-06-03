@@ -15,6 +15,7 @@ use DateTimeZone;
 use PDO;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
+use App\Helpers\WP;
 use App\Models\CommandModule;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterSettings;
@@ -52,12 +53,17 @@ class AppServiceProvider extends ServiceProvider
                 // $view->with('time', $time);
 
 
-                $checkAccess = TrialCountdown::wp_status_and_wp_trialperiod();
+                $checkAccess = WP::wp_status_and_wp_trialperiod();
 
                 $view->with('statuses', $checkAccess['status']);
                 if ($checkAccess['status'] !== 'wc-active') {
+                    $accountActive = 1;
+                    $view->with('accountActive', $accountActive);
                     $message = 'Your account is inactive. Please update your payment to continue using the features.';
                     $view->with('message', $message);
+                } else {                    
+                    $accountActive = 0;
+                    $view->with('accountActive', $accountActive);
                 }
 
 
@@ -269,7 +275,7 @@ class AppServiceProvider extends ServiceProvider
                 // modal togglers
 
 
-                $checkAccess = TrialCountdown::wp_status_and_wp_trialperiod();
+                $checkAccess = WP::wp_status_and_wp_trialperiod();
 
             $view->with('paymentstats', $checkAccess['status']);
                 if ($checkAccess['status'] !== 'wc-active') {

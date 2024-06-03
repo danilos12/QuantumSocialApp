@@ -63,10 +63,11 @@
                     <input type="checkbox" id="make-promo" name="make-promo[]" value="evergreen-tweets" class="slot-type-check-label">
                     <label for="make-evergreen">Reserve Slot for Evergreen</label>
                 </div>  <!-- END .checkbox-wraps -->
-                    <div class="checkbox-wraps">
+                    {{-- <div class="checkbox-wraps">
                     <input type="checkbox" id="make-promo" name="make-promo[]" value="tweet-storm-tweets" class="slot-type-check-label">
                     <label for="make-tweetstorm">Reserve Slot for Tweet Storms</label>
-                </div>  <!-- END .checkbox-wraps -->
+                </div>  --}}
+                 <!-- END .checkbox-wraps -->
 
                 <input type="submit" class="save-new-slot" value="Save Time Slot" />
                 <div class="some-messages"></div>

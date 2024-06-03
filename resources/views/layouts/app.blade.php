@@ -28,10 +28,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
-<!-- Add Toastr.js CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-
-
+  <!-- Add Toastr.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+  {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/4.3.0/introjs.min.css"> --}}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
 
 
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
@@ -198,11 +198,11 @@
                       <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" statusdata={{ $statuses }} class="menu-icon launch-general-settings" data-id="modal"  id="general-settings"/>
                       @endif
                       <a href="https://quantumsocial.io/help/" target="new">
-                        <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
+                        <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" id="help"  />
                       </a>
                       {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-upgrade-page" data-id="modal" id="upgrade-page" /> --}}
                       <a href="https://quantumsocial.io/roadmap/" target="new">
-                        <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
+                        <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" id="roadmap"/>
                       </a>
                       <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                           <img src = "{{ asset('public/ui-images/icons/00e-logout.svg') }}" class="menu-icon" />
@@ -231,8 +231,13 @@
             @endif
 
             @if(isset($message))
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-warning" role="alert" style="display:flex; justify-content: space-between">
+              <span style="align-content: center">
               {{ $message }}
+              </span>
+              <button onclick="window.location.href='/#'" style="background: #43ebf1; border: none; color: white; font-weight: 700;text-transform: uppercase;
+              padding: 0.5em 1em;
+              border-radius: 5px;">Update Payment</button>
             </div>
             @else
             @yield('content')
@@ -286,11 +291,19 @@
   @endif
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+  @if (Route::has('login'))
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
+  @auth
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
+  @if (Route::is('dashboard'))
   <script type='text/javascript' src="{{asset('public/js/dashboard.js')}}"></script>
+  @endif
+  @endauth
+  @endif
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
   {{-- <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script> --}}
   {{-- <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>   --}}
@@ -311,7 +324,7 @@
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
         var menuId = e.target.dataset.target;
-        // console.log(menuId)
+        console.log(menuId)
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();
@@ -339,14 +352,11 @@
       })
 
       // var timeDisplay = document.getElementById("time");
-
-
       // function refreshTime() {
       //   var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});
       //   var formattedString = dateString.replace(", ", " - ");
       //   timeDisplay.innerHTML = formattedString;
       // }
-
       // setInterval(refreshTime, 1000);
     });
   </script>
