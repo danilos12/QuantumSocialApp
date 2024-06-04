@@ -84,8 +84,10 @@ Route::get('wp', function () {
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
 
-
-
+            $checkExistingEmail = $r['wp_email'];
+            if(User::where('email',$checkExistingEmail)->exists()){
+                return response()->json(['status' =>'error', 'laravel_id' => 0]);
+            }
 
 				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
 					$value = 1;
@@ -132,12 +134,7 @@ Route::get('wp', function () {
 
 
 				if( $user->id ) {
-					DB::table('app_usermeta')->insert([
-						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => base64_decode($r['wp_user_id'])],
-						['user_id' => $user->id, 'meta_key' => 'subscription_name', 'meta_value' => $wp_data['info']['product_name']],
 
-
-					]);
 
 					$now = date("Y-m-d");
 					$your_date = $wp_data['info']['trial_date'];

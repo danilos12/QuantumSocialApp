@@ -472,6 +472,8 @@ $TagGroupModalClose.click(function () {
 $modalLargeAnchor = $(".modal-large-anchor");
 $modalLargeBackdrop = $(".modal-large-backdrop");
 
+$launchInactiveBox = $(".modal-large-anchor-inactive");
+$modalInactiveBox = $('.modal-box ');
 
 $launchCommandModule = $(".launch-command-module");
 $postingToolOuter = $(".posting-tool-outer");
@@ -486,30 +488,37 @@ $twitterSettingsOuter = $(".twitter-settings-outer");
 $closeTwitterSettings = $(".close-twitter-settings");
 
 let currentModal = null;
-$contentmodal = $("#showinactive");
-var h1Value = $contentmodal.find("h1").text();
+
 $(document).on('click', '[data-id="modal"]', function(event) {
     var $target = event.target.id;
     var statusCheck = $('#general-settings').attr('statusdata');
+    var commandModuleStatus = $('#command-module').attr('statusdata');
+    var elementClass = $('.modal-large-backdrop-inactive').attr('class');
+
+    if(statusCheck !== 'wc-active' || commandModuleStatus !== 'wc-active'){
+        openInactiveBox(elementClass);
 
 
-    if(statusCheck !== 'wc-active'){
-        openInactiveBox();
-
-        console.log('must pay first');
     }else{
-    openModal($target);
+        openModal($target);
     console.log($target, "id");
-    console.log(statusCheck, "status");
 }
 });
 
 
-function openInactiveBox($contentmodals) {
-    $(".onboard").append(responseData.html);
-    $modalLargeAnchor.html($contentmodals.html());
+function openInactiveBox(modalId) {
 
-    console.log($contentmodals);
+    if (currentModal !== null) {
+        closeModal(modalId);
+    }
+    setTimeout(function () {
+        $launchInactiveBox.show();
+        $launchInactiveBox.fadeIn("slow");
+
+    }, 175);
+
+    currentModal = modalId;
+
 }
 
 $(".modal-large-close").click(function (event) {
@@ -518,7 +527,7 @@ $(".modal-large-close").click(function (event) {
 });
 
 $(document).ready(function () {
-
+    $launchInactiveBox.hide();
     $('img.ui-icon[data-icon="twitter-settings"]').on(
         "click",
         function (event) {
@@ -567,6 +576,20 @@ function closeModal(modalId) {
 
     // const modal = document.getElementById(modalId);
     // modal.style.display = 'none';
+
+
+    if(modalId == 'close-inactive'){
+
+        setTimeout(function () {
+            $launchInactiveBox.fadeOut("slow");
+
+        }, 175);
+    }
+
+
+
+
+
     $(`.${modalId}-outer`).toggle("slide", { direction: "up" }, 350);
     setTimeout(function () {
         $modalLargeAnchor.fadeOut("slow");
