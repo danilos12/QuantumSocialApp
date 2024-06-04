@@ -328,20 +328,20 @@
       }
 
       $('.sub-menu').css('display', 'none');
-    //   $('.menu-item').click(function(e) {
-    //     var menuId = e.target.dataset.target;
-    //     console.log(menuId,'hajhwkjd')
-    //     if (menuId) {
-    //     // If menuId is defined, toggle its visibility
-    //         $(`${menuId}`).toggle();
-    //         // console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
-    //     } else {
-    //         // If menuId is not defined or falsy, close all menus
-    //         // $(`ul:not(${menuId})`).hide();
-    //         // $(`li:not(${menuId})`).attr('aria-expanded', false);
-    //       // Replace 'your-menu-selector' with the appropriate selector for your menus
-    //     }
-    //   })
+      $('.menu-item').click(function(e) {
+        var menuId = e.target.dataset.target;
+        console.log(menuId,'hajhwkjd')
+        if (menuId) {
+        // If menuId is defined, toggle its visibility
+            $(`${menuId}`).toggle();
+            // console.log($(`ul:not(${menuId})`)) //.css('display', 'none')
+        } else {
+            // If menuId is not defined or falsy, close all menus
+            // $(`ul:not(${menuId})`).hide();
+            // $(`li:not(${menuId})`).attr('aria-expanded', false);
+          // Replace 'your-menu-selector' with the appropriate selector for your menus
+        }
+      })
 
       // Sub Menu
       var uri =  "{{  basename($_SERVER['REQUEST_URI']) }}";
