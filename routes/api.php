@@ -151,7 +151,8 @@ Route::get('wp', function () {
 						'timezone' =>'+00:00',
 						'queue_switch'=>1,
 						'promo_switch'=>1,
-						'evergreen_switch'=>1
+						'evergreen_switch'=>1,
+						'trial_credits'>=25
 					]);
 
 					$generalSettings = [

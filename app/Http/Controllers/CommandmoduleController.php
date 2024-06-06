@@ -76,7 +76,7 @@ class CommandmoduleController extends Controller
     public function create(Request $request) {
 
         $checkRole = MembershipHelper::tier($this->setDefaultId());
-
+        
         $postCredit = $checkRole->mo_post_credits === -1 ? 'unli' : $checkRole->mo_post_credits; 
 
         $postCount = DB::table('posts')
@@ -84,14 +84,17 @@ class CommandmoduleController extends Controller
             ->whereMonth('created_at', now()->month)
             ->count();
 
-
+        $trialCredit = DB::table('users_meta')
+            ->where('user_id', $this->setDefaultId())
+            ->value('trial_credits');
+        
         if (is_int($postCredit) && $checkRole->mo_post_credits <= $postCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
 
         $checkTwitter = DB::table('ut_acct_mngt')->where('user_id', $this->setDefaultId())->where('selected', 1)->first();
-		
+
 		if ($checkTwitter === null) {
 			$message = 'You need to add your social media account first to proceed with your post queue.';
             return response()->json(['status' => 403, 'message' => 'Post is not possible, please connect your social media first.', 'html' => $message]);
@@ -306,6 +309,14 @@ class CommandmoduleController extends Controller
 
             // Retrieve the last saved data
             $lastSavedData = CommandModule::latest()->first();
+
+
+            if ($trialCredit) {
+                $newTrialCredit = $trialCredit - 1;
+                DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->update(['trial_credits' => $newTrialCredit]);    
+            }
 
             // Return success response
             return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Post has been created. ' . $messages, 'tweet' => $lastSavedData]);
@@ -880,7 +891,6 @@ class CommandmoduleController extends Controller
 
             $allowedHosts = ['example.com', 'another-example.com']; // Replace with your allowed hosts
 
-
             foreach ($lines as $index => $line) {
                 $values = str_getcsv($line);
                 if (count($values) !== count($header)) {
@@ -896,13 +906,26 @@ class CommandmoduleController extends Controller
                     $record['month'] = $monthMap[$record['month']];
                 }
 
+                
                 $validator = Validator::make($record, [
                     'post_description' => 'required',
                     'year' => 'required|digits:4',
                     'month' => 'required|digits_between:1,2|between:1,12', // Ensure month is between 1 and 12
                     'day' => 'required',
                     'hour' => 'required|between:1,23', // Assuming hour is in 24-hour format, restrict between 1 and 23
-                    'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59                    
+                    'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59  
+                    // 'hour' => 'required|digits:1|between:1,23', // Assuming hour is in 24-hour format, restrict between 1 and 23
+                    // 'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59
+                    // 'image_url' => [
+                    //     Rule::requiredIf(function () use ($record) {
+                    //         return empty($record['link_url']) && empty($record['image_url']); // image_url is required if both image_url and link_url are empty
+                    //     }),
+                    // ],
+                    // 'link_url' => [
+                    //     Rule::requiredIf(function () use ($record) {
+                    //         return empty($record['image_url']); // link_url is required if image_url is empty
+                    //     }),
+                    // ],
                     'image_url' => [
                         'required_without_all:link_url',
                         function ($attribute, $value, $fail) {
@@ -943,7 +966,6 @@ class CommandmoduleController extends Controller
                 $file = $request->file('csv_file');
                 $csvData = $this->parse($file);
 
-                
                 $monthMap = [
                     'January' => 1, 'Jan' => 1, 'February' => 2, 'Feb' => 2, 'March' => 3, 'Mar' => 3,
                     'April' => 4, 'Apr' => 4, 'May' => 5, 'June' => 6, 'Jun' => 6,
@@ -953,10 +975,11 @@ class CommandmoduleController extends Controller
 
                 foreach ($csvData as $key => $data) {
 
-                     // Convert month name to numeric value if needed
+                    // Convert month name to numeric value if needed
                     if (isset($data['month']) && array_key_exists($data['month'], $monthMap)) {
                         $data['month'] = $monthMap[$data['month']];
                     }
+                    
                    // Validation passed, save the data to the database
                     $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
                     $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
@@ -1011,8 +1034,6 @@ class CommandmoduleController extends Controller
         // Check if the URL has a valid domain
         return preg_match('/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/', $url);
     }
-
-
 
     function scrapeMeta(Request $request) {
         $findMeta = Bulk_meta::where('link_url', $request->input('url'))->first();
