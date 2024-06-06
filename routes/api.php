@@ -152,9 +152,9 @@ Route::get('wp', function () {
 						'next_payment'=>$wp_data['info']['next_payment'],
 						'status'=>$status,
 						'timezone' =>'+00:00',
-						'queue_switch'=>0,
-						'promo_switch'=>0,
-						'evergreen_switch'=>0,
+						'queue_switch'=>1,
+						'promo_switch'=>1,
+						'evergreen_switch'=>1,
 						'trial_credits'>=25
 					]);
 
@@ -170,7 +170,7 @@ Route::get('wp', function () {
 					];
 
 					DB::table('settings_toggler_general')->insert($generalSettings);
-					DB::table('user_onboard')->insert(['user_id' => $user->id, 'onboarded' => 0]);
+					DB::table('user_onboard')->insert(['user_id' => $user->id, 'onboarded' => 0, 'tour' => 0]);
 
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
@@ -194,7 +194,7 @@ Route::get('wp', function () {
 });
 
 
-
+Route::get('auth/scrape', [App\Http\Controllers\Api\V1\Auth\RegisterController::class, 'scrapeMetatags']);
 
 
 

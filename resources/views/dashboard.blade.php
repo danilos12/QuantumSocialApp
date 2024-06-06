@@ -53,7 +53,7 @@
                                     {{-- <svg width="200" height="200" viewBox="-31.25 -31.25 312.5 312.5" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
                                         <circle r="115" cx="125" cy="125" fill="transparent" stroke="#C8C8C8" stroke-width="10" stroke-dasharray="722.2px" stroke-dashoffset="0"></circle>
                                         <circle r="115" cx="125" cy="125" stroke="#43EBF1" stroke-width="10" stroke-linecap="butt" stroke-dashoffset="419px" fill="transparent" stroke-dasharray="722.2px"></circle>
-                                        <text x="102px" y="140px" fill="#fafafa" font-family="Montserrat" font-size="48px" font-weight="bold" style="transform:rotate(90deg) translate(0px, -246px)">42</text>
+                                        <text x="102px" y="140px" fill="#fafafa" font-family="Montserrat" font-size="48px"  font-weight="bold" style="transform:rotate(90deg) translate(0px, -246px)">42</text>
                                     </svg>         --}}
 
                                     <span class="actual">
