@@ -330,7 +330,7 @@
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
         var menuId = e.target.dataset.target;
-        console.log(menuId,'hajhwkjd')
+     
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();

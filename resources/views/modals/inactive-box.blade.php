@@ -11,7 +11,7 @@
                 <div class="w-full flex justify-center"><span class="text-lg">&#9888;</span></div>
                 <div class="flex flex-col h-full w-full items-center justify-center p-3 ">
 
-                    <span class="text-center ">{{ $message }}</span>
+                    <span class="text-center ">{{ $message ?? '' }}</span>
                     <button onclick="window.location.href='/#'" class="mt-12" style="background: #43ebf1; border: none; color: white; font-weight: 700;text-transform: uppercase;
                     padding: 0.5em 1em;
                     border-radius: 5px;">Update Payment</button>
