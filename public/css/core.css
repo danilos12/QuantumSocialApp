@@ -959,6 +959,17 @@ canvas {
     /*min-height: 85vh;  Consider removing this...*/
     padding: 0 1.5em 0 0;
 }
+.error-inner {
+    z-index: 20;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    
+}
 
 .toggle-wrap {
     position: fixed;
@@ -4241,7 +4252,7 @@ input#toggle_api {
     margin-right: 5%;
     width: 100vw;
     height: 100vh;
-    backdrop-filter: blur(5px);    
+    backdrop-filter: blur(5px);
     z-index: 79;
 }
 
@@ -4813,14 +4824,14 @@ input#toggle_api {
     background-color: var(--color-nova-75);
     border: none;
     }
-    
+
 .btn-primary:hover {
     color: #fff;
     background-color: var(--color-nova);
     border: none
     }
-    
-    
+
+
 /* login screen - change height*/
 .login-inner {
     height: auto;

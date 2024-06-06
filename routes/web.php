@@ -38,7 +38,7 @@ Route::get('/login/member', function () {
 
 Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
 Route::post('/logout/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'logout'])->name('memberlogout');
-
+Route::get('/404', [App\Http\Controllers\ErrorPage::class, 'errorPages'])->name('errorPage');
 
 // Auth::routes();
 Auth::routes(['register' => false]);

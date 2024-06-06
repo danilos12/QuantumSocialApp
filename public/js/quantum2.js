@@ -492,16 +492,16 @@ let currentModal = null;
 $(document).on('click', '[data-id="modal"]', function(event) {
     var $target = event.target.id;
     var statusCheck = $('#general-settings').attr('statusdata');
-    var commandModuleStatus = $('#command-module').attr('statusdata');
+
     var elementClass = $('.modal-large-backdrop-inactive').attr('class');
 
-    if(statusCheck !== 'wc-active' || commandModuleStatus !== 'wc-active'){
+    if(statusCheck !== 'wc-active' ){
         openInactiveBox(elementClass);
 
 
     }else{
         openModal($target);
-    console.log($target, "id");
+
 }
 });
 
