@@ -108,8 +108,9 @@
         flex-direction: column;
         align-items: center;
         border-radius: 1rem;
-        width: 25%;
-        height: 25%;
+        width: auto;
+        height: auto;
+        padding: 3%;
         background-color: var(--frost-background);
     }
 .modal-large-anchor-inactive {

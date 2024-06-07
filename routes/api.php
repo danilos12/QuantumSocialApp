@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-
+use App\Helpers\WP;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,10 +76,7 @@ Route::get('wp', function () {
 	if(isset( $r['wp_user_id'] ) ) {
 
 
-        $response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($r['wp_user_id'])));
-		$wp_data = $response->json();
-
-        // return response()->json(['status' =>$wp_data, 'laravel_id' => $r['wp_user_id']]);
+		$wp_data = WP::external_wp_rest_api($r['wp_user_id']);
 
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
@@ -152,7 +149,7 @@ Route::get('wp', function () {
 						'queue_switch'=>1,
 						'promo_switch'=>1,
 						'evergreen_switch'=>1,
-						'trial_credits'>=25
+						'trial_credits'=>25
 					]);
 
 					$generalSettings = [
