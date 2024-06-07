@@ -7,7 +7,7 @@
 <div class="p-12">
 <button id="navigateButton" class="custom-button ">Go Home</button>
 </div>
-<div class=""><img class="astro" src="{{ asset('public/')}}/ui-images/icons/astronaut.png" alt="astronaut"></div>
+<div class=""><img class="astro" loading="lazy" src="{{ asset('public/')}}/ui-images/icons/astronaut.png" alt="astronaut"></div>
 
 <script>
     document.getElementById('navigateButton').addEventListener('click', function() {
