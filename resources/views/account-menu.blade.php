@@ -4,86 +4,86 @@
     <div class="modal-large-backdrop">
 
 
-     <div class="add-team-member-modal">
-      <div class="add-team-member-inner montserrat " style="color: white">
-        <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/>
-        <div class="exit-button" >
+      <div class="add-team-member-modal">
+        <div class="add-team-member-inner montserrat " style="color: white">
+          <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/>
+          <div class="exit-button" >
 
-          <svg id="closing" style="width: 10%;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-2 h-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+            <svg id="closing" style="width: 10%;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-2 h-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
 
-        </div>
-          <!-- BEGIN input copied from engage.html -->
-          <div class="global-input-email add-team-fonts ">
-            <form class="global-input-email">
-                <div class="">
-                  <div class="w-full font-normal" ><label class="font-normal" for="newuser_fname" >YOU ARE CURRENLY <span id="actionLabel">ADDING</span>:</label></div>
-                  <div  id="alertcontainer" style="display: flex;justify-content:center; width:100%;"></div>
-                    <div class="w-full">
-                      <div class="w-full " ><label class="font-normal" for="newuser_fname" >FULL NAME</label></div>
-
-                    <input class="h-10 w-full" type="text" placeholder="Name" id="newuser_fname"/>
-                    </div>
-                    <div class="w-full">
-
-                        <label class="font-normal" for="newuser_fname ">Email Address</label>
-                        <div id="emailSpan" style="display: none;align-items: center;height: 50px;">
-                          <div class="mr-3"><span id="emailSpansa" class="font-normal" ></span></div>
-
-                          <div class="w-5 h-5 svgiconhover">
-                            <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-                            </svg>
-                            <div class="tooltip-text" id="tooltipText">Verified</div>
-                          </div>
-                        </div>
-
-                    <input class="h-10 w-full" type="text" placeholder="Email" id="newuser_email"/>
-
-                    </div>
-              </div>
-                <div class="conts">
-                  <div class="flex w-full items-center">
-                    <div class="flex justify-start items-center" >
-                    <label for="toggle_api" class="font-size-base mr-3 font-normal ">GRANT API ACCESS (Allow users to...)</label>
-                    <input type="checkbox" class="menu-twirl-toggle " name="grant-api" id="toggle_api" >
-                  </div>
-
-                  </div>
-
-
-                  <div class="conts mb-4">
-                    <div class="flex items-center w-full mb-11">
-                        <div class="flex justify-center" style="height: 20px;width:30px;" >
-                          <input style='scale:2.5' type="radio" id="member_role" name="fav_language" value="Member">
-                        </div>
-                    <label class="bits font-normal" for="javascript">Team Member (Allows user to schedule posts..)</label>
-                  </div>
-                  <div class="flex w-full items-center ">
-                    <div class="flex justify-center" style="height: 20px;width:30px;" >
-                        <input style="scale:2.5" type="radio" id="admin_role" name="fav_language" value="Admin">
-                    </div>
-                    <label class="bits font-normal" for="admin_role">Admin (Allows user to add other members)</label>
-                  </div>
-
-                  </div>
-                </div>
-
-
-
-
-            </form>
-            <div class="center-block">
-              <span  class="add-team-button"><span id="labeling">Add</span></span>
-            </div>
           </div>
-          <!-- END copied from engage.html -->
+            <!-- BEGIN input copied from engage.html -->
+            <div class="global-input-email add-team-fonts ">
+              <form class="global-input-email">
+                  <div class="">
+                    <div class="w-full font-normal" ><label class="font-normal" for="newuser_fname" >YOU ARE CURRENLY <span id="actionLabel">ADDING</span>:</label></div>
+                    <div  id="alertcontainer" style="display: flex;justify-content:center; width:100%;"></div>
+                      <div class="w-full">
+                        <div class="w-full " ><label class="font-normal" for="newuser_fname" >FULL NAME</label></div>
 
-      </div>  <!-- END .add-team-member-inner -->
-    </div>  <!-- END .add-team-member-modal -->
+                      <input class="h-10 w-full" type="text" placeholder="Name" id="newuser_fname"/>
+                      </div>
+                      <div class="w-full">
 
-     <div class="change-pass-modal" style="display: none">
+                          <label class="font-normal" for="newuser_fname ">Email Address</label>
+                          <div id="emailSpan" style="display: none;align-items: center;height: 50px;">
+                            <div class="mr-3"><span id="emailSpansa" class="font-normal" ></span></div>
+
+                            <div class="w-5 h-5 svgiconhover">
+                              <svg  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                              </svg>
+                              <div class="tooltip-text" id="tooltipText">Verified</div>
+                            </div>
+                          </div>
+
+                      <input class="h-10 w-full" type="text" placeholder="Email" id="newuser_email"/>
+
+                      </div>
+                </div>
+                  <div class="conts">
+                    <div class="flex w-full items-center">
+                      <div class="flex justify-start items-center" >
+                      <label for="toggle_api" class="font-size-base mr-3 font-normal ">GRANT API ACCESS (Allow users to...)</label>
+                      <input type="checkbox" class="menu-twirl-toggle " name="grant-api" id="toggle_api" >
+                    </div>
+
+                    </div>
+
+
+                    <div class="conts mb-4">
+                      <div class="flex items-center w-full mb-11">
+                          <div class="flex justify-center" style="height: 20px;width:30px;" >
+                            <input style='scale:2.5' type="radio" id="member_role" name="fav_language" value="Member">
+                          </div>
+                      <label class="bits font-normal" for="javascript">Team Member (Allows user to schedule posts..)</label>
+                    </div>
+                    <div class="flex w-full items-center ">
+                      <div class="flex justify-center" style="height: 20px;width:30px;" >
+                          <input style="scale:2.5" type="radio" id="admin_role" name="fav_language" value="Admin">
+                      </div>
+                      <label class="bits font-normal" for="admin_role">Admin (Allows user to add other members)</label>
+                    </div>
+
+                    </div>
+                  </div>
+
+
+
+
+              </form>
+              <div class="center-block">
+                <span  class="add-team-button"><span id="labeling">Add</span></span>
+              </div>
+            </div>
+            <!-- END copied from engage.html -->
+
+        </div>  <!-- END .add-team-member-inner -->
+      </div>  <!-- END .add-team-member-modal -->
+
+      <div class="change-pass-modal" style="display: none">
         <div class="change-pass-inner frosted">
             <!-- BEGIN input copied from engage.html -->
             <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/>
@@ -109,6 +109,32 @@
 
         </div>  <!-- END .add-team-member-inner -->
       </div>  <!-- END .add-team-member-modal -->
+            
+      <div class="cancel-subscription-modal" style="display: none">
+        <div class="cancel-subscription-inner frosted">
+            <!-- BEGIN input copied from engage.html -->
+            {{-- <img src="{{ asset('public/')}}/ui-images/icon2/Edit.svg" class="editiconadd" id=""/> --}}
+            <div class="exit-button" >
+              <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon settings-close close-change-pass" id="close-change-pass"/>
+            </div>
+
+            <div class="menu-header font-white">Are you sure you want to cancel your subscription?</div>
+            <div class="global-input-email" style="padding: 0%">
+              <form id="cancelSubscriptionForm">
+                <div class="global-input-text ">
+                  <p style="font-weight:bold; color: white">If you are sure, please type below your quantum email</p>
+                  <input type="text" placeholder="Quantum Social Email" id="quantum_social_email" name="quantum_social_email" style="width: 100%; "/>
+                </div>  
+                <br>              
+
+                <input type="submit" class="subTwirl-buttons"  value="Cancel my subscription" style="border:none; color: white; background-color: red ">
+                
+              </form>
+            </div>
+            <!-- END copied from engage.html -->
+
+        </div>  <!-- END .add-team-member-inner -->
+      </div>  <!-- END .add-team-member-modal -->
 
       <div class="modal-large-outer main-settings-outer general-settings-outer frosted">
         <img src="{{ asset('public/')}}/ui-images/icons/pg-close.svg" class="ui-icon modal-large-close settings-close close-general-settings" id="general-settings"/>
@@ -116,6 +142,7 @@
 
         <div class="modal-large-inner main-settings-inner general-settings-inner">
           <!--     BEGIN QUANTUM ACCOUNT   -->
+          
           <div class="menu-section-outer quantum-settings-outer">
             <div class="menu-section-inner quantum-settings-inner" id="quantum_acct">
               <span class="menu-section-header">
@@ -170,7 +197,7 @@
             </div>  <!-- END .quantum-settings-inner -->
           </div>  <!-- END .quantum-settings-outer -->
           <!--     END QUANTUM ACCOUNT   -->
-
+          
           {{-- for admin access only --}}
           @if (Auth::guard('web')->check() || Auth::guard('member')->check())
 
@@ -319,14 +346,14 @@
 
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
-              <span class="menu-section-header">Twitter API Credential</span>
+              <span class="menu-section-header">X API Credential</span>
 
               <div class="menu-twirl-option-outer">
                 <div class="menu-twirl-option-inner">
                   <div class="menu-twirl-left">
                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                       <span class="menu-twirl-option-text">
-                        Use this Master API for every Twitter account.</span>
+                        Use this Master API for every X account.</span>
                   </div>
                   <!-- END .menu-twirl-left -->
                   <div class="menu-twirl-right">
@@ -390,7 +417,7 @@
                   <div class="menu-twirl-left">
                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                       <span class="menu-twirl-option-text">
-                        Allow each Twitter account to have its own API <br>
+                        Allow each X account to have its own API <br>
                         <span style="font-weight: 200; font-style: italic;">(Keeping this off forces all accounts to use the Master API, but activating it will give the choice on the account level in each Twitter account's settings.)</span>
                       </span>
                   </div>  <!-- END .menu-twirl-left -->
@@ -402,21 +429,21 @@
             </div>  <!-- END .social-accounts-inner -->
           </div>
 
-       <!-- END .social-accounts-outer -->
+          <!-- END .social-accounts-outer -->
           @elseif(Auth::guard('member')->user()->api_access == 1)
           @auth('member')
 
           <!-- TWITTER API -->
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
-              <span class="menu-section-header">Twitter API Credential</span>
+              <span class="menu-section-header">X API Credential</span>
 
               <div class="menu-twirl-option-outer">
                 <div class="menu-twirl-option-inner">
                   <div class="menu-twirl-left">
                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                       <span class="menu-twirl-option-text">
-                        Use this Master API for every Twitter account.</span>
+                        Use this Master API for every X account.</span>
                   </div>
                   <!-- END .menu-twirl-left -->
                   <div class="menu-twirl-right">
@@ -480,7 +507,7 @@
                   <div class="menu-twirl-left">
                       <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                       <span class="menu-twirl-option-text">
-                        Allow each Twitter account to have its own API <br>
+                        Allow each X account to have its own API <br>
                         <span style="font-weight: 200; font-style: italic;">(Keeping this off forces all accounts to use the Master API, but activating it will give the choice on the account level in each Twitter account's settings.)</span>
                       </span>
                   </div>  <!-- END .menu-twirl-left -->
@@ -545,12 +572,14 @@
                     <p>No accounts found</p>
                 @endif
 
+                {{-- @if ($checkRole->status === 1 && $checkRole->trial_counter > 0)  --}}
                 <div class="menu-social-add-accounts-section">
                   <div class="add-account add-twitter-account" id="link-twitter" style="width: 15%">
                     <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon vertical-middle" />
                         <span>Add X account</span>
                   </div>  <!-- END .add-twitter-account -->
                 </div>  <!-- END .menu-social-add-accounts-section -->
+                {{-- @endif --}}
 
             </div>  <!-- END .social-accounts-inner -->
           </div>  <!-- END .social-accounts-outer -->
@@ -606,6 +635,10 @@
             </div>  <!-- END .command-module-inner -->
           </div>  <!-- END .command-module-outer -->
 
+          @php 
+            $show = 0;
+          @endphp 
+          @if ($show==1)
           <div class="menu-section-outer advanced-preferences-outer">
             <div class="menu-section-inner advanced-preferences-inner">
 
@@ -677,7 +710,24 @@
 
             </div>  <!-- END .advanced-preferences-inner -->
           </div>  <!-- END .advanced-preferences-outer -->
+          @endif
 
+          <div class="menu-section-outer advanced-preferences-outer">
+            <div class="menu-section-inner advanced-preferences-inner">
+
+                <div class="menu-section-twirl-header-outer">
+                  <div class="menu-section-twirl-header-inner">
+
+                    <span class="menu-section-header">
+                      Cancel your subscription</span>                                     
+
+                      <div class="menu-subTwirl-inner">
+                        <input type="button" value="Cancel your subscription" class="subTwirl-buttons" id="cancel-subscription" style="margin-top: 0.5em; border: none; background: red;">                        
+                      </div>
+                  </div>  <!-- END .menu-section-twirl-header-inner -->
+                </div>  <!-- END .menu-section-twirl-header-outer -->                            
+            </div>  <!-- END .advanced-preferences-inner -->
+          </div>  <!-- END .advanced-preferences-outer -->
 
         </div>  <!-- END .general-settings-inner -->
       </div>  <!-- END .general-settings-outer -->
@@ -687,11 +737,11 @@
       @include('twittersettings')
 
 
+      @include('modals.commandmodule')
 
     </div>  <!-- END .main-settings-background -->
     <!-- BEGIN COMMAND MODULE -->
 
-    @include('modals.commandmodule')
     {{-- @include('modals.edit-commandmodule') --}}
 
     <!-- END COMMAND MODULE -->

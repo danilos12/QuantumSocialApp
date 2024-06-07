@@ -177,6 +177,8 @@ const darkModeToggle = document.querySelector("#dark-mode-toggle");
 const enableDarkMode = () => {
     // 1. Add the class to the body
     document.body.classList.add("darkmode");
+    // document.getElementById('api-banner').classList.add('api-dark');
+    document.getElementById('api-banner').style.color = "white";
     // 2. Update darkMode in localStorage
     localStorage.setItem("darkMode", "enabled");
 };
@@ -184,6 +186,7 @@ const enableDarkMode = () => {
 const disableDarkMode = () => {
     // 1. Remove the class from the body
     document.body.classList.remove("darkmode");
+    document.getElementById('api-banner').style.color = "purple";
     // 2. Update darkMode in localStorage
     localStorage.setItem("darkMode", null);
 };
@@ -469,6 +472,9 @@ $TagGroupModalClose.click(function () {
 $modalLargeAnchor = $(".modal-large-anchor");
 $modalLargeBackdrop = $(".modal-large-backdrop");
 
+$launchInactiveBox = $(".modal-large-anchor-inactive");
+$modalInactiveBox = $('.modal-box ');
+
 $launchCommandModule = $(".launch-command-module");
 $postingToolOuter = $(".posting-tool-outer");
 $closePostingTool = $(".posting-tool-close");
@@ -483,11 +489,37 @@ $closeTwitterSettings = $(".close-twitter-settings");
 
 let currentModal = null;
 
-$(document).on('click', '[data-id="modal"]',function (event) {
-    $target = event.target.id;
-    openModal($target);
-    console.log($target, "id");
+$(document).on('click', '[data-id="modal"]', function(event) {
+    var $target = event.target.id;
+    var statusCheck = $('#general-settings').attr('statusdata');
+
+    var elementClass = $('.modal-large-backdrop-inactive').attr('class');
+
+    if(statusCheck !== 'wc-active' ){
+        openInactiveBox(elementClass);
+
+
+    }else{
+        openModal($target);
+
+}
 });
+
+
+function openInactiveBox(modalId) {
+
+    if (currentModal !== null) {
+        closeModal(modalId);
+    }
+    setTimeout(function () {
+        $launchInactiveBox.show();
+        $launchInactiveBox.fadeIn("slow");
+
+    }, 175);
+
+    currentModal = modalId;
+
+}
 
 $(".modal-large-close").click(function (event) {
     $target = event.target.id;
@@ -495,6 +527,7 @@ $(".modal-large-close").click(function (event) {
 });
 
 $(document).ready(function () {
+    $launchInactiveBox.hide();
     $('img.ui-icon[data-icon="twitter-settings"]').on(
         "click",
         function (event) {
@@ -502,7 +535,7 @@ $(document).ready(function () {
             openTwitterModal($target);
         }
     );
-
+    openInactiveBox($contentmodal);
     $("img.twitter-bar-settings-icon").on("click", function (event) {
         $target = event.target.id;
         openTwitterModal($target);
@@ -517,7 +550,7 @@ $(document).ready(function () {
 
 // Open modal
 function openModal(modalId) {
-    console.log(modalId, currentModal);
+    // console.log(modalId, currentModal);
 
     // Close any open modal
     if (currentModal !== null) {
@@ -539,10 +572,24 @@ function openModal(modalId) {
 
 // Close modal
 function closeModal(modalId) {
-    console.log(modalId);
+    // console.log(modalId);
 
     // const modal = document.getElementById(modalId);
     // modal.style.display = 'none';
+
+
+    if(modalId == 'close-inactive'){
+
+        setTimeout(function () {
+            $launchInactiveBox.fadeOut("slow");
+
+        }, 175);
+    }
+
+
+
+
+
     $(`.${modalId}-outer`).toggle("slide", { direction: "up" }, 350);
     setTimeout(function () {
         $modalLargeAnchor.fadeOut("slow");
@@ -555,7 +602,7 @@ function closeModal(modalId) {
     $("div[data-post]").filter(`.post-alert`).addClass("tweets-hide"); // hide tweet panels
 
     currentModal = null;
-    console.log(currentModal);
+    // console.log(currentModal);
 
     if (currentModal === null) {
         // Get the current pathname
@@ -599,6 +646,10 @@ window.onkeyup = function (event) {
     }
 };
 
+$body = $('body');
+
+console.log($body.hasClass('darkmode'));
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 
@@ -633,3 +684,27 @@ function openUpgradeModal(responseData) {
     $(".upgrade").append(responseData.html);
     $(".upgrade").css("z-index", "1500");
 }
+
+function onboardingModal(responseData) {
+    // console.log(responseData.html);
+    $(".onboard").append(responseData.html);
+    // $(".onboard").css("z-index", "1500");
+}
+
+toastr.options = {
+    closeButton: false,
+    debug: false,
+    newestOnTop: true,
+    progressBar: false,
+    positionClass: "toast-top-center",
+    preventDuplicates: false,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "300",
+    timeOut: "5000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+};

@@ -5,10 +5,16 @@
         try {
             const response = await fetch(APP_URL + "/cmd/get-tag-groups/" + TWITTER_ID);
             const responseData = await response.json(); 
-    
-            if (responseData.length > 0) {
-                // console.log(responseData);
-                $.each(responseData, function (index, k, value) {
+            console.log(responseData);
+
+            if (responseData.status === 500) {
+                $('.content-inner').html(`<div class="alert alert-${responseData.stat}" role="alert">
+                ${responseData.message}
+              </div>`)
+            }
+            if (responseData.tagGroups.length > 0) {
+            
+                $.each(responseData.tagGroups, function (index, k, value) {
                     var template = tagGrptemplateItem(this);
                     $("#tag-groups-content").append(template);
                 });
@@ -27,13 +33,14 @@
     }
     getTagGroups();
 
-   $('#tag-groups-content').on('click', '.tag-group-controller', async function() {
+   $(document).on('click', '.tag-group-controller', async function() {
         $('.tag-container').empty()
-        var tag_id = $(this).find('.tag-option-title').attr('id');
+        const tag_id = $(this).find('span.tag-option-title').attr('id');
+        console.log(tag_id)
         $('.copyButton').attr('data-tag-id', tag_id)
 
         try {
-            const response = await fetch(APP_URL + "/cmd/get-tag-items?twitter_id=" + TWITTER_ID + '&tag_id=' + tag_id);
+            const response = await fetch(`${APP_URL}/cmd/get-tag-items?twitter_id=${TWITTER_ID}&tag_id=${tag_id}`);
             const responseData = await response.json();
 
             if (responseData.length > 0) {
@@ -81,10 +88,17 @@
 
                 // Remove the temporary textarea
                 tempTextArea.remove();
-              alert(responseData.message);
+
+                toastr[responseData.stat](
+                    `${responseData.message}`
+                );
             } else {
-              alert('No tags available for this hashtag group.')
+
+                toastr[responseData.stat](
+                    `${responseData.message}`
+                );
             }
+
         } catch (err) {
             console.error(err)
         }
@@ -151,12 +165,11 @@
                     })
                 });
                 const responseData = await response.json();
-    
+                    
                 if (responseData.status === 200) {
-                    console.log(responseData)
                     var span = addNewTagTemplateItem(responseData.hashtag);
                     container.append(span);
-                    response.value = '';  
+                    $('#addTagForm_tags').val('');
                 } else {
                     throw new Error('Request failed');
                 }
@@ -208,9 +221,13 @@
                 var template = tagGrptemplateItem(responseData.data);
                 // $(template).appendTo('#tag-groups-content');
                 $('#tag-groups-content').append(template);
+                toastr[responseData.stat](
+                    `Success! ${responseData.message}`
+                );
 
-                alert(responseData.message);
-                location.reload();
+                setTimeout(function() {
+                    location.reload();
+                    }, 3000); 
             } else if (responseData.status === 500) {    
 
                 toastr[responseData.stat](
@@ -226,21 +243,92 @@
         }
     });
 
+    // remove tagGroup
+    $(document).on('click', '[data-id="remove-tag"]', async function(e) {
+        const tag_group_id = e.target.id.split('-')[1];
+
+        try {
+            const response = await fetch(APP_URL + "/cmd/remove-tag", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                body: JSON.stringify({ // Convert the data to JSON string
+                    tag_group_id, 
+                    twitter_id: TWITTER_ID 
+                })
+            });
+            const responseData = await response.json();
+
+            
+            
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
+
+            setTimeout(function() {
+                location.reload();
+                }, 3000); 
+
+           
+        } catch (err) {
+            console.error(err)
+        }
+    })
+
+    // remove tagItem
+    $(document).on('click', '[data-id="remove-tag-item"]', async function(e) {
+        const tag_group_id = e.target.id;       
+
+        try {
+            const response = await fetch(APP_URL + "/cmd/remove-tag-item", {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                body: JSON.stringify({ // Convert the data to JSON string
+                    tag_group_id, 
+                    twitter_id: TWITTER_ID 
+                })
+            });
+            const responseData = await response.json();
+            $('.tag-container').find(`img#${responseData.item_removed}`).closest('span').remove()
+                    
+            toastr[responseData.stat](
+                `${responseData.message}`
+            );
+
+            
+        } catch (err) {
+            console.error(err)
+        }
+    })
+
     
     function tagGrptemplateItem(data) {
-        return $template = `<div class="tag-group-controller" >
-                                <div class"tag-group-option">
+        
+        return $template = `<div class=""  style="justify-content: space-between;display: flex; align-items: center; padding: 1px 1em 0 0;">
+                            <div class="tag-group-controller" id="${data.id}">
+                                <div class"tag-group-option" >
                                     <span class="tag-option-title-wrap">
                                         <img src="${APP_URL}/public/ui-images/icons/14-hashtag-feeds.svg" class="ui-icon tag-option-icon" />
                                         <span class="tag-option-title" id="${data.tag_group_mkey}">${data.tag_group_mvalue}</span>
                                     </span> 
                                 </div> 
+                            </div>
+                            <div class="remove" style="cursor: pointer">
+                                <img src="${APP_URL}/public/ui-images/icons/pg-trash.svg" class="ui-icon" tooltip="" id="removeTag-${data.id}" data-id="remove-tag" title="Delete">
                             </div> 
+                            </div>
                             `;                
     }
 
     function addNewTagTemplateItem(hashtag) {
-        return $template = `<span class="existing-tag"><i class="xtag">X</i>${hashtag.tag_meta_value}</span>`        
+        return $template = `<span class="existing-tag"><i class="xtag">
+            <img src="${APP_URL}/public/ui-images/icons/pg-close.svg" class="ui-icon" data-id="remove-tag-item" id="${hashtag.tag_meta_value}">
+        </i>${hashtag.tag_meta_value}</span>`        
     }
 });
 

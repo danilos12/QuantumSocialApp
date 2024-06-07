@@ -14,14 +14,14 @@
         <img src="{{ asset('public/')}}/ui-images/icons/pg-arrow.svg" class="ui-icon drop-arrow" />
         </span>
         <ul class="page-filters-dropdown profile-filter-dropdown frosted profile-page-dd">
-            <li id="tweets"><img src="{{ asset('public/')}}/ui-images/icons/pg-list.svg" class="ui-icon" id="tweets"/>All Tweets</li>
+            <li id="tweets"><img src="{{ asset('public/')}}/ui-images/icons/pg-list.svg" class="ui-icon" id="tweets"/>All Posts</li>
             <li id="retweet"><img src="{{ asset('public') }}/ui-images/icons/pg-retweet.svg" class="ui-icon" id="retweet"/>Retweets Only</li>
-            <li id="quote"><img src="{{ asset('public/')}}/ui-images/icons/pg-quote.svg" class="ui-icon" value="quote"/>Quoted Tweets Only</li>
+            <li id="quote"><img src="{{ asset('public/')}}/ui-images/icons/pg-quote.svg" class="ui-icon" value="quote"/>Quoted Posts Only</li>
             <li id="comments"><img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon" id="comments"/>Comments Only</li>
             <li id="replies"><img src="{{ asset('public/')}}/ui-images/icons/pg-no-replies.svg" class="ui-icon" id="replies"/>Exclude Retweets & Comments</li>
-            <li id="image"><img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" class="ui-icon" id="image"/>Tweets w/Media Only</li>
-            <li id="links"><img src="{{ asset('public/')}}/ui-images/icons/pg-links.svg" class="ui-icon" id="links"/>Tweets w/Links Only</li>
-            <li id="no-links"><img src="{{ asset('public/')}}/ui-images/icons/pg-no-links.svg" class="ui-icon" id="no-links"/>Tweets w/o Links</li>
+            <li id="image"><img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" class="ui-icon" id="image"/>Posts w/Media Only</li>
+            <li id="links"><img src="{{ asset('public/')}}/ui-images/icons/pg-links.svg" class="ui-icon" id="links"/>Posts w/Links Only</li>
+            <li id="no-links"><img src="{{ asset('public/')}}/ui-images/icons/pg-no-links.svg" class="ui-icon" id="no-links"/>Posts w/o Links</li>
         </ul>
     </div>  <!-- END .filter-wrap -->
     <div class="drop-button-wrap sort-wrap">

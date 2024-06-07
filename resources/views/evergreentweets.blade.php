@@ -14,7 +14,7 @@
     <div class="page-head-n-sort">
       <div class="head-left-wrap">
         <span class="profile-heading">
-          Evergreen Tweets</span>
+          Evergreen Posts</span>
         <div class="toggle-wrapper">
           <label class="toggleSwitch large" onclick="">
             <input type="checkbox" id="post-status" {{ $toggle > 0 ? 'checked' : '' }} />
@@ -51,7 +51,7 @@
         </div>  <!-- END .global-twitter-profile-header -->
 
         <div class="paste-evergreen-link">
-          <input type="text" placeholder="Paste Tweet URL here...">
+          <input type="text" placeholder="Paste Post URL here...">
         </div>
 
       </div>  <!-- END .paste-evergreen-tweet-modal -->

@@ -33,12 +33,12 @@
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
-                    
+
                             <img src="{{ asset('/public/ui-images/icons/planet.svg') }}" class="planet">
-                    
+
                             <div class="queued-single-start">
                                 <span class="greeting">Hi,</span>
-                                <span class="name">{{ $user ? $user->email : 'Guest' }}</span>
+                                <span class="name">{{ isset($user) ? $user->email : 'Guest' }}</span>
                             </div>  <!-- END .queue-single-start -->
 
                             <div class="queued-single-end">
@@ -53,32 +53,32 @@
                                     {{-- <svg width="200" height="200" viewBox="-31.25 -31.25 312.5 312.5" version="1.1" xmlns="http://www.w3.org/2000/svg" style="transform:rotate(-90deg)">
                                         <circle r="115" cx="125" cy="125" fill="transparent" stroke="#C8C8C8" stroke-width="10" stroke-dasharray="722.2px" stroke-dashoffset="0"></circle>
                                         <circle r="115" cx="125" cy="125" stroke="#43EBF1" stroke-width="10" stroke-linecap="butt" stroke-dashoffset="419px" fill="transparent" stroke-dasharray="722.2px"></circle>
-                                        <text x="102px" y="140px" fill="#fafafa" font-family="Montserrat" font-size="48px" font-weight="bold" style="transform:rotate(90deg) translate(0px, -246px)">42</text>
+                                        <text x="102px" y="140px" fill="#fafafa" font-family="Montserrat" font-size="48px"  font-weight="bold" style="transform:rotate(90deg) translate(0px, -246px)">42</text>
                                     </svg>         --}}
-                                    <span class="actual">{{ $countPosts}}</span>
+
+                                    <span class="actual">
+                                        {{$plan->mo_post_credits === -1 ? '∞': ($countCredits ? $plan->mo_post_credits : $plan->mo_post_credits-$countPosts)}}
+                                    </span>
+
 									@if( $plan )
-                                    <span class="total">out of {{ $plan->mo_post_credits }} </span>
+
 									@else
-									 <span class="total">Contact you administrator </span>
+									 <span class="total">Contact you administrator</span>
 									@endif
                                 </div>
                                 <div class="b">
-                                    Monthly post credits
+                                    Monthly post credits remaining
                                 </div>
                             </div>
                             <div class="card-item-50">
                                 <div class="a">
-                                    <span class="actual">{{ $countHashtagGroups }}</span>
-									@if( !empty($plan) )
-                                    <span class="total">out of {{ $plan->hashtag_group }}
-									@else
-									 <span class="total">Contact you administrator </span>
-									@endif
+                                    <span class="actual">{{$plan->hashtag_group === -1?'∞': $plan->hashtag_group - $countHashtagGroups }}</span>
+
 
                                     </span>
                                 </div>
                                 <div class="b">
-                                    Hashtag <br> Groups
+                                    Hashtag <br> Groups Remaining
                                 </div>
                             </div>
                         </div>
@@ -87,22 +87,23 @@
                         <div class="queued-single-post-wrapper queue-type-promo" style="    width: 100%;
                         height: 100%;">
                             <div class="queued-single-post">
-                    
+
                             <img src="{{ asset('/public/ui-images/icons/planet.svg') }}" class="planet" style="width: 133px height: 145px">
-                    
+
                             <div class="queued-single-start" style="flex-direction: column; width: 100%">
                                <span class="current-label">You are currently</span>
 							   	@if( !empty($plan) )
-								  <span class="current-plan">{{ ucfirst($plan->subscription_name) }} </span>
+								  <span class="current-plan">{{ ucfirst($plan->subscription_name) == 'Astro' ?'Astral Lifetime': ucfirst($plan->subscription_name)}} </span>
 								@else
-								  <span class="current-plan">Contact you administrator </span>
+								  <span class="current-plan">Contact your administrator </span>
 								@endif
 
 
-
+                                {{ $hide = false }}
+                                @if ($hide)
                                <span class="current-uplabel">need more features?</span>
                                <button id="upgrade-now" class="current-upgrade">Upgrade</button>
-
+                                @endif
                             </div>  <!-- END .queue-single-start -->
 
                             <div class="queued-single-end">
@@ -116,44 +117,32 @@
                 <div class="second-row-container">
                     <div class="card-item-25">
                         <div class="a card-col-a">
-                            <span class="actual">{{ $countXaccts }}</span>
+                            <span class="actual">{{ $plan->member_count - $countXaccts }}</span>
                         </div>
                         <div class="b card-col-b">
-							 	@if( !empty($plan) )
-								 <span class="card-description1">out of {{ $plan->member_count }} </span>
-								@else
-								  <span class="card-description1">Contact you administrator </span>
-								@endif
 
-                            <span class="card-description2">X accounts </span>
+
+                            <span class="card-description2">X accounts Remaining </span>
                         </div>
                     </div>
                     <div class="card-item-25">
                         <div class="a card-col-a">
-                            <span class="actual">{{ $countAdmin }}</span>
+                            <span class="actual">{{ $plan->admin_count - $countAdmin }}</span>
                         </div>
                         <div class="b card-col-b">
-								@if( !empty($plan) )
-								  <span class="card-description1">out of {{ $plan->admin_count  }} </span>
-								@else
-								  <span class="card-description1">Contact you administrator </span>
-								@endif
 
-                            <span class="card-description2">Admin </span>
+
+                            <span class="card-description2">Admin Remaining </span>
                         </div>
                     </div>
                     <div class="card-item-25">
                         <div class="a card-col-a">
-                            <span class="actual">{{ $countTeamMembers}}</span>
+                            <span class="actual">{{ $plan->tm_count-$countTeamMembers}}</span>
                         </div>
                         <div class="b card-col-b">
-								@if( !empty($plan) )
-								   <span class="card-description1">out of {{ $plan->tm_count }} </span>
-								@else
-								    <span class="card-description1">Contact you administrator </span>
-								@endif
 
-                            <span class="card-description2">Team Members </span>
+
+                            <span class="card-description2">Team Members Remaining </span>
                         </div>
                     </div>
                     <div class="card-item-25">
@@ -166,6 +155,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="third-row-container">
+                    <div class="card-item-25">
+                        <div class="a card-col-a">
+                            <span class="actual">{{ $countCredits }}</span>
+                        </div>
+                        <div class="b card-col-b">
+                            <span class="card-description1">Trial Credits</span>
+                            <span class="card-description2">Remaining</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -175,10 +175,16 @@
 
 <style>
 .first-row-container,
-.second-row-container {
+.second-row-container, 
+.third-row-container {
     display: flex;
     /* background-color: rgba(143, 116, 188, 0.1); */
 }
+
+.third-row-container {
+    margin: 14px 0;
+}
+
 .card-item-75 {
     display: flex;
     /* width: 740; */
@@ -193,7 +199,7 @@
 }
 .card-item-50 {
     display: flex;
-
+    height: 120px;
     width: 50%;
     /* background: #8F74BC; */
     background: rgba(143, 116, 188, 0.4);
@@ -216,14 +222,22 @@
 
 .a {
     width: 40%;
-    text-align: center
+    text-align: center;
+
+
 }
 
 .a span.actual {
     font-family: Montserrat;
     font-size: 48px;
     font-weight: bold;
-    line-height: 1.2em
+    line-height: 1.2em;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
 }
 .a span.total {
     font-family: Montserrat;
@@ -233,7 +247,7 @@
 
 .b {
     font-family: Montserrat;
-    font-size: 18px;
+    font-size: 15px;
     text-transform: uppercase  ;
     display: flex;
     justify-content: center  ;

@@ -959,6 +959,17 @@ canvas {
     /*min-height: 85vh;  Consider removing this...*/
     padding: 0 1.5em 0 0;
 }
+.error-inner {
+    z-index: 20;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    
+}
 
 .toggle-wrap {
     position: fixed;
@@ -4230,7 +4241,8 @@ input#toggle_api {
 }
 
 
-.change-pass-modal {
+.change-pass-modal,
+.cancel-subscription-modal {
     display: flex;
     justify-items: center;
     flex-direction: row;
@@ -4240,15 +4252,12 @@ input#toggle_api {
     margin-right: 5%;
     width: 100vw;
     height: 100vh;
-
     backdrop-filter: blur(5px);
-    /*
-  right: 0;
-  min-height: 1px;
-*/
     z-index: 79;
 }
-.change-pass-inner {
+
+.change-pass-inner,
+.cancel-subscription-inner {
     position: relative;
     top: 25%;
     left: 35%;
@@ -4815,14 +4824,14 @@ input#toggle_api {
     background-color: var(--color-nova-75);
     border: none;
     }
-    
+
 .btn-primary:hover {
     color: #fff;
     background-color: var(--color-nova);
     border: none
     }
-    
-    
+
+
 /* login screen - change height*/
 .login-inner {
     height: auto;
@@ -4832,3 +4841,55 @@ input#toggle_api {
 .post-textarea {
 	font-size: 1.8rem;
 }
+
+/* banner fb & IG */
+#api-banner {
+    position: fixed;
+    bottom: 1.2em;
+    display: flex;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    align-items: center;
+    color: white;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20;
+}
+
+/* Interactive Cards CSS */
+.introjs-skipbutton {
+    display: none;
+}
+
+.introjs-tooltip {
+    background: radial-gradient(93.21% 93.21% at 50% 50%, #721A66 80%, rgba(65, 30, 76, 0) 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+}
+.introjs-tooltip-header {
+    font-size: 18px;
+    font-weight: bold;
+}
+.introjs-tooltiptext {
+    font-size: 16px;
+    line-height: 1.5;
+}
+.introjs-button {
+    background-color: var(--color-nova-75);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.introjs-button:hover {
+    background-color: var(--color-nova);
+}
+.introjs-tooltip-arrow {
+    border-top-color: #333;
+}
+/* .introjs-overlay {
+    background: rgba(0, 0, 0, 0.7);
+} */

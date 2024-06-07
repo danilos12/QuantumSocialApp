@@ -112,14 +112,14 @@
             <div id="post_evergreen" data-post="evergreen-tweets" class="post-alert evergreen-alert tweets-hide">
               <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" class="ui-icon alert-icon" />
               <span>
-                Adding to Evergreen Tweets
+                Adding to Evergreen Posts
               </span>
             </div>  <!-- END .evergreen-alert -->
 
             <div id="post_promo" data-post="promos-tweets" class="post-alert promo-alert tweets-hide">
               <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" class="ui-icon alert-icon" />
               <span>
-                Adding to Promo Tweets
+                Adding to Promo Posts
               </span>
               <select class="promo-campaign-select">
                 <option disabled selected>Select a Promo Campaign...</option>
@@ -132,14 +132,14 @@
             <div id="post_tweet_storms" data-post="tweet-storm-tweets" class="post-alert tweet-storm-alert tweets-hide">
               <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" class="ui-icon alert-icon" />
               <span>
-                Adding to Tweet Storms
+                Adding to Post Storms
               </span>
             </div>  <!-- END .promo-alert -->
 
             <div id="post_regular_retweet" data-post="retweet-tweets" class="post-alert retweet-alert tweets-hide">
               <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" class="ui-icon alert-icon" />
               <span>
-                Tweet to Retweet:
+                Post to Retweet:
               </span>
               <input type="text" name="retweet-link-input" placeholder="...paste tweet link here..." class="retweet-link-input" />
                 <!-- CARLO - Just have this grab the tweet in the URL when it is pasted. -->
@@ -148,7 +148,7 @@
             <div id="post_comment" data-post="comments-tweets" class="post-alert comment-alert tweets-hide">
               <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" class="ui-icon alert-icon" />
               <span>
-                Tweet to Comment On:
+                Post to Comment On:
               </span>
               <input type="text" name="comment-link-input" placeholder="...paste tweet link here..." class="comment-link-input" />
                 <!-- CARLO - Just have this grab the tweet in the URL when it is pasted. -->
@@ -189,7 +189,7 @@
 
             <div class="cross-tweet-profiles-outer">
               <div class="cross-tweet-header">
-                Cross-Tweet On:</div>
+                Cross-Post On:</div>
               <div class="cross-tweet-profiles-inner cmd">                                  
               </div>  <!-- END .cross-tweet-profiles-inner -->
             </div>  <!-- END .cross-tweet-profiles-outer -->
@@ -203,7 +203,7 @@
             <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
               <option disabled selected value="save-draft">Select a scheduling method...</option>
               <option value="add-queue">Add to Queue (default)</option>
-              <option value="send-now">Tweet Now</option>
+              <option value="send-now">Post Now</option>
               <option value="set-countdown">Set Countdown</option>
               <option value="custom-time">Custom Time</option>
               <option value="custom-slot">Custom Slot</option>

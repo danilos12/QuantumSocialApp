@@ -1,12 +1,12 @@
 <div class="profile_free_content">
     <h1>Congrats on getting started with QuantumSocial!  </h1>
     
-    <p>
+    <h2>
         Due to recent changes in X/Twitter's API policies, you will need to connect your own X API.  
         <br>
         Don't worry, it's rather straight forward!  
-    </p>
-    
+    </h2>
+    <br>
     <p>
         Here's the link to signup for you API on X:  
         <a href="https://developer.twitter.com/en/portal/petition/essential/basic-info">https://developer.twitter.com/en/portal/petition/essential/basic-info</a>        
@@ -20,7 +20,7 @@
     <p>
         Click here: 
         <button class="primary launch-general-settings"  data-id="modal" id="general-settings">Open General Settings</button>
-        to add your API credentials in the Twitter API Credential section: 
+        to add your API credentials in the X API Credential section: 
     </p>
     
     

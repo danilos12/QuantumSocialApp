@@ -23,12 +23,12 @@
                                 <span style="font-weight: 200; font-style=italic">(Turn this on to add account level credentials form).</span> 
                             </span>
                         </div>  <!-- END .menu-twirl-left -->
-                        <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_10" {{ isset($twitterSetting) ? ($twitterSetting->toggle_10 === 1) ? 'checked' : '' : ''}}>
+                        <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="twitter-settings[]" id="toggle_10" {{ isset($twitterSettingsToggler) ? ($twitterSettingsToggler->toggle_10 === 1) ? 'checked' : '' : ''}}>
                         </div>  <!-- END .menu-twirl-right -->
                     </div>  <!-- END .menu-twirl-option-inner -->
 
-                    @if (isset($twitterSetting))
-                        @if ($twitterSetting->toggle_10 === 1) 
+                    @if (isset($twitterSettingsToggler))
+                        @if ($twitterSettingsToggler->toggle_10 === 1) 
                             @include('twitterapi-form')
                         @endif 
                     @endif

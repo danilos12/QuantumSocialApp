@@ -1,6 +1,6 @@
 $(document).ready(function() {
   var maxChars = 200;
-  var autoReplyCount = $('.auto-reply-count').text($('.auto-reply-text').val().length);
+  // var autoReplyCount = $('.auto-reply-count').text($('.auto-reply-text').val().length);
   $('.auto-reply-text').on('input', function() {
     var charCount = $(this).val().length;
     console.log(charCount);

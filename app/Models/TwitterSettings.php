@@ -9,7 +9,7 @@ class TwitterSettings extends Model
 {
     use HasFactory;
 
-    protected $table = 'settings_twitter';
+    protected $table = 'settings_toggler_twitter';
     protected $fillable = [
         'twitter_id',
         'toggle_1', 

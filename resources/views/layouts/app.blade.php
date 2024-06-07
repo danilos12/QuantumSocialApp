@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,10 +28,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Montserrat&display=swap" rel="stylesheet">
-<!-- Add Toastr.js CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-
-
+  <!-- Add Toastr.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+  {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/4.3.0/introjs.min.css"> --}}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
 
 
 	<link rel="stylesheet" href="{{ asset('public/css/core.css') }}">
@@ -57,8 +57,30 @@
   <script> var QUANTUM_ID = `{{ $user_id }}`; </script>
   @endauth
   @endif
+
+
+
+{{-- pusher start --}}
+  {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  <script>
+
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+    var pusher = new Pusher('25f52777301a06d4cde3', {
+      cluster: 'us2'
+    });
+
+    var channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function(data) {
+      alert(JSON.stringify(data));
+    });
+    </script> --}}
+{{-- pusher end --}}
+
 </head>
 <body class="{{ Route::has('login') ? 'darkmode' : '' }}">
+
   <canvas></canvas>
   <div class="interface-outer">
     <div class="interface-inner">
@@ -75,6 +97,7 @@
                   <img src="{{ $twitter_photo ?: asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                   <span class="twitter-profile-name">
                     {{ isset($selected_user) ? $selected_user->twitter_name: 'Quantum User' }}
+                    {{-- <span id="time"></span> --}}
                   </span>
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
@@ -169,15 +192,17 @@
 
                 <div class="settings-bar-outer">
                   <div class="settings-bar-inner">
+
                       @if (Auth::guard('web')->check())
-                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" class="menu-icon launch-general-settings" data-id="modal" id="general-settings"/>
+
+                      <img src = "{{ asset('public/ui-images/icons/00b-gear.svg') }}" statusdata={{ $statuses }} class="menu-icon launch-general-settings" data-id="modal"  id="general-settings"/>
                       @endif
                       <a href="https://quantumsocial.io/help/" target="new">
-                        <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" />
+                        <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-help-page" id="help"  />
                       </a>
                       {{-- <img src = "{{ asset('public/ui-images/icons/00c-help.svg') }}" class="menu-icon launch-upgrade-page" data-id="modal" id="upgrade-page" /> --}}
                       <a href="https://quantumsocial.io/roadmap/" target="new">
-                        <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" />
+                        <img src = "{{ asset('public/ui-images/icons/00d-compass.svg') }}" class="menu-icon" id="roadmap"/>
                       </a>
                       <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                           <img src = "{{ asset('public/ui-images/icons/00e-logout.svg') }}" class="menu-icon" />
@@ -206,14 +231,24 @@
             @endif
 
             @if(isset($message))
-            <div class="alert alert-warning" role="alert">
-                {{ $message }}
+            <div class="alert alert-warning" role="alert" style="display:flex; justify-content: space-between">
+              <span style="align-content: center">
+              {{ $message }}
+              </span>
+              <button onclick="window.location.href='/#'" style="background: #43ebf1; border: none; color: white; font-weight: 700;text-transform: uppercase;
+              padding: 0.5em 1em;
+              border-radius: 5px;">Update Payment</button>
             </div>
-            @else 
+            @else
             @yield('content')
             @endif
           </div>
         </div>
+        <div class="footer">
+          <span id="api-banner">
+            Facebook and Instagram coming soon!
+        </span>
+      </div>
     </div>  <!-- END .interface-inner -->
   </div>  <!-- END .interface-outer -->
 	@if (Route::has('login'))
@@ -227,31 +262,54 @@
       </div>  <!-- END .new-slot-anchor -->
 
       @endif
-      <div class="upgrade">
+
+
+        @include('modals.inactive-box')
+
+
+      <div class="upgrade" >
         @if(isset($modalContent))
             <!-- Render the modal content -->
             {!! $modalContent !!}
         @endif
       </div>
+
+      @if ($title == 'Dashboard')
+      <div class="onboard">
+        @if (isset($onboarding))
+          {!! $onboarding !!}
+        @endif
+      </div>
+      @endif
   @else
     @endauth
   @endif
     </div>  <!-- END .new-slot-overlay -->
   </div>  <!-- END .new-slot-anchor -->
 
+
 	@if (Route::has('login'))
+
     @auth('web')
 	  @include('account-menu')
   @else
     @endauth
   @endif
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+  @if (Route::has('login'))
   <script type='text/javascript' src="{{asset('public/js/quantum2.js')}}"></script>
+  @auth
   <script type='text/javascript' src="{{asset('public/js/generalSettings.js')}}"></script>
   <script type='text/javascript' src="{{asset('public/js/command-module.js')}}"></script>
+  @if (Route::is('dashboard'))
   <script type='text/javascript' src="{{asset('public/js/dashboard.js')}}"></script>
+  @endif
+  @endauth
+  @endif
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
   {{-- <script src="https://cdn.rawgit.com/mervick/emojionearea/master/dist/emojionearea.min.js"></script> --}}
   {{-- <script type='text/javascript' src="{{asset('public/js/emojionearea-master/dist/emojionearea.js')}}"></script>   --}}
@@ -261,18 +319,18 @@
   <script>
      $(document).ready(function() {
       // // Alert
-      // var alert = $('.alert ');
+      var alert = $('.warning-sign ');
 
-      // if(alert.length == 1) {
-      //   setTimeout(function(){
-      //     alert.fadeOut('slow');
-      //   }, 5000);
-      // }
+      if(alert.length == 1) {
+        setTimeout(function(){
+          alert.fadeOut('slow');
+        }, 5000);
+      }
 
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
         var menuId = e.target.dataset.target;
-        // console.log(menuId)
+     
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();
@@ -299,8 +357,19 @@
         });
       })
 
+      // var timeDisplay = document.getElementById("time");
+      // function refreshTime() {
+      //   var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});
+      //   var formattedString = dateString.replace(", ", " - ");
+      //   timeDisplay.innerHTML = formattedString;
+      // }
+      // setInterval(refreshTime, 1000);
     });
   </script>
+
+
+
+
 
 </body>
 </html>

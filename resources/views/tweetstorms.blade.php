@@ -16,7 +16,7 @@
                   <div class="page-head-n-sort">
                     <div class="head-left-wrap">
                       <span class="profile-heading">
-                        TweetStorms</span>
+                        PostStorms</span>
                       <div class="toggle-wrapper">
                         <label class="toggleSwitch large" onclick="">
                           <input type="checkbox" checked />

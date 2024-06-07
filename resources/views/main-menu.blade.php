@@ -1,6 +1,6 @@
 
 
-      
+
 
 
         <li class="menu-item menu-margin">
@@ -8,7 +8,7 @@
                 <img src = "{{ asset('public/ui-images/icons/01-dashboard.svg') }}" class="menu-icon" />Dashboard
             </a>
         </li>
-    
+
         <li class="menu-item menu-margin launch-command-module" data-id="modal" id="command-module">
             <img src = "{{ asset('public/ui-images/icons/pg-command.svg') }}" class="menu-icon" />
             Command Module
@@ -44,7 +44,7 @@
 
             <li id="slot-scheduler">
                 <a href="{{ route('slot-scheduler') }}">
-                    <img src = "{{asset('public/ui-images/icons/07-schedule.svg')}} " class="menu-icon" />
+                    <img src = "{{asset('public/ui-images/icons/07-schedule.svg')}} " class="menu-icon" id="a-slot"/>
                     Slot Scheduler
                 </a>
             </li>
@@ -69,11 +69,16 @@
                 </a>
             </li>
         </ul>
+        @if(Auth::guard('web'))
+
+        @auth('member')
+
 
         <li class="menu-item" data-toggle="collapse" data-target="#engagement">
         <!-- <a href="{{ route('social-engage') }}"></a> -->
             <img src = "{{ asset('public/ui-images/icons/10-engagement.svg')}}" class="menu-icon" />Engagement
         </li>
+        
         <ul  class="sub-menu menu-margin" id="engagement">
             <li id="engage">
                 <a href="{{ route('social-engage') }}">
@@ -102,6 +107,10 @@
                 </a>
             </li>
         </ul>
+        @endauth
+        @else
+        
+        @endif
 
         <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
         <!-- <a href="{{ route('promo-tweets') }}"></a> -->
@@ -112,21 +121,21 @@
             <li id="promo">
                 <a href="{{ route('promo-tweets') }}">
                     <img src = "{{asset('public/ui-images/icons/17-promos.svg')}} " class="menu-icon" />
-                    Promo Tweets
+                    Promo Posts
                 </a>
             </li>
             <li id="evergreen">
                 <a href="{{ route('evergreen-tweets') }}">
                     <img src = "{{asset('public/ui-images/icons/16-evergreen.svg')}} " class="menu-icon" />
-                    Evergreen Tweets
+                    Evergreen Posts
                 </a>
             </li>
-            <li id="tweet-storms">
+            {{-- <li id="tweet-storms">
                 <a href="{{ route('tweet-storms') }}">
                     <img src = "{{asset('public/ui-images/icons/pg-storms.svg')}} " class="menu-icon" />
-                    Tweet Storms
+                    PostStorms
                 </a>
-            </li>
+            </li> --}}
             @if (Auth::guard('web')->check() || (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin'))
 
             <li id="tag-groups">

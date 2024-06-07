@@ -111,6 +111,71 @@ $(document).ready(function () {
         }
     })
 
+    $('#cancel-subscription').on('click', async function(e) {
+        try {
+            $('.cancel-subscription-modal').css('display', 'block')
+            // const response = await fetch(APP_URL + '/settings/cancel');
+            // const responseData = await response.json();
+
+            // console.log(responseData);
+
+        } catch (err) {
+            console.log('Error fetching the modal' + err)
+        }
+    })
+   
+    $('#cancelSubscriptionForm').on('submit', async function(e) {
+        e.preventDefault();
+        console.log(e);
+
+        const formArray = $(this).serializeArray();
+        const formObject = {};
+        
+        $.each(formArray, function() {
+          formObject[this.name] = this.value;
+        });
+
+        console.log(formObject);
+
+        try {
+            const response = await fetch(APP_URL + '/settings/cancel/subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify(formObject) // Convert the object to JSON string
+            });
+            const responseData = await response.json();
+            console.log(responseData);
+            
+            if (responseData.status === 200) {
+                toastr[responseData.stat](
+                    `${responseData.message}`
+                );
+
+                setTimeout(function() {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/logout';
+        
+                    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    var csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+        
+                    document.body.appendChild(form);
+                    form.submit();
+                }, 3000);
+            }
+
+        } catch (err) {
+            console.log('Error fetching the data' + err)
+        }
+    })
+
     // toggle api secrets
     $('.secrets').on('click', function(e) {
         var input = $('input#' + e.target.id);
@@ -153,7 +218,7 @@ $(document).ready(function () {
 
             setTimeout(function() {
             location.reload();
-            }, 3000); // Reload after 5 seconds (adjust the delay as needed)
+            }, 3000);
         } catch(err) {
             console.log('Error fetching the data' + err)
         }
@@ -329,7 +394,7 @@ $(document).ready(function () {
             const response = await fetch(
                 APP_URL + "/twitter/remove",
                 {
-                    method: "POST",
+                    method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
                         "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
@@ -339,13 +404,6 @@ $(document).ready(function () {
             );
 
             const responseData = await response.json();
-
-            // var div = $(`<div class="alert alert-${responseData.stat} mt-2"> ${responseData.message} </div>`);
-            // if (responseData.status === 200) {
-            //     $(this).closest('.menu-social-account-outer').remove();
-            // } else {
-            //     console.log(responseData.message)
-            // }
 
             toastr[responseData.stat](
                 `${responseData.message}`
@@ -362,9 +420,7 @@ $(document).ready(function () {
 
 
 
-    $('img.ui-icon[data-icon="twitter-settings"]').on(
-        "click",
-        function (event) {
+    $('img.ui-icon[data-icon="twitter-settings"]').on("click",function (event) {
             $(".general-settings-outer").hide();
             $(".twitter-settings-outer").show();
         }
@@ -397,6 +453,11 @@ $(document).ready(function () {
                         '"]'
                 ).addClass("active");
 
+                toastr[response.stat](
+                    `Success, ${response.message}`
+                );
+
+
                 setTimeout(function () {
                     location.reload();
                 }, 3000); // Reload after 5 seconds (adjust the delay as needed)
@@ -426,7 +487,7 @@ $(document).ready(function () {
                 .popover({
                     html: true,
                     content:
-                        '<span class="selected-popover">Twitter account is selected</span>',
+                        '<span class="selected-popover">X account is selected</span>',
                 })
                 .popover("show");
         } else {
@@ -485,10 +546,11 @@ $(document).ready(function () {
         if(selectedRole == 'Member'){
             if(isChecked){
                 $('#toggle_api').prop('checked', false);
-                toastr['warning']('Warning! Memberssssss12 are not allowed to access API, only Admin role');
-            }
+                toastr['warning']('Warning! Members are not allowed to access API, only Admin role');
+            }else{
 
-        }else{
+
+
 
         try {
             const response = await fetch(APP_URL + "/settings/_add_new", {
@@ -499,7 +561,7 @@ $(document).ready(function () {
                         "content"
                     ),
                 },
-                body: JSON.stringify(data), // Convert the object to JSON string
+                body: JSON.stringify(data),
             });
             const responseData = await response.json();
 
@@ -519,7 +581,44 @@ $(document).ready(function () {
                 }
             }
 
-            // Reload after 5 seconds (adjust the delay as needed)
+
+        } catch (err) {
+            console.log("Error fetching the data" + err);
+        }
+    }
+    }
+
+    if(selectedRole == 'Admin'){
+        try {
+            const response = await fetch(APP_URL + "/settings/_add_new", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                body: JSON.stringify(data),
+            });
+            const responseData = await response.json();
+
+            if (responseData) {
+                if (responseData.stat == "success") {
+                    toastr[responseData.stat](
+                        `Success, ${responseData.message}`
+                    );
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                } else if (responseData.stat == "warning") {
+                    toastr[responseData.stat](
+                        `Warning! ${responseData.message}`
+                    );
+                    openUpgradeModal(responseData);
+                }
+            }
+
+
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
@@ -536,6 +635,13 @@ $(document).ready(function () {
             roles: selectedRole,
             api_access: isChecked,
         };
+        if(selectedRole == 'Member'){
+            if(isChecked){
+                $('#toggle_api').prop('checked', false);
+                toastr['warning']('Warning! Members are not allowed to access API, only Admin role');
+            }else{
+
+
 
         try {
             const response = await fetch(APP_URL + "/settings/members/_edit", {
@@ -568,6 +674,42 @@ $(document).ready(function () {
         } catch (err) {
             console.log("Error fetching the data" + err);
         }
+    }}
+    if(selectedRole == 'Admin'){
+
+        try {
+            const response = await fetch(APP_URL + "/settings/members/_edit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
+                body: JSON.stringify(data), // Convert the object to JSON string
+            });
+            const responseData = await response.json();
+
+            if (responseData.stat == "success") {
+                toastr[responseData.stat](
+                    `${responseData.status_m}, ${responseData.message}`
+                );
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            } else if (responseData.stat == "warning") {
+                toastr[responseData.stat](
+                    `${responseData.status_m}, ${responseData.message}`
+                );
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            }
+        } catch (err) {
+            console.log("Error fetching the data" + err);
+        }
+
+    }
     });
 
     // edit

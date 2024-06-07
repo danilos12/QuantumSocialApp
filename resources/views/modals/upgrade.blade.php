@@ -142,12 +142,19 @@
     }
     .card-features{
         width:100%;
+        display: flex;
+        text-align: justify;
+        flex-direction: column;
+        justify-content: center;
+        margin: 0 auto;
+        padding: 2em 2em;
     }
     .feature-item{
 
         display: flex;
-        justify-content: center;
+        /* justify-content: center; */
         width:100%;
+        padding: 0.5em;
 
     }
     .text-grey{
@@ -202,7 +209,11 @@
         margin-left: 1rem;
     }
 </style>
+@php
+use App\Http\Controllers\EncryptionDecryption;
 
+
+@endphp
 <div class="modal-large-anchor-upgrade">
     <div class="modal-large-backdrop-upgrade">
         <div class="modal-large-outer-upgrade  upgrade-page-outer frosted">
@@ -224,159 +235,83 @@
 
 
                 <div class="card-container">
+                    @foreach ($plans as $subscriptionId => $features)
+
                     <div class="card">
-                        <div class="card-header">SOLAR</div>
+                        @php
+                            $product_name = '';
+                            $plan_price = '';
+                        @endphp
+                        @foreach ($features as $feature)
+                            @if ($feature->meta_key === 'product_name')
+                                @php $product_name = $feature->meta_value @endphp
+                            @endif
+                            @if ($feature->meta_key === 'product_price')
+                                @php $plan_price = $feature->meta_value @endphp
+                            @endif
+                        @endforeach
+                        <div class="card-header">{{ $product_name }}</div>
                         <div class="card-price-description">
-                            <div class="price-text">$49</div>
-                            per user participant
+                            <div class="price-text">{{ $plan_price }}</div>
                         </div>
-                        <div class="sub-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. </div>
-                        <div class="card-features">
-                            <div class="feature-item">
-                                <div class="">
-                                <div class="flex items-center ">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
+                         <div class="card-features flex justify-center">
+                            @foreach ($features as $f)
+                                @if (strpos($f->meta_key, 'feature_') === 0)
+                                    <div class="feature-item">
+                                        <div class="">
+                                            <div class="flex items-center ">
+                                                <div class="w-8">
+                                                    <img src="/public/ui-images/icons/check.svg" alt="">
+                                                </div>
+                                                <div class="flex justify-center">
+                                                    <span class="ml-4 text-center">{{ $f->meta_value }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span class="ml-4 text-center">7 days trial</span>
-                                </div>
-                                <div class="flex items-cente space-y-3">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can add 1 Administrator</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can add 0 Members</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8 ">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can link 3 X accounts</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8 ">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4 ">Monthly Post Credits 200</span>
-                                </div>
-                            </div>
-                            </div>
-
-
-
-
-
+                                @endif
+                            @endforeach
                         </div>
+
                         @if (Auth::guard('web')->check())
-                        <input type="button" class="card-cta" value="{{ ($product_id === 61) ? "Your Plan" : "Upgrade Now" }}" data-product-id="61" {{ ($product_id === 61) ? 'disabled' : "" }} >
+                            @php
+                                $encrypted = EncryptionDecryption::encrypt((string)Auth::id());
+                                $value = null;
+                                $pr_name = '';
+                                switch ($feature->subscription_id) {
+                                    case 1:
+                                        $value=59;
+                                        $pr_name = 'solar';
+                                        break;
+                                    case 2:
+                                        $value=61;
+                                        $pr_name = 'galactic';
+                                        break;
+                                    case 3:
+                                        $value = 66;
+                                        $pr_name = 'astral';
+                                        break;
+
+
+                                }
+                                $encryptedproduct =EncryptionDecryption::encrypt($value);
+                                $encryptprname =EncryptionDecryption::encrypt($pr_name);
+                            @endphp
+                        <form action="http://quantumsocial.io/wp-json/plan/update/items" method="post">
+                            @csrf
+                            <input type="hidden" name="prdt" value={{ $encryptedproduct }}>
+                            <input type="hidden" name="klase" value={{ $encryptprname }}>
+                            <input type="hidden" name="awsg" value={{$encrypted}}>
+                            <!-- Other form fields -->
+                            <input type="submit" class="card-cta" value="{{ ($product_id === $feature->subscription_id) ? "Your Plan" : "Upgrade Now" }}" {{ ($product_id === $feature->subscription_id) ? 'disabled' : "" }} >
+                          </form>
+
                         @endif
                     </div>
-                    <div class="card">
-                        <div class="card-header">ASTRAL</div>
-                        <div class="card-price-description">
-                            <div class="price-text">$89</div>
-                            per user participant
-                        </div>
-                        <div class="sub-description text-grey">For large organization that wants to post thousands of contents on multiple accounts </div>
-                        <div class="card-features">
-                            <div class="feature-item">
-                                <div class="">
-                                <div class="flex items-center ">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4 text-center">7 days trial</span>
-                                </div>
-                                <div class="flex items-cente space-y-3">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can add 5 Administrator</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can add 10 Members</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8 ">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can link 25 X accounts</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8 ">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4 ">Monthly Post Credits Unlimited</span>
-                                </div>
-                            </div>
-                            </div>
+                    @endforeach
 
-                        </div>
-                        @if (Auth::guard('web')->check())
-                        <input type="button" class="card-cta" value="{{ ($product_id === 62) ? "Your Plan" : "Upgrade Now" }}" data-product-id="62" {{ ($product_id === 62) ? 'disabled' : "" }} >
-                        @endif
-                    </div>
-                    <div class="card">
-                        <div class="card-header">GALACTIC</div>
-                        <div class="card-price-description">
-                            <div class="price-text">$119</div>
-                            per user participant
-                        </div>
-                        <div class="sub-description">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. </div>
-                        <div class="card-features">
-                            <div class="feature-item">
-                                <div class="">
-                                <div class="flex items-center ">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <div class="flex justify-center">
-                                    <span class="ml-4 text-center">7 days trial</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-cente space-y-3">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can add 3 Administrator</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can add 5 Members</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8 ">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4">Can link 15 X accounts</span>
-                                </div>
-                                <div class="flex items-center space-y-3">
-                                    <div class="w-8 ">
-                                        <img src="/public/ui-images/icons/check.svg" alt="">
-                                    </div>
-                                    <span class="ml-4 ">Monthly Post Credits 2500</span>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        @if (Auth::guard('web')->check())
-                        <input type="button" class="card-cta" value="{{ ($product_id === 63) ? "Your Plan" : "Upgrade Now" }}" data-product-id="63" {{ ($product_id === 63) ? 'disabled' : "" }} >
-                        @endif
-                    </div>
                 </div>
             </div>
-
-
         </div>  <!-- END .twitter-settings-outer -->
     </div>
 </div>
@@ -384,12 +319,7 @@
 <script>
     $(document).ready(function(e) {
         // $('upgrade-outer-page').closest('.modal-large-outer').attr('style', '')
-        $('.card-cta').on('click', function(e) {
-            const prod_id = e.target.dataset.productId;
-            console.log(prod_id);
 
-            window.location.href = "https://quantumsocial.io/wp-json/plan/login/subscription";
-        })
 
         $('.close-upgrade-page').on('click', function(e) {
             // Sub Menu

@@ -11,11 +11,11 @@
 @section('content')
 <div class="page-outer profile-outer">
       <div id="spinner" style="display: none; color: white">
-        Page loading...
+        Getting the posts for you...
       </div>
       <div class="profileSection" style="display:none">
         <div id="getting-tweets" style="display: none; color: white">
-          Getting tweets...
+          Getting posts...
         </div>
 
         @include('selectedAcctTweets')

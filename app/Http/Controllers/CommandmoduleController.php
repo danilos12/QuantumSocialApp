@@ -14,6 +14,7 @@ use App\Models\Tag_groups;
 use App\Models\Tag_items;
 use App\Models\TwitterToken;
 use Carbon\Carbon;
+use Carbon\CarbonTimeZone;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
 use App\Models\QuantumAcctMeta;
@@ -76,29 +77,36 @@ class CommandmoduleController extends Controller
 
         $checkRole = MembershipHelper::tier($this->setDefaultId());
         
-        // check if subscription is active
-        if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
-            return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
-        }
+        $postCredit = $checkRole->mo_post_credits === -1 ? 'unli' : $checkRole->mo_post_credits; 
 
         $postCount = DB::table('posts')
             ->where('user_id', $this->setDefaultId())
             ->whereMonth('created_at', now()->month)
             ->count();
 
-        if ($checkRole->mo_post_credits <= $postCount) {              
+        $trialCredit = DB::table('users_meta')
+            ->where('user_id', $this->setDefaultId())
+            ->value('trial_credits');
+        
+        if (is_int($postCredit) && $checkRole->mo_post_credits <= $postCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
-        }         
-            
+        }
+
+        $checkTwitter = DB::table('ut_acct_mngt')->where('user_id', $this->setDefaultId())->where('selected', 1)->first();
+
+		if ($checkTwitter === null) {
+			$message = 'You need to add your social media account first to proceed with your post queue.';
+            return response()->json(['status' => 403, 'message' => 'Post is not possible, please connect your social media first.', 'html' => $message]);
+		}
+
         try {
             $postData = $request->input('formData');
             $user_id = $this->setDefaultId();
             $main_twitter_id = $postData['twitter_id'];
-            $getToken = TwitterHelper::getTwitterToken($main_twitter_id);
-            // $twitterMeta = $getToken->toArray();
-            $twitter_meta = $getToken->toArray();
-            // $utc = TwitterHelper::now($user_id);
+            $getToken = TwitterHelper::getTwitterToken($main_twitter_id, $user_id);
+            $twitter_meta = json_decode(json_encode($getToken), true); 
+
             $utc = Carbon::now('UTC');
             $url = isset($postData['retweet-link-input']) ? urldecode($postData['retweet-link-input']) : null;
             $tweet_id = basename(parse_url($url, PHP_URL_PATH));
@@ -118,11 +126,10 @@ class CommandmoduleController extends Controller
                 'rt_ite' => $postData['iterations-custom-cm'] ?? null,
                 'promo_id' => $postData['promo-tweets-cmp'] ?? null,
                 'post_type_code' => rand(10000, 99999),
-                'active' => $checkToggle->queue_switch,
+                'active' => ($postData['scheduling-options'] === 'send-now') ? 1 : $checkToggle->queue_switch,
                 'social_media' => $postData['social_media'] // 1 => twitter, 2 => facebook, 3= instagram
             ];
 
-            // dd($insertData);
 
             // Determine the scheduling method and time based on the user's selected option
             if (isset($postData['scheduling-options'])) {
@@ -147,43 +154,68 @@ class CommandmoduleController extends Controller
                         $countDownWithWords = $postData['c-set-countdown'] . ' ' . $countDown;
 
                         // modify the UTC datetime object by adding the countdown time
-                        $utcFormat = $utc->modify($countDownWithWords);
-
+                        $utcDatetime = $utc->modify($countDownWithWords);
+                        
                         // format the resulting datetime object as a string in the  'YYYY-MM-DD HH:MM:SS' format
-                        $scheduled_time = $utcFormat->format('Y-m-d H:i:s');
+                        $scheduled_time = $utcDatetime->format('Y-m-d H:i:s');
                         $sched_time = $scheduled_time;
                         break;
 
                     case 'custom-time':
-                        // Refactor this section to reduce duplication
-                        $formatted24hrTime = date('H:i A', strtotime($postData['ct-hour'] . ":" . $postData['ct-min'] . " " . $postData['ct-am-pm']));
-                        $localDatetime = Carbon::createFromFormat('d-m-Y h:i A', $postData['ct-time-date'] . ' ' . $formatted24hrTime);
+                        $timezoned = DB::table('users_meta')
+                            ->where('user_id', $this->setDefaultId())
+                            ->first();
+
+                        $localTimeZone = new CarbonTimeZone($timezoned->timezone);
+
+                        $date = $postData['ct-time-date'];
+                        $hour = $postData['ct-hour'];
+                        $minute = $postData['ct-min'];
+                        $amPm = $postData['ct-am-pm'];
+
+                        $dateTimeString = "$date $hour:$minute $amPm";
+                        $dateTime = Carbon::createFromFormat('d-m-Y h:i A', $dateTimeString, $localTimeZone);
                         
-                        // Convert the datetime to UTC timezone
-                        $utcDatetime = $localDatetime->setTimezone('UTC');
-                        
-                        // Format the UTC datetime as needed
-                        $sched_time = $utcDatetime->format('Y-m-d H:i:s');                                               
+                        // Convert to UTC
+                        $utcDateTime = $dateTime->setTimezone('UTC');                        
+
+                        // Format the DateTime object as a UTC string
+                        $sched_time = $utcDateTime->format('Y-m-d H:i:s');
 
                         break;
 
                     case 'custom-slot':
-                        $date = Carbon::parse(urldecode($postData['custom-slot-datetime']), TwitterHelper::timezone($this->setDefaultId()));
-                        $sched_time = $date;
+                        $timezoned = DB::table('users_meta')
+                            ->where('user_id', $this->setDefaultId())
+                            ->first();
+
+                        $localTimeZone = new CarbonTimeZone($timezoned->timezone);
+
+                        $dateTime = Carbon::parse(urldecode($postData['custom-slot-datetime']), $localTimeZone);
+                        
+                        // Convert to UTC
+                        $utcDateTime = $dateTime->setTimezone('UTC');                        
+
+                        // Format the DateTime object as a UTC string
+                        $sched_time = $utcDateTime->format('Y-m-d H:i:s');
                         break;
 
                     case 'rush-queue':
                         $count = DB::table('posts')
                             ->where('twitter_id', $main_twitter_id)
+                            ->where('user_id', $user_id)
                             ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                             ->count();
 
-                            $firstTweet = DB::table('posts')
+                        $firstTweet = DB::table('posts')
                             ->where('twitter_id', $main_twitter_id)
                             ->whereNotIn('sched_method', ['send-now', 'save-draft'])
                             ->where('sched_time', '>', TwitterHelper::now($user_id))
                             ->orderBy('sched_time', 'ASC')
                             ->first();
+
+                            // dd($count, $firstTweet, $utc->modify($firstTweet->sched_time), $datetime);
+
 
 
                         $sched_time = ($count > 0) ? $firstTweet->sched_time : $datetime;
@@ -212,24 +244,26 @@ class CommandmoduleController extends Controller
                 if ($postData['scheduling-options'] === 'send-now') {
                     if ($postData['post_type_tweets'] === "retweet-tweets") {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
-                        
+
                         if ($responses->getOriginalContent()['status'] === 500) {
-                            return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                         } elseif ($responses->getOriginalContent()['status'] === 403) {
-                            return response()->json(['status' => 403, 'message' => $responses->getOriginalContent()['message']]);
+                            return response()->json(['status' => 403, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         } else {
+                            $insertData['active'] = 1;
                             CommandModule::create($insertData);
 
                             $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
                         }
                     }  else {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-                        
+
                         if ($responses->getOriginalContent()['status'] === 500) {
-                            return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                         }  elseif ($responses->getOriginalContent()['status'] === 403) {
-                            return response()->json(['status' => 403, 'message' => $responses->getOriginalContent()['message']]);
+                            return response()->json(['status' => 403, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         }else {
+                            $insertData['active'] = 1;
                             CommandModule::create($insertData);
 
                             $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
@@ -260,7 +294,7 @@ class CommandmoduleController extends Controller
                                 $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
 
                                 if ($responses->getOriginalContent()['status'] === 500) {
-                                    return response()->json(['status' => 500, 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                                    return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
                                 } else {
                                     CommandModule::create($crosstweetData);
                                     $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
@@ -276,15 +310,23 @@ class CommandmoduleController extends Controller
             // Retrieve the last saved data
             $lastSavedData = CommandModule::latest()->first();
 
+
+            if ($trialCredit) {
+                $newTrialCredit = $trialCredit - 1;
+                DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->update(['trial_credits' => $newTrialCredit]);    
+            }
+
             // Return success response
-            return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Data has been created. ' . $messages, 'tweet' => $lastSavedData]);
+            return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Post has been created. ' . $messages, 'tweet' => $lastSavedData]);
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message, 'stat' => 'warning']);
         }
 
     }
@@ -295,12 +337,14 @@ class CommandmoduleController extends Controller
         $checkRole = MembershipHelper::tier($this->setDefaultId());
 
         if ($checkRole->status !== 1 || $checkRole->trial_counter < 1) {
-            return response()->json(['status' => 500,  'stat' => 'danger', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
+            return response()->json(['status' => 500,  'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
+
+        $tagGroup = $checkRole->hashtag_group === -1 ? 'unli' : $checkRole->hashtag_group; 
     
-        $tagCount = DB::table('tag_groups_meta')->where('user_id', $this->setDefaultId())->count();
-    
-        if ($checkRole->hashtag_group <= $tagCount ) {
+        $tagCount = DB::table('tag_groups_meta')->where('user_id', $this->setDefaultId())->count();        
+
+        if (is_int($tagGroup) && $checkRole->hashtag_group <= $tagCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
         }
@@ -315,19 +359,39 @@ class CommandmoduleController extends Controller
 
             if ($insert) {
                 // Return success response
-                return response()->json(['status' => 200, 'data' => $insert, 'message' => 'Tag group added successfully']);
+                return response()->json(['status' => 200,  'stat' => 'success', 'data' => $insert, 'message' => 'Tag group added successfully']);
             }
 
         } catch (Exception $e) {
             return response()->json(['status' => '400', 'message' => $e]);
         }
-       
+
+    }
+
+    public function removeTagGroup(Request $request)
+    {                
+        try {            
+            $tagGroupId = $request->input('tag_group_id');
+
+            $tagGroup = Tag_groups::find($tagGroupId);
+
+            if (!$tagGroup) {
+                return response()->json([ 'stat' => 'warning', 'message' => 'Tag group not found'], 404);
+            }
+
+            $tagGroup->delete();
+
+            return response()->json([ 'stat' => 'success', 'message' => 'Tag group removed successfully'], 200);
+        } catch (Exception $e)  {
+            return response()->json(['status' => '500', 'message' => $e]);
+
+        }
     }
 
     public function addTagItem(Request $request) {
-        try {
+        try {            
             $insert = Tag_items::create([
-                'user_id' => Auth::id(),
+                'user_id' => $this->setDefaultId(),
                 'twitter_id' => $request->input('twitter_id'),
                 'tag_meta_key' => $request->input('tag_id'),
                 'tag_meta_value' => $request->input('hashtag'),
@@ -343,36 +407,66 @@ class CommandmoduleController extends Controller
 
     }
 
-    public function getTagGroups($id) {        
+    public function removeTagItem(Request $request) {
+        try {            
+            $tagItemId = $request->input('tag_group_id');
+
+            $tagItem = Tag_items::where('tag_meta_value', $tagItemId);
+    
+            if (!$tagItem) {
+                return response()->json([ 'stat' => 'warning', 'message' => 'Tag item not found'], 404);
+            }
+    
+            $tagItem->delete();
+    
+            return response()->json([ 'stat' => 'success', 'message' => 'Tag item removed successfully', 'item_removed' => $tagItemId], 200);    
+        } catch (Exception $e)  {
+            return response()->json(['status' => '500', 'message' => $e]);
+
+        }
+
+    }
+
+    public function getTagGroups($id) {
+
+        
+        // for hashtag Groups no twitter linked
+        $checkTwitter = MembershipHelper::twitterAcct(auth()->id()); 
+        if ($checkTwitter < 1) {
+            return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'Your account is not linked to any X accounts, please add one in the general settings to proceed.' ]);
+        }
+
+        $checkRole = MembershipHelper::tier($this->setDefaultId()); 
+
+        $tagGroups = Tag_groups::where('user_id', $this->setDefaultId())->count();
+        $tagGroupsPerX = Tag_groups::where(['user_id' => $this->setDefaultId(), 'twitter_id' => $id])->get();        
+        
+        // // 2 < 2 && 1 < 2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        $tagGroups, $tagGroupsPerX);
+        // if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
+        //     return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
+        // };
+
         try {
-            $checkRole = MembershipHelper::tier($id);
-            $tagGroupsPerX = Tag_groups::where(['user_id' => Auth::id(), 'twitter_id' => $id])->get();
-            $tagGroups = Tag_groups::where('user_id', Auth::id())->get();
-
-            if (count($tagGroups) < $checkRole->hashtag_group && count($tagGroupsPerX) < count($tagGroups) ) {
-                return response()->json(['stat' => 'warning', 'status' => 500, 'message' => 'huhuhu' ]);
-            }; 
-
-            return response()->json(['tagGroups' => $tagGroups, 'status' => 200]);
+            return response()->json(['tagGroups' => $tagGroupsPerX, 'status' => 200]);
         }  catch (Exception $e) {
-            return response()->json(['status' => '400', 'message' => $e]);
+            return response()->json(['status' => 400, 'message' => $e]);
         }
     }
 
     public function getTagItems(Request $request) {
-        try {
+        try {            
             $twitterId = $request->input('twitter_id');
-            $tagId = $request->input('tag_id');            
-            
+            $tagId = $request->input('tag_id');
+
             if ($request->input('copy')) {
                 // Fetch tag items from the database
-                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get(); 
-                
+                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get();
+
                 // Count the number of tag items
                 $tagItemCount = $tagItems->count();
-                
+
                 $tags = ''; // Initialize variable to store tag items
-                
+
                 // Check if there are any tag items before looping
                 if ($tagItemCount > 0) {
                     // Loop through each tag item and concatenate them into a string
@@ -381,21 +475,21 @@ class CommandmoduleController extends Controller
                     }
 
                     // Return response with tag items
-                    return response()->json(['tags' => $tags, 'message' => 'Tags are copy to your clipboard.', 'status' => 200]);
+                    return response()->json(['stat' => 'success', 'tags' => $tags, 'message' => 'Tags are copied to your clipboard.', 'status' => 200]);
                 } else {
                     // No tag items found, handle accordingly
-                    return response()->json(['message' => 'No tag items found.', 'status' => 402]);
+                    return response()->json(['stat' => 'warning', 'message' => 'No tag items found.', 'status' => 402]);
                 }
-                
+
             } else {
-                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get(); 
+                $tagItems = Tag_items::where(['twitter_id' => $twitterId, 'tag_meta_key' => $tagId])->get();
                 return response()->json($tagItems);
             };
 
         } catch (Exception $e) {
             return response()->json(['status' => 500, 'message' => 'Error getting the tags']);
         }
-    }     
+    }
 
     public function getUnselectedTwitterAccounts() {
 
@@ -403,11 +497,9 @@ class CommandmoduleController extends Controller
                 ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
                 ->select('twitter_accts.*', 'ut_acct_mngt.*')
                 ->where('ut_acct_mngt.selected', "=", 0) // selected
-                ->where('ut_acct_mngt.user_id', "=", Auth::id())
+                ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
                 ->where('twitter_accts.deleted', "=", 0)
                 ->get();
-
-            // dd($getUnselectedTwitter);
 
         return response()->json($getUnselectedTwitter);
     }
@@ -422,7 +514,7 @@ class CommandmoduleController extends Controller
                             ->where('schedule.post_type', $request->post_type)
                             ->orderBy('days.id', 'ASC')
                             ->get();
-
+            // dd($getCustomSlot);
         } catch(Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
@@ -436,129 +528,170 @@ class CommandmoduleController extends Controller
 
     public function getTweetsUsingPostTypes(Request $request, $id, $post_type) {
 
-        $checkRole = MembershipHelper::tier($this->setDefaultId());
-
-        if ($checkRole->status !== 1 || $checkRole->trial_counter < 1) {
-            return response()->json(['status' => 500,  'stat' => 'danger', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
-        }
-
         try {
             $tweets = '';
             $type = ($request->input('category')) ? (($request->input('category') === 'type') ? 'type' : 'month') : '';
+            
+            $timezoned = DB::table('users_meta')
+                        ->where('user_id', $this->setDefaultId())
+                        ->first();
 
             switch ($post_type) {
                 case 'posted':
-                    // dd(TwitterHelper::now(Auth::id()));
-                    $tweets = DB::table('posts')
+                    $currentDateTime = Carbon::now($timezoned->timezone);                    
+                    
+
+                    $posts = DB::table('posts')
                         ->where('twitter_id', $id)
-                        // ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
-                        ->where('active', 1)
+                        ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
+                        // ->where('active', 1)
                         ->where('sched_method', 'send-now')
                         ->get();
+                  
+                    $tweets = $posts->map(function($tweet) use($timezoned) {
+                        $tweet->sched_time = Carbon::createFromFormat('Y-m-d H:i:s', $tweet->sched_time, 'UTC')
+                                                    ->setTimezone($timezoned->timezone)
+                                                    ->format('Y-m-d H:i:s');
+                        return $tweet;
+                    })->sortBy('sched_time')->values()->toArray();
+
                     break;
 
                 case 'save-draft':
-                    $tweets = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type])->get();
+                    $posts = CommandModule::where(['twitter_id' => $id, 'sched_method' => $post_type])->get();
+
+                    
+                    $tweets = $posts->map(function($tweet) use($timezoned) {
+                        $tweet->sched_time = Carbon::createFromFormat('Y-m-d H:i:s', $tweet->sched_time, 'UTC')
+                                                    ->setTimezone($timezoned->timezone)
+                                                    ->format('Y-m-d H:i:s');
+                        return $tweet;
+                    })->sortBy('sched_time')->values()->toArray();
+
                     break;
 
                 case 'queue':
+                    $timezoned = DB::table('users_meta')
+                                ->where('user_id', $this->setDefaultId())
+                                ->first();
+                    // dd(TwitterHelper::now($this->setDefaultId()));
 
                     $posts = DB::table('posts')
                             ->select('*')
-                            ->whereIn('id', function ($query) {
-                                $query->select(DB::raw('MIN(id)'))
-                                ->from('posts')
-                                ->groupBy('post_type_code');
-                            })
+                            // ->whereIn('id', function ($query) {
+                            //     $query->select(DB::raw('MIN(id)'))
+                            //     ->from('posts')
+                            //     ->groupBy('post_type_code');
+                            // })
                             ->where('twitter_id', $id)
                             ->where('user_id', $this->setDefaultId())
                             // ->where('sched_time', '>=', TwitterHelper::now($this->setDefaultId()))
-                            ->where('sched_time', '>=', Carbon::now('UTC'))
                             ->where('posts.post_type', '!=','evergreen-tweets')
                             ->where('posts.post_type', '!=','promos-tweets')
-                            ->when($type, function ($query) use ($type, $request) {
-                                if ($type === 'month') {
-                                    return $query->whereRaw("DATE_FORMAT(sched_time, '%b-%Y') = ?", $request->input('type'));
-                                } else {
-                                    return $query->whereRaw("posts.post_type = ?", $request->input('type'));
-                                }
+                            // ->when($type, function ($query) use ($type, $request) {
+                            //     if ($type === 'month') {
+                            //         return $query->whereRaw("DATE_FORMAT(sched_time, '%b-%Y') = ?", $request->input('type'));
+                            //     } else {
+                            //         return $query->whereRaw("posts.post_type = ?", $request->input('type'));
+                            //     }
 
-                                return $query;
-                            })
+                            //     return $query;
+                            // })
                             ->orderBy('sched_time', 'ASC')
                             ->orderBy('sched_method', 'DESC')
                             ->get();
 
+                            // dd($posts, $id, $this->setDefaultId());
+
                     $schedules = Schedule::where('user_id', $this->setDefaultId())->get();
 
-                    $recurringDates = [];
-                    $r = [];
-                    $currentMonth = now()->month;
-                    $currentYear = now()->year;
-                    // dd($posts, $r, $currentMonth, $currentYear);
+                    // if (count($schedules) > 0) {
 
-                    foreach ($schedules as $schedule) {
-                        $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
-                        $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
-
-                        // $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth()->subMonths(2);
-                        // $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
-                        $startDate = Carbon::now()->startOfMonth();
-                        $endDate = Carbon::now()->addMonths(1)->endOfMonth();
-                        $currentDate = $startDate->copy();
-
-                        while ($currentDate->lte($endDate)) {
-                            if ($currentDate->dayOfWeek === $dayOfWeek) {
-                                $recurringDates[] = [
-                                    'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
-                                    'post_type' => $schedule->post_type,
-                                    'sched_method' => 'slot_sched'
-                                ];
+                        $recurringDates = [];
+    
+                        foreach ($schedules as $schedule) {
+                            $dayOfWeek = Carbon::parse($schedule->slot_day)->dayOfWeek;
+                            $time = Carbon::parse($schedule->hour . ':' . $schedule->minute_at . ' ' . $schedule->ampm);
+    
+                            // $startDate = Carbon::create($currentYear, $currentMonth)->startOfMonth()->subMonths(2);
+                            // $endDate = Carbon::create($currentYear, $currentMonth)->endOfMonth();
+                            $startDate = Carbon::now()->startOfMonth();
+                            $endDate = Carbon::now()->addMonths(1)->endOfMonth();
+                            $currentDate = $startDate->copy();
+    
+                            while ($currentDate->lte($endDate)) {
+                                if ($currentDate->dayOfWeek === $dayOfWeek) {
+                                    $recurringDates[] = [
+                                        'sched_time' => $currentDate->copy()->setTime($time->hour, $time->minute)->format('Y-m-d H:i:s'),
+                                        'post_type' => $schedule->post_type,
+                                        'sched_method' => 'slot_sched'
+                                    ];
+                                }
+    
+                                $currentDate->addDay();
                             }
-
-                            $currentDate->addDay();
                         }
-                    }
+    
+                        $object = collect($recurringDates)->map(function ($item) {
+                            return (object) $item;
+                        });
+    
+                        $objects = $object->sortBy('sched_time');
+    
+                        $objects->transform(function ($item) {
+                            $item->sched_time = (string) $item->sched_time; // Convert specific property to string
+                            return $item;
+                        });
+    
+                        $mergedData = $objects->merge($posts);
+                        // dd($mergedData);
+                        $currentDateTime = Carbon::now($timezoned->timezone);
+                        // dd($currentDateTime);
+                        $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
+                            // dd($currentDateTime->timezone);
+                            $dateTime = Carbon::createFromFormat('Y-m-d H:i:s', $tweet->sched_time, 'UTC')->setTimezone($currentDateTime->timezone);
+                            $tweetDateTime = Carbon::parse($dateTime);
+                            // dd($tweetDateTime);
+    
+                           
+                            return $tweetDateTime->greaterThan($currentDateTime);
+                        });
+        
 
-                    $object = collect($recurringDates)->map(function ($item) {
-                        return (object) $item;
-                    });
-
-                    $objects = $object->sortBy('sched_time');
-
-                    $objects->transform(function ($item) {
-                        $item->sched_time = (string) $item->sched_time; // Convert specific property to string
-                        return $item;
-                    });
-
-                    $mergedData = $objects->merge($posts);
-                    // dd($mergedData);
-                    $currentDateTime = Carbon::now();
-                    $tweetSorted = collect($mergedData)->filter(function ($tweet) use ($currentDateTime) {
-                        $tweetDateTime = Carbon::parse($tweet->sched_time);
-
-                        // dd($tweet->sched_time);
-                        return $tweetDateTime->greaterThan($currentDateTime);
-                    });
-
-
-                    $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();
-                    // dd($tweets);
+                        $tweets = $tweetSorted->map(function($tweet) use($timezoned) {
+                            
+                            // Convert sched_time to +08:00 timezone
+                            // if ($tweet->sched_method === 'set-countdown' || $tweet->sched_method === 'rush-queue') {
+                            $tweet->sched_time = Carbon::createFromFormat('Y-m-d H:i:s', $tweet->sched_time, 'UTC')
+                                                        ->setTimezone($timezoned->timezone)
+                                                        ->format('Y-m-d H:i:s');
+                            //     return $tweet; 
+                            // } else {
+                                return $tweet;
+                            // }
+                        })->sortBy('sched_time')->values()->toArray();
+    
+                        
+                        // $tweets = $tweetSorted->sortBy('sched_time')->values()->toArray();
+                        // dd($tweets);
+                    // } else {
+                    //     $tweets = $posts;
+                    // }
 
                     break;
 
                 case 'evergreen':
                     $tweets = DB::table('posts')
                         ->select('*')
-                        ->whereIn('id', function ($query) {
-                            $query->select(DB::raw('MIN(id)'))
-                            ->from('posts')
-                            ->groupBy('post_type_code');
-                        })
                         ->where('twitter_id', $id)
+                        // ->whereIn('id', function ($query) {
+                        //     $query->select(DB::raw('MIN(id)'))
+                        //     ->from('posts')
+                        //     ->groupBy('post_type_code');
+                        // })
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                        ->where('post_type', '=','evergreen-tweets')
                         // ->where('active', $checkToggle->queue_switch)
+                        ->where('post_type', '=','evergreen-tweets')
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -566,18 +699,19 @@ class CommandmoduleController extends Controller
                         ->get();
                         break;
 
+
                 case 'promo':
                     $tweets = DB::table('posts')
                         ->select('*')
-                        ->whereIn('id', function ($query) {
-                            $query->select(DB::raw('MIN(id)'))
-                            ->from('posts')
-                            ->groupBy('post_type_code');
-                        })
                         ->where('twitter_id', $id)
+                        // ->whereIn('id', function ($query) {
+                        //     $query->select(DB::raw('MIN(id)'))
+                        //     ->from('posts')
+                        //     ->groupBy('post_type_code');
+                        // })
                         // ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                        ->where('post_type', '=','promos-tweets')
                         // ->where('active', $checkToggle->queue_switch)
+                        ->where('post_type', '=','promos-tweets')
                         ->orderByRaw('CASE WHEN sched_time < ? THEN 1 ELSE 0 END', TwitterHelper::now($this->setDefaultId()))
                         ->orderBy('sched_time', 'ASC')
                         ->orderBy('sched_method', 'DESC')
@@ -667,15 +801,15 @@ class CommandmoduleController extends Controller
             $post = CommandModule::findOrFail($post_id);
 
             if ($post) {
-                $getToken = TwitterHelper::getTwitterToken($request->input('twitter_id'));
-                // $twitterMeta = $getToken->toArray();
+                $getToken = TwitterHelper::getTwitterToken($request->input('twitter_id'), $this->setDefaultId());
+                $twitter_meta = json_decode(json_encode($getToken), true); 
 
                 // check access tokenW
-                TwitterHelper::tweet2twitter($getToken, array('text' => urldecode($post->post_description)), "https://api.twitter.com/2/tweets");
+                TwitterHelper::tweet2twitter($twitter_meta, array('text' => urldecode($post->post_description)), "https://api.twitter.com/2/tweets");
             }
 
             //get time now
-            $utc = TwitterHelper::now(Auth::id());
+            $utc = TwitterHelper::now($this->setDefaultId());
             $datetime = $utc->format('Y-m-d H:i:s'); // save this to database for custom slot initially
 
             // Update the desired fields with the request data
@@ -685,75 +819,18 @@ class CommandmoduleController extends Controller
             // // Save the changes to the database
             $post->save();
 
-            return response()->json(['status' => 200, 'message' => 'Post tweeted successfully!']);
+            return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Post tweeted successfully!']);
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'stat' => 'warning', 'error' => $trace, 'internal_message' => $message, 'message' => 'Error when posting to Twitter']);
         }
 
     }
-
-    public function moveTopFromQueue(Request $request, $id) {
-        try {
-            // dd($id);
-            $post_id = str_replace('move-top-', '', $id);
-            $post = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])->findOrFail($post_id);
-
-            $nearestPost = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])
-                ->where('twitter_id', $request->twitter_id)
-                ->where('sched_time', '>', TwitterHelper::now(Auth::id()))
-                ->orderBy('sched_time', 'ASC')
-                ->first();
-
-            if ($nearestPost) {
-                // dd($nearestPost->sched_time, $nearestPost->sched_method);
-                $post->sched_time = $nearestPost->sched_time;
-                $post->sched_method = 'rush-queue';
-                $post->save();
-            }
-
-            // Return a response indicating success
-            return response()->json(['status' => 200, 'message' => 'Sched time updated successfully']);
-
-        } catch (Exception $e) {
-            $trace = $e->getTrace();
-            $message = $e->getMessage();
-            // Handle the error
-            // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
-        }
-    }
-
-
-    // API to post and retweet to twitter
-    function tweet2twitter($twitter_meta, $data, $endpoint) {
-
-        // check access token
-        $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);
-
-        // send tweet
-        $headers = array(
-            // 'Authorization: Bearer ' . 11,
-            'Authorization: Bearer ' . $checkIfTokenExpired['token'],
-            'Content-Type: application/json'
-        );
-
-        $data = json_encode($data);
-
-        $sendTweetNow = $this->apiRequest($endpoint, $headers, 'POST', $data );    
-
-        if ($sendTweetNow) {
-            return response()->json(['status' => 200, 'message' => 'Your tweet has been posted']);
-        } else {
-            return response()->json(['status' => 500, 'message' => 'Failed to send tweet', 'data' => $sendTweetNow]);
-        }
-    }
-
-
+  
     function apiRequest($url, $headers, $method, $data)
     {
         $curl = curl_init();
@@ -787,24 +864,33 @@ class CommandmoduleController extends Controller
     }
 
     public function upload(Request $request) {
-    
+
         if ($request->hasFile('csv_file')) {
 
             $validator = Validator::make($request->all(), [
                 'csv_file' => 'required|mimes:csv,txt|max:10240', // Adjust max file size as needed
             ]);
-    
+
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator);
             }
-    
+
+            $monthMap = [
+                'January' => 1, 'Jan' => 1, 'February' => 2, 'Feb' => 2, 'March' => 3, 'Mar' => 3,
+                'April' => 4, 'Apr' => 4, 'May' => 5, 'June' => 6, 'Jun' => 6,
+                'July' => 7, 'Jul' => 7, 'August' => 8, 'Aug' => 8, 'September' => 9, 'Sep' => 9,
+                'October' => 10, 'Oct' => 10, 'November' => 11, 'Nov' => 11, 'December' => 12, 'Dec' => 12
+            ];
+
             $path = $request->file('csv_file')->getRealPath();
             $csvData = file_get_contents($path);
             $lines = explode("\n", $csvData);
             $header = str_getcsv(array_shift($lines)); // Extract header
             $errorRows = [];
-            $error= [];           
-    
+            $error= [];
+
+            $allowedHosts = ['example.com', 'another-example.com']; // Replace with your allowed hosts
+
             foreach ($lines as $index => $line) {
                 $values = str_getcsv($line);
                 if (count($values) !== count($header)) {
@@ -812,16 +898,24 @@ class CommandmoduleController extends Controller
                     $errorRows[] = $index + 1; // Record the row number with missing values
                     continue;
                 }
-    
+
                 $record = array_combine($header, $values); // Combine header and data
-                // dd($header, $values, $record);
+
+                // Convert month name to numeric value if needed
+                if (isset($record['month']) && array_key_exists($record['month'], $monthMap)) {
+                    $record['month'] = $monthMap[$record['month']];
+                }
+
+                
                 $validator = Validator::make($record, [
                     'post_description' => 'required',
                     'year' => 'required|digits:4',
                     'month' => 'required|digits_between:1,2|between:1,12', // Ensure month is between 1 and 12
                     'day' => 'required',
-                    'hour' => 'required|digits:1|between:1,23', // Assuming hour is in 24-hour format, restrict between 1 and 23
-                    'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59
+                    'hour' => 'required|between:1,23', // Assuming hour is in 24-hour format, restrict between 1 and 23
+                    'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59  
+                    // 'hour' => 'required|digits:1|between:1,23', // Assuming hour is in 24-hour format, restrict between 1 and 23
+                    // 'minute' => 'required|digits:2|between:0,59', // Minutes should be between 0 and 59
                     // 'image_url' => [
                     //     Rule::requiredIf(function () use ($record) {
                     //         return empty($record['link_url']) && empty($record['image_url']); // image_url is required if both image_url and link_url are empty
@@ -842,15 +936,20 @@ class CommandmoduleController extends Controller
                     ],
                     'link_url' => [
                         'required_without_all:image_url',
+                        'url',
                         function ($attribute, $value, $fail) use ($record) {
                             if (!empty($record['image_url'])) {
                                 $fail("The $attribute must not have a value if image_url is provided.");
                             }
+                            // Custom validation rule to check if URL has a domain
+                            if (!$this->isValidDomainUrl($value)) {
+                                $fail("The $attribute must be a valid URL with a domain.");
+                            }
                         },
                     ],
-                    
+
                 ]);
-    
+
                 if ($validator->fails()) {
                     // Handle validation errors for each row
                     // For example, log errors or store them in an array to display later
@@ -858,20 +957,33 @@ class CommandmoduleController extends Controller
                     $error[$index + 1] = $validator->errors()->all();
                 }
             }
-    
-            
+
+
             if (!empty($error)) {
                 return response()->json(['status' => 402, 'errors' => $error]);
             } else {
-                
+
                 $file = $request->file('csv_file');
-                $csvData = $this->parse($file);                
+                $csvData = $this->parse($file);
+
+                $monthMap = [
+                    'January' => 1, 'Jan' => 1, 'February' => 2, 'Feb' => 2, 'March' => 3, 'Mar' => 3,
+                    'April' => 4, 'Apr' => 4, 'May' => 5, 'June' => 6, 'Jun' => 6,
+                    'July' => 7, 'Jul' => 7, 'August' => 8, 'Aug' => 8, 'September' => 9, 'Sep' => 9,
+                    'October' => 10, 'Oct' => 10, 'November' => 11, 'Nov' => 11, 'December' => 12, 'Dec' => 12
+                ];
 
                 foreach ($csvData as $key => $data) {
+
+                    // Convert month name to numeric value if needed
+                    if (isset($data['month']) && array_key_exists($data['month'], $monthMap)) {
+                        $data['month'] = $monthMap[$data['month']];
+                    }
+                    
                    // Validation passed, save the data to the database
                     $timestamp = mktime($data['hour'], $data['minute'], '00', $data['month'], $data['day'], $data['year']);
                     $formattedDateTime = date("Y-m-d H:i:s", $timestamp);
-            
+
                     $insertData = Bulk_post::create([
                         'user_id' => Auth::id(),
                         'twitter_id' => $request->input('twitter_id'),
@@ -882,34 +994,34 @@ class CommandmoduleController extends Controller
                         'link_url' => $data['link_url'],
                         'image_url' => $data['image_url'],
                     ]);
-            
+
                     // Create Bulk_meta record if it doesn't exist
                     if ($insertData['link_url'] !== '') {
                         $findMeta = Bulk_meta::where('link_url', $insertData['link_url'])->first();
                         if (!$findMeta) {
                             $metaTags = $this->scrapeMetaTags($data['link_url']);
                             $metaData = [
-                                'meta_title' => $metaTags['og:title'],
+                                'meta_title' => $metaTags['og:title'] || $metaTags['og:site_name'],
                                 'meta_description' => $metaTags['og:description'],
                                 'meta_image' => $metaTags['og:image'],
                                 'link_url' => $data['link_url'],
                             ];
                             Bulk_meta::create($metaData);
-                        }                        
-                    }   
-                    
+                        }
+                    }
+
                 }
-                
+
                 return response()->json(['status' => 200, 'message' =>'Bulk posts and meta details are saved successfully.']);
             }
-               
+
         } else {
             return  response()->json(['status' => 500, 'message' => 'No CSV file found']);
         }
 
     }
 
-    function endsWith($haystack, $needles) {
+    protected function endsWith($haystack, $needles) {
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && substr($haystack, -strlen($needle)) === $needle) {
                 return true;
@@ -918,16 +1030,23 @@ class CommandmoduleController extends Controller
         return false;
     }
 
+    protected function isValidDomainUrl($url) {
+        // Check if the URL has a valid domain
+        return preg_match('/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/', $url);
+    }
+
     function scrapeMeta(Request $request) {
         $findMeta = Bulk_meta::where('link_url', $request->input('url'))->first();
 
         if ($findMeta) {
             $metaTags = $this->scrapeMetaTags($request->input('url'));
 
+            $defaultImage = env('APP_URL') . '/public/ui-images/default_og.jpg';
+
             $findMeta->update([
-                'meta_title' => $metaTags['og:title'],
-                'meta_description' => $metaTags['og:description'],
-                'meta_image' => $metaTags['og:image'],
+                'meta_title' => $metaTags['og:title'] ?? 'Default Title',
+                'meta_description' => $metaTags['og:description'] ?? 'Default Description',
+                'meta_image' => $metaTags['og:image'] ?? $defaultImage,
             ]);
 
             return response()->json([

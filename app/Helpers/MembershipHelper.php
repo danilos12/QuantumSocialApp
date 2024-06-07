@@ -15,19 +15,14 @@ use Illuminate\Support\Facades\DB;
 class MembershipHelper
 {
     public static function tier($id) {
-        $usersid = null;
-
-        if(Auth::guard('member')->check()){
-            $usersid = self::membercurrent();
-        }
-
-        if(Auth::guard('web')->check()){
-            $usersid = Auth::id();
-        }
 
         $subscription = DB::table('users_meta')
             ->join('plans', 'users_meta.subscription_id', 'plans.id')
-            ->where('users_meta.user_id', $usersid)
+            ->where('users_meta.user_id', $id)
+            ->select(
+                'users_meta.*',
+                'plans.*',
+            )
             ->first();
         // dd($subscription);
         return $subscription;
@@ -61,26 +56,32 @@ class MembershipHelper
 
         return $acctemail;
     }
-    
-    // wp api connection
-    public static function apiGetCurl($url) {
-        $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-                
-        return $response;
+    public static function twitterAcct($id) {
+        $twitter = Twitter::where('user_id', $id)->count();
+        return $twitter;
     }
 
+
+
+    // wp api connection
+    public static function apiGetCurl($url) {
+        // Initialize cURL session
+        $ch = curl_init($url);
+
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+        // Execute cURL session
+        $response = curl_exec($ch);
+
+        // Get the HTTP status code
+        $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        // Close cURL session
+        curl_close($ch);
+
+        return ['response' => $response, 'httpStatusCode' => $httpStatusCode];
+    }
 }

@@ -21,7 +21,7 @@ class UpdateSubscriptionStatus extends Command
      *
      * @var string
      */
-    protected $signature = 'update:subscription-status';
+    protected $signature = 'subscription:update';
 
     /**
      * The console command description.
@@ -48,100 +48,118 @@ class UpdateSubscriptionStatus extends Command
     public function handle()
     {
         try {
-            if (env('APP_ENV') === "local") {
-                $pdo = new PDO('mysql:host=127.0.0.1;dbname=quantum_app', 'root', '');             
-            } else {
-                $pdo = new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');             
-            }
-    
-            // // Set PDO to throw exceptions on errors
+
+            // Connect to the database
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
+
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    
+
             // // Prepare the SQL statement to get posts
-            $userMeta = $pdo->prepare("SELECT * FROM users");
-            $userMeta->execute();            
-            
-            // Fetch all post results
-            $get = $userMeta->fetchAll(PDO::FETCH_ASSOC);
-            $result = [];        
-    
-            foreach($get as $user) {
-                
-                // get twitter meta
-                $user_meta = $pdo->prepare("SELECT * FROM users_meta where user_id= :id");
-                $user_id = $user['id'];    
-                $user_meta->bindParam(':id', $user_id, PDO::PARAM_STR);
-                $user_meta->execute();
-                $res = $user_meta->fetchAll(PDO::FETCH_ASSOC);      
-                
-                if (count($res) > 0) {
-                    // $res is not empty
-                    // Do something with $res
-                    foreach ($res as $meta) {                                                
-                        // Process $meta
-                        $api = MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $meta['wp_user_id']);                
-                        $jsonStart = strpos($api, '{');
-                            
-                        // Extract JSON data
-                        $jsonData = substr($api, $jsonStart);
-                        
-                        // Parse JSON
+            $users = $pdo->prepare("SELECT * FROM users");
+            $users->execute();
+
+            // Fetch all users results
+            $users = $users->fetchAll(PDO::FETCH_ASSOC);
+            $result = [];
+
+            if ($users) {
+                \Log::info('Users retrieved: ' . json_encode($users));
+            } else {
+                \Log::error('User not retrieved');
+            }
+
+             // Track user IDs for which the API has been called
+            // $processedUserIds = [];
+
+            // Process each user
+            foreach ($users as $user) {
+                // Log the user
+                \Log::info('Processing user: ' . json_encode($user));
+
+                // Get user meta using the user ID
+                $userMetaQuery = $pdo->prepare("SELECT * FROM users_meta WHERE user_id = :id");
+                $userMetaQuery->bindParam(':id', $user['id'], PDO::PARAM_INT);
+                $userMetaQuery->execute();
+                $userMetas = $userMetaQuery->fetchAll(PDO::FETCH_ASSOC);
+
+                // Process each user meta
+                foreach ($userMetas as $userMeta) {
+                    // Check if the API has already been called for this user ID
+                    // Log the user meta
+                    \Log::info('Processing user meta: ' . json_encode($userMeta));
+
+                    \Log::info('subscription_id: ' . $userMeta['subscription_id']);
+
+                    // Call the API
+
+                    if($userMeta['subscription_id'] != 4){
+
+                        $apiResult = env("APP_URL") == 'http://app.quantumsocial.local'? MembershipHelper::apiGetCurl('http://quantumsocial.local/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']):MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']);
+
+
+
+                    // Get the HTTP status code of the API response
+                    $httpStatusCode = $apiResult['httpStatusCode'];
+
+                    // Check if the API call was successful
+                    if ($httpStatusCode === 200) {
+                        // API call was successful
+                        \Log::info('API request successful. HTTP status code: ' . $httpStatusCode);
+                        \Log::info('API response: ' . json_encode($apiResult['response']));
+
+                        $jsonStart = strpos($apiResult['response'], '{');
+                        $jsonData = substr($apiResult['response'], $jsonStart);
                         $parsedData = json_decode($jsonData, true);
-            
+
+
                         $status = config('wp.status_labels');
-        
+
                         if ($parsedData['n'] === 'valid') {
                             $now = strtotime(date("Y/m/d"));
                             $your_date = strtotime($parsedData['info']['trial_date']);
                             $datediff = $your_date - $now;
                             $days_diff = floor($datediff / (60 * 60 * 24));
+                            $days_diff = max(0, $days_diff);
                             $updateResult = QuantumAcctMeta::where('user_id', $user['id'])->update([
                                 'trial_counter' => $days_diff,
                                 'status' => $status[$parsedData['wc_status']],
                             ]);
-            
+
                             // $result .= 'Status valid, table is updated. ID: ' . $user['id'] . PHP_EOL;
                             $result[] = [
-                                'id' => $meta['id'],
-                                'message' =>  'Has entry for user ID: ' . $meta['id'] . PHP_EOL,
+                                'id' => $userMeta['id'],
+                                'message' =>  'Has entry for user ID: ' . $userMeta['id'] . PHP_EOL,
                                 'updated' => ($updateResult !== false && $updateResult > 0) ? true : false
                             ];
+                        }
 
-                        } else {
-                            // $now = strtotime(date("Y/m/d"));
-                            // $your_date = strtotime($parsedData['info']['trial_date']);
-                            // $datediff = $your_date - $now;
-                            // $days_diff = floor($datediff / (60 * 60 * 24));
-                            // QuantumAcctMeta::where('user_id', auth()->id())->update([
-                            //     'trial_counter' => $days_diff,
-                            //     'status' => $status[$parsedData['wc_status']],
-                            // ]);
+                            // Process $apiResult
+                    } else {
+                        // API call failed
+                        \Log::error('API request failed. HTTP status code: ' . $httpStatusCode);
 
-                            $result[] = [
-                                'status' => $parsedData['n'],
-                                'message' => 'Status invalid, subscription for user ID: ' . $user['id'] . PHP_EOL
-                            ]; 
-                        }                    
+                        $updateResult = QuantumAcctMeta::where('user_id', $user['id'])->update([
+                            'trial_counter' => 0,
+                            'status' => 4,
+                        ]);
+
+                        $result[] = [
+                            'status' => 'invalid',
+                            'message' => 'Status invalid, subscription for user ID: ' . $user['id'] . PHP_EOL
+                        ];
                     }
-                } else {
-                    // $res is empty
-                    // Handle the case where there is no user meta
-                    $result[] = 'No entry for user ID: ' . $user['id'] . PHP_EOL;
+
+                }else{
+                    \Log::info('subscription_id_skipped: ' . $userMeta['subscription_id']);
                 }
-        
+                }
             }
-    
-            print_r($result);
-            // Print formatted result to console
-            // $this->info($result);
 
-            //  Log a message to indicate the task is running
-            echo 'Scheduled task is running now.';                
+            \Log::info('Scheduled task completed successfully.');
 
-        } catch (PDOException $e) {
-            // echo "PDO MySQL connection failed: " . $e->getMessage();
+        } catch (\Exception $e) {
 
-            echo 'PDO MySQL connection failed: ' . $e->getMessage();
-        }  
+            \Log::error('An error occurred: ' . $e->getMessage());
+        }
     }
 }

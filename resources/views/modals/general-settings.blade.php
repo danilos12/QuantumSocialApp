@@ -26,6 +26,7 @@
                 <span class="settings-item-label">Current Plan</span>
               </div>  <!-- END .settings-item-label -->
               <div class="settings-item-data-wrap">
+               
                 <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
                 <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
               </div>  <!-- END .settings-item-data -->
@@ -144,14 +145,14 @@
 
       <div class="menu-section-outer social-accounts-outer">
         <div class="menu-section-inner social-accounts-inner">
-          <span class="menu-section-header">Twitter API Credential</span>
+          <span class="menu-section-header">X API Credential</span>
 
           <div class="menu-twirl-option-outer">
             <div class="menu-twirl-option-inner">
               <div class="menu-twirl-left">
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                   <span class="menu-twirl-option-text">
-                    Use this Master API for every Twitter account.</span>
+                    Use this Master API for every X account.</span>
               </div>  <!-- END .menu-twirl-left -->
               <div class="menu-twirl-right"><input type="checkbox" class="menu-twirl-toggle" name="general-settings[]" id="toggle_1" {{ isset($generalSetting) ? ($generalSetting->toggle_1 === 1) ? 'checked' : '' : ''}}>
               </div>  <!-- END .menu-twirl-right -->
@@ -206,7 +207,7 @@
               <div class="menu-twirl-left">
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-comment.svg" class="ui-icon menu-twirl-option-icon" />
                   <span class="menu-twirl-option-text">
-                    Allow each Twitter account to have its own API <br>
+                    Allow each X account to have its own API <br>
                     <span style="font-weight: 200; font-style: italic;">(Keeping this off forces all accounts to use the Master API, but activating it will give the choice on the account level in each Twitter account's settings.)</span>
                   </span>
               </div>  <!-- END .menu-twirl-left -->
@@ -252,7 +253,7 @@
                           <span class="menu-account-default" data-twitter_id="{{ $acct->twitter_id }}" data-toggle="tooltip" title="Set default account. Page will reload after select" default="{{ isset($selected_user) ? ($selected_user->twitter_id === $acct->twitter_id ? 'active' : '') : '' }}"></span>
                           @if ($selected_user->twitter_id === $acct->twitter_id)
                           <img src="{{ asset('public/')}}/ui-images/icons/00j-x-settings.svg" class="ui-icon ui-icon-width" title="Twitter Settings" id="x-twitter-settings" data-icon="twitter-settings" data-toggle="tooltip" />
-                          @else 
+                          @else
                           <img src="{{ asset('public/')}}/ui-images/icons/pg-trash.svg" data-twitterid="{{ $acct->twitter_id }}" id="{{ $acct->twitter_id }}"  class="ui-icon delete-account" title="Delete" data-toggle="tooltip" onclick="deleteTwitterAccount(this)"/>
                           @endif
                         </span>
@@ -268,7 +269,7 @@
             @endif
 
             <div class="menu-social-add-accounts-section">
-              <div class="add-account add-twitter-account" id="link-twitter">                                   
+              <div class="add-account add-twitter-account" id="link-twitter">
                 <img src="{{ asset('public/')}}/ui-images/icons/pg-x.svg" class="ui-icon vertical-middle" />
                     <span>+ Twitter</span>
               </div>  <!-- END .add-twitter-account -->
@@ -436,7 +437,7 @@
     //     console.error('Error:', error);
     //     // Handle errors
     // });
-   
+
 }
 
 </script>

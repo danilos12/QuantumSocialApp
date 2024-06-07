@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\testingapi;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,28 +29,19 @@ Route::get('/', function () {
 Route::get('/login/member', function () {
     // Redirect authenticated users to member home
     if(Auth::guard('member')->check()) {
-        return redirect()->route('memberhome');
+        return redirect()->route('dashboard');
+    }elseif(Auth::guard('web')->check()) {
+        return redirect()->route('dashboard');
     }
     return view('auth.memberlogin');
 })->name('tomemberauth');
 
 Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
 Route::post('/logout/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'logout'])->name('memberlogout');
-
+Route::get('/404', [App\Http\Controllers\ErrorPage::class, 'errorPages'])->name('errorPage');
 
 // Auth::routes();
 Auth::routes(['register' => false]);
-
-
-
-
-
-
-
-
-
-// Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-// Routes accessible only to authenticated members
 
 
 // Password reset routes
@@ -58,17 +50,14 @@ Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordCon
 Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::post('/change-password', [App\Http\Controllers\Auth\ChangePasswordController::class, 'updatePassword'])->name('change.password');
 Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword'])->name('password.update');
-// Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
-
-
-
-
-
 
 // dashboard controller
 Route::get('/help', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
+Route::get('/privacy-policy', [App\Http\Controllers\dashboardController::class, 'help'])->name('help');
 Route::get('/', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [App\Http\Controllers\dashboardController::class, 'index'])->name('dashboard');
+// Route::get('/testing',function(){return view('testpage');})->name('memberbanner')->name('testpage')->middleware('auth');
+
 Route::get('/get-upgrade-modal', [App\Http\Controllers\HomeController::class, 'upgrademodal'])->name('upgradecheckout');
 
 
@@ -88,7 +77,7 @@ Route::get('/schedule', [App\Http\Controllers\PostingController::class, 'slot_sc
 Route::post('/schedule/save', [App\Http\Controllers\PostingController::class, 'schedule_save'])->name('schedule.save');
 Route::post('/schedule/action/{slot_id}', [App\Http\Controllers\PostingController::class, 'schedule_action'])->name('schedule.action');
 Route::match(['get', 'post'], '/add-new-slot', [App\Http\Controllers\PostingController::class, 'add_new_slot'])->name('add-new-slot');
-Route::get('/tweet-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('tweet-stormer');
+Route::get('/post-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('post-stormer');
 Route::get('/bulk', [App\Http\Controllers\PostingController::class, 'bulk_uploader'])->name('bulk-uploader');
 Route::get('/bulk-queue', [App\Http\Controllers\PostingController::class, 'bulk_queue'])->name('bulk-queue');
 Route::get('/schedule/slots',[App\Http\Controllers\PostingController::class, 'getScheduledSlots'])->name('schedule.slot');
@@ -98,21 +87,19 @@ Route::get('/post/getmonth',[App\Http\Controllers\PostingController::class, 'get
 Route::get('/post/sortbymonth',[App\Http\Controllers\PostingController::class, 'sortPostbyMonth'])->name('sort.month');
 Route::get('/post/edit/{id}',[App\Http\Controllers\PostingController::class, 'editPost'])->name('post.edit');
 Route::post('/post/update/{id}',[App\Http\Controllers\PostingController::class, 'editPostData'])->name('post.edit');
-Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+// Route::post('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
+Route::delete('/post/delete/{id}',[App\Http\Controllers\PostingController::class, 'deletePost'])->name('post.delete');
 Route::get('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // retrieve modal
 Route::put('/post/bulk_edit/{id}',[App\Http\Controllers\PostingController::class, 'editBulk'])->name('post.bulk_edit'); // update data in modal
 Route::post('/post/duplicate/{id}',[App\Http\Controllers\PostingController::class, 'duplicatePost'])->name('post.duplicate');
+Route::post('/post/move-to-top/{id}',[App\Http\Controllers\PostingController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingController::class, 'retrieveSpecialPost'])->name('post.special');
-
-
-
-
 
 
 Route::get('/campaigns', [App\Http\Controllers\CampaignsController::class, 'index'])->name('campaigns');
 Route::get('/promo', [App\Http\Controllers\CampaignsController::class, 'promo_tweets'])->name('promo-tweets');
 Route::get('/evergreen', [App\Http\Controllers\CampaignsController::class, 'evergreen_tweets'])->name('evergreen-tweets');
-Route::get('/tweet-storms', [App\Http\Controllers\CampaignsController::class, 'tweet_storms'])->name('tweet-storms');
+Route::get('/post-storms', [App\Http\Controllers\CampaignsController::class, 'tweet_storms'])->name('post-storms');
 Route::get('/tag-groups', [App\Http\Controllers\CampaignsController::class, 'tag_groups'])->name('tag-groups');
 
 
@@ -135,7 +122,9 @@ Route::get('/twitter/getTweets/{id}', [App\Http\Controllers\TwitterApi::class, '
 Route::get('/tweets/{id}', [App\Http\Controllers\TwitterApi::class, 'tweets'])->name('tweets');
 Route::get('/twitter/accts', [App\Http\Controllers\TwitterApi::class, 'getTwitterAccts']);
 Route::post('/twitter/switchUser', [App\Http\Controllers\TwitterApi::class, 'switchedAccount'])->name('twitter.switchUser');
-Route::post('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
+Route::post('/twitter/default/accounts', [App\Http\Controllers\TwitterApi::class, 'setDefaultxAcct'])->name('twitter.setDefault');
+Route::get('/twitter/unselected/accounts', [App\Http\Controllers\TwitterApi::class, 'getUnselectedTwitterAccounts']);
+Route::delete('/twitter/remove', [App\Http\Controllers\TwitterApi::class, 'removeTwitterAccount'])->name('twitter.remove');
 Route::get('/twitter/details/{id}', [App\Http\Controllers\TwitterApi::class, 'twitterDetails'])->name('twitter.details');
 Route::get('/twitter/{id}/filter/{type}', [App\Http\Controllers\TwitterApi::class, 'getTweetFilters'])->name('tweet.filter');
 Route::get('/twitter/{id}/filter/{type}/get-more-tweets', [App\Http\Controllers\TwitterApi::class, 'getTweetMoreTweets'])->name('tweet.more');
@@ -162,15 +151,17 @@ Route::post('/settings/members/_update/{id}', [App\Http\Controllers\GeneralSetti
 Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\GeneralSettingController::class, '_deleteMember'])->name('member.delete');
 Route::post('/settings/members/_apiaccess', [App\Http\Controllers\GeneralSettingController::class, '_apiaccess'])->name('member.apiaccess');
 Route::post('/settings/members/_adminaccess', [App\Http\Controllers\GeneralSettingController::class, '_adminaccess'])->name('member.adminaccess');
+Route::post('/settings/cancel/subscription', [App\Http\Controllers\GeneralSettingController::class, 'cancelSubscription'])->name('cancel.subscription');
 
 
 // Command Module Controller
 Route::get('/command-module', [App\Http\Controllers\CommandmoduleController::class, 'index'])->name('command-module');
 Route::post('/cmd/save', [App\Http\Controllers\CommandmoduleController::class, 'create'])->name('cmd.save');
 Route::post('/cmd/add-tag', [App\Http\Controllers\CommandmoduleController::class, 'addTagGroup'])->name('cmd.add_tag');
+Route::delete('/cmd/remove-tag', [App\Http\Controllers\CommandmoduleController::class, 'removeTagGroup'])->name('cmd.remove_tag');
 Route::post('/cmd/add-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'addTagItem'])->name('cmd.add_tag_item');
+Route::delete('/cmd/remove-tag-item', [App\Http\Controllers\CommandmoduleController::class, 'removeTagItem'])->name('cmd.remove_tag_item');
 Route::post('/cmd/post/tweet-now',[App\Http\Controllers\CommandmoduleController::class, 'postNowFromQueue'])->name('post.tweet');
-Route::post('/cmd/post/move-to-top',[App\Http\Controllers\CommandmoduleController::class, 'moveTopFromQueue'])->name('post.move');
 Route::get('/cmd/get-tag-groups/{id}',[App\Http\Controllers\CommandmoduleController::class, 'getTagGroups'])->name('cmd.get_tag_groups');
 Route::get('/cmd/get-tag-items',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
 Route::get('/cmd/get-tag-items-json',[App\Http\Controllers\CommandmoduleController::class, 'getTagItems'])->name('cmd.get_tag_items');
@@ -193,7 +184,18 @@ Route::get('/su/admin/plans', [App\Http\Controllers\SuperAdminController::class,
 Route::get('/su/admin/phpinfo', [App\Http\Controllers\SuperAdminController::class, 'phpInfo']);
 // Add more routes as needed
 
+Route::redirect('/home', '/dashboard');
+Route::redirect('/registration', '/');
+Route::post('/onboard', [App\Http\Controllers\dashboardController::class, 'onboarded'])->name('onboard');
+Route::get('/checkOnboard', [App\Http\Controllers\dashboardController::class, 'checkOnboard'])->name('checkOnboard');
+Route::get('/tourStarted', [App\Http\Controllers\dashboardController::class, 'tourStarted'])->name('tourStarted');
 
+
+Route::middleware(['web'])->group(function () {
+    // Your routes here
+    Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+});
 
 Route::middleware(['web','guest','session_expired'])
     ->group(function () {
@@ -218,18 +220,3 @@ Route::middleware(['web','guest','session_expired'])
 
 
 
-    Route::middleware('member-access')->group(function(){
-
-        Route::get('/member/home',function()
-        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome')->withoutMiddleware(['session_expired']);;
-        Route::get('/member/promo',function(){
-
-            return view('promo-tweets')->with('title','Promo');});
-        Route::get('/member/banner',function(){return view('layouts.app');})->name('memberbanner');
-
-
-
-
-
-
-    });

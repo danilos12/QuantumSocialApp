@@ -17,7 +17,7 @@
     <div class="page-head-n-sort">
       <div class="head-left-wrap">
         <span class="profile-heading">
-          Promo Tweets</span>
+          Promo Posts</span>
         <div class="toggle-wrapper">
           <label class="toggleSwitch large" onclick="">
             <input type="checkbox" id="post-status" {{ $toggle > 0 ? 'checked' : '' }} />

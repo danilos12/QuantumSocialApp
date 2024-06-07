@@ -36,46 +36,41 @@ class Controller extends BaseController
     // Step 1 (Redirect to Authorize)
     public function checkTwitterCreds(Request $request, $id) {
 
-        if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
-        $checkRole = MembershipHelper::tier($this->setDefaultId());
+        if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1) {
+            $checkRole = MembershipHelper::tier($this->setDefaultId());
 
-        $twitterCount = DB::table('twitter_accts')
-            ->where('user_id', $this->setDefaultId())
-            ->count();
+            $twitterCount = DB::table('twitter_accts')
+                ->where('user_id', $this->setDefaultId())
+                ->count();
 
+            if ($checkRole->member_count > $twitterCount) {
 
+                try {
+                    $findCred = MasterTwitterApiCredentials::where('user_id', $this->setDefaultId())->first();
 
-        if ($checkRole->member_count > $twitterCount) {
+                    if ($findCred) {
+                        $url = $this->twitterOAuth($findCred->oauth_id);
+                        return response()->json(['status' => 200, 'redirect' => $url, 'stat' => 'success', 'message' => 'Redirecting to Twitter']);
+                    } else {
+                        return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Please add your Master API above.']);
+                    }
 
-            try {
-                $findCred = MasterTwitterApiCredentials::where('user_id', $this->setDefaultId())->first();
-
-                if ($findCred) {
-                    $url = $this->twitterOAuth($findCred->oauth_id);
-
-                    return response()->json(['status' => 200, 'redirect' => $url, 'stat' => 'success', 'message' => 'Redirecting to Twitter']);
-                } else {
-                    return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Please add your Master API above.']);
+                } catch (Exception $e) {
+                    $trace = $e->getTrace();
+                    $message = $e->getMessage();
+                    // Handle the error
+                    // Log or display the error message along with file and line number
+                    return response()->json(['status' => 409, 'stat' => 'warning' ,'error' => $trace, 'message' => $message]);
                 }
-
-            } catch (Exception $e) {
-                $trace = $e->getTrace();
-                $message = $e->getMessage();
-                // Handle the error
-                // Log or display the error message along with file and line number
-                return response()->json(['status' => 409, 'stat' => 'warning' ,'error' => $trace, 'message' => $message]);
+            }  else {
+                // Return a response indicating that the limitation has been reached
+                $html = view('modals.upgrade')->render();
+                return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
             }
 
-        }  else {
-
-            // Return a response indicating that the limitation has been reached
-            $html = view('modals.upgrade')->render();
-            return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
+        } else{
+            return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to add twitter account, please ask permission to the owner']);
         }
-
-    }else{
-        return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to add twitter account, please ask permission to the owner']);
-    }
 
     }
 
@@ -97,19 +92,16 @@ class Controller extends BaseController
     public function twitterOAuthCallback(Request $request) {
         try {
 
-            // if (isset($_GET['error'])) {
-            //     // return redirect('/');
-            //     // If there was an error saving data, redirect back to the previous page with an error message
-            //     return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
+            if (isset($_GET['error'])) {
+                // return redirect('/');
+                // If there was an error saving data, redirect back to the previous page with an error message
+                return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
 
-            // } else {
-
-
-                    $userid =  $this->setDefaultId();
+            } else {
 
 
-                $codeVerifier = session()->get('code_verifier');
-
+                $userid =  $this->setDefaultId();
+                $codeVerifier = session()->pull('code_verifier');
                 $url = 'https://api.twitter.com/2/oauth2/token';
                 $data = array(
                     'code' => $request->input('code'),
@@ -160,11 +152,13 @@ class Controller extends BaseController
                     $selectedAcct = UT_AcctMngt::firstOrCreate([
                         'user_id' => $userid,
                         'twitter_id' => $twitterId->id,
-                        'selected' => Twitter::where('user_id', $userid)->count() === 1 ? 1 : 0
+                        'selected' => Twitter::where('user_id', $userid)->count() === 1 ? 1 : 0,
+                        'is_default_ctAcct' => 0
                     ]);
 
-                    TwitterSettings::create([
+                    DB::table('settings_toggler_twitter')->insert([
                         'twitter_id' => $twitterId->id,
+                        'user_id' => $this->setDefaultId(),
                         'toggle_1' => 0,
                         'toggle_2' => 0,
                         'toggle_3' => 0,
@@ -177,21 +171,38 @@ class Controller extends BaseController
                         'toggle_10' => 0
                     ]);
 
-                    TwitterSettingsMeta::create([
-                        'twitter_id' => $twitterId->id,
-                        'auto_reply_text' => 'Hey thank you for following (@' . $twitterId->id . ')! <br /><br />1' ,
-                        'text_draft_ender' => 'If you liked this thread then please follow me (@' . $twitterId->id . ') and share this thread by retweeting the first tweet: <br /><br />1',
-                        'eg_rt_retweets' => 3,
-                        'eg_rt_likes' => 7,
-                        'he_rt_likes' => 7,
-                        'he_rt_retweets' => 3,
-                        'rt_auto_time' => 3,
-                        'rt_auto_frame' => 3,
-                        'rt_auto_ite' => 3,
-                        'rt_auto_rm_time' => 3,
-                        'rt_auto_rm_frame' => 3,
-                        'text_comment_offer' => 'For more great content please follow me @' . $twitterId->id,
-                        'text_ender_dm' => 'For more great content please follow me @' . $twitterId->id,
+                    // TwitterSettingsMeta::create([
+                    //     'twitter_id' => $twitterId->id,
+                    //     'auto_reply_text' => 'Hey thank you for following (@' . $twitterId->id . ')! <br /><br />1' ,
+                    //     'text_draft_ender' => 'If you liked this thread then please follow me (@' . $twitterId->id . ') and share this thread by retweeting the first tweet: <br /><br />1',
+                    //     'eg_rt_retweets' => 3,
+                    //     'eg_rt_likes' => 7,
+                    //     'he_rt_likes' => 7,
+                    //     'he_rt_retweets' => 3,
+                    //     'rt_auto_time' => 3,
+                    //     'rt_auto_frame' => 3,
+                    //     'rt_auto_ite' => 3,
+                    //     'rt_auto_rm_time' => 3,
+                    //     'rt_auto_rm_frame' => 3,
+                    //     'text_comment_offer' => 'For more great content please follow me @' . $twitterId->id,
+                    //     'text_ender_dm' => 'For more great content please follow me @' . $twitterId->id,
+                    // ]);
+
+                    DB::table('settings_twitter')->insert([                        
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'auto_reply_text', 'meta_value' => 'Hey thank you for following (@' . $twitterId->id . ')! <br /><br />1' , 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'text_draft_ender', 'meta_value' => 'If you liked this thread then please follow me (@' . $twitterId->id . ') and share this thread by retweeting the first tweet: <br /><br />1', 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'eg_rt_retweets', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'eg_rt_likes', 'meta_value' => 7, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'he_rt_likes', 'meta_value' => 7, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'he_rt_retweets', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_time', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_frame', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_ite', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_rm_time', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'rt_auto_rm_frame', 'meta_value' => 3, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'text_comment_offer', 'meta_value' => 'For more great content please follow me @' . $twitterId->id, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'text_ender_dm', 'meta_value' => 'For more great content please follow me @' . $twitterId->id, 'showSettings' => 0],
+                        ['user_id' => $this->setDefaultId(), 'twitter_id' => $twitterId->id, 'meta_key' => 'set_default_acct', 'meta_value' => '' . $twitterId->id, 'showSettings' => 0],
                     ]);
 
                     session()->put('id', $this->setDefaultId());
@@ -206,7 +217,7 @@ class Controller extends BaseController
                     }
 
                 }
-            // }
+            }
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
@@ -307,8 +318,7 @@ class Controller extends BaseController
 
     }
 
-
-    function base64url_encode($data) {
+    protected function base64url_encode($data) {
         $encoded = base64_encode($data);
         $encoded = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
         return $encoded;

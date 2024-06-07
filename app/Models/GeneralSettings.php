@@ -9,7 +9,7 @@ class GeneralSettings extends Model
 {
     use HasFactory;
 
-    protected $table = 'settings_general';
+    protected $table = 'settings_toggler_general';
     protected $fillable = [
         'user_id',
         'toggle_1', 

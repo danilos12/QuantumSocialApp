@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
 use App\Helpers\MembershipHelper;
+use App\Helpers\WP;
 use App\Models\TwitterSettings;
 use App\Models\TwitterSettingsMeta;
 use App\Models\GeneralSettings;
@@ -23,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PDO;
 
 
 
@@ -80,7 +82,7 @@ class GeneralSettingController extends Controller
             if ($settings) {
                 return response()->json(['status' => 200, 'stat' => 'success', 'html' => $html, 'message' => "Data has been updated"]);
             } else {
-                return response()->json(['status' => 400, 'stat' => 'danger', 'message' => 'Failed to update your membership.']);
+                return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Failed to update your membership.']);
             }
 
         } catch(Exception $e) {
@@ -326,9 +328,51 @@ class GeneralSettingController extends Controller
         }
 
     }
+    
+    public function cancelSubscription(Request $request) {
+        try {
+             // Validate first the email provided
+            $email = $request->input('quantum_social_email');
+            $subscription = WP::getUserSubscription($email);      
+            
+            // dd($subscription);
 
+            if (!$subscription) {
+                return response()->json(['status' => 404, 'message' => 'Subscription not found']);
+            }
 
+            $dbConnection = WP::external_db_connection();
+            $table_prefix = 'wp_ftvis8_';
+    
+            // Prepare the UPDATE query
+            $update = $dbConnection->prepare("
+                UPDATE {$table_prefix}posts 
+                SET 
+                    post_status = 'wc-cancelled'
+                WHERE 
+                    ID = :id
+                AND
+                    post_type = 'shop_subscription'
+            ");
+    
+            $update->bindParam(':id', $subscription['ID'], PDO::PARAM_INT);
+    
+            // Execute the query
+            $update->execute();
+    
+            // Check if the update was successful
+            if ($update->rowCount() > 0) {
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Subscription cancelled successfully. You will be logged out automatically.']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'No rows updated']);
+            }
 
+        } catch(Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+    }
 
     public function addNewMember(Request $request) {
 
@@ -369,12 +413,12 @@ class GeneralSettingController extends Controller
             if ($existingUser) {
                 return response()->json(['message' => 'Email already exists','stat'=> 'warning']);
             }
-            $hasaccess = null;
+            $adminaccess = null;
             $randomPassword = Str::random(10);
-            if($request->input('Admin')==='Admin'){
-                $hasaccess = true;
+            if($request->input('roles')=="Admin"){
+                $adminaccess = true;
             }else{
-                $hasaccess= false;
+                $adminaccess= false;
             }
             $relational = [
                 'account_holder_id' => $userId,
@@ -382,19 +426,23 @@ class GeneralSettingController extends Controller
                 'email' => $request->input('emails'),
                 'role' => $request->input('roles'),
                 'api_access' => $request->input('api_access'),
-                'admin_access' => $hasaccess,
+                'admin_access' => $adminaccess,
                 'password' => $randomPassword,
                 'isverified' => false,
                 'tokens' => ''
             ];
 
 
+            $plans1 =  DB::table('plans')->where('id', 1)->first();
+            $plans2 =  DB::table('plans')->where('id', 2)->first();
+            $plans3 =  DB::table('plans')->where('id', 3)->first();
+            $plans4 =  DB::table('plans')->where('id', 4)->first();
 
             // Check the subscription type and count limits
             // solar subscription
         if ($subs_id == 1 ) {
 
-            if($memberCount < 0 && $relational['role'] === 'Member' ){
+            if($memberCount < $plans1->tm_count && $relational['role'] === 'Member' ){
                 try{
                         DB::beginTransaction();
                         $userMngt = DB::table('members')->insert($relational);
@@ -409,7 +457,7 @@ class GeneralSettingController extends Controller
                     // Handle the Swift_TransportException
                     return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
                 }
-            }elseif($adminCount < 1 && $relational['role'] === 'Admin'){
+            }elseif($adminCount < $plans1->admin_count && $relational['role'] === 'Admin'){
                 try{
 
                             DB::beginTransaction();
@@ -439,7 +487,8 @@ class GeneralSettingController extends Controller
 
 if ($subs_id == 2 ) {
 
-    if($memberCount < 5 && $relational['role'] === 'Member' ){
+
+    if($memberCount < $plans2->tm_count && $relational['role'] === 'Member' ){
         try{
             DB::beginTransaction();
             $userMngt = DB::table('members')->insert($relational);
@@ -455,7 +504,7 @@ if ($subs_id == 2 ) {
             // Handle the Swift_TransportException
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
-        }elseif($adminCount < 3 && $relational['role'] === 'Admin'){
+        }elseif($adminCount < $plans2->admin_count && $relational['role'] === 'Admin'){
             try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -485,7 +534,7 @@ if ($subs_id == 2 ) {
 
         if ($subs_id == 3 ) {
 
-            if($memberCount < 10 && $relational['role'] === 'Member' ){
+            if($memberCount < $plans3->tm_count && $relational['role'] === 'Member' ){
                 try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -501,7 +550,7 @@ if ($subs_id == 2 ) {
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
         }
-        elseif($adminCount < 5 && $relational['role'] === 'Admin')
+        elseif($adminCount < $plans3->admin_count && $relational['role'] === 'Admin')
         {
             try{
 
@@ -574,19 +623,28 @@ if ($subs_id == 2 ) {
     public function _editMember(Request $request) {
 
         if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1){
-
+            $adminaccess = null;
+            if(  $request->input('roles')=='Admin'){
+                    $adminaccess = true;
+            }else{
+                $adminaccess = false;
+            }
 
         $editdataverified = [
             'fullname'=>$request->input('fullname'),
             'role'=>$request->input('roles'),
             'api_access'=>$request->input('api_access'),
+            'admin_access'=>$adminaccess
         ];
+
 
         $editdatanotverified = [
             'fullname'=>$request->input('fullname'),
             'role'=>$request->input('roles'),
             'api_access'=>$request->input('api_access'),
+            'admin_access'=>$adminaccess
         ];
+
         $member_id = $request->input('user_id');
         $isverified = DB::table('members')->where('email',$request->input('emails'))->value('isverified');
 

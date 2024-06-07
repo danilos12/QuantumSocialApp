@@ -163,12 +163,11 @@ class PostingController extends Controller
 						$update->post_type = 'regular-tweets';
 					// }
 				}
-				// dd($update);
 
 				$update->save();
 
 				// Return the JSON response
-				return response()->json(['status' => 200, 'message' => 'Schedule has been updated.', 'info' => $update]);
+				return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Schedule has been updated.', 'info' => $update]);
 
 			} else {
 				$captureDate = null;
@@ -214,12 +213,12 @@ class PostingController extends Controller
 
 				if ($saved) {
 					// Return success response
-					return response()->json(['status' => 200, 'message' => 'Schedule has been created.', 'info' => $saved]);
+					return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Schedule has been created.', 'info' => $saved]);
 				}
 			}
 
 		} catch (Exception $e) {
-			return response()->json(['status' => 500, 'error' => 'Failed to create data:' . $e->getMessage()]);
+			return response()->json(['status' => 500, 'stat' => 'warning', 'error' => 'Failed to create data:' . $e->getMessage()]);
 		}
 	}
 
@@ -275,11 +274,18 @@ class PostingController extends Controller
 			return view('bulk-queue', compact('message', 'title'));
             // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
-
+		
 		if ($checkRole->basic_bulk_uploader !== 1) {
 			$modalContent = view('modals.upgrade')->render();
 			return view('bulk-queue', compact('modalContent', 'title'));
 		} 
+		
+		$checkTwitter = DB::table('ut_acct_mngt')->where('user_id', $this->setDefaultId())->where('selected', 1)->first();
+		
+		// if ($checkTwitter === null) {
+		// 	$message = 'You need to add your social media account first to proceed with the bulk uploader.';
+		// 	return view('bulk', compact('message', 'title'));	
+		// }
 	
 		return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
 		
@@ -434,9 +440,41 @@ class PostingController extends Controller
             $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => '500', 'stat' => 'warning',  'error' => $trace, 'internal_message' => $message, 'message' => $message]);
 		}
 	}
+
+	public function moveTopFromQueue(Request $request, $id) {
+        try {
+            
+            $post_id = str_replace('move-top-', '', $id);
+            $post = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])->findOrFail($post_id);
+
+            $nearestPost = CommandModule::whereNotIn('post_type', ['evergreen', 'promos', 'tweetstorms'])
+                ->where('twitter_id', $request->twitter_id)
+                ->where('sched_time', '>', TwitterHelper::now($this->setDefaultId()))
+                ->orderBy('sched_time', 'ASC')
+                ->first();
+
+            if ($nearestPost) {
+                // dd($nearestPost->sched_time, $nearestPost->sched_method);
+                $post->sched_time = $nearestPost->sched_time;
+                $post->sched_method = 'rush-queue';
+                $post->save();
+            }
+
+            // Return a response indicating success
+            return response()->json(['status' => 200, 'stat' => 'success' , 'message' => 'Sched time updated successfully']);
+
+        } catch (Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();
+            // Handle the error
+            // Log or display the error message along with file and line number
+            return response()->json(['status' => '500', 'stat' => 'warning', 'error' => $trace, 'internal_message' => $message, 'message' => 'Error moving your post to the top of queue.']);
+        }
+    }
+
 
 	public function duplicatePost($id) {
         try {
@@ -459,14 +497,14 @@ class PostingController extends Controller
 			$newRow->save();
 
             // Redirect or return a response
-            return response()->json(['status' => 200, 'message' => 'Post duplicated successfully!']);
+            return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Post duplicated successfully!']);
 
         } catch (Exception $e) {
             $trace = $e->getTrace();
             $message = $e->getMessage();
             // Handle the error
             // Log or display the error message along with file and line number
-            return response()->json(['status' => '500', 'error' => $trace, 'message' => $message]);
+            return response()->json(['status' => 500, 'stat' => 'warning', 'error' => $trace, 'inner_message'=> $message ,  'message' => 'Error while duplicating your post']);
         }
 	}
 
@@ -688,7 +726,7 @@ class PostingController extends Controller
 							}
 						}
 
-						return response()->json(['status' => 200, 'action' => $id, 'message' => 'Data is cloned successfully!']);
+						return response()->json(['status' => 200, 'stat' => 'success', 'action' => $id, 'message' => 'Data is cloned successfully!']);
 
 					} else {
 						// Data entry not found
@@ -704,7 +742,7 @@ class PostingController extends Controller
 					if ($originalDay) {
 						$originalDay->delete();
 
-						return response()->json(['status' => 200, 'action' => $id, 'message' => 'Data is deleted successfully!']);
+						return response()->json(['status' => 200, 'stat' => 'success', 'action' => $id, 'message' => 'Data is deleted successfully!']);
 					} else {
 						// Data entry not found
 						throw new \Exception('Data not found');

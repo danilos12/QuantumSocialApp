@@ -45,88 +45,74 @@ class ProcessScheduledPosts extends Command
      * @return int
      */
     public function handle()
-    {              
-       
+    {
         try {
-            if (env('APP_ENV') === "local") {
-                $pdo = new PDO('mysql:host=127.0.0.1;dbname=quantum_app', 'root', '');             
-            } else {
-                $pdo = new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');             
-            }
+            // Connect to the database
 
-            // // Set PDO to throw exceptions on errors
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-            // // Prepare the SQL statement to get posts
-            $postsQuery = $pdo->prepare("SELECT * FROM posts");
-            $postsQuery->execute();            
-            
-            // Fetch all post results
+            // Get the current datetime
+            // $currentDateTime = now()->toDateTimeString();
+            $currentDateTime = now()->format('Y-m-d H:i');
+
+            // Fetch scheduled posts
+            // $postsQuery = $pdo->prepare("SELECT * FROM posts WHERE sched_time <= :currentDateTime AND sched_method = 'schedule'");
+            $postsQuery = $pdo->prepare("SELECT * FROM posts WHERE DATE_FORMAT(sched_time, '%Y-%m-%d %H:%i') = :currentDateTime AND active = 1");
+            $postsQuery->bindParam(':currentDateTime', $currentDateTime, PDO::PARAM_STR);
+            $postsQuery->execute();
             $scheduledPosts = $postsQuery->fetchAll(PDO::FETCH_ASSOC);
-            $result = [];
-            
-            // // Process the results (if needed)
+
+            if ($scheduledPosts) {
+                \Log::info('ScheduledPosts retrieved' . json_encode($scheduledPosts));
+            } else {
+                \Log::error('ScheduledPosts not retrieved' . json_encode($scheduledPosts));
+            }
+
+            // Process scheduled posts
             foreach ($scheduledPosts as $post) {
-                // convert all the time of post to UTC
-                $datetime = Carbon::parse($post['sched_time']);
 
-                // Convert the datetime to UTC
-                $utcDateTime = $datetime->utc();                
-
-                // $postsQuery->bindParam(':sched_time', $time, PDO::PARAM_STR);
-                // get the timezone of user using user Id                                
-                // $getTimezone = $pdo->prepare("SELECT * FROM users_meta where user_id= :id");
-                // $id = $post['user_id'];    
-                // $getTimezone->bindParam(':id', $id, PDO::PARAM_STR);
-                // $getTimezone->execute();
-                // $userTimezone = $getTimezone->fetchAll(PDO::FETCH_ASSOC);
-
-                $id = $post['user_id'];      
-                $serverTime = NOW();   
-                $ss = $serverTime->utc();       
-
-                // get twitter meta
-                $twitter_meta = $pdo->prepare("SELECT * FROM twitter_meta where twitter_id= :twitter_id");
-                $twitter_id = $post['twitter_id'];    
+                // Get Twitter meta
+                $twitter_meta = $pdo->prepare("SELECT * FROM twitter_meta WHERE twitter_id = :twitter_id AND user_id = :user_id");
+                $twitter_id = $post['twitter_id'];
+                $user_id = $post['user_id'];
                 $twitter_meta->bindParam(':twitter_id', $twitter_id, PDO::PARAM_STR);
+                $twitter_meta->bindParam(':user_id', $user_id, PDO::PARAM_STR);
                 $twitter_meta->execute();
-                $userTwitterMeta = $twitter_meta->fetchAll(PDO::FETCH_ASSOC);                                                               
-
-                // Prepare the SQL statement to update the column in the posts table to send-now
-                $updateQuery = $pdo->prepare("UPDATE posts SET sched_method = :new_value WHERE user_id = :id");
-                $sched_method = 'send-now';
-
-                // Bind parameters
-                $updateQuery->bindParam(':new_value', $sched_method, PDO::PARAM_STR);
-                $updateQuery->bindParam(':id', $id, PDO::PARAM_STR);
-                $updateQuery->execute();
+                $userTwitterMeta = $twitter_meta->fetchAll(PDO::FETCH_ASSOC);
 
 
-                // Fetch the updated rows
-                $selectQuery = $pdo->prepare("SELECT * FROM posts WHERE user_id = :id AND sched_method = :new_value AND sched_time = :sched_time");
-                $selectQuery->bindParam(':id', $id, PDO::PARAM_STR);
-                $selectQuery->bindParam(':new_value', $sched_method, PDO::PARAM_STR);
-                $selectQuery->bindParam(':sched_time', $utcDateTime, PDO::PARAM_STR); // change this to server time
-                $selectQuery->execute();
-                $scheduledNowPosts = $selectQuery->fetchAll(PDO::FETCH_ASSOC);
+                \Log::info('User Twitter Meta retrieved: ' . json_encode($userTwitterMeta));
 
-                
-                foreach ($scheduledNowPosts as $row) {
-                    foreach($userTwitterMeta as $twit) {
-                        $postTweet = TwitterHelper::tweet2twitter($twit, array('text' => urldecode($post['post_description'])), "https://api.twitter.com/2/tweets");
-                        
-                        echo $postTweet;
-                    }
-                }                                                       
-            }         
 
-            //  Log a message to indicate the task is running
-            echo 'Scheduled task is running now.';
-                       
-        } catch (PDOException $e) {
-            // echo "PDO MySQL connection failed: " . $e->getMessage();
+                $updateQuery = $pdo->prepare("UPDATE posts SET sched_method = 'send-now' WHERE id = :id AND DATE_FORMAT(sched_time, '%Y-%m-%d %H:%i') = :currentDateTime");
+                $updateQuery->bindParam(':id', $post['id'], PDO::PARAM_INT);
+                $updateQuery->bindParam(':currentDateTime', $currentDateTime, PDO::PARAM_STR);
+                $success = $updateQuery->execute();
 
-            echo 'PDO MySQL connection failed: ' . $e->getMessage();
-        }      
+                \Log::info('Success updating');
+                // If the post was successfully updated, post to Twitter
+                if ($success) {
+                    \Log::info('Success Now tweeting' . print_r($userTwitterMeta[0], true));
+                    \Log::info('Success Now tweeting' . print_r(['text' => urldecode($post['post_description'])], true));
+
+                    $postTweet = TwitterHelper::tweet2twitterSched($userTwitterMeta[0], ['text' => urldecode($post['post_description'])], "https://api.twitter.com/2/tweets", $post['user_id']);
+                    \Log::info('Tweet result: ' . $postTweet);
+
+                    // Tweet the post
+
+                } else {
+                    \Log::info('Something went wrong: ' . json_encode($post));
+                }
+
+            }
+
+            \Log::info('Scheduled task completed successfully.');
+
+
+        } catch (\Exception $e) {
+            \Log::error('An error occurred: ' . $e->getMessage());
+        }
+
     }
 }

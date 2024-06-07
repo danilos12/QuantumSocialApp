@@ -2,19 +2,21 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Auth\RegisterController;
+
+
+
 use App\Models\User;
 use App\Models\GeneralSettings;
 use App\Models\QuantumAcctMeta;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 // use DateTime;
 // use DateTimeZone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Auth\LoginController;
 
-use Illuminate\Support\Facades\Session;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,35 +51,14 @@ Route::get('update-wp', function () {
 
 
 
-	Route::get('dsboard', function () {
-    $r = $_REQUEST;
-    if(isset( $r['sss'] ) ) {
-        $decoded = base64_decode($r['sss']);
-        $decoded_email = base64_decode($r['kslae']);
-        $decryption = substr($decoded, 27, -13);
-        $wp_originalid = $decryption  - 215;
+Route::get('dsboard', function (Request $request) {
+			if(Auth::check()){
+				return redirect()->route('dashboard');
 
-        $compareid = DB::table('users')
-            ->where('email', $decoded_email)
-            ->value('id');
+			}
 
-        $laravelid = DB::table('users_meta')
-            ->where('user_id', $compareid)
-            ->value('wp_subscription_id');
-        $laraveliddecryption = substr($laravelid, 27, -13);
-        $lrv_originalid = $laraveliddecryption  - 215;
+})->middleware('unauthorized');
 
-        if ($lrv_originalid == $wp_originalid) {
-	
-			$user = User::find($compareid);
-						return redirect()->route('dashboard',['user_id'=>$user->id]);
-
-
-        }
-    }
-
-
-});
 
 
     // trial counter trial_date - now()
@@ -95,20 +76,24 @@ Route::get('wp', function () {
 	if(isset( $r['wp_user_id'] ) ) {
 
 
-		$response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='.base64_decode($r['wp_user_id']));
+        $response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($r['wp_user_id'])));
 		$wp_data = $response->json();
 
+        // return response()->json(['status' =>$wp_data, 'laravel_id' => $r['wp_user_id']]);
 
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
 
+            $checkExistingEmail = $r['wp_email'];
+            if(User::where('email',$checkExistingEmail)->exists()){
+                return response()->json(['status' =>'error', 'laravel_id' => 0]);
+            }
 
-
-				if ($wp_data['info']['product_name'] == "Solar") {
+				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
 					$value = 1;
-				} elseif ($wp_data['info']['product_name'] == "Galactic") {
+				} elseif ($wp_data['info']['product_name'] == "Membership Level - Galactic") {
 					$value = 2;
-				} elseif ($wp_data['info']['product_name'] == "Astral") {
+				} elseif ($wp_data['info']['product_name'] == "Membership Level - Astral") {
 					$value = 3;
 				} else{
 					$value = null;
@@ -149,12 +134,7 @@ Route::get('wp', function () {
 
 
 				if( $user->id ) {
-					DB::table('app_usermeta')->insert([
-						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => base64_decode($r['wp_user_id'])],
-						['user_id' => $user->id, 'meta_key' => 'subscription_name', 'meta_value' => $wp_data['info']['product_name']],
 
-
-					]);
 
 					$now = date("Y-m-d");
 					$your_date = $wp_data['info']['trial_date'];
@@ -169,9 +149,10 @@ Route::get('wp', function () {
 						'next_payment'=>$wp_data['info']['next_payment'],
 						'status'=>$status,
 						'timezone' =>'+00:00',
-						'queue_switch'=>0,
-						'promo_switch'=>0,
-						'evergreen_switch'=>0
+						'queue_switch'=>1,
+						'promo_switch'=>1,
+						'evergreen_switch'=>1,
+						'trial_credits'>=25
 					]);
 
 					$generalSettings = [
@@ -185,7 +166,8 @@ Route::get('wp', function () {
 						'toggle_7' => 0
 					];
 
-					DB::table('settings_general')->insert($generalSettings);
+					DB::table('settings_toggler_general')->insert($generalSettings);
+					DB::table('user_onboard')->insert(['user_id' => $user->id, 'onboarded' => 0, 'tour' => 0]);
 
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
@@ -208,10 +190,9 @@ Route::get('wp', function () {
 
 });
 
-Route::post('auth/register', RegisterController::class); // Define route using RegisterController method
 
+Route::get('auth/scrape', [App\Http\Controllers\Api\V1\Auth\RegisterController::class, 'scrapeMetatags']);
 
-Route::get('scrape/', [RegisterController::class, 'scrapeMetaTags']);
 
 
 function decryptData($data, $key) {
@@ -222,3 +203,4 @@ function decryptData($data, $key) {
     $encrypted = substr($data, $ivLength);
     return openssl_decrypt($encrypted, $cipher, $key, OPENSSL_RAW_DATA, $iv);
 }
+

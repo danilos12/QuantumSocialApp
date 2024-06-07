@@ -28,19 +28,18 @@ $(document).ready(function() {
                                 :  '?id=' + TWITTER_ID + '&category=' + params.category +  '&type=' + params.type // month
                             : '?' ;
 
+                            // console.log(params)
+
             const response = await fetch(APP_URL + '/cmd/' + TWITTER_ID + '/post-type/' + method + param);
             const responseData = await response.json();    
-            
-            // if (responseData.status === 500) {
-            //     $alert = `<div class="alert alert-warning" role="alert">${responseData.message}</div>`;
-            //     $('.content-inner').html($alert);
-            // }
+
 
             switch (method) {
                 case 'queue':          
-                                
+                    console.log(responseData);            
                     // Assuming the response data is an array of posts
                     data = responseData; // Add the new posts to the existing array
+                    // console.log(data);
 
                     if (data.length > 0) {
                         // Check if the initial data has been loaded
@@ -81,6 +80,7 @@ $(document).ready(function() {
                 
                 case 'posted' :
                     if (responseData.length > 0) {
+                        // console.log(responseData);
                         $.each(responseData, (index, k) => {
                             const postType = getPostType(k.post_type);
                             const wrapper = postWrapper(k, postType);
@@ -148,11 +148,12 @@ $(document).ready(function() {
     function appendPosts(startIndex, endIndex) {
         // console.log(startIndex, endIndex)
         for (var i = startIndex; i < endIndex; i++) {
-            // console.log(data)
             if (i < data.length) {
                 var k = data[i];
                 var currentDate = new Date();
                 var dataDate = new Date(k.sched_time);
+
+                console.log(dataDate, currentDate,k.sched_time);
                 // Create the post element and append it to the container
                 if (dataDate > currentDate) {
 
@@ -274,7 +275,6 @@ $(document).ready(function() {
     $('.queue-day-wrapper').on("click", 'img.queued-icon', async function(e) {
         var id = e.target.id;
         var rmId = id.split('-');
-        console.log(id, rmId);
     
         switch (rmId[0]) {
             case "edit":
@@ -284,9 +284,6 @@ $(document).ready(function() {
                 try {
                     const response = await fetch(APP_URL + '/post/edit/' + id);
                     const responseData = await response.json();              
-                    
-                    console.log(responseData.data[0]['id']);
-
 
                     // render the modal
                     $('.modal-large-backdrop').append(responseData.html);
@@ -311,7 +308,7 @@ $(document).ready(function() {
 
                     // crosstweets
                     if (responseData.data[0]['crosstweets_accts'] === null) {
-                        $('.edit-commandmodule-outer').find('.cross-tweet-profiles-outer').append('<div>No other twitter accounts are cross linked to this post</div>');                    
+                        $('.edit-commandmodule-outer').find('.cross-tweet-profiles-outer').append('<div>No other x accounts are cross linked to this post</div>');                    
                     }
 
                     // postpanels
@@ -326,10 +323,8 @@ $(document).ready(function() {
                 break;
             
             case "delete":
-                console.log(rmId);
                 try {
-                    deletePost(id);
-                                                   
+                    deletePost(id);                        
                 } catch (error) {
                     console.log("Failed to delete data");
                 }
@@ -353,6 +348,7 @@ $(document).ready(function() {
                             break;
                         
                         case 'move':
+                            console.log($spanId);
                             movePostToTop($spanId)
                             break;                                                
                     }
@@ -374,7 +370,7 @@ $(document).ready(function() {
                         
                 const getTimeFormat = timeString.split(' ');
                 const splitTime = timeString.split(':');
-                console.log(getTimeFormat, splitTime);
+                // console.log(getTimeFormat, splitTime);
                 
                 // render the modal
                 $('.modal-large-backdrop').append(responseData.html);
@@ -444,7 +440,6 @@ $(document).ready(function() {
             location.reload();
         } else {
             $('.queued-posts-outer').before(div);        
-            console.log(1);
         } 
         
         // remove the div after 3 seconds
@@ -456,7 +451,7 @@ $(document).ready(function() {
     
     async function deletePost(id) {        
         const response = await fetch(APP_URL + '/post/delete/' + id , {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': $('meta[name="csrf-token"]').attr("content"),
@@ -465,19 +460,16 @@ $(document).ready(function() {
         });
 
         const responseData= await response.json();                    
-        var div = $(`<div class="alert alert-${responseData.stat}"> ${responseData.message} </div>`);
         
-        if (responseData.status === 200) {
-            alert(responseData.message);
-            location.reload();
-        } else {
-            $('.queued-posts-outer').before(div);        
-            console.log(1);
-        } 
-        
+
+        toastr[responseData.stat](
+            ` ${responseData.message}`
+        );
+
+
         // remove the div after 3 seconds
         setTimeout(function() {
-            div.remove();
+            location.reload();
         }, 3000);
     }
 
@@ -581,12 +573,11 @@ $(document).ready(function() {
             });
     
             const responseData = await response.json();
-            console.log(responseData)      
             
             if (responseData.status === 200) {
                 window.location.reload();
             } else {
-                alert(responseData.error);
+                
                 window.location.reload();
             }
 
@@ -598,7 +589,7 @@ $(document).ready(function() {
     $('.profile-posts-inner').on('click', 'img.evergreen-icon' , async function(e) {        
         var id = e.currentTarget.id;
         var arr = id.split('-');
-        console.log(arr);
+
         try {
             switch (arr[1]) {
                 case 'comment' :
@@ -621,7 +612,7 @@ $(document).ready(function() {
 
     async function movePostToTop(id) {
         try {
-            const response = await fetch(APP_URL + '/cmd/post/move-to-top/' + id + '?twitter_id=' + TWITTER_ID, {
+            const response = await fetch(APP_URL + '/post/move-to-top/' + id + '?twitter_id=' + TWITTER_ID, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -629,13 +620,17 @@ $(document).ready(function() {
                 },
             });
     
-            const data = await response.json();
-            console.log(data);
+            const responseData = await response.json();
     
-            if (data.status === 200) {
-                alert(data.message);
+            toastr[responseData.stat](
+                ` ${responseData.message}`
+            );
+
+            // remove the div after 3 seconds
+            setTimeout(function() {
                 location.reload();
-            }
+            }, 3000);
+           
         } catch (error) {
             console.log(error);
         }
@@ -651,13 +646,16 @@ $(document).ready(function() {
                 },                
             });
     
-            const data = await response.json();
-            console.log(data);
-    
-            if (data.status === 200) {
-                alert(data.message);
+            const responseData = await response.json();
+           
+            toastr[responseData.stat](
+                ` ${responseData.message}`
+            );
+
+            // remove the div after 3 seconds
+            setTimeout(function() {
                 location.reload();
-            }
+            }, 3000);
         } catch (error) {
             console.log(error);
         }
@@ -673,12 +671,16 @@ $(document).ready(function() {
                 },
             });
     
-            const data = await response.json();           
+            const responseData = await response.json();           
     
-            if (data.status === 200) {
-                alert(data.message);
+            toastr[responseData.stat](
+                ` ${responseData.message}`
+            );
+
+               // remove the div after 3 seconds
+            setTimeout(function() {
                 location.reload();
-            }
+            }, 3000);
         } catch (error) {
             console.log(error);
         }

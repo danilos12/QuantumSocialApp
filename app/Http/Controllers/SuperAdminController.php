@@ -11,7 +11,16 @@ use Illuminate\View\Factory as ViewFactory;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\CommandModule;
+use App\Models\Schedule;
+use Illuminate\Support\Facades\Cache;
+use App\Helpers\MembershipHelper;
+use App\Models\Members;
+use App\Models\QuantumAcctMeta;
+use App\Models\Tag_groups;
+use App\Models\Twitter;
+use App\Models\UT_AcctMngt;
+use Illuminate\Support\Facades\Session;
 
 
 
@@ -22,6 +31,7 @@ class SuperAdminController extends Controller
     public function __construct(ViewFactory $view)
     {
         $this->view = $view;
+        $this->middleware('unauthorized');
     }
    /**
      * Create a new controller instance.
@@ -100,4 +110,41 @@ class SuperAdminController extends Controller
         dd(phpinfo());
     }
 
+    public function guideTest() {
+        $title = 'Dashboard';
+
+        // $isNewUser = !$request->session()->has('onboard_done') && !$request->session()->has('onboard_later');
+        // if ($isNewUser) {
+        //     $onboardingModalHtml = view('modals.onboard')->render();
+        // } else {
+        //     $onboardingModalHtml = '';
+        // }
+        
+  
+        $checkRole = MembershipHelper::tier(Auth::id());
+        $user = User::find($checkRole->user_id);
+  
+        $countPosts = CommandModule::where('user_id', Auth::id())->whereMonth('created_at', now()->month)->count();
+        // $countPosts = 20000;
+        // $countPosts = strlen((string)$countPosts);
+        // dd($countPosts);
+        $countHashtagGroups = Tag_groups::where('user_id', Auth::id())->count();
+        $countXaccts = Twitter::where('user_id', Auth::id())->count();
+        $countTeamMembers = Members::where('account_holder_id', Auth::id())->where('role', 'Member')->count();
+        $countAdmin = Members::where('account_holder_id', Auth::id())->where('role', 'Admin')->count();
+  
+        $countTrial = QuantumAcctMeta::where('user_id', Auth::id())->first();
+  
+        return view('dashboard2')->with([
+          'title' => $title,
+          'plan' => $checkRole ?? '',
+          'user' => $user,
+          'countPosts' => $countPosts,
+          'countXaccts' => $countXaccts,
+          'countHashtagGroups' => $countHashtagGroups,
+          'countAdmin' => ($countAdmin === 0) ? 1 : $countAdmin + 1,
+          'countTeamMembers' => $countTeamMembers,
+          'countTrial' => $countTrial->trial_counter
+        ]);
+    }
 }

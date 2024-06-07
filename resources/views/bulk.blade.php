@@ -56,16 +56,21 @@
                     <span class="uploader-tips-title">
                       How to format your CSV file:
                     </span>
+                    <p>Each row is a post and each column has different values. </p>
                     <ul>
-                      <li>The first row is the title for the columns </li>
-                      <li>Only the first 10 row is uploaded.</li>
-                      <li>Maximum tweet length is 280 characters <i>( <a href="https://developer.twitter.com/en/docs/counting-characters" target="new">see more</a> )</i>.</li>
-                      <li>Use \b\b\b to make TweetStorm breakpoints <i>(threading)</i>.</li>
-                      <li>To retweet, include only the full URL <i>(with https)</i> of the tweet.</li>
-                      <li>To quote a tweet, just add the full URL <i>(with https)</i> at the end of your comment.</li>
-                      <li>Only links from Facebook is allowed, Instagram is still inprogress</li>
-                      <li>To include an image, place the full image URL <i>(with https)</i> between sets of double asterisks, like: **https://domain.com/image.png**</li>
-                    </ul>
+                      <li>Column A – Your post text*</li>
+                      <li>Column B – Year</li>
+                      <li>Column C – Month (January, Jan or 1)</li>
+                      <li>Column D – Day</li>
+                      <li>Column E – Hour</li>
+                      <li>Column F – Minute</li>
+                      <li>Column G – Image URL</li>
+                      <li>Column H – Link URL</li>
+                    </ul>                                                                                          
+                    
+                    <p>*For Column A, you can add your entire post, including your hashtags.</p>
+                    <p>**For Columns G & H, you can only add one or the other to a post.  If you want to add an image and a link, add the link in the post text on Column A</p>
+                    
                     <a href="{{ asset('public/')}}/files/quantum-upload-template.csv" target="new" class="download-bulk-template">Download Our CSV Template</a>
 
                   </div>  <!-- END .uploader-tips -->
