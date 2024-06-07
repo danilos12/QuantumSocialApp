@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Helpers\TrialCountdown;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use App\Models\TwitterToken;
@@ -11,8 +12,10 @@ use App\Models\Twitter;
 use App\Models\User;
 use DateTime;
 use DateTimeZone;
+use PDO;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
+use App\Helpers\WP;
 use App\Models\CommandModule;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterSettings;
@@ -42,19 +45,30 @@ class AppServiceProvider extends ServiceProvider
 
         // share to all views
         View::composer('*', function ($view) {
-                            
+
 
             if (Auth::guard('web')->check()) {
 
                 // $time = Carbon::now('UTC');
                 // $view->with('time', $time);
 
-                $checkRole = MembershipHelper::tier(auth()->id());
-                // check if subscription is not active
-                if ($checkRole->status !== 1  && $checkRole->trial_counter < 1) {
+
+                $checkAccess = WP::wp_status_and_wp_trialperiod();
+             
+                $view->with('statuses', $checkAccess['status']);
+                if ($checkAccess['status'] !== 'wc-active') {
+                    $accountActive = 1;
+                    $view->with('accountActive', $accountActive);
                     $message = 'Your account is inactive. Please update your payment to continue using the features.';
                     $view->with('message', $message);
+                } else {
+                    $accountActive = 0;
+                    $view->with('accountActive', $accountActive);
                 }
+
+
+
+                $checkRole = MembershipHelper::tier(auth()->id());
 
                 // upgrade modal content
                 $plans = DB::table('feature_content')
@@ -66,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 $view->with('plans', $organizedPlans);
+
 
                 $view->with('product_id', $checkRole->subscription_id);
 
@@ -114,33 +129,33 @@ class AppServiceProvider extends ServiceProvider
                 $mainUser = DB::table('users')
                             ->join('users_meta', 'users.id', '=', 'users_meta.user_id')
                             ->where('users.id', Auth::id())->first();
-                $view->with('mainUser', $mainUser);             
+                $view->with('mainUser', $mainUser);
 
                 // modal togglers
                 $generalSettings = DB::table('settings_toggler_general')->where('user_id', Auth::id())->first();
-                $view->with('generalSetting', $generalSettings);              
+                $view->with('generalSetting', $generalSettings);
 
                 // twitter settings modal
                 $twitterSettings = DB::table('settings_twitter')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', '=', auth()->id())
-                    ->pluck('meta_value', 'meta_key')->toArray();       
-                    $twitterSettings = 0;             
+                    ->pluck('meta_value', 'meta_key')->toArray();
+                    $twitterSettings = 0;
                 $view->with('twitterSetting', $twitterSettings);
 
                 // show twitter settings in UI
                 $showTwitterSettings = DB::table('settings_twitter')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', '=', auth()->id())
-                    ->pluck('showSettings', 'meta_key')->toArray();       
-                // $showTwitterSettings = 1;    
+                    ->pluck('showSettings', 'meta_key')->toArray();
+                // $showTwitterSettings = 1;
                 $view->with('showTwitterSettings', $showTwitterSettings);
 
                 $twitterSettingsToggler = DB::table('settings_toggler_twitter')
                     ->select('*')
                     ->where('twitter_id', '=', $twitterID)
                     ->where('user_id', auth()->id())
-                    ->first();            
+                    ->first();
                 $view->with('twitterSettingToggler', $twitterSettingsToggler);
 
                 // API inside General settings
@@ -249,40 +264,24 @@ class AppServiceProvider extends ServiceProvider
 
 
             // formembers auth
-             if (Auth::guard('member')->check()) {
+            if (Auth::guard('member')->check()) {
                 $user = Auth::guard('member')->user();
                 $member_id = $user->id;
-
-                
-                // modal togglers
-                $generalSettings = DB::table('settings_toggler_general')->where('user_id', Auth::id())->first();
-                $view->with('generalSetting', $generalSettings);              
-
-                // twitter settings modal
-                $twitterSettings = DB::table('settings_twitter')
-                    ->where('twitter_id', '=', $twitterID)
-                    ->where('user_id', '=', auth()->id())
-                    ->pluck('meta_value', 'meta_key')->toArray();                    
-                $view->with('twitterSetting', $twitterSettings);
-
-                // show twitter settings in UI
-                $showTwitterSettings = DB::table('settings_twitter')
-                    ->where('twitter_id', '=', $twitterID)
-                    ->where('user_id', '=', auth()->id())
-                    ->pluck('showSettings', 'meta_key')->toArray();                    
-                $view->with('showTwitterSettings', $showTwitterSettings);
-
-                $twitterSettingsToggler = DB::table('settings_toggler_twitter')
-                    ->select('*')
-                    ->where('twitter_id', '=', $twitterID)
-                    ->where('user_id', auth()->id())
-                    ->first();            
-                $view->with('twitterSettingToggler', $twitterSettingsToggler);
-
 
                 $acct_hdid = DB::table('members')
                 ->where('id', $member_id)
                 ->value('account_holder_id');
+
+                // modal togglers
+
+
+                $checkAccess = WP::wp_status_and_wp_trialperiod();
+
+            $view->with('paymentstats', $checkAccess['status']);
+                if ($checkAccess['status'] !== 'wc-active') {
+                    $message = 'Your account is inactive. Please update your payment to continue using the features.';
+                    $view->with('message', $message);
+                }
 
 
                 // $account_holder_idsss = 123123;
@@ -325,7 +324,7 @@ class AppServiceProvider extends ServiceProvider
 
                 $selectedUserObject = [];
                 foreach ($twxaccts as $key => $twxacct) {
-                    if ($selectedstatus[$key] == 1) { // Check if selected status is 1
+                    if ($selectedstatus[$key] == 1) {
                         $twxacct->selected = $selectedstatus[$key];
                         $selectedUserObject[] = $twxacct;
                     }
@@ -349,6 +348,11 @@ class AppServiceProvider extends ServiceProvider
 
                 $twitterID = $selectedUser->twitter_id ?? 0;
 
+
+
+
+
+
                 $view->with('twitter_id', $twitterID);
 
 
@@ -364,7 +368,29 @@ class AppServiceProvider extends ServiceProvider
 
 
 
+                $generalSettings = DB::table('settings_toggler_general')->where('user_id', $acct_hdid)->first();
+                $view->with('generalSetting', $generalSettings);
 
+                // twitter settings modal
+                $twitterSettings = DB::table('settings_twitter')
+                    ->where('twitter_id', '=', $twitterID)
+                    ->where('user_id', '=', $acct_hdid)
+                    ->pluck('meta_value', 'meta_key')->toArray();
+                $view->with('twitterSetting', $twitterSettings);
+
+                // show twitter settings in UI
+                $showTwitterSettings = DB::table('settings_twitter')
+                    ->where('twitter_id', '=', $twitterID)
+                    ->where('user_id', '=', $acct_hdid)
+                    ->pluck('showSettings', 'meta_key')->toArray();
+                $view->with('showTwitterSettings', $showTwitterSettings);
+
+                $twitterSettingsToggler = DB::table('settings_toggler_twitter')
+                    ->select('*')
+                    ->where('twitter_id', '=', $twitterID)
+                    ->where('user_id', $acct_hdid)
+                    ->first();
+                $view->with('twitterSettingToggler', $twitterSettingsToggler);
 
 
 

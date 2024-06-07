@@ -139,7 +139,7 @@
             </div>  <!-- END .banner-twitter-profile-wrap -->
           @else
           <div style="display:flex;align-items:center">
-            <a href="{{ route('register') }}">
+            <a href="https://quantumsocial.io">
             Register
             </a>
           </div>
@@ -147,7 +147,7 @@
           @endif
 
 
-          @if (Route::has('login'))
+          @if (Route::has('tomemberauth'))
             @auth('member')
             <span class="toggle-wrap">
             <img src = "{{ asset('public/ui-images/icons/00f-moon.svg') }}"
@@ -165,7 +165,7 @@
             <div class="menu-inner">
               <div class="main-menu">
                 <ul>
-                @if (Route::has('login'))
+                @if (Route::has('tomemberauth'))
                   @auth('member')
                   @include('main-menu')
                 </ul>
@@ -204,6 +204,7 @@
             </div>  <!-- END .menu-inner -->
           </div>  <!-- END .menu-outer -->
 
+
         <div class="content-outer">
           <div class="content-inner">
             @if(session()->has('alert'))
@@ -211,16 +212,27 @@
                   {{ session('alert') }}
               </div>
             @endif
-            @auth('member')
 
 
+
+            @if(isset($message))
+            <div class="alert alert-warning" role="alert">
+              {{ $message }}
+            </div>
+            @else
             @yield('content')
-            @endauth
+            @endif
+
           </div>
+        </div>
+        <div class="footer">
+            <span id="api-banner">
+              Facebook and Instagram coming soon!
+          </span>
         </div>
     </div>  <!-- END .interface-inner -->
   </div>  <!-- END .interface-outer -->
-	@if (Route::has('login'))
+	@if (Route::has('tomemberauth'))
 	  @auth('member')
       @if ($title == 'Slot Scheduler')
       <div class="new-slot-anchor">
@@ -243,7 +255,7 @@
     </div>  <!-- END .new-slot-overlay -->
   </div>  <!-- END .new-slot-anchor -->
 
-	@if (Route::has('login'))
+	@if (Route::has('tomemberauth'))
     @auth('member')
 	  @include('account-menu')
   @else
@@ -265,7 +277,7 @@
   <script>
      $(document).ready(function() {
             // Alert
-      var alert = $('.alert ');
+      var alert = $('.warning-sign ');
 
       if(alert.length == 1) {
         setTimeout(function(){

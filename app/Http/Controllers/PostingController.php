@@ -274,11 +274,18 @@ class PostingController extends Controller
 			return view('bulk-queue', compact('message', 'title'));
             // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
-
+		
 		if ($checkRole->basic_bulk_uploader !== 1) {
 			$modalContent = view('modals.upgrade')->render();
 			return view('bulk-queue', compact('modalContent', 'title'));
 		} 
+		
+		$checkTwitter = DB::table('ut_acct_mngt')->where('user_id', $this->setDefaultId())->where('selected', 1)->first();
+		
+		// if ($checkTwitter === null) {
+		// 	$message = 'You need to add your social media account first to proceed with the bulk uploader.';
+		// 	return view('bulk', compact('message', 'title'));	
+		// }
 	
 		return view('bulk', ['title' => $title, 'hasRegularTweetsInQueue' => $hasRegularTweetsInQueue]);
 		

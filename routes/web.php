@@ -29,7 +29,7 @@ Route::get('/', function () {
 Route::get('/login/member', function () {
     // Redirect authenticated users to member home
     if(Auth::guard('member')->check()) {
-        return redirect()->route('memberhome');
+        return redirect()->route('dashboard');
     }elseif(Auth::guard('web')->check()) {
         return redirect()->route('dashboard');
     }
@@ -38,7 +38,7 @@ Route::get('/login/member', function () {
 
 Route::post('/login/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'login'])->name('forauth');
 Route::post('/logout/member', [App\Http\Controllers\Auth\MemberLoginController::class, 'logout'])->name('memberlogout');
-
+Route::get('/404', [App\Http\Controllers\ErrorPage::class, 'errorPages'])->name('errorPage');
 
 // Auth::routes();
 Auth::routes(['register' => false]);
@@ -77,7 +77,7 @@ Route::get('/schedule', [App\Http\Controllers\PostingController::class, 'slot_sc
 Route::post('/schedule/save', [App\Http\Controllers\PostingController::class, 'schedule_save'])->name('schedule.save');
 Route::post('/schedule/action/{slot_id}', [App\Http\Controllers\PostingController::class, 'schedule_action'])->name('schedule.action');
 Route::match(['get', 'post'], '/add-new-slot', [App\Http\Controllers\PostingController::class, 'add_new_slot'])->name('add-new-slot');
-Route::get('/tweet-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('tweet-stormer');
+Route::get('/post-stormer', [App\Http\Controllers\PostingController::class, 'tweet_stormer'])->name('post-stormer');
 Route::get('/bulk', [App\Http\Controllers\PostingController::class, 'bulk_uploader'])->name('bulk-uploader');
 Route::get('/bulk-queue', [App\Http\Controllers\PostingController::class, 'bulk_queue'])->name('bulk-queue');
 Route::get('/schedule/slots',[App\Http\Controllers\PostingController::class, 'getScheduledSlots'])->name('schedule.slot');
@@ -99,7 +99,7 @@ Route::get('/post/evergreen/retrieve/{id}',[App\Http\Controllers\PostingControll
 Route::get('/campaigns', [App\Http\Controllers\CampaignsController::class, 'index'])->name('campaigns');
 Route::get('/promo', [App\Http\Controllers\CampaignsController::class, 'promo_tweets'])->name('promo-tweets');
 Route::get('/evergreen', [App\Http\Controllers\CampaignsController::class, 'evergreen_tweets'])->name('evergreen-tweets');
-Route::get('/tweet-storms', [App\Http\Controllers\CampaignsController::class, 'tweet_storms'])->name('tweet-storms');
+Route::get('/post-storms', [App\Http\Controllers\CampaignsController::class, 'tweet_storms'])->name('post-storms');
 Route::get('/tag-groups', [App\Http\Controllers\CampaignsController::class, 'tag_groups'])->name('tag-groups');
 
 
@@ -151,6 +151,7 @@ Route::post('/settings/members/_update/{id}', [App\Http\Controllers\GeneralSetti
 Route::post('/settings/members/_delete/{id}', [App\Http\Controllers\GeneralSettingController::class, '_deleteMember'])->name('member.delete');
 Route::post('/settings/members/_apiaccess', [App\Http\Controllers\GeneralSettingController::class, '_apiaccess'])->name('member.apiaccess');
 Route::post('/settings/members/_adminaccess', [App\Http\Controllers\GeneralSettingController::class, '_adminaccess'])->name('member.adminaccess');
+Route::post('/settings/cancel/subscription', [App\Http\Controllers\GeneralSettingController::class, 'cancelSubscription'])->name('cancel.subscription');
 
 
 // Command Module Controller
@@ -187,7 +188,14 @@ Route::redirect('/home', '/dashboard');
 Route::redirect('/registration', '/');
 Route::post('/onboard', [App\Http\Controllers\dashboardController::class, 'onboarded'])->name('onboard');
 Route::get('/checkOnboard', [App\Http\Controllers\dashboardController::class, 'checkOnboard'])->name('checkOnboard');
+Route::get('/tourStarted', [App\Http\Controllers\dashboardController::class, 'tourStarted'])->name('tourStarted');
 
+
+Route::middleware(['web'])->group(function () {
+    // Your routes here
+    Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [App\Http\Controllers\Auth\LoginController::class, 'login']);
+});
 
 Route::middleware(['web','guest','session_expired'])
     ->group(function () {
@@ -212,18 +220,3 @@ Route::middleware(['web','guest','session_expired'])
 
 
 
-    Route::middleware('member-access')->group(function(){
-
-        Route::get('/member/home',function()
-        {return view('layouts.membersdashboard')->with('title','Home');})->name('memberhome');
-        Route::get('/member/promo',function(){
-
-            return view('promo-tweets')->with('title','Promo');});
-        Route::get('/member/banner',function(){return view('layouts.app');})->name('memberbanner');
-
-
-
-
-
-
-    });

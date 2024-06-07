@@ -2,6 +2,7 @@
 
 # Ignore the .env file containing environment variables
 .env
+/vendor
 
 # Ignore log files and debug output
 *.log
@@ -9,7 +10,6 @@
 *.debugbar.*
 
 # Ignore compiled source files
-vendor/
 node_modules/
 npm-debug.log
 yarn-error.log

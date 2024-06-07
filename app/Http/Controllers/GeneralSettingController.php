@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Twitter;
 use App\Models\TwitterToken;
 use App\Helpers\MembershipHelper;
+use App\Helpers\WP;
 use App\Models\TwitterSettings;
 use App\Models\TwitterSettingsMeta;
 use App\Models\GeneralSettings;
@@ -23,6 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PDO;
 
 
 
@@ -326,9 +328,51 @@ class GeneralSettingController extends Controller
         }
 
     }
+    
+    public function cancelSubscription(Request $request) {
+        try {
+             // Validate first the email provided
+            $email = $request->input('quantum_social_email');
+            $subscription = WP::getUserSubscription($email);      
+            
+            // dd($subscription);
 
+            if (!$subscription) {
+                return response()->json(['status' => 404, 'message' => 'Subscription not found']);
+            }
 
+            $dbConnection = WP::external_db_connection();
+            $table_prefix = 'wp_ftvis8_';
+    
+            // Prepare the UPDATE query
+            $update = $dbConnection->prepare("
+                UPDATE {$table_prefix}posts 
+                SET 
+                    post_status = 'wc-cancelled'
+                WHERE 
+                    ID = :id
+                AND
+                    post_type = 'shop_subscription'
+            ");
+    
+            $update->bindParam(':id', $subscription['ID'], PDO::PARAM_INT);
+    
+            // Execute the query
+            $update->execute();
+    
+            // Check if the update was successful
+            if ($update->rowCount() > 0) {
+                return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Subscription cancelled successfully. You will be logged out automatically.']);
+            } else {
+                return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'No rows updated']);
+            }
 
+        } catch(Exception $e) {
+            $trace = $e->getTrace();
+            $message = $e->getMessage();
+            return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+    }
 
     public function addNewMember(Request $request) {
 
@@ -389,12 +433,16 @@ class GeneralSettingController extends Controller
             ];
 
 
+            $plans1 =  DB::table('plans')->where('id', 1)->first();
+            $plans2 =  DB::table('plans')->where('id', 2)->first();
+            $plans3 =  DB::table('plans')->where('id', 3)->first();
+            $plans4 =  DB::table('plans')->where('id', 4)->first();
 
             // Check the subscription type and count limits
             // solar subscription
         if ($subs_id == 1 ) {
 
-            if($memberCount < 0 && $relational['role'] === 'Member' ){
+            if($memberCount < $plans1->tm_count && $relational['role'] === 'Member' ){
                 try{
                         DB::beginTransaction();
                         $userMngt = DB::table('members')->insert($relational);
@@ -409,7 +457,7 @@ class GeneralSettingController extends Controller
                     // Handle the Swift_TransportException
                     return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
                 }
-            }elseif($adminCount < 0 && $relational['role'] === 'Admin'){
+            }elseif($adminCount < $plans1->admin_count && $relational['role'] === 'Admin'){
                 try{
 
                             DB::beginTransaction();
@@ -439,7 +487,8 @@ class GeneralSettingController extends Controller
 
 if ($subs_id == 2 ) {
 
-    if($memberCount < 4 && $relational['role'] === 'Member' ){
+
+    if($memberCount < $plans2->tm_count && $relational['role'] === 'Member' ){
         try{
             DB::beginTransaction();
             $userMngt = DB::table('members')->insert($relational);
@@ -455,7 +504,7 @@ if ($subs_id == 2 ) {
             // Handle the Swift_TransportException
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
-        }elseif($adminCount < 2 && $relational['role'] === 'Admin'){
+        }elseif($adminCount < $plans2->admin_count && $relational['role'] === 'Admin'){
             try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -485,7 +534,7 @@ if ($subs_id == 2 ) {
 
         if ($subs_id == 3 ) {
 
-            if($memberCount < 9 && $relational['role'] === 'Member' ){
+            if($memberCount < $plans3->tm_count && $relational['role'] === 'Member' ){
                 try{
                 DB::beginTransaction();
                 $userMngt = DB::table('members')->insert($relational);
@@ -501,7 +550,7 @@ if ($subs_id == 2 ) {
             return response()->json(['message' => 'Failed to send email, please check recipient email address', 'stat' => 'warning']);
         }
         }
-        elseif($adminCount < 4 && $relational['role'] === 'Admin')
+        elseif($adminCount < $plans3->admin_count && $relational['role'] === 'Admin')
         {
             try{
 
