@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use PDO;
 use Exception;
 use PDOException;
-
+use Illuminate\Support\Facades\Http;
 class WP
 {
     public static function decrypted_user_id_v1($data)
@@ -85,7 +85,29 @@ class WP
 
         return $items;
     }
+    public static function external_wp_rest_api($wp_user_id){
+        $localUrl = 'http://app.quantumsocial.local';
+        $stagingUrl = 'https://stg.app.quantumsocial.io';
+        $liveUrl = 'https://app.quantumsocial.io';
+        $appUrl = env('APP_URL');
+        $currentRestApi = null;
 
+        switch ($appUrl) {
+            case $localUrl:
+                $currentRestApi = Http::get('http://quantumsocial.local/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($wp_user_id)));
+                break;
+            case $stagingUrl:
+                $currentRestApi = Http::get('https://stg.wp.quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($wp_user_id)));
+                break;
+            case $liveUrl:
+                $currentRestApi = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($wp_user_id)));
+                break;
+            default:
+                throw new \Exception('Environment URL does not match any known environments.');
+        }
+        
+        return $currentRestApi->json();
+    }
     public static function external_db_connection()
     {
         $localUrl = 'http://app.quantumsocial.local';
