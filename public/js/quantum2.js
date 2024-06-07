@@ -522,6 +522,7 @@ function openInactiveBox(modalId) {
 }
 
 $(".modal-large-close").click(function (event) {
+    // close modal
     $target = event.target.id;
     closeModal($target);
 });
