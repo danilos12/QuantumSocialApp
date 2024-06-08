@@ -343,7 +343,7 @@
           </div>  <!-- END .team-account-outer -->
           <!--     END TEAM MEMBERS    -->
 
-
+          @if($membership->trial_credits == 0)
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
               <span class="menu-section-header">X API Credential</span>
@@ -428,6 +428,7 @@
 
             </div>  <!-- END .social-accounts-inner -->
           </div>
+          @endif
 
           <!-- END .social-accounts-outer -->
           @elseif(Auth::guard('member')->user()->api_access == 1)
