@@ -57,7 +57,7 @@
                                     </svg>         --}}
 
                                     <span class="actual">
-                                        {{$plan->mo_post_credits === -1 ? '∞': ($countCredits ? $plan->mo_post_credits : $plan->mo_post_credits-$countPosts)}}
+                                        {{ $plan->mo_post_credits === -1 ? '∞': $plan->mo_post_credits - $countPosts }}
                                     </span>
 
 									@if( $plan )
