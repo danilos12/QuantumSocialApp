@@ -1001,6 +1001,8 @@ $(document).ready(function () {
             
             if (responseData.status == 403) {
                 openUpgradeModal(responseData);
+            } else if (responseData.status == 401) {
+                form.find('input[type="submit"]').val("Tokens Invalid");
             } else if (responseData.status === 500) {
                 toastr[responseData.stat](
                     `Warning! ${responseData.message}`
