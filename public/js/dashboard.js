@@ -71,7 +71,7 @@ $(document).ready(function () {
         $(`#posting`).toggle();
 
         var intro = introJs();
-        console.log(intro)
+        console.log(intro);
         intro.setOptions({
             steps: [
             //     {
@@ -84,19 +84,23 @@ $(document).ready(function () {
             },
             {
               element: document.querySelector('#twitter-settings'),
-              intro: 'Start by adding your Twitter API. You can also configure your account settings here to personalize your experience.'
+              intro: 'After adding your X/Twitter API and X/Twitter Account in General Settings, you can configure your X account settings here to personalize your experience.'
             },
             {
               element: document.querySelector('.twitter-account-item'),
               intro: 'Access this menu to view all your linked Twitter accounts. Manage and switch between them effortlessly.'
             },
             {
-              element: document.querySelector('img#a-slot'),
-              intro: 'Once your account setup is complete, use the Slot Scheduler to plan and schedule your posts. This feature ensures your content is posted at optimal times.'
+              element: document.querySelector('#slot-scheduler'),
+              intro: 'Once your account setup is completed, use the Slot Scheduler to plan your regular post times. This feature gives you the ability to post your content at optimal times.',
+              position:'right',
+              tooltipClass: 'custom-right'
+
             },
             {
               element: document.querySelector('#command-module'),
-              intro: 'With your Slot Scheduler ready, move to the Command Module. Here, you can curate posts and comments, allowing you to engage with your audience effectively.'
+              intro: 'With your Slot Scheduler ready, move to the Command Module. Here, you can curate posts and comments, allowing you to engage with your audience effectively.',
+              position:'right'
             },
             {
               element: document.querySelector('#help'),

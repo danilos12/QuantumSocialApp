@@ -93,7 +93,8 @@
                             <div class="queued-single-start" style="flex-direction: column; width: 100%">
                                <span class="current-label">You are currently</span>
 							   	@if( !empty($plan) )
-								  <span class="current-plan">{{ ucfirst($plan->subscription_name) == 'Astro' ?'Astral Lifetime': ucfirst($plan->subscription_name)}} </span>
+                           
+								  <span class="current-plan">{{ ucfirst($plan->subscription_name) == 'Astro ' ?'Astral Lifetime': ucfirst($plan->subscription_name)}} </span>
 								@else
 								  <span class="current-plan">Contact your administrator </span>
 								@endif

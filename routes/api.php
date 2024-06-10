@@ -77,7 +77,7 @@ Route::get('wp', function () {
 
 
 		$wp_data = WP::external_wp_rest_api($r['wp_user_id']);
-
+	
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
 
@@ -85,7 +85,9 @@ Route::get('wp', function () {
             if(User::where('email',$checkExistingEmail)->exists()){
                 return response()->json(['status' =>'error', 'laravel_id' => 0]);
             }
-
+				if(base64_decode($r['wp_product_id']) != '742'){
+					
+				
 				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
 					$value = 1;
 				} elseif ($wp_data['info']['product_name'] == "Membership Level - Galactic") {
@@ -173,7 +175,54 @@ Route::get('wp', function () {
 					return response()->json(['status' =>'error', 'laravel_id' => 0]);
 			}
 
+		}else{
+			$secretkey = 'contigosandigoalternatibomathcoboxo~~~';
 
+			$wppassword = 	base64_decode($r['wp_password']);
+
+			$decryptedpass = decryptData($wppassword,$secretkey);
+
+			$user = User::create([
+			'firstname' => base64_decode($r['wp_firstname']),
+			'lastname' => base64_decode($r['wp_lastname']),
+			'email' => base64_decode($r['wp_email']),
+			'password' => Hash::make($decryptedpass),
+			]);
+
+
+			// users_meta insertion
+			DB::table('users_meta')->insert([
+				'user_id' => $user->id,
+				'subscription_id' => 4,
+				'wp_user_id' => base64_decode($r['wp_user_id']),
+				'trial_counter'=>-1,
+				'next_payment'=>'-1',
+				'status'=>1,
+				'timezone' =>'+00:00',
+				'queue_switch'=>1,
+				'promo_switch'=>1,
+				'evergreen_switch'=>1,
+				'trial_credits'=>25
+			]);
+			$generalSettings = [
+				'user_id' => $user->id,
+				'toggle_1' => 0,
+				'toggle_2' => 0,
+				'toggle_3' => 0,
+				'toggle_4' => 0,
+				'toggle_5' => 0,
+				'toggle_6' => 0,
+				'toggle_7' => 0
+			];
+
+			DB::table('settings_toggler_general')->insert($generalSettings);
+			DB::table('user_onboard')->insert(['user_id' => $user->id, 'onboarded' => 0, 'tour' => 0]);
+
+			return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
+
+
+
+		}
 		} else {
 			return response()->json(['status' =>'Bad Request']);
 		}

@@ -62,6 +62,7 @@ class dashboardController extends Controller
       
 
       $checkRole = MembershipHelper::tier($this->setDefaultId());
+ 
       $user = User::find($checkRole->user_id);
       
       // month and year user created 
@@ -102,7 +103,7 @@ class dashboardController extends Controller
         'countHashtagGroups' => $countHashtagGroups,
         'countAdmin' => ($countAdmin === 0) ? 1 : $countAdmin + 1,
         'countTeamMembers' => $countTeamMembers,
-        'countTrial' => $countTrial->trial_counter,
+        'countTrial' => $countTrial->trial_counter == -1 ? '∞':$countTrial->trial_counter,
         'countCredits' => $countCredits
       ]);
     }

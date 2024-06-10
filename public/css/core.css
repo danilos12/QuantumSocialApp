@@ -4861,7 +4861,10 @@ input#toggle_api {
 .introjs-skipbutton {
     display: none;
 }
+.introjs-tooltip.custom-right {
 
+    transform: translateX(5%); 
+  }
 .introjs-tooltip {
     background: radial-gradient(93.21% 93.21% at 50% 50%, #721A66 80%, rgba(65, 30, 76, 0) 100%);
     color: #fff;
