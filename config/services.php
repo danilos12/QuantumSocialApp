@@ -30,10 +30,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    // "twitter" => [
-    //     'client_id' => env('TWITTER_CLIENT_ID'),
-    //     'client_secret' => env('TWITTER_CLIENT_SECRET'),
-    //     'redirect' => env('TWITTER_CALLBACK_URL'),
-    // ]
+    "twitter" => [
+        'client_id' => env('TWITTER_OAUTH_ID'),
+        'client_secret' => env('TWITTER_OAUTH_SECRET'),
+        'redirect' => env('TWITTER_CALLBACK_URL'),
+        'api_key' => env('TWITTER_API_KEY'),
+        'api_secret' => env('TWITTER_API_SECRET'),
+        'bearer_token' => env('TWITTER_BEARER_TOKEN')
+    ]
 
 ];
