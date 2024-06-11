@@ -33,8 +33,11 @@
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
-
-                            <img src="{{ asset('/public/ui-images/icons/planet.svg') }}" class="planet">
+                            
+                            @php 
+                             $tier = $plan->subscription_name;
+                            @endphp
+                            <img src="{{ asset('/public/ui-images/icons/tiers/' . $tier . '.svg') }}" class="planet">
 
                             <div class="queued-single-start">
                                 <span class="greeting">Hi,</span>
@@ -88,7 +91,7 @@
                         height: 100%;">
                             <div class="queued-single-post">
 
-                            <img src="{{ asset('/public/ui-images/icons/planet.svg') }}" class="planet" style="width: 133px height: 145px">
+                            <img src="{{ asset('/public/ui-images/icons/tiers/' . $tier .  '.svg') }}" class="planet" style="width: 133px; height: 145px">
 
                             <div class="queued-single-start" style="flex-direction: column; width: 100%">
                                <span class="current-label">You are currently</span>
