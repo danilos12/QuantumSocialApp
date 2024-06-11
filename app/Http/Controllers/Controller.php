@@ -46,10 +46,19 @@ class Controller extends BaseController
             if ($checkRole->member_count > $twitterCount) {
 
                 try {
-                    $findCred = MasterTwitterApiCredentials::where('user_id', $this->setDefaultId())->first();
+                    $trialCredit = DB::table('users_meta')
+                        ->where('user_id', $this->setDefaultId())
+                        ->value('trial_credits');
 
-                    if ($findCred) {
-                        $url = $this->twitterOAuth($findCred->oauth_id);
+                    if ($trialCredit) {
+                        $oauthId = env('TWITTER_OAUTH_ID');
+                    } else {
+                        $creds = MasterTwitterApiCredentials::where('user_id', $this->setDefaultId())->first();
+                        $oauthId = $creds->oauth_id;
+                    }
+
+                    if ($oauthId) {
+                        $url = $this->twitterOAuth($trialCredit, $oauthId);
                         return response()->json(['status' => 200, 'redirect' => $url, 'stat' => 'success', 'message' => 'Redirecting to Twitter']);
                     } else {
                         return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'Please add your Master API above.']);
@@ -75,13 +84,15 @@ class Controller extends BaseController
     }
 
      // Authorized
-    public function twitterOAuth($twitterClientId) {
-
+    public function twitterOAuth($trialCredit, $twitterClientId) {
+        // use config->redirect if trialCredit>0
+        $callback_redirect = $trialCredit ? env('TWITTER_CALLBACK_URL') : TwitterHelper::getActiveAPI($this->setDefaultId())->callback_url;
+        
         // create an authorized URL
         $url = $this->buildAuthorizedURL("https://twitter.com/i/oauth2/authorize", [
             'response_type' => 'code',
             'client_id' => $twitterClientId,
-            'redirect_uri' => TwitterHelper::getActiveAPI($this->setDefaultId())->callback_url,
+            'redirect_uri' => $callback_redirect,
             'scope' => 'tweet.read users.read follows.read follows.write tweet.write offline.access'
         ]);
 
@@ -98,16 +109,21 @@ class Controller extends BaseController
                 return redirect('/')->with('alert', 'Adding the account was cancelled')->with('alert_type', 'success');
 
             } else {
-
-
                 $userid =  $this->setDefaultId();
                 $codeVerifier = session()->pull('code_verifier');
                 $url = 'https://api.twitter.com/2/oauth2/token';
+
+                $trialCredit = DB::table('users_meta')
+                ->where('user_id', $userid)
+                ->value('trial_credits');
+                $oauth_id = $trialCredit ? env('TWITTER_OAUTH_ID') : TwitterHelper::getActiveAPI($userid)->oauth_id;
+                $redirect_callback = $trialCredit ? env('TWITTER_CALLBACK_URL') : TwitterHelper::getActiveAPI($userid)->callback_url;
+
                 $data = array(
                     'code' => $request->input('code'),
                     'grant_type' => 'authorization_code',
-                    'client_id' => TwitterHelper::getActiveAPI($userid)->oauth_id,
-                    'redirect_uri' => TwitterHelper::getActiveAPI($userid)->callback_url,
+                    'client_id' => $oauth_id,
+                    'redirect_uri' => $redirect_callback,
                     'code_verifier' => $codeVerifier
                 );
 

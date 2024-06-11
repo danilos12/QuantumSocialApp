@@ -93,7 +93,11 @@ class TwitterApi extends Controller
     public function getTweets($twitterId)
     {
         try {
-            $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+            $trialCredit = DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->value('trial_credits');
+
+            $_ENV = $trialCredit ? env("TWITTER_BEARER_TOKEN") : TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
@@ -160,8 +164,12 @@ class TwitterApi extends Controller
                     'message' => 'Tweets retrieved from cache',
                 ]);
             } else {
+                $trialCredit = DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->value('trial_credits');
+
                 // If cached data doesn't exist, fetch tweets from Twitter API
-                $_ENV = TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+                $_ENV = $trialCredit ? env("TWITTER_BEARER_TOKEN") : TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
                 $headers = ["Authorization: Bearer " . $_ENV];
                 $url = "https://api.twitter.com/2/users/" . $twitterId . "/tweets";
                 $data = null;
@@ -319,7 +327,11 @@ class TwitterApi extends Controller
                 'message' => 'Tweets retrieved from cache',
             ]);
         } else {
-            $_ENV =  TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+            $trialCredit = DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->value('trial_credits');
+
+            $_ENV = $trialCredit ? env("TWITTER_BEARER_TOKEN") : TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
 
             $headers = array(
                 "Authorization: Bearer " . $_ENV
