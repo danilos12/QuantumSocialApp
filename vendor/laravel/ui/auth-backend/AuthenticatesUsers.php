@@ -87,7 +87,8 @@ trait AuthenticatesUsers
         
         $credentials = $this->credentials($request);
         $subscriptionDetails = WP::getUserSubscription($request->email);       
-        $subs = WP::wp_status_and_wp_trialperiod();       
+        $subs = WP::wp_status_and_wp_trialperiod();
+        
         // dd($credentials,$subscriptionDetails,$subs);
         // return Auth::attempt($credentials, $request->filled('remember'));
         if ($subscriptionDetails && $subscriptionDetails['post_status'] == 'wc-active') {

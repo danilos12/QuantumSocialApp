@@ -55,6 +55,7 @@ class WP
         try {
             
             $wp_user_id = self::wp_user_id();
+  
         } catch (Exception $e) {
             // Handle the exception, e.g., log it and return a default value or null
             // Log::error($e->getMessage());
@@ -75,12 +76,12 @@ class WP
         $checkstatus->bindParam('p_id', $post_id[0]['post_id'], PDO::PARAM_INT);
         $checkstatus->execute();
         $getstatus = $checkstatus->fetchAll(PDO::FETCH_OBJ);
-        
+    
         if (empty($getstatus)) {
             // Handle the case where no post status is found
             return ['status' => 'error', 'message' => 'No post status found for the given post_id'];
         }
-     
+   
         $items = [];
         $items['status'] = $getstatus[0]->post_status;
        
