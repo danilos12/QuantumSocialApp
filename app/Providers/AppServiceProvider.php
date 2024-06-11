@@ -54,9 +54,9 @@ class AppServiceProvider extends ServiceProvider
 
 
                 $checkAccess = WP::wp_status_and_wp_trialperiod();
-             
+
                 $view->with('statuses', $checkAccess['status']);
-                if ($checkAccess['status'] !== 'wc-active') {
+                if ($checkAccess['status'] !== 'wc-pending') {
                     $accountActive = 1;
                     $view->with('accountActive', $accountActive);
                     $message = 'Your account is inactive. Please update your payment to continue using the features.';

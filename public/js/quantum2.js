@@ -495,7 +495,7 @@ $(document).on('click', '[data-id="modal"]', function(event) {
 
     var elementClass = $('.modal-large-backdrop-inactive').attr('class');
 
-    if(statusCheck !== 'wc-active' ){
+    if(statusCheck !== 'wc-pending' ){
         openInactiveBox(elementClass);
 
 

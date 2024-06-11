@@ -31,7 +31,7 @@
                     @enderror
 
                     @if ($errors->any())
-  dsadsa
+ 
 @endif
                 </div>
             </div>

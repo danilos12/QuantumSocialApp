@@ -557,7 +557,7 @@ class TwitterApi extends Controller
             // check if id is selected in the UT_ACCT_MNGT table
             $selectedTwitter = UT_AcctMngt::where('twitter_id', $id)->first();
 
-            if ($selectedTwitter->selected === 1) {
+            if ($selectedTwitter->selected === 0) {
                 return response()->json([
                     'stat' => 'warning',
                     'message' => 'Unable to delete. This twitter account is currently selected.',

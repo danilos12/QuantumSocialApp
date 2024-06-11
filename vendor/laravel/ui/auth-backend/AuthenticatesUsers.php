@@ -84,10 +84,10 @@ trait AuthenticatesUsers
      */
     protected function attemptLogin(Request $request)
     {
-        
+
         $credentials = $this->credentials($request);
-        $subscriptionDetails = WP::getUserSubscription($request->email);       
-        
+        $subscriptionDetails = WP::getUserSubscription($request->email);
+
         // return Auth::attempt($credentials, $request->filled('remember'));
         if ($subscriptionDetails && $subscriptionDetails['post_status'] == 'wc-active') {
             // return $this->guard()->attempt(
@@ -95,8 +95,8 @@ trait AuthenticatesUsers
             // );
             // Attempt to authenticate the user if the subscription is active
             return Auth::attempt($credentials, $request->boolean('remember'));
-        } 
-        
+        }
+
         // If the subscription is not active, do not attempt to login
         return false;
     }
@@ -162,13 +162,13 @@ trait AuthenticatesUsers
 
         // $user = \App\Models\User::where('email', $request->email)->first();
 
-        // $dbConnection = WP::getUserSubscription($request->email);         
+        // $dbConnection = WP::getUserSubscription($request->email);
 
         // if ($user && $dbConnection->post_status == 'wc-cancelled') {
         //     return redirect()->route('login')->withErrors([
         //         'email' => [trans('auth.subscription_cancelled')],
         //     ]);
-            
+
         // }
 
         // return parent::sendFailedLoginResponse($request);
