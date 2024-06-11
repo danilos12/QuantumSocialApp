@@ -91,8 +91,17 @@ class TwitterHelper
         if (($expires_in + $created_at) <= time()) {
             // dd(($expires_in + $created_at) <= time());
             $defaultId = (new self())->setDefaultId();
-            $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id; 
-            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);   
+            $trialCredit = DB::table('users_meta')
+                ->where('user_id', $defaultId)
+                ->value('trial_credits');
+
+            if($trialCredit) {
+                $client_id = config('services.twitter.client_id');
+            } else {
+                $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
+            }
+
+            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
             session()->put('token_details', $d);
 
             // update token in database
