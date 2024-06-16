@@ -87,7 +87,17 @@ class CommandmoduleController extends Controller
         $trialCredit = DB::table('users_meta')
             ->where('user_id', $this->setDefaultId())
             ->value('trial_credits');
-        
+
+        $tokens = DB::table('settings_general_twapi')
+            ->where('user_id',  $this->setDefaultId())
+            ->first();
+
+        if ($trialCredit == 0 && (!$tokens || !$tokens->api_key 
+            || !$tokens->api_secret || !$tokens->bearer_token 
+            || !$tokens->oauth_id || !$tokens->oauth_secret)) {
+            return response()->json(['status' => 401, 'message' => 'Trial ended. Please input tokens'], 401);
+        }
+
         if (is_int($postCredit) && $checkRole->mo_post_credits <= $postCount) {
             $html = view('modals.upgrade')->render();
             return response()->json(['status' => 403, 'message' => 'Post count limit reached.', 'html' => $html]);
