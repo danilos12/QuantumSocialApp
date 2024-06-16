@@ -53,13 +53,13 @@ $(document).ready(function () {
 
                   <div class="twitter-account-select-bar">
 
-                    <div class="twitter-account-item" data-step="3" data-intro="Access this menu to view all your linked Twitter accounts. Manage and switch between them effortlessly.">
+                    <div class="twitter-account-item" id="step3">
                       <a href="#">
                       <div class="twitter-bar-profile-info">
-                        <img src="${APP_URL}/public/temp-images/william-wallace.jpg">
+                        <img src="${APP_URL}/public/temp-images/imgpsh_fullsize_anim (3).png">
                       @wimbleyJimbley</div></a>
                       <a href="#">
-                      <img src="${APP_URL}/public/ui-images/icons/00j-twitter-settings.svg" class="menu-icon twitter-bar-settings-icon"></a>
+                      <img src="${APP_URL}/public/ui-images/icons/00j-x-settings.svg" class="menu-icon twitter-bar-settings-icon"></a>
                     </div>  <!-- END .twitter-account-item -->
 
                   </div>  <!-- END .twitter-account-select-bar -->
@@ -79,34 +79,38 @@ $(document).ready(function () {
             //   intro: 'Hello World! 👋'
             // },           
             {
+              title: "General Settings",
               element: document.querySelector('#general-settings'),
               intro: 'Start by adding your Twitter API. You can also configure your account settings here to personalize your experience.'
             },
             {
+              title: "X Settings",
               element: document.querySelector('#twitter-settings'),
               intro: 'After adding your X/Twitter API and X/Twitter Account in General Settings, you can configure your X account settings here to personalize your experience.'
             },
             {
-              element: document.querySelector('.twitter-account-item'),
-              intro: 'Access this menu to view all your linked Twitter accounts. Manage and switch between them effortlessly.'
+              title: "X Account",
+              element: document.querySelector('#step3'),
+              intro: 'Access this menu to view all your linked X accounts. Manage and switch between them effortlessly.'
             },
             {
-              element: document.querySelector('#slot-scheduler'),
-              intro: 'Once your account setup is completed, use the Slot Scheduler to plan your regular post times. This feature gives you the ability to post your content at optimal times.',
-              position:'right',
-              tooltipClass: 'custom-right'
-
+              title: "Slot Scheduler",
+              element: document.querySelector('img#a-slot'),
+              intro: 'Once your account setup is completed, use the Slot Scheduler to plan your regular post times. This feature gives you the ability to post your content at optimal times.'
             },
             {
+              title: "Command Module",
               element: document.querySelector('#command-module'),
               intro: 'With your Slot Scheduler ready, move to the Command Module. Here, you can curate posts and comments, allowing you to engage with your audience effectively.',
               position:'right'
             },
             {
+              title: "Help",
               element: document.querySelector('#help'),
               intro: 'For a smoother experience, check out the Help section. It offers tutorials and answers to common questions.'
             },
             {
+              title: "Roadmap",
               element: document.querySelector('#roadmap'),
               intro: 'Stay updated with the latest features and improvements by keeping an eye on the Roadmap. Look out for exciting new Quantum updates.'
             },

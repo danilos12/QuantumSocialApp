@@ -18,6 +18,7 @@ use App\Models\Twitter;
 use App\Models\UT_AcctMngt;
 use Illuminate\Support\Facades\Session;
 use PDO;
+use Carbon\Carbon;
 
 class dashboardController extends Controller
 {
@@ -51,14 +52,15 @@ class dashboardController extends Controller
      */
     public function index(Request $request)
     {
-      $title = 'Dashboard';
+      $title = 'Dashboard';      
 
-      // $isNewUser = !$request->session()->has('onboard_done') && !$request->session()->has('onboard_later');
-      // if ($isNewUser) {
-      //     $onboardingModalHtml = view('modals.onboard')->render();
-      // } else {
-      //     $onboardingModalHtml = '';
-      // }
+      // session for adding existing X account
+      $timeout = Session::get('key_timeout');
+      if ($timeout && Carbon::now()->gt($timeout)) {
+        // Session has timed out, perform logout or other action
+        Session::forget('twitterInfo');
+        Session::forget('key_timeout');    
+      }
       
 
       $checkRole = MembershipHelper::tier($this->setDefaultId());
