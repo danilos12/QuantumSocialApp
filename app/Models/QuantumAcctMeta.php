@@ -19,5 +19,6 @@ class QuantumAcctMeta extends Model
         'queue_switch',
         'promo_switch',
         'evergreen_switch',
+        'trial_credits'
     ];
 }

@@ -102,14 +102,18 @@
 
             <div class="content-footer">
                 <button class="done done-onboard-page">Done</button>
-                <button class="show-later close-onboard-page">Show me later</button>
+                <button class="show-later close-onboard-page" id="startTour">Show me later</button>
             </div>
         </div>  <!-- END .twitter-settings-outer -->
     </div>
 </div>
 
+
 <script>
     $(document).ready(function() {
-       
+        $("#startTour").click(function() {
+            console.log(1);
+            introJs().start();
+        });
     });
 </script>

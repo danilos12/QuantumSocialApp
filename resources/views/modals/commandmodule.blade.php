@@ -58,7 +58,7 @@ div[data-schedule="none"] {
                 <span class="post-type-buttons primary-post-type-buttons">
                   <img src="{{ asset('public/')}}/ui-images/icons/16-evergreen.svg" data-select="0" data-type="evergreen-tweets" id="select-evergreen-icon" class="ui-icon post-tool-icon post-type-icon" />
                   <img src="{{ asset('public/')}}/ui-images/icons/17-promos.svg" data-select="0" data-type="promos-tweets" id="select-promo-icon" class="ui-icon post-tool-icon promo-type-icon post-type-icon" />
-                  <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" />
+                  {{-- <img src="{{ asset('public/')}}/ui-images/icons/08-tweet-storm.svg" data-select="0" data-type="tweet-storm-tweets" id="select-tweet-storm-icon" class="ui-icon post-tool-icon tweet-storm-type-icon post-type-icon" /> --}}
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-retweet.svg" data-select="0" data-type="retweet-tweets" id="select-retweet-icon" class="ui-icon post-tool-icon retweet-type-icon post-type-icon" />
                   <img src="{{ asset('public/')}}/ui-images/icons/pg-comments.svg" data-select="0" data-type="comments-tweets" id="select-comments-icon" class="ui-icon post-tool-icon comment-type-icon post-type-icon" />
                 </span>  <!-- END .primary-post-type-buttons -->
@@ -89,7 +89,8 @@ div[data-schedule="none"] {
 
             <div class="post-area-right primary-post-right">
               <div class="post-right-buttons primary-post-right-buttons">
-                <img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" data-clicked="0" class="ui-icon post-tool-icon add-image-icon" /><br />
+                {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-image.svg" data-clicked="0" class="ui-icon post-tool-icon add-image-icon" /> --}}
+                <br />
                 {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-gif.svg" class="ui-icon post-tool-icon add-gif-icon" /><br /> --}}
                 {{-- <img src="{{ asset('public/')}}/ui-images/icons/pg-smile.svg" class="ui-icon post-tool-icon add-emoji-icon emojionearea-button" data-emoji-open="0" /><br /> --}}
               </div>  <!-- END .primary-post-right-buttons -->
@@ -98,7 +99,7 @@ div[data-schedule="none"] {
 
           </div>  <!-- END .primary-post-wrap -->
 
-          <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" data-select="0" class="ui-icon add-tweet-icon add-tweet-initial" />
+          {{-- <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" data-select="0" class="ui-icon add-tweet-icon add-tweet-initial" /> --}}
 
           <div class="more-tweets-roster">     
                                         

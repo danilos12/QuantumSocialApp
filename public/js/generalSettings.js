@@ -111,6 +111,71 @@ $(document).ready(function () {
         }
     })
 
+    $('#cancel-subscription').on('click', async function(e) {
+        try {
+            $('.cancel-subscription-modal').css('display', 'block')
+            // const response = await fetch(APP_URL + '/settings/cancel');
+            // const responseData = await response.json();
+
+            // console.log(responseData);
+
+        } catch (err) {
+            console.log('Error fetching the modal' + err)
+        }
+    })
+   
+    $('#cancelSubscriptionForm').on('submit', async function(e) {
+        e.preventDefault();
+        console.log(e);
+
+        const formArray = $(this).serializeArray();
+        const formObject = {};
+        
+        $.each(formArray, function() {
+          formObject[this.name] = this.value;
+        });
+
+        console.log(formObject);
+
+        try {
+            const response = await fetch(APP_URL + '/settings/cancel/subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr("content"),
+                },
+                body: JSON.stringify(formObject) // Convert the object to JSON string
+            });
+            const responseData = await response.json();
+            console.log(responseData);
+            
+            if (responseData.status === 200) {
+                toastr[responseData.stat](
+                    `${responseData.message}`
+                );
+
+                setTimeout(function() {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/logout';
+        
+                    var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    var csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+        
+                    document.body.appendChild(form);
+                    form.submit();
+                }, 3000);
+            }
+
+        } catch (err) {
+            console.log('Error fetching the data' + err)
+        }
+    })
+
     // toggle api secrets
     $('.secrets').on('click', function(e) {
         var input = $('input#' + e.target.id);
@@ -355,9 +420,7 @@ $(document).ready(function () {
 
 
 
-    $('img.ui-icon[data-icon="twitter-settings"]').on(
-        "click",
-        function (event) {
+    $('img.ui-icon[data-icon="twitter-settings"]').on("click",function (event) {
             $(".general-settings-outer").hide();
             $(".twitter-settings-outer").show();
         }

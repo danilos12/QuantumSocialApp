@@ -48,18 +48,19 @@ class UpdateSubscriptionStatus extends Command
     public function handle()
     {
         try {
-            
+
             // Connect to the database
-            $pdo = new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
+
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
+
             // // Prepare the SQL statement to get posts
             $users = $pdo->prepare("SELECT * FROM users");
-            $users->execute();            
-            
+            $users->execute();
+
             // Fetch all users results
             $users = $users->fetchAll(PDO::FETCH_ASSOC);
-            $result = [];        
+            $result = [];
 
             if ($users) {
                 \Log::info('Users retrieved: ' . json_encode($users));
@@ -87,9 +88,16 @@ class UpdateSubscriptionStatus extends Command
                     // Log the user meta
                     \Log::info('Processing user meta: ' . json_encode($userMeta));
 
+                    \Log::info('subscription_id: ' . $userMeta['subscription_id']);
+
                     // Call the API
-                    $apiResult = MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']);
-                    
+
+                    if($userMeta['subscription_id'] != 4){
+
+                        $apiResult = env("APP_URL") == 'http://app.quantumsocial.local'? MembershipHelper::apiGetCurl('http://quantumsocial.local/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']):MembershipHelper::apiGetCurl('https://quantumsocial.io/wp-json/plan/membership/subscription/?wp_user_id=' . $userMeta['wp_user_id']);
+
+
+
                     // Get the HTTP status code of the API response
                     $httpStatusCode = $apiResult['httpStatusCode'];
 
@@ -99,30 +107,31 @@ class UpdateSubscriptionStatus extends Command
                         \Log::info('API request successful. HTTP status code: ' . $httpStatusCode);
                         \Log::info('API response: ' . json_encode($apiResult['response']));
 
-                        $jsonStart = strpos($apiResult['response'], '{');                            
-                        $jsonData = substr($apiResult['response'], $jsonStart);                        
+                        $jsonStart = strpos($apiResult['response'], '{');
+                        $jsonData = substr($apiResult['response'], $jsonStart);
                         $parsedData = json_decode($jsonData, true);
 
-                        // Add the user ID to the list of processed user IDs
+
                         $status = config('wp.status_labels');
-        
+
                         if ($parsedData['n'] === 'valid') {
                             $now = strtotime(date("Y/m/d"));
                             $your_date = strtotime($parsedData['info']['trial_date']);
                             $datediff = $your_date - $now;
                             $days_diff = floor($datediff / (60 * 60 * 24));
+                            $days_diff = max(0, $days_diff);
                             $updateResult = QuantumAcctMeta::where('user_id', $user['id'])->update([
                                 'trial_counter' => $days_diff,
                                 'status' => $status[$parsedData['wc_status']],
                             ]);
-            
+
                             // $result .= 'Status valid, table is updated. ID: ' . $user['id'] . PHP_EOL;
                             $result[] = [
                                 'id' => $userMeta['id'],
                                 'message' =>  'Has entry for user ID: ' . $userMeta['id'] . PHP_EOL,
                                 'updated' => ($updateResult !== false && $updateResult > 0) ? true : false
                             ];
-                        } 
+                        }
 
                             // Process $apiResult
                     } else {
@@ -137,17 +146,20 @@ class UpdateSubscriptionStatus extends Command
                         $result[] = [
                             'status' => 'invalid',
                             'message' => 'Status invalid, subscription for user ID: ' . $user['id'] . PHP_EOL
-                        ]; 
+                        ];
                     }
 
+                }else{
+                    \Log::info('subscription_id_skipped: ' . $userMeta['subscription_id']);
+                }
                 }
             }
-    
-            \Log::info('Scheduled task completed successfully.');        
+
+            \Log::info('Scheduled task completed successfully.');
 
         } catch (\Exception $e) {
 
             \Log::error('An error occurred: ' . $e->getMessage());
-        }  
+        }
     }
 }

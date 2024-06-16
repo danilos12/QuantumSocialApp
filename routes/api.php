@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-
+use App\Helpers\WP;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,17 +76,15 @@ Route::get('wp', function () {
 	if(isset( $r['wp_user_id'] ) ) {
 
 
-        $response = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($r['wp_user_id'])));
-		$wp_data = $response->json();
-
-        // return response()->json(['status' =>$wp_data, 'laravel_id' => $r['wp_user_id']]);
+		$wp_data = WP::external_wp_rest_api($r['wp_user_id']);
 
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
 
-
-
-
+            $checkExistingEmail = $r['wp_email'];
+            if(User::where('email',$checkExistingEmail)->exists()){
+                return response()->json(['status' =>'error', 'laravel_id' => 0]);
+            }
 
 				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
 					$value = 1;
@@ -133,12 +131,7 @@ Route::get('wp', function () {
 
 
 				if( $user->id ) {
-					DB::table('app_usermeta')->insert([
-						['user_id' => $user->id, 'meta_key' => 'wp_user_id', 'meta_value' => base64_decode($r['wp_user_id'])],
-						['user_id' => $user->id, 'meta_key' => 'subscription_name', 'meta_value' => $wp_data['info']['product_name']],
 
-
-					]);
 
 					$now = date("Y-m-d");
 					$your_date = $wp_data['info']['trial_date'];
@@ -153,9 +146,10 @@ Route::get('wp', function () {
 						'next_payment'=>$wp_data['info']['next_payment'],
 						'status'=>$status,
 						'timezone' =>'+00:00',
-						'queue_switch'=>0,
-						'promo_switch'=>0,
-						'evergreen_switch'=>0
+						'queue_switch'=>1,
+						'promo_switch'=>1,
+						'evergreen_switch'=>1,
+						'trial_credits'=>25
 					]);
 
 					$generalSettings = [
@@ -170,7 +164,7 @@ Route::get('wp', function () {
 					];
 
 					DB::table('settings_toggler_general')->insert($generalSettings);
-					DB::table('user_onboard')->insert(['user_id' => $user->id, 'onboarded' => 0]);
+					DB::table('user_onboard')->insert(['user_id' => $user->id, 'onboarded' => 0, 'tour' => 0]);
 
 					return response()->json(['status' =>'success', 'laravel_id' => $user->id]);
 
@@ -194,7 +188,7 @@ Route::get('wp', function () {
 });
 
 
-
+Route::get('auth/scrape', [App\Http\Controllers\Api\V1\Auth\RegisterController::class, 'scrapeMetatags']);
 
 
 

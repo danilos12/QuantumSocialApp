@@ -91,8 +91,17 @@ class TwitterHelper
         if (($expires_in + $created_at) <= time()) {
             // dd(($expires_in + $created_at) <= time());
             $defaultId = (new self())->setDefaultId();
-            $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id; 
-            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);   
+            $trialCredit = DB::table('users_meta')
+                ->where('user_id', $defaultId)
+                ->value('trial_credits');
+
+            if($trialCredit) {
+                $client_id = env('TWITTER_OAUTH_ID');
+            } else {
+                $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
+            }
+
+            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
             session()->put('token_details', $d);
 
             // update token in database
@@ -239,7 +248,16 @@ class TwitterHelper
     public static function isTokenExpiredSched($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id, $user_id) {
 
         if (($expires_in + $created_at) <= time()) {
-            $client_id = TwitterHelper::getActiveAPISched($user_id)->oauth_id; 
+            $trialCredit = DB::table('users_meta')
+                ->where('user_id', $user_id)
+                ->value('trial_credits');
+
+            if($trialCredit) {
+                $client_id = env('TWITTER_OAUTH_ID');
+            } else {
+                $client_id = TwitterHelper::getActiveAPI($user_id)->oauth_id;
+            }
+            
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);   
             session()->put('token_details', $d);
 

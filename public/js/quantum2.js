@@ -472,6 +472,9 @@ $TagGroupModalClose.click(function () {
 $modalLargeAnchor = $(".modal-large-anchor");
 $modalLargeBackdrop = $(".modal-large-backdrop");
 
+$launchInactiveBox = $(".modal-large-anchor-inactive");
+$modalInactiveBox = $('.modal-box ');
+
 $launchCommandModule = $(".launch-command-module");
 $postingToolOuter = $(".posting-tool-outer");
 $closePostingTool = $(".posting-tool-close");
@@ -486,18 +489,46 @@ $closeTwitterSettings = $(".close-twitter-settings");
 
 let currentModal = null;
 
-$(document).on('click', '[data-id="modal"]',function (event) {
-    $target = event.target.id;
-    openModal($target);
-    // console.log($target, "id");
+$(document).on('click', '[data-id="modal"]', function(event) {
+    var $target = event.target.id;
+    var statusCheck = $('#general-settings').attr('statusdata');
+
+    var elementClass = $('.modal-large-backdrop-inactive').attr('class');
+
+    if(statusCheck !== 'wc-active' ){
+        openInactiveBox(elementClass);
+
+
+    }else{
+        openModal($target);
+
+}
 });
 
+
+function openInactiveBox(modalId) {
+
+    if (currentModal !== null) {
+        closeModal(modalId);
+    }
+    setTimeout(function () {
+        $launchInactiveBox.show();
+        $launchInactiveBox.fadeIn("slow");
+
+    }, 175);
+
+    currentModal = modalId;
+
+}
+
 $(".modal-large-close").click(function (event) {
+    // close modal
     $target = event.target.id;
     closeModal($target);
 });
 
 $(document).ready(function () {
+    $launchInactiveBox.hide();
     $('img.ui-icon[data-icon="twitter-settings"]').on(
         "click",
         function (event) {
@@ -505,7 +536,7 @@ $(document).ready(function () {
             openTwitterModal($target);
         }
     );
-
+    openInactiveBox($contentmodal);
     $("img.twitter-bar-settings-icon").on("click", function (event) {
         $target = event.target.id;
         openTwitterModal($target);
@@ -546,6 +577,20 @@ function closeModal(modalId) {
 
     // const modal = document.getElementById(modalId);
     // modal.style.display = 'none';
+
+
+    if(modalId == 'close-inactive'){
+
+        setTimeout(function () {
+            $launchInactiveBox.fadeOut("slow");
+
+        }, 175);
+    }
+
+
+
+
+
     $(`.${modalId}-outer`).toggle("slide", { direction: "up" }, 350);
     setTimeout(function () {
         $modalLargeAnchor.fadeOut("slow");

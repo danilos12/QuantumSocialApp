@@ -10,6 +10,12 @@
     <div class="login-inner">
 
 
+
+        @if (session()->has('login_error'))
+        <div class="alert alert-danger warning-sign">{{ session('login_error') }}</div>
+        @endif
+
+
         <form method="POST" action="{{ route('login') }}">
             @csrf
 
@@ -23,6 +29,10 @@
                             <strong>{{ $message }}</strong>
                         </span>
                     @enderror
+
+                    @if ($errors->any())
+  dsadsa
+@endif
                 </div>
             </div>
 
@@ -63,12 +73,14 @@
 
             <div class>
                 <div class="d-flex justify-space-between m1em">
-                    <div class="p-2">
+                    <div class="p-2 flex flex-col items-start">
+
                         @if (Route::has('password.request'))
                             <a class="btn btn-link p-0 forgotpass" href="{{ route('password.request') }}">
                                 {{ __('Forgot Your Password?') }}
                             </a>
                         @endif
+                        <a class="btn btn-link p-0 forgotpass" href="{{ env('APP_URL') }}/login/member">Login as Member</a>
                     </div>
                     <div class="ml-auto p-2">
                         {{-- @if (Route::has('register')) --}}
@@ -90,7 +102,18 @@
 </div>
 
 <style>
-
+    .items-start{
+        align-items: flex-start
+    }
+.justify-start{
+    justify-items: start;
+}
+.flex{
+    display: flex
+}
+.flex-col{
+    flex-direction: column
+}
 .login-outer {
 
     justify-content: center;
@@ -122,7 +145,7 @@
     border-radius: 25px;
     background: rgba(143, 116, 188, 0.40);
     width: 434px;
-    height: 356px;
+    height: auto;
     flex-shrink: 0;
 }
 
