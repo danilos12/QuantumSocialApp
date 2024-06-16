@@ -22,20 +22,20 @@
             <!-- <div class="card-header">{{ ('Dashboard') }}</div>   -->
 
             <div class="card-body">
-                @if (session('status'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('status') }}
+                {{-- {{ dd(session()->all()) }}  --}}
+                @if(Session::has('twitterInfo'))
+                    <div class="alert alert-{{ Session::get('alert_type') }}" id="twitterInfoAlert">
+                        {{ Session::get('twitterInfo') }}
                     </div>
                 @endif
-
-
+                
                 <div class="first-row-container">
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
                             
                             @php 
-                             $tier = $plan->subscription_name;
+                             $tier = $plan->subscription_name === 'astro' ? 'astral' : $plan->subscription_name ;
                             @endphp
                             <img src="{{ asset('/public/ui-images/icons/tiers/' . $tier . '.svg') }}" class="planet">
 
