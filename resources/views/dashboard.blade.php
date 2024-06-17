@@ -22,22 +22,30 @@
             <!-- <div class="card-header">{{ ('Dashboard') }}</div>   -->
 
             <div class="card-body">
-                {{-- {{ dd(session()->all()) }}  --}}
+                @if (session('status'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('status') }}
+                    </div>
+                @endif
+                {{-- {{ dd(session()->all())}} --}}
                 @if(Session::has('twitterInfo'))
                     <div class="alert alert-{{ Session::get('alert_type') }}" id="twitterInfoAlert">
                         {{ Session::get('twitterInfo') }}
                     </div>
                 @endif
-                
+       
+
                 <div class="first-row-container">
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
                             
                             @php 
-                             $tier = $plan->subscription_name === 'astro' ? 'astral' : $plan->subscription_name ;
+                             $tier = $plan->subscription_name;
+                     
+                             $specifictiers = $tier == 'astro' ? 'astral' : $tier; 
                             @endphp
-                            <img src="{{ asset('/public/ui-images/icons/tiers/' . $tier . '.svg') }}" class="planet">
+                            <img src="{{ asset('/public/ui-images/icons/tiers/' . $specifictiers . '.svg') }}" class="planet">
 
                             <div class="queued-single-start">
                                 <span class="greeting">Hi,</span>
@@ -85,39 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card25">
-                        <div class="queued-single-post-wrapper queue-type-promo" style="    width: 100%;
-                        height: 100%;">
-                            <div class="queued-single-post">
-
-                            <img src="{{ asset('/public/ui-images/icons/tiers/' . $tier .  '.svg') }}" class="planet" style="width: 133px; height: 145px">
-
-                            <div class="queued-single-start" style="flex-direction: column; width: 100%">
-                               <span class="current-label">You are currently</span>
-							   	@if( !empty($plan) )
-								  <span class="current-plan">{{ ucfirst($plan->subscription_name) == 'Astro' ?'Astral Lifetime': ucfirst($plan->subscription_name)}} </span>
-								@else
-								  <span class="current-plan">Contact your administrator </span>
-								@endif
-
-
-                                {{ $hide = false }}
-                                @if ($hide)
-                               <span class="current-uplabel">need more features?</span>
-                               <button id="upgrade-now" class="current-upgrade">Upgrade</button>
-                                @endif
-                            </div>  <!-- END .queue-single-start -->
-
-                            <div class="queued-single-end">
-
-                            </div>  <!-- END .queued-single-end -->
-
-                            </div>  <!-- END .queued-single-post -->
-                        </div>
-                    </div>
-                </div>
-                <div class="second-row-container">
+                               <div class="second-row-container">
                     <div class="card-item-25">
                         <div class="a card-col-a">
                             <span class="actual">{{ $plan->member_count - $countXaccts }}</span>
@@ -148,27 +124,62 @@
                             <span class="card-description2">Team Members Remaining </span>
                         </div>
                     </div>
-                    <div class="card-item-25">
-                        <div class="a card-col-a">
-                            <span class="actual">{{ $countTrial }}</span>
-                        </div>
-                        <div class="b card-col-b">
-                            <span class="card-description1">days left in your</span>
-                            <span class="card-description2">Free Trial </span>
-                        </div>
+                  
+                </div>
+                    </div>
+                    <div class="card25 rounded-br w-full relative p-4">
+                      
+                            <div class="flex flex-col  items-center justify-center h-full rounded-br">
+                         
+                              <img src="{{ asset('/public/ui-images/icons/tiers/' . $specifictiers  .  '.svg') }}" class="planet-2" style="width: 133px; height: 145px">
+                         
+                          
+
+                            <div class=" " style="display:flex;flex-direction: column;justify-content:center;align-items:center; width: 100%">
+                               <span class="current-label">You are currently</span>
+                            
+							   	@if( !empty($plan) )
+
+								  <span class="current-plan">{{ ucfirst($tier) == 'Astro' ?'Astral Lifetime': ucfirst($tier)}} </span>
+								@else
+								  <span class="current-plan">Contact your administrator </span>
+								@endif
+
+
+                                {{ $hide = false }}
+                                @if ($hide)
+                               <span class="current-uplabel">need more features?</span>
+                               <button id="upgrade-now" class="current-upgrade">Upgrade</button>
+                                @endif
+                            </div>  <!-- END .queue-single-start -->
+
+                              <!-- END .queued-single-end -->
+                                <div class="flex" >
+                                    <div class="a card-col-a">
+                                        <span class="actual">{{ $countCredits }}</span>
+                                    </div>
+                                    <div class="b card-col-b">
+                                        <span class="card-description1">Trial Credits</span>
+                                        <span class="card-description2">Remaining</span>
+                                    </div>
+                                </div>
+                                <div class="flex">
+                                    <div class="a card-col-a">
+                                        <span class="actual">{{ $countTrial === -1 ? '∞' : $countTrial }}</span>
+                                    </div>
+                                    <div class="b card-col-b">
+                                        <span class="card-description1">days left in your</span>
+                                        <span class="card-description2">Free Trial </span>
+                                    </div>
+                                </div>
+                            </div>  <!-- END .queued-single-post -->
+                      
+        
+               
                     </div>
                 </div>
-                <div class="third-row-container">
-                    <div class="card-item-25">
-                        <div class="a card-col-a">
-                            <span class="actual">{{ $countCredits }}</span>
-                        </div>
-                        <div class="b card-col-b">
-                            <span class="card-description1">Trial Credits</span>
-                            <span class="card-description2">Remaining</span>
-                        </div>
-                    </div>
-                </div>
+         
+            
             </div>
         </div>
 
@@ -177,15 +188,52 @@
 @endsection
 
 <style>
+.flex{
+    display:flex;
+}
+.flex-col{
+    flex-direction:column;
+}
+.items-center{
+    align-items:center;
+}
+.justify-center{
+    justify-content:center;
+}
+.h-full{
+    height:100%;
+}
+.w-full{
+    width:100%;
+}
+.relative{
+    position:relative;
+    overflow:hidden;
+}
+.p-4{
+    padding:1rem;
+}
+.rounded-br{
+    border-radius:25px;
+}
 .first-row-container,
 .second-row-container, 
 .third-row-container {
     display: flex;
-    /* background-color: rgba(143, 116, 188, 0.1); */
+ 
+        /* background-color: rgba(143, 116, 188, 0.1); */
 }
 
 .third-row-container {
-    margin: 14px 0;
+ 
+     justify-content:center;
+      margin: 14px;
+}
+.bg-red{
+    background-color:red;
+}
+.bg-blue{
+    background-color:blue;
 }
 
 .card-item-75 {
@@ -268,7 +316,7 @@ span.metrics-text {
 }
 
 .card-item-25 {
-    width: 25%;
+    width: 100%;
 
     display: flex;
     flex-direction: row;
@@ -288,6 +336,7 @@ span.metrics-text {
 }
 
 .queued-single-post {
+    flex-direction:column;
     border-radius: 20px!important;
     margin-right:2em;
     background: rgba(143, 116, 188, 0.4)!important;
@@ -309,13 +358,18 @@ span.metrics-text {
 }
 
 .card75 {
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
   flex: 0 0 75%; /* flex-grow: 0, flex-shrink: 0, flex-basis: 75% */
   margin: 2px;
 }
 
-.card25 {
-    flex: 0 0 25%; /* flex-grow: 0, flex-shrink: 0, flex-basis: 25% */
-    margin: 2px;
+.card25{
+    display:flex;
+    flex-direction:column;
+background: rgba(143, 116, 188, 0.4);
+  margin: 2px;
 }
 
 .container {
@@ -345,6 +399,17 @@ span.metrics-text {
     width: 80;
     height: 87px;
     rotate: 25deg;
+    opacity: 0.1;
+    z-index: 51;
+    rotate: 0deg;
+}
+.planet-2 {
+    filter: white;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+
+   
     opacity: 0.1;
     z-index: 51;
     rotate: 0deg;

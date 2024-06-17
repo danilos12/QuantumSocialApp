@@ -101,7 +101,9 @@ class TwitterHelper
                 $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
             }
 
+            
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
+            
             session()->put('token_details', $d);
 
             // update token in database
@@ -126,12 +128,13 @@ class TwitterHelper
 
    
     public static function getTwitterToken($twitter_id, $user_id) {
+
         $findActiveTwitter = DB::table('twitter_accts')
             ->leftJoin('twitter_meta', 'twitter_accts.user_id', '=', 'twitter_meta.user_id')
             ->leftJoin('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
-            ->select('twitter_meta.*', 'twitter_accts.*',  'ut_acct_mngt.selected')
-            ->where('twitter_accts.twitter_id', '=', $twitter_id)
-            ->where('twitter_accts.user_id', '=', $user_id)
+            ->select('twitter_meta.*', 'ut_acct_mngt.selected')
+            ->where('twitter_meta.user_id', '=', $user_id)
+            ->where('twitter_meta.twitter_id', '=', $twitter_id)
             ->where('ut_acct_mngt.selected', '=', 1)
             // ->where('twitter_meta.active', '=',   1)
             ->first();
@@ -194,7 +197,6 @@ class TwitterHelper
         );
 
         $data = json_encode($data);        
-        // dd($data);
 
         $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
 
@@ -287,6 +289,19 @@ class TwitterHelper
     public static function getActiveAPISched($id) {        
         $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();        
         return $activeAPI;
+    }
+
+    public static function trialCreditsAPI() {
+        $api = [
+            "x_api" => env("TWITTER_API_KEY"),
+            "x_apiSecret" => env("TWITTER_API_SECRET"),        
+            "x_bearerToken" => env("TWITTER_BEARER_TOKEN"),
+            "x_oauthId" => env("TWITTER_OAUTH_ID"),
+            "x_oauthSecret" => env("TWITTER_OAUTH_SECRET"),
+            "x_callbackURL" => env("TWITTER_CALLBACK_URL")
+        ];
+
+        return $api;
     }
 
 

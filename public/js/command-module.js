@@ -999,7 +999,7 @@ $(document).ready(function () {
 
             const responseData = await response.json();
             
-            if (responseData.status == 403) {
+            if (responseData.status == 402) {
                 openUpgradeModal(responseData);
             } else if (responseData.status == 401) {
                 form.find('input[type="submit"]').val("Tokens Invalid");
@@ -1008,7 +1008,7 @@ $(document).ready(function () {
                     `Warning! ${responseData.message}`
                 );
 
-                  // Wait for toastr to fade out and then reload the page
+                //   Wait for toastr to fade out and then reload the page
                 setTimeout(function() {
                     location.reload();
                 }, 3000); // Adjust the time according to toastr fadeOut duration
@@ -1031,7 +1031,7 @@ $(document).ready(function () {
                     } else if ($getPostType.includes('promos')) {
                         window.location.href = APP_URL + '/promo';
                     }
-                    // location.reload();
+                    location.reload();
                 }, 3000); // Adjust the time according to toastr fadeOut duration
             } else {
                 // Handle the server response here
