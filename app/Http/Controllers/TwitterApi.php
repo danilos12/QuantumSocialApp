@@ -175,7 +175,6 @@ class TwitterApi extends Controller
                 $data = null;
                 $filteredData = null;
 
-
                 switch ($type) {
                     case "retweet":
                         $data = "tweet.fields=referenced_tweets,created_at,author_id,public_metrics,text,attachments&max_results=30";
@@ -250,9 +249,7 @@ class TwitterApi extends Controller
                     default:
                         $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
                         $request = $this->curlGetHttpRequest($url, $headers, $data);
-
-                        // dd($request);
-
+                        dd($url);
                         if (isset($request->data)) {
                             // get images of the tweet
                             $filteredData['data'] = $request->data;
@@ -283,8 +280,7 @@ class TwitterApi extends Controller
                         }
                     break;
 
-                }
-
+                }                
 
                 if ($filteredData['status'] === 200) {
                     // Cache the fetched tweets
@@ -543,11 +539,10 @@ class TwitterApi extends Controller
     public function getUnselectedTwitterAccounts() {
 
         $getUnselectedTwitter = DB::table('twitter_accts')
-                ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                ->leftJoin('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                ->select('twitter_accts.*', 'ut_acct_mngt.selected')
                 ->where('ut_acct_mngt.selected', "=", 0) // selected
-                ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
-                ->where('twitter_accts.deleted', "=", 0)
+                ->where('twitter_accts.user_id', "=", $this->setDefaultId())
                 ->get();
 
         return response()->json($getUnselectedTwitter);

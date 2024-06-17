@@ -93,72 +93,39 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card25">
-                        <div class="queued-single-post-wrapper queue-type-promo" style="    width: 100%;
-                        height: 100%;">
-                            <div class="queued-single-post">
-
-                            <img src="{{ asset('/public/ui-images/icons/tiers/' . $tier .  '.svg') }}" class="planet" style="width: 133px; height: 145px">
-
-                            <div class="queued-single-start" style="flex-direction: column; width: 100%">
-                               <span class="current-label">You are currently</span>
-							   	@if( !empty($plan) )
-                           
-								  <span class="current-plan">{{ ucfirst($plan->subscription_name) == 'Astro ' ?'Astral Lifetime': ucfirst($plan->subscription_name)}} </span>
-								@else
-								  <span class="current-plan">Contact your administrator </span>
-								@endif
+                        <div class="second-row-container">
+                            <div class="card-item-25">
+                                <div class="a card-col-a">
+                                    <span class="actual">{{ $plan->member_count - $countXaccts }}</span>
+                                </div>
+                                <div class="b card-col-b">
 
 
-                                {{ $hide = false }}
-                                @if ($hide)
-                               <span class="current-uplabel">need more features?</span>
-                               <button id="upgrade-now" class="current-upgrade">Upgrade</button>
-                                @endif
-                            </div>  <!-- END .queue-single-start -->
+                                    <span class="card-description2">X accounts Remaining </span>
+                                </div>
+                            </div>
+                            <div class="card-item-25">
+                                <div class="a card-col-a">
+                                    <span class="actual">{{ $plan->admin_count - $countAdmin }}</span>
+                                </div>
+                                <div class="b card-col-b">
 
-                            <div class="queued-single-end">
 
-                            </div>  <!-- END .queued-single-end -->
+                                    <span class="card-description2">Admin Remaining </span>
+                                </div>
+                            </div>
+                            <div class="card-item-25">
+                                <div class="a card-col-a">
+                                    <span class="actual">{{ $plan->tm_count-$countTeamMembers}}</span>
+                                </div>
+                                <div class="b card-col-b">
 
-                            </div>  <!-- END .queued-single-post -->
+
+                                    <span class="card-description2">Team Members Remaining </span>
+                                </div>
+                            </div>
+                        
                         </div>
-                    </div>
-                </div>
-                <div class="second-row-container">
-                    <div class="card-item-25">
-                        <div class="a card-col-a">
-                            <span class="actual">{{ $plan->member_count - $countXaccts }}</span>
-                        </div>
-                        <div class="b card-col-b">
-
-
-                            <span class="card-description2">X accounts Remaining </span>
-                        </div>
-                    </div>
-                    <div class="card-item-25">
-                        <div class="a card-col-a">
-                            <span class="actual">{{ $plan->admin_count - $countAdmin }}</span>
-                        </div>
-                        <div class="b card-col-b">
-
-
-                            <span class="card-description2">Admin Remaining </span>
-                        </div>
-                    </div>
-                    <div class="card-item-25">
-                        <div class="a card-col-a">
-                            <span class="actual">{{ $plan->tm_count-$countTeamMembers}}</span>
-                        </div>
-                        <div class="b card-col-b">
-
-
-                            <span class="card-description2">Team Members Remaining </span>
-                        </div>
-                    </div>
-                  
-                </div>
                     </div>
                     <div class="card25 rounded-br w-full relative p-4">
                       
@@ -272,7 +239,7 @@
 .card-item-75 {
     display: flex;
     /* width: 740; */
-    background: rgba(143, 116, 188, 0.4)
+    background: rgba(143, 116, 188, 0.4);
     margin: 2px;
     border-radius: 25px;
 }
