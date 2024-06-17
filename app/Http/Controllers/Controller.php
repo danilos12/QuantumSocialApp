@@ -150,7 +150,7 @@ class Controller extends BaseController
                 if ($xID) {                    
                     
                     Session::put('twitterInfo', 'The X account you tried to add is already existing on your Quantum account.');
-                    Session::put('alert_type', 'info');
+                    Session::put('alert_type', 'warning');
                     Session::put('xID', $xID);
                     $timeout = Carbon::now()->addSeconds(5);
                     Session::put('key_timeout', $timeout);
