@@ -960,7 +960,7 @@ $(document).ready(function () {
 
         var crossTweet = [];
         $(".cross-tweet-profiles-inner.cmd img").each(function () {
-            if ($(this).attr("status")) {
+            if ($(this).attr("status") === 'active') {
                 crossTweet.push(this.id);
             }
         });
@@ -999,16 +999,16 @@ $(document).ready(function () {
 
             const responseData = await response.json();
             
-            if (responseData.status == 403) {
+            if (responseData.status == 402) {
                 openUpgradeModal(responseData);
             } else if (responseData.status == 401) {
                 form.find('input[type="submit"]').val("Tokens Invalid");
-            } else if (responseData.status === 500) {
+            } else if (responseData.status === 500 || responseData.status === 403 ) {
                 toastr[responseData.stat](
                     `Warning! ${responseData.message}`
                 );
 
-                  // Wait for toastr to fade out and then reload the page
+                //   Wait for toastr to fade out and then reload the page
                 setTimeout(function() {
                     location.reload();
                 }, 3000); // Adjust the time according to toastr fadeOut duration
