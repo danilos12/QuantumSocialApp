@@ -555,72 +555,125 @@ class TwitterApi extends Controller
     // to be back
     public function removeTwitterAccount(Request $request)
     {
-        if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1) {
-
-            $id = $request->input('twitter_id');
-
-            $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
-
-            // check if id is selected in the UT_ACCT_MNGT table
-            $selectedTwitter = UT_AcctMngt::where('twitter_id', $id)->first();
-
-            if ($selectedTwitter->selected === 1) {
-                return response()->json([
-                    'stat' => 'warning',
-                    'message' => 'Unable to delete. This twitter account is currently selected.',
-                    'status' => 500,
-                ]);
-            } else {
-
-                $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
-
-                // Deleting the Twitter account
-                $deletedTwitter = $twitter->delete();
-
-                // Checking if the Twitter account deletion was successful
-                if ($deletedTwitter) {
-                    // Deleting associated Twitter meta
-                    $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
-                    $deletedMeta = $deleteTwitterMeta->delete();
-
-                    $deleteUT_Acct_Mngt = UT_AcctMngt::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
-                    $deletedUT_Acct_Mngt = $deleteUT_Acct_Mngt->delete();
-
-                    // If deletion of Twitter meta is successful
-                    if ($deletedMeta && $deletedUT_Acct_Mngt) {
-                        return response()->json([
-                            'success' => 200,
-                            'deleted_twitter' => $twitter, // Sending deleted Twitter account details
-                            'deleted_meta' => $deleteTwitterMeta, // Sending deleted Twitter meta details
-                            'deleted_mngt' => $deletedUT_Acct_Mngt, // Sending deleted Twitter meta details
-                            'message' => 'Twitter account and associated meta data are now deleted',
-                            'stat' => 'success',
-                        ]);
-                    } else {
-                        // If deletion of Twitter meta fails
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Failed to delete associated Twitter meta data',
-                            'stat' => 'warning',
-                        ], 500);
-                    }
-
-                } else {
-                    // If deletion of Twitter account fails
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Failed to delete Twitter account',
-                        'stat' => 'warning',
-                    ], 500);
-                }
-
-                return response()->json(['stat' => 'success', 'status' => 200, 'message' => 'Twitter account is now deleted']);
-            }
-
-        } else {
-                return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to delete X account, please ask permission to the owner'],403);
+        if (!$this->isAuthorized()) {
+            return $this->buildResponse('warning', 'You are not allowed to delete this account, please ask permission from the owner', 403);
         }
+
+        $twitterId = $request->input('twitter_id');
+        $userId = $this->setDefaultId();
+
+        if ($this->isAccountSelected($twitterId, $userId)) {
+            return $this->buildResponse('warning', 'Unable to delete. This Twitter account is currently selected.', 500);
+        }
+
+        if ($this->deleteTwitterAccount($twitterId, $userId)) {
+            return $this->buildResponse('success', 'Twitter account and associated meta data are now deleted', 200);        
+        } 
+        
+        return $this->buildResponse('warning', 'Failed to delete Twitter account', 500);
+        
     }
+
+    private function isAuthorized()
+    {
+        return Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1;
+    }
+
+    private function isAccountSelected($twitterId, $userId)
+    {
+        $selectedTwitter = UT_AcctMngt::where('twitter_id', $twitterId)->where('user_id', $userId)->first();
+        return $selectedTwitter && $selectedTwitter->selected === 1;
+    }
+
+    private function deleteTwitterAccount($twitterId, $userId)
+    {
+        $deletedTwitter = Twitter::where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+        if (!$deletedTwitter) {
+            return false;
+        }        
+
+        $deleteTwitterMeta = DB::table('twitter_meta')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+        $deleteUT_Acct_Mngt = DB::table('ut_acct_mngt')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+
+        return $deleteTwitterMeta && $deleteUT_Acct_Mngt;
+    }
+
+    private function buildResponse($stat, $message, $status, $additionalData = [])
+    {
+        $response = [
+            'stat' => $stat,
+            'message' => $message,
+            'status' => $status,
+        ];
+
+        return response()->json(array_merge($response, $additionalData), $status);
+    }
+    // public function removeTwitterAccount(Request $request)
+    // {
+    //     if(Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1) {
+
+    //         $id = $request->input('twitter_id');
+
+    //         $twitter = Twitter::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+
+    //         // check if id is selected in the UT_ACCT_MNGT table
+    //         $selectedTwitter = UT_AcctMngt::where('twitter_id', $id)->where('user_id', $this->setDefaultId())->first();
+
+    //         if ($selectedTwitter->selected === 1) {
+    //             return response()->json([
+    //                 'stat' => 'warning',
+    //                 'message' => 'Unable to delete. This twitter account is currently selected.',
+    //                 'status' => 500,
+    //             ]);
+    //         } else {
+
+    //             // Deleting the Twitter account
+    //             $deletedTwitter = $selectedTwitter->delete();
+
+    //             // Checking if the Twitter account deletion was successful
+    //             if ($deletedTwitter) {
+    //                 // Deleting associated Twitter meta
+    //                 $deleteTwitterMeta = TwitterToken::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+    //                 $deletedMeta = $deleteTwitterMeta->delete();
+
+    //                 $deleteUT_Acct_Mngt = UT_AcctMngt::where('twitter_id', $id)->where('user_id', $this->setDefaultId());
+    //                 $deletedUT_Acct_Mngt = $deleteUT_Acct_Mngt->delete();
+
+    //                 // If deletion of Twitter meta is successful
+    //                 if ($deletedMeta && $deletedUT_Acct_Mngt) {
+    //                     return response()->json([
+    //                         'success' => 200,
+    //                         'deleted_twitter' => $twitter, // Sending deleted Twitter account details
+    //                         'deleted_meta' => $deleteTwitterMeta, // Sending deleted Twitter meta details
+    //                         'deleted_mngt' => $deletedUT_Acct_Mngt, // Sending deleted Twitter meta details
+    //                         'message' => 'Twitter account and associated meta data are now deleted',
+    //                         'stat' => 'success',
+    //                     ]);
+    //                 } else {
+    //                     // If deletion of Twitter meta fails
+    //                     return response()->json([
+    //                         'success' => false,
+    //                         'message' => 'Failed to delete associated Twitter meta data',
+    //                         'stat' => 'warning',
+    //                     ], 500);
+    //                 }
+
+    //             } else {
+    //                 // If deletion of Twitter account fails
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => 'Failed to delete Twitter account',
+    //                     'stat' => 'warning',
+    //                 ], 500);
+    //             }
+
+    //             return response()->json(['stat' => 'success', 'status' => 200, 'message' => 'Twitter account is now deleted']);
+    //         }
+
+    //     } else {
+    //             return response()->json(['stat' => 'warning', 'message' => 'You are not allowed to delete X account, please ask permission to the owner'],403);
+    //     }
+    // }
 
     public function curlGetHttpRequest($url, $headers,  $data) {
         $curl = curl_init();
