@@ -960,7 +960,7 @@ $(document).ready(function () {
 
         var crossTweet = [];
         $(".cross-tweet-profiles-inner.cmd img").each(function () {
-            if ($(this).attr("status")) {
+            if ($(this).attr("status") === 'active') {
                 crossTweet.push(this.id);
             }
         });
@@ -1003,7 +1003,7 @@ $(document).ready(function () {
                 openUpgradeModal(responseData);
             } else if (responseData.status == 401) {
                 form.find('input[type="submit"]').val("Tokens Invalid");
-            } else if (responseData.status === 500) {
+            } else if (responseData.status === 500 || responseData.status === 403 ) {
                 toastr[responseData.stat](
                     `Warning! ${responseData.message}`
                 );
@@ -1031,7 +1031,7 @@ $(document).ready(function () {
                     } else if ($getPostType.includes('promos')) {
                         window.location.href = APP_URL + '/promo';
                     }
-                    location.reload();
+                    // location.reload();
                 }, 3000); // Adjust the time according to toastr fadeOut duration
             } else {
                 // Handle the server response here

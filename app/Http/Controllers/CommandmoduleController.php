@@ -243,6 +243,8 @@ class CommandmoduleController extends Controller
             // Save data for main account 
             // $responses = array();
             $messages = '';
+            // dd($postData);
+
             foreach ($postData['textarea'] as $textarea) {
                 $insertData['post_description'] = $textarea;
                 $insertData['sched_method'] = $sched_method;
@@ -282,9 +284,11 @@ class CommandmoduleController extends Controller
                         if ($responses->getStatusCode() === 200) {
                             $insertData['active'] = 1;
                             CommandModule::create($insertData);
+                            // Retrieve the last saved data
+                            $lastSavedData = CommandModule::latest()->first();
     
                             $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
-                            return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database',  'tweet' => $lastSavedData]);
                             // dd($messages);
                         } else {
                             return response()->json(['status' => $responses->getStatusCode(), 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
@@ -307,6 +311,7 @@ class CommandmoduleController extends Controller
 
                 // Save crosstweet data
                 $crosstweetData = $insertData;
+
                 if (!empty($postData['crosstweet'])) {
                     foreach ($postData['crosstweet'] as $key => $account) {
                         $crosstweetData['post_description'] = $textarea;
@@ -323,7 +328,7 @@ class CommandmoduleController extends Controller
                                 $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
                             } else {
                                 $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-
+                                
                                 if ($responses->getStatusCode() === 200) {
                                     CommandModule::create($crosstweetData);
                                     $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
