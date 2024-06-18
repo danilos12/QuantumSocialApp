@@ -226,6 +226,10 @@ class TwitterHelper
 
     public static function tweet2twitterSched($twitter_meta, $data, $endpoint, $user_id) {
         \Log::info('tweet2Twitter: ' . print_r($twitter_meta, true));
+        $defaultId = (new self())->setDefaultId();
+        $trialCredit = DB::table('users_meta')
+            ->where('user_id', $defaultId)
+            ->value('trial_credits');
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpiredSched($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id'], $user_id);        
@@ -247,6 +251,12 @@ class TwitterHelper
 
         if ($sendTweetNow['status'] === 200) {
             \Log::info('Status 200: '. print_r($sendTweetNow, true));
+            if ($trialCredit) {
+                $newTrialCredit = $trialCredit - 1;
+                DB::table('users_meta')
+                    ->where('user_id', $defaultId)
+                    ->update(['trial_credits' => $newTrialCredit]);    
+            }
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
         } elseif ($sendTweetNow['status'] === 403) {
             \Log::error('Status 403: '. print_r($sendTweetNow, true));
