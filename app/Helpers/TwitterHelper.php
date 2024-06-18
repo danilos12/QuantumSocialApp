@@ -186,6 +186,10 @@ class TwitterHelper
 
     // API to post and retweet to twitter
     public static function tweet2twitter($twitter_meta, $data, $endpoint) {
+        $defaultId = (new self())->setDefaultId();
+        $trialCredit = DB::table('users_meta')
+            ->where('user_id', $defaultId)
+            ->value('trial_credits');
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);        
@@ -203,6 +207,12 @@ class TwitterHelper
         Log::info('Response: ', $sendTweetNow);
 
         if ($sendTweetNow['status'] === 200) {
+            if ($trialCredit) {
+                $newTrialCredit = $trialCredit - 1;
+                DB::table('users_meta')
+                    ->where('user_id', $defaultId)
+                    ->update(['trial_credits' => $newTrialCredit]);    
+            }
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
         } elseif ($sendTweetNow['status'] === 403) {
             return response()->json(['status' => 403, 'message' => 'Failed to post tweet. ' . $sendTweetNow['data']->detail]);
