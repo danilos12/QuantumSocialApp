@@ -101,7 +101,9 @@ class TwitterHelper
                 $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
             }
 
+            
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
+            
             session()->put('token_details', $d);
 
             // update token in database
@@ -126,12 +128,13 @@ class TwitterHelper
 
    
     public static function getTwitterToken($twitter_id, $user_id) {
+
         $findActiveTwitter = DB::table('twitter_accts')
             ->leftJoin('twitter_meta', 'twitter_accts.user_id', '=', 'twitter_meta.user_id')
             ->leftJoin('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
-            ->select('twitter_meta.*', 'twitter_accts.*',  'ut_acct_mngt.selected')
-            ->where('twitter_accts.twitter_id', '=', $twitter_id)
-            ->where('twitter_accts.user_id', '=', $user_id)
+            ->select('twitter_meta.*', 'ut_acct_mngt.selected')
+            ->where('twitter_meta.user_id', '=', $user_id)
+            ->where('twitter_meta.twitter_id', '=', $twitter_id)
             ->where('ut_acct_mngt.selected', '=', 1)
             // ->where('twitter_meta.active', '=',   1)
             ->first();
@@ -183,6 +186,10 @@ class TwitterHelper
 
     // API to post and retweet to twitter
     public static function tweet2twitter($twitter_meta, $data, $endpoint) {
+        $defaultId = (new self())->setDefaultId();
+        $trialCredit = DB::table('users_meta')
+            ->where('user_id', $defaultId)
+            ->value('trial_credits');
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);        
@@ -194,13 +201,18 @@ class TwitterHelper
         );
 
         $data = json_encode($data);        
-        // dd($data);
 
         $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
 
         Log::info('Response: ', $sendTweetNow);
 
         if ($sendTweetNow['status'] === 200) {
+            if ($trialCredit) {
+                $newTrialCredit = $trialCredit - 1;
+                DB::table('users_meta')
+                    ->where('user_id', $defaultId)
+                    ->update(['trial_credits' => $newTrialCredit]);    
+            }
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
         } elseif ($sendTweetNow['status'] === 403) {
             return response()->json(['status' => 403, 'message' => 'Failed to post tweet. ' . $sendTweetNow['data']->detail]);
@@ -214,6 +226,10 @@ class TwitterHelper
 
     public static function tweet2twitterSched($twitter_meta, $data, $endpoint, $user_id) {
         \Log::info('tweet2Twitter: ' . print_r($twitter_meta, true));
+        $defaultId = (new self())->setDefaultId();
+        $trialCredit = DB::table('users_meta')
+            ->where('user_id', $defaultId)
+            ->value('trial_credits');
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpiredSched($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id'], $user_id);        
@@ -235,6 +251,12 @@ class TwitterHelper
 
         if ($sendTweetNow['status'] === 200) {
             \Log::info('Status 200: '. print_r($sendTweetNow, true));
+            if ($trialCredit) {
+                $newTrialCredit = $trialCredit - 1;
+                DB::table('users_meta')
+                    ->where('user_id', $defaultId)
+                    ->update(['trial_credits' => $newTrialCredit]);    
+            }
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
         } elseif ($sendTweetNow['status'] === 403) {
             \Log::error('Status 403: '. print_r($sendTweetNow, true));
@@ -287,6 +309,19 @@ class TwitterHelper
     public static function getActiveAPISched($id) {        
         $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();        
         return $activeAPI;
+    }
+
+    public static function trialCreditsAPI() {
+        $api = [
+            "x_api" => env("TWITTER_API_KEY"),
+            "x_apiSecret" => env("TWITTER_API_SECRET"),        
+            "x_bearerToken" => env("TWITTER_BEARER_TOKEN"),
+            "x_oauthId" => env("TWITTER_OAUTH_ID"),
+            "x_oauthSecret" => env("TWITTER_OAUTH_SECRET"),
+            "x_callbackURL" => env("TWITTER_CALLBACK_URL")
+        ];
+
+        return $api;
     }
 
 

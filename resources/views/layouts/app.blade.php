@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="{{ asset('public/favicon.ico') }}" type="image/x-icon">
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -224,11 +225,7 @@
 
         <div class="content-outer">
           <div class="content-inner">
-            @if(session()->has('alert'))
-              <div class="alert alert-{{ session('alert_type', 'info') }}">
-                  {{ session('alert') }}
-              </div>
-            @endif
+            
 
             @if(isset($message))
             <div class="alert alert-warning" role="alert" style="display:flex; justify-content: space-between">
@@ -239,7 +236,7 @@
               padding: 0.5em 1em;
               border-radius: 5px;">Update Payment</button>
             </div>
-            @else
+            @else                      
             @yield('content')
             @endif
           </div>
@@ -324,6 +321,13 @@
       if(alert.length == 1) {
         setTimeout(function(){
           alert.fadeOut('slow');
+        }, 5000);
+      }
+      
+      var $xalert = $('#twitterInfoAlert');
+      if ($xalert.length == 1) {
+        setTimeout(function(){
+          $xalert.remove();
         }, 5000);
       }
 

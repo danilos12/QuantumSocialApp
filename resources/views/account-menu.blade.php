@@ -171,7 +171,10 @@
                     <span class="settings-item-label">Current Plan</span>
                   </div>  <!-- END .settings-item-label -->
                   <div class="settings-item-data-wrap">
-                    <span class="settings-item-data subscription-text">{{ $membership ? ucfirst($membership->subscription_name) : 'No' }} Plan</span>
+                    @php 
+                      $tier = $membership ? $membership->subscription_name === 'astro' ? 'Astral Lifetime' : ucfirst($membership->subscription_name) : 'No'; 
+                    @endphp 
+                    <span class="settings-item-data subscription-text">{{ $tier }} Plan</span>
                     <img src="{{ asset('public/')}}/ui-images/icons/pg-plan.svg" class="ui-icon change-plan" />
                   </div>  <!-- END .settings-item-data -->
                 </div>  <!-- END .plan-data-wrap -->
