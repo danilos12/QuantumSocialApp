@@ -345,14 +345,6 @@ class CommandmoduleController extends Controller
 
             // Retrieve the last saved data
             $lastSavedData = CommandModule::latest()->first();
-
-
-            if ($trialCredit) {
-                $newTrialCredit = $trialCredit - 1;
-                DB::table('users_meta')
-                    ->where('user_id', $this->setDefaultId())
-                    ->update(['trial_credits' => $newTrialCredit]);    
-            }
             
             // Return success response
             return response()->json(['status' => 200, 'stat' => 'success',  'message' => 'Post has been created. ' . $messages, 'tweet' => $lastSavedData]);
