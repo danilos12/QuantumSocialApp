@@ -243,7 +243,6 @@ class CommandmoduleController extends Controller
             // Save data for main account 
             // $responses = array();
             $messages = '';
-            // dd($postData);
 
             foreach ($postData['textarea'] as $textarea) {
                 $insertData['post_description'] = $textarea;
@@ -251,8 +250,7 @@ class CommandmoduleController extends Controller
                 $insertData['sched_time'] = $sched_time;
                 // $insertData['post_type'] = 'tweet-storm-tweets';
 
-
-                // Post tweet if scheduling option is "send-now"
+                // Post tweet if scheduling option is "send-now" // SINGLE POSTS
                 if ($postData['scheduling-options'] === 'send-now') {
                     if ($postData['post_type_tweets'] === "retweet-tweets") {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
@@ -262,7 +260,7 @@ class CommandmoduleController extends Controller
                             CommandModule::create($insertData);
     
                             $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
-                            return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                            // return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
 
                         } else {
                             return response()->json(['status' => $responses->getStatusCode(), 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
@@ -288,30 +286,20 @@ class CommandmoduleController extends Controller
                             $lastSavedData = CommandModule::latest()->first();
     
                             $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
-                            return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database',  'tweet' => $lastSavedData]);
-                            // dd($messages);
+                            // return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database',  'tweet' => $lastSavedData]);
                         } else {
                             return response()->json(['status' => $responses->getStatusCode(), 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         }
-                        // if ($responses->getOriginalContent()['status'] === 500) {
-                        //     return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
-                        // }  elseif ($responses->getOriginalContent()['status'] === 403) {
-                        //     return response()->json(['status' => 403, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
-                        // }else {
-                        //     $insertData['active'] = 1;
-                        //     CommandModule::create($insertData);
-
-                        //     $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
-                        // }
+                       
                     }
 
                 } else {
                     CommandModule::create($insertData);
                 }
-
+               
                 // Save crosstweet data
                 $crosstweetData = $insertData;
-
+                
                 if (!empty($postData['crosstweet'])) {
                     foreach ($postData['crosstweet'] as $key => $account) {
                         $crosstweetData['post_description'] = $textarea;
@@ -320,27 +308,30 @@ class CommandmoduleController extends Controller
                         $crosstweetData['twitter_id'] = $crosstweetId;
                         $crosstweetData['crosstweets_accts'] = $key;
 
-                        $twitter_meta_cross = TwitterToken::where('twitter_id', $crosstweetId )->first();
+                        $c_getToken = TwitterHelper::getTwitterToken($crosstweetId, $user_id);
+                        $c_twitter_meta = json_decode(json_encode($c_getToken), true); 
+
+                        // $twitter_meta_cross = DB::table('twitter_meta')->where('twitter_id', $crosstweetId )->where('user_id', $user_id)->first();
 
                         // Post tweet if scheduling option is "send-now"
                         if ($postData['scheduling-options'] === 'send-now') {
                             if ($postData['post_type_tweets'] === "retweet-tweets") {
-                                $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
+                                $responses = TwitterHelper::tweet2twitter($c_twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $crosstweetId . "/retweets");
                             } else {
-                                $responses = TwitterHelper::tweet2twitter($twitter_meta_cross, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
+                                $responses = TwitterHelper::tweet2twitter($c_twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
                                 
                                 if ($responses->getStatusCode() === 200) {
                                     CommandModule::create($crosstweetData);
                                     $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
                                 } else {
-                                    return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
+                                    return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Cross tweet not posted and saved to database']);
                                 }
                             }
                         } else {
                             CommandModule::create($crosstweetData);
                         }
                     }
-                }
+                } 
             }
 
             // Retrieve the last saved data

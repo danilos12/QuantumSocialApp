@@ -3171,6 +3171,10 @@ input#file-upload-button {
     margin-top: 0.5em;
 }
 
+.italic{
+    font-style: italic;
+}
+
 .cross-tweet-profile-image {
     width: 100%;
     border-radius: 50%;
@@ -3183,6 +3187,9 @@ input#file-upload-button {
     filter: grayscale(0);
     opacity: 1;
 }
+.opacity-50{
+    opacity: 0.5;
+}
 
 .posting-tool-submit-wrap {
     display: flex;
@@ -3191,7 +3198,6 @@ input#file-upload-button {
     align-items: center;
     width: 100%;
     border-top: 1px solid var(--frost-background);
-    margin-top: 1em;
     padding-top: 1em;
 }
 

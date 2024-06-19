@@ -782,13 +782,17 @@ $(document).ready(function () {
         function (e) {
             // e.preventDefault();
             console.log(e);
-            if ($(this).attr("status") === "active") {
-                $(this).attr("status", ""); // remove the active when it was active
-            } else {
-                $(this).attr("status", "active");
+    
+            if ($(this).attr("status") === "inactive") {
+                $(this).attr("status", "active"); 
+            } else if ($(this).attr("status") === "active") {
+                $(this).attr("status", "inactive");
             }
+    
+            console.log($(this).attr("status"));
         }
     );
+    
 
     $(".cross-tweet-profiles-inner.x-settings").on(
         "click",

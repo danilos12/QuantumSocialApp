@@ -89,7 +89,7 @@ class TwitterHelper
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
         // dd($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id);
         if (($expires_in + $created_at) <= time()) {
-            // dd(($expires_in + $created_at) <= time());
+
             $defaultId = (new self())->setDefaultId();
             $trialCredit = DB::table('users_meta')
                 ->where('user_id', $defaultId)
@@ -101,9 +101,8 @@ class TwitterHelper
                 $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
             }
 
-            
+            // dd($refresh_token);
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
-            
             session()->put('token_details', $d);
 
             // update token in database
@@ -128,7 +127,6 @@ class TwitterHelper
 
    
     public static function getTwitterToken($twitter_id, $user_id) {
-
         $findActiveTwitter = DB::table('twitter_accts')
             ->leftJoin('twitter_meta', 'twitter_accts.user_id', '=', 'twitter_meta.user_id')
             ->leftJoin('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
@@ -186,7 +184,7 @@ class TwitterHelper
 
     // API to post and retweet to twitter
     public static function tweet2twitter($twitter_meta, $data, $endpoint) {
-
+   
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);        
         // send tweet
@@ -197,6 +195,7 @@ class TwitterHelper
         );
 
         $data = json_encode($data);        
+        // dd($data);
 
         $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
 
@@ -289,19 +288,6 @@ class TwitterHelper
     public static function getActiveAPISched($id) {        
         $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();        
         return $activeAPI;
-    }
-
-    public static function trialCreditsAPI() {
-        $api = [
-            "x_api" => env("TWITTER_API_KEY"),
-            "x_apiSecret" => env("TWITTER_API_SECRET"),        
-            "x_bearerToken" => env("TWITTER_BEARER_TOKEN"),
-            "x_oauthId" => env("TWITTER_OAUTH_ID"),
-            "x_oauthSecret" => env("TWITTER_OAUTH_SECRET"),
-            "x_callbackURL" => env("TWITTER_CALLBACK_URL")
-        ];
-
-        return $api;
     }
 
 
