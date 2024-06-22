@@ -24,7 +24,7 @@ class MembershipHelper
                 'plans.*',
             )
             ->first();
-        // dd($subscription);
+    
         return $subscription;
 
     }

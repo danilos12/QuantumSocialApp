@@ -197,9 +197,12 @@ div[data-schedule="none"] {
 
         </div>  <!-- END .posting-tool-right-col -->
       </div>  <!-- END .posting-tool-columns -->
-
+        <div>
+            <span class="opacity-50 italic">PostStorms coming soon...</span>
+        </div>
 
       <div class="posting-tool-submit-wrap">
+   
         <div class="post-tool-submit-left">
           <select id="scheduling-options" name="scheduling-options" class="scheduling-options">
             <option disabled selected value="save-draft" id="mainselect">Select a scheduling method...</option>

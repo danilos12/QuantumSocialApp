@@ -110,8 +110,8 @@ class Controller extends BaseController
 
     // STEP 2
     public function twitterOAuthCallback(Request $request) {
-        try {            
-
+        try {  
+         
             if (isset($_GET['error'])) {
                 // return redirect('/');
                 // If there was an error saving data, redirect back to the previous page with an error message
