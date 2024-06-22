@@ -98,7 +98,10 @@
                   <img src="{{ $twitter_photo ?: asset('public/temp-images/imgpsh_fullsize_anim (1).png') }}" class="twitter-profile-image" />
                   <span class="twitter-profile-name">
                     {{ isset($selected_user) ? $selected_user->twitter_name: 'Quantum User' }}
-                    {{-- <span id="time"></span> --}}
+
+                    @if (env('APP_URL') === 'https://stg.app.quantumsocial.io')
+                    <span id="time"></span>
+                    @endif
                   </span>
                 </div>  <!-- END .banner-twitter-profile-inner -->
               </a>
@@ -361,13 +364,13 @@
         });
       })
 
-      // var timeDisplay = document.getElementById("time");
-      // function refreshTime() {
-      //   var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});
-      //   var formattedString = dateString.replace(", ", " - ");
-      //   timeDisplay.innerHTML = formattedString;
-      // }
-      // setInterval(refreshTime, 1000);
+      var timeDisplay = document.getElementById("time");
+      function refreshTime() {
+        var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});
+        var formattedString = dateString.replace(", ", " - ");
+        timeDisplay.innerHTML = formattedString;
+      }
+      setInterval(refreshTime, 1000);
     });
   </script>
 

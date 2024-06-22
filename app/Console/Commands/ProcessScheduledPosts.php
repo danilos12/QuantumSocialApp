@@ -49,7 +49,7 @@ class ProcessScheduledPosts extends Command
         try {
             // Connect to the database
 
-            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%T%2dN4s');
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app_stg', 'quantumsocialstg', 'eS5jR*n5Q*Ku');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // Get the current datetime
@@ -94,7 +94,7 @@ class ProcessScheduledPosts extends Command
                 // If the post was successfully updated, post to Twitter
                 if ($success) {
                     \Log::info('Success Now tweeting' . print_r($userTwitterMeta[0], true));
-                    \Log::info('Success Now tweeting' . print_r(['text' => urldecode($post['post_description'])], true));
+                    \Log::info('Success Now tweet' . print_r(['text' => urldecode($post['post_description'])], true));
 
                     $postTweet = TwitterHelper::tweet2twitterSched($userTwitterMeta[0], ['text' => urldecode($post['post_description'])], "https://api.twitter.com/2/tweets", $post['user_id']);
                     \Log::info('Tweet result: ' . $postTweet);

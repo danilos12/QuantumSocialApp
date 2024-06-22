@@ -71,7 +71,7 @@ $(document).ready(function () {
         $(`#posting`).toggle();
 
         var intro = introJs();
-        console.log(intro)
+        console.log(intro);
         intro.setOptions({
             steps: [
             //     {
@@ -101,7 +101,8 @@ $(document).ready(function () {
             {
               title: "Command Module",
               element: document.querySelector('#command-module'),
-              intro: 'With your Slot Scheduler ready, move to the Command Module. Here, you can curate posts and comments, allowing you to engage with your audience effectively.'
+              intro: 'With your Slot Scheduler ready, move to the Command Module. Here, you can curate posts and comments, allowing you to engage with your audience effectively.',
+              position:'right'
             },
             {
               title: "Help",
