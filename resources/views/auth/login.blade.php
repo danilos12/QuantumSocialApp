@@ -14,7 +14,7 @@
         @if (session()->has('login_error'))
         <div class="alert alert-danger warning-sign">{{ session('login_error') }}</div>
         @endif
-
+        
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
@@ -31,7 +31,11 @@
                     @enderror
 
                     @if ($errors->any())
-  dsadsa
+<<<<<<< HEAD
+ 
+=======
+
+>>>>>>> 0f66be8d70a70103918aa5b9f886d8ce5fe16a8f
 @endif
                 </div>
             </div>

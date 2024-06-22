@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Cache;
 class LoginController extends Controller
 {
     /*
@@ -48,6 +48,7 @@ class LoginController extends Controller
 
     protected function sendFailedLoginResponse(Request $request)
     {
+       
         Session::flash('login_error', 'Invalid email or password. Please try again.');
 
         return view('auth.login');

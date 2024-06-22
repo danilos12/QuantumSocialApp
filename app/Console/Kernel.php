@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('process:scheduled-posts')->everyMinute();
         // $schedule->command('subscription:update')->twiceDaily(0, 12);
-        $schedule->command('subscription:update')->everyMinute();
+        // $schedule->command('subscription:update')->everyMinute();
         // $schedule->command('subscription:update')->dailyAt('00:00');
         // $schedule->job(new SchedulePosts)->everyMinute();
     }

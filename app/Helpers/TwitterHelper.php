@@ -88,8 +88,14 @@ class TwitterHelper
 
     public static function isTokenExpired($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id) {
         // dd($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id);
+        \Log::info('expires in: ' . print_r($expires_in, true));
+        \Log::info('created at: ' . print_r($created_at, true));
+        \Log::info('refresh token: ' . print_r($refresh_token, true));
+        \Log::info('access token: ' . print_r($accessToken, true));
+        \Log::info('twitter_id: ' . print_r($twitter_id, true));
+
         if (($expires_in + $created_at) <= time()) {
-            // dd(($expires_in + $created_at) <= time());
+
             $defaultId = (new self())->setDefaultId();
             $trialCredit = DB::table('users_meta')
                 ->where('user_id', $defaultId)
@@ -101,9 +107,9 @@ class TwitterHelper
                 $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
             }
 
-            
+            // dd($refresh_token);
+            \Log::info('client_id: ' . print_r($client_id, true));
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
-            
             session()->put('token_details', $d);
 
             // update token in database
@@ -128,7 +134,9 @@ class TwitterHelper
 
    
     public static function getTwitterToken($twitter_id, $user_id) {
-
+        \Log::info('getTwitterToken twitter: ' . print_r($twitter_id, true));
+        \Log::info('getTwitterToken user_id: ' . print_r($user_id, true));
+        
         $findActiveTwitter = DB::table('twitter_accts')
             ->leftJoin('twitter_meta', 'twitter_accts.user_id', '=', 'twitter_meta.user_id')
             ->leftJoin('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
@@ -138,25 +146,10 @@ class TwitterHelper
             ->where('ut_acct_mngt.selected', '=', 1)
             // ->where('twitter_meta.active', '=',   1)
             ->first();
+
+        \Log::info('getTwitterToken result: ' . print_r($findActiveTwitter, true));
             
         return $findActiveTwitter;
-    }
-
-
-    public static function executeAfterFiveHoursFromLastUpdate($lastUpdated)
-    {
-
-        // Convert the last update time to a Carbon object
-        $lastUpdated = Carbon::parse($lastUpdated);
-
-        // Add 5 hours to the last update time
-        $executeTime = $lastUpdated->addHours(5);
-
-        // Check if the current time is greater than or equal to the execute time
-        if (Carbon::now()->gte($executeTime)) {
-            // Execute the script here
-            // ...
-        }
     }
 
 
@@ -181,18 +174,18 @@ class TwitterHelper
         $defaultId = (new self())->setDefaultId();
 
         $activeAPI = DB::table('settings_general_twapi')->where('user_id', $defaultId)->first();
+        \Log::info('activeAPI: ' . print_r($activeAPI, true));
         return $activeAPI;
     }
 
     // API to post and retweet to twitter
     public static function tweet2twitter($twitter_meta, $data, $endpoint) {
-        $defaultId = (new self())->setDefaultId();
-        $trialCredit = DB::table('users_meta')
-            ->where('user_id', $defaultId)
-            ->value('trial_credits');
+        \Log::info('tweet2Twitter: ' . print_r($twitter_meta, true));
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);        
+        \Log::info('checkIfTokenExpired: ' . print_r($checkIfTokenExpired, true));
+
         // send tweet
         $headers = array(
             // 'Authorization: Bearer ' . 11,
@@ -201,18 +194,13 @@ class TwitterHelper
         );
 
         $data = json_encode($data);        
+        // dd($data);
 
         $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
 
         Log::info('Response: ', $sendTweetNow);
 
         if ($sendTweetNow['status'] === 200) {
-            if ($trialCredit) {
-                $newTrialCredit = $trialCredit - 1;
-                DB::table('users_meta')
-                    ->where('user_id', $defaultId)
-                    ->update(['trial_credits' => $newTrialCredit]);    
-            }
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
         } elseif ($sendTweetNow['status'] === 403) {
             return response()->json(['status' => 403, 'message' => 'Failed to post tweet. ' . $sendTweetNow['data']->detail]);
@@ -225,15 +213,17 @@ class TwitterHelper
     /* Beginning of methods for scheduled posts in SSH */
 
     public static function tweet2twitterSched($twitter_meta, $data, $endpoint, $user_id) {
-        \Log::info('tweet2Twitter: ' . print_r($twitter_meta, true));
-        $defaultId = (new self())->setDefaultId();
-        $trialCredit = DB::table('users_meta')
-            ->where('user_id', $defaultId)
-            ->value('trial_credits');
+        \Log::info('tweet2Twitter sched: ' . print_r($twitter_meta, true));
 
         // check access token
         $checkIfTokenExpired = TwitterHelper::isTokenExpiredSched($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id'], $user_id);        
-        
+        \Log::info('checkIfTokenExpired expire in: ' . print_r($twitter_meta['expires_in'], true));
+        \Log::info('checkIfTokenExpired updated at: ' . print_r($twitter_meta['updated_at'], true));
+        \Log::info('checkIfTokenExpired refresh token: ' . print_r($twitter_meta['refresh_token'], true));
+        \Log::info('checkIfTokenExpired access token: ' . print_r($twitter_meta['access_token'], true));
+        \Log::info('checkIfTokenExpired twitter id: ' . print_r($twitter_meta['twitter_id'], true));
+        \Log::info('checkIfTokenExpired user id: ' . print_r($twitter_meta['user_id'], true));
+        \Log::info('checkIfTokenExpired : ' . print_r($checkIfTokenExpired, true));
         // send tweet
         $headers = array(
             // 'Authorization: Bearer ' . 11,
@@ -251,12 +241,6 @@ class TwitterHelper
 
         if ($sendTweetNow['status'] === 200) {
             \Log::info('Status 200: '. print_r($sendTweetNow, true));
-            if ($trialCredit) {
-                $newTrialCredit = $trialCredit - 1;
-                DB::table('users_meta')
-                    ->where('user_id', $defaultId)
-                    ->update(['trial_credits' => $newTrialCredit]);    
-            }
             return response()->json(['status' => 200, 'message' => 'Your tweet has been posted', 'data' => $sendTweetNow]);
         } elseif ($sendTweetNow['status'] === 403) {
             \Log::error('Status 403: '. print_r($sendTweetNow, true));
@@ -268,7 +252,12 @@ class TwitterHelper
     }
 
     public static function isTokenExpiredSched($expires_in, $created_at, $refresh_token, $accessToken, $twitter_id, $user_id) {
-
+        \Log::info('isTokenExpiredSched expire in: ' . print_r($expires_in, true));
+        \Log::info('isTokenExpiredSched updated at: ' . print_r($created_at, true));
+        \Log::info('isTokenExpiredSched refresh token: ' . print_r($refresh_token, true));
+        \Log::info('isTokenExpiredSched access token: ' . print_r($accessToken, true));
+        \Log::info('isTokenExpiredSched twitter id: ' . print_r($twitter_id, true));
+        \Log::info('isTokenExpiredSched user id: ' . print_r($user_id, true));
         if (($expires_in + $created_at) <= time()) {
             $trialCredit = DB::table('users_meta')
                 ->where('user_id', $user_id)
@@ -277,9 +266,11 @@ class TwitterHelper
             if($trialCredit) {
                 $client_id = env('TWITTER_OAUTH_ID');
             } else {
-                $client_id = TwitterHelper::getActiveAPI($user_id)->oauth_id;
+                $client_id = TwitterHelper::getActiveAPISched($user_id);
             }
             
+            \Log::info('client ID: ' . print_r($client_id, true));
+            \Log::info('refresh ID: ' . print_r($refresh_token, true));
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);   
             session()->put('token_details', $d);
 
@@ -307,21 +298,10 @@ class TwitterHelper
     }
 
     public static function getActiveAPISched($id) {        
-        $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();        
+        // $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();       
+        $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->value('oauth_id');       
+        \Log::info('activeAPI: ' . print_r($activeAPI, true)); 
         return $activeAPI;
-    }
-
-    public static function trialCreditsAPI() {
-        $api = [
-            "x_api" => env("TWITTER_API_KEY"),
-            "x_apiSecret" => env("TWITTER_API_SECRET"),        
-            "x_bearerToken" => env("TWITTER_BEARER_TOKEN"),
-            "x_oauthId" => env("TWITTER_OAUTH_ID"),
-            "x_oauthSecret" => env("TWITTER_OAUTH_SECRET"),
-            "x_callbackURL" => env("TWITTER_CALLBACK_URL")
-        ];
-
-        return $api;
     }
 
 
