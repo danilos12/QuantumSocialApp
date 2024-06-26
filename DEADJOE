@@ -1,0 +1,48 @@
+
+*** These modified files were found in JOE when it aborted on Sat Feb 17 15:39:28 2024
+*** JOE was aborted because the terminal closed
+
+*** File '(Unnamed)'
+/home/quantum_social/app.quantumsocial.io/.git/MERGE_MSG
+
+*** File '/home/quantum_social/app.quantumsocial.io/.git/MERGE_MSG'
+Merge branch 'main' of github.com:BPCreative/Quantum into main
+# Please enter a commit message to explain why this merge is necessary,
+# especially if it merges an updated upstream into a topic branch.
+#
+# Lines starting with '#' will be ignored, and an empty message aborts
+# the commit.
+updated composer packages
+	
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc
+
+*** These modified files were found in JOE when it aborted on Mon Jun 17 17:28:35 2024
+*** JOE was aborted by UNIX signal 1
+
+*** File '/home/quantum_stgi/stg.app.quantumsocial.io/.git/MERGE_MSG'
+:Merge
+ branch 'staging' of github.com:BPCreative/Quantum into staging
+# Please enter a commit message to explain why this merge is necessary,
+# especially if it merges an updated upstream into a topic branch.
+#
+# Lines starting with '#' will be ignored, and an empty message aborts
+# the commit.
+
+
+
+*** File '(Unnamed)'
+!
+
+*** File '(Unnamed)'
+/home/quantum_stgi/stg.app.quantumsocial.io/.git/MERGE_MSG
+/home/quantum_stgi/stg.app.quantumsocial.io/.git/MERGE_MSG
+
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc
