@@ -31,7 +31,11 @@
                     @enderror
 
                     @if ($errors->any())
+<<<<<<< HEAD
+ 
+=======
 
+>>>>>>> 0f66be8d70a70103918aa5b9f886d8ce5fe16a8f
 @endif
                 </div>
             </div>

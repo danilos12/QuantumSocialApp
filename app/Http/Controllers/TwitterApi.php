@@ -280,7 +280,7 @@ class TwitterApi extends Controller
                         }
                     break;
 
-                }                
+                }
 
                 if ($filteredData['status'] === 200) {
                     // Cache the fetched tweets
@@ -567,11 +567,11 @@ class TwitterApi extends Controller
         }
 
         if ($this->deleteTwitterAccount($twitterId, $userId)) {
-            return $this->buildResponse('success', 'Twitter account and associated meta data are now deleted', 200);        
-        } 
-        
+            return $this->buildResponse('success', 'Twitter account and associated meta data are now deleted', 200);
+        }
+
         return $this->buildResponse('warning', 'Failed to delete Twitter account', 500);
-        
+
     }
 
     private function isAuthorized()
@@ -590,7 +590,7 @@ class TwitterApi extends Controller
         $deletedTwitter = Twitter::where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
         if (!$deletedTwitter) {
             return false;
-        }        
+        }
 
         $deleteTwitterMeta = DB::table('twitter_meta')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
         $deleteUT_Acct_Mngt = DB::table('ut_acct_mngt')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();

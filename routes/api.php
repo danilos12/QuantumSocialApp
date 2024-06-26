@@ -77,7 +77,7 @@ Route::get('wp', function () {
 
 
 		$wp_data = WP::external_wp_rest_api($r['wp_user_id']);
-	
+
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
 
@@ -86,8 +86,8 @@ Route::get('wp', function () {
                 return response()->json(['status' =>'error', 'laravel_id' => 0]);
             }
 				if(base64_decode($r['wp_product_id']) != '742'){
-					
-				
+
+
 				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
 					$value = 1;
 				} elseif ($wp_data['info']['product_name'] == "Membership Level - Galactic") {
