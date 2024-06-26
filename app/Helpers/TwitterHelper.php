@@ -132,11 +132,11 @@ class TwitterHelper
         }
     }
 
-   
+
     public static function getTwitterToken($twitter_id, $user_id) {
         \Log::info('getTwitterToken twitter: ' . print_r($twitter_id, true));
         \Log::info('getTwitterToken user_id: ' . print_r($user_id, true));
-        
+
         $findActiveTwitter = DB::table('twitter_accts')
             ->leftJoin('twitter_meta', 'twitter_accts.user_id', '=', 'twitter_meta.user_id')
             ->leftJoin('ut_acct_mngt', 'twitter_meta.user_id', '=', 'ut_acct_mngt.user_id')
@@ -148,7 +148,7 @@ class TwitterHelper
             ->first();
 
         \Log::info('getTwitterToken result: ' . print_r($findActiveTwitter, true));
-            
+
         return $findActiveTwitter;
     }
 
@@ -161,6 +161,7 @@ class TwitterHelper
 
         // Convert the datetime to UTC
         $utc = $datetime->utc();
+
         return $utc;
     }
 
@@ -183,7 +184,7 @@ class TwitterHelper
         \Log::info('tweet2Twitter: ' . print_r($twitter_meta, true));
 
         // check access token
-        $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);        
+        $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);
         \Log::info('checkIfTokenExpired: ' . print_r($checkIfTokenExpired, true));
 
         // send tweet
@@ -193,7 +194,7 @@ class TwitterHelper
             'Content-Type: application/json'
         );
 
-        $data = json_encode($data);        
+        $data = json_encode($data);
         // dd($data);
 
         $sendTweetNow = TwitterHelper::apiRequest($endpoint, $headers, 'POST', $data);
@@ -216,7 +217,7 @@ class TwitterHelper
         \Log::info('tweet2Twitter sched: ' . print_r($twitter_meta, true));
 
         // check access token
-        $checkIfTokenExpired = TwitterHelper::isTokenExpiredSched($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id'], $user_id);        
+        $checkIfTokenExpired = TwitterHelper::isTokenExpiredSched($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id'], $user_id);
         \Log::info('checkIfTokenExpired expire in: ' . print_r($twitter_meta['expires_in'], true));
         \Log::info('checkIfTokenExpired updated at: ' . print_r($twitter_meta['updated_at'], true));
         \Log::info('checkIfTokenExpired refresh token: ' . print_r($twitter_meta['refresh_token'], true));
@@ -231,7 +232,7 @@ class TwitterHelper
             'Content-Type: application/json'
         );
 
-        $data = json_encode($data);        
+        $data = json_encode($data);
         // dd($data);
         \Log::info('data: ' . print_r($data, true));
 
@@ -268,10 +269,10 @@ class TwitterHelper
             } else {
                 $client_id = TwitterHelper::getActiveAPISched($user_id);
             }
-            
+
             \Log::info('client ID: ' . print_r($client_id, true));
             \Log::info('refresh ID: ' . print_r($refresh_token, true));
-            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);   
+            $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
             session()->put('token_details', $d);
 
             // update token in database
@@ -297,10 +298,10 @@ class TwitterHelper
         }
     }
 
-    public static function getActiveAPISched($id) {        
-        // $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();       
-        $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->value('oauth_id');       
-        \Log::info('activeAPI: ' . print_r($activeAPI, true)); 
+    public static function getActiveAPISched($id) {
+        // $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->first();
+        $activeAPI = DB::table('settings_general_twapi')->where('user_id', $id)->value('oauth_id');
+        \Log::info('activeAPI: ' . print_r($activeAPI, true));
         return $activeAPI;
     }
 

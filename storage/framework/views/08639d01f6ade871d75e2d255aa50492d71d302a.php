@@ -86,7 +86,7 @@
                     <?php echo e(isset($selected_user) ? $selected_user->twitter_name: 'Quantum User'); ?>
 
 
-                    <?php if(env('APP_URL') === 'https://stg.app.quantumsocial.io'): ?>
+                    <?php if(env('APP_URL') === 'https://stg.app.quantumsocial.io' || env('APP_URL') === 'http://app.quantumsocial.local'): ?>
                     <span id="time"></span>
                     <?php endif; ?>
                   </span>
@@ -216,7 +216,7 @@
 
         <div class="content-outer">
           <div class="content-inner">
-            
+
 
             <?php if(isset($message)): ?>
             <div class="alert alert-warning" role="alert" style="display:flex; justify-content: space-between">
@@ -228,7 +228,7 @@
               padding: 0.5em 1em;
               border-radius: 5px;">Update Payment</button>
             </div>
-            <?php else: ?>                      
+            <?php else: ?>
             <?php echo $__env->yieldContent('content'); ?>
             <?php endif; ?>
           </div>
@@ -311,24 +311,22 @@
      $(document).ready(function() {
       // // Alert
       var alert = $('.warning-sign ');
-
       if(alert.length == 1) {
         setTimeout(function(){
           alert.fadeOut('slow');
         }, 5000);
       }
-      
+
       var $xalert = $('#twitterInfoAlert');
       if ($xalert.length == 1) {
         setTimeout(function(){
           $xalert.remove();
         }, 5000);
       }
-
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
         var menuId = e.target.dataset.target;
-     
+
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();
@@ -340,13 +338,10 @@
           // Replace 'your-menu-selector' with the appropriate selector for your menus
         }
       })
-
       // Sub Menu
       var uri =  "<?php echo e(basename($_SERVER['REQUEST_URI'])); ?>";
-
       $('.sub-menu').each(function(e, i) {
         var slug = $(this).text().toLowerCase();
-
         $(this).find('li').each(function(index, value) {
           if (value.id === $.trim(uri)) {
             $(this).closest('ul.sub-menu').toggle();
@@ -354,7 +349,6 @@
           var li = $(this).find('li');
         });
       })
-
       var timeDisplay = document.getElementById("time");
       function refreshTime() {
         var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});
