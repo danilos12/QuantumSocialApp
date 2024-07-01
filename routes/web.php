@@ -114,6 +114,7 @@ Route::get('/trending', [App\Http\Controllers\TrendingtopicsController::class, '
 // twitter API/twitter/redirect/
 Route::get('/twitter/redirect/{id}', [App\Http\Controllers\Controller::class, 'checkTwitterCreds']);
 Route::get('/twitter/oauth', [App\Http\Controllers\Controller::class, 'twitterOAuthCallback']);
+Route::get('/twitter/authorize', [App\Http\Controllers\Controller::class, 'redirectToProvider'])->name('twitter.authorize');
 Route::get('/post/popup',[App\Http\Controllers\Controller::class, 'modalPopup'])->name('modal');
 
 

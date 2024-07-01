@@ -51,7 +51,7 @@ Route::get('update-wp', function () {
 
 
 
-Route::get('dsboard', function (Request $request) {
+Route::get('dsboard', function () {
 			if(Auth::check()){
 				return redirect()->route('dashboard');
 
@@ -76,27 +76,45 @@ Route::get('wp', function () {
 	if(isset( $r['wp_user_id'] ) ) {
 
 
+		
 		$wp_data = WP::external_wp_rest_api($r['wp_user_id']);
 	
 		if( !is_numeric(base64_decode($r['wp_user_id']))  ) {
 
-
-            $checkExistingEmail = $r['wp_email'];
-            if(User::where('email',$checkExistingEmail)->exists()){
-                return response()->json(['status' =>'error', 'laravel_id' => 0]);
-            }
-				if(base64_decode($r['wp_product_id']) != '742'){
+		
+			$checkExistingEmail = base64_decode($r['wp_email']);
+	
+			if(User::where('email',$checkExistingEmail)->exists()){
+			
+				$lv_id = User::where('email',$checkExistingEmail)->value('id');
+			
+				return response()->json(['status' =>'error', 'laravel_id' => $lv_id]);
+			}
 					
-				
-				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
-					$value = 1;
-				} elseif ($wp_data['info']['product_name'] == "Membership Level - Galactic") {
-					$value = 2;
-				} elseif ($wp_data['info']['product_name'] == "Membership Level - Astral") {
-					$value = 3;
-				} else{
-					$value = null;
-				}
+		
+				switch ($wp_data['info']['product_name']) {
+                    case "Membership Level - Solar":
+                        $value = 1;
+                        break;
+                    case "Membership Level - Galactic":
+                        $value = 2;
+                        break;
+                    case "Membership Level - Astral":
+                        $value = 3;
+                        break;
+                    case "Solar LTD":
+                        $value = 5;
+                        break;
+                    case "Galactic LTD":
+                        $value = 6;
+                        break;
+                    case "Astral LTD":
+                        $value = 4;
+                        break;
+                    default:
+                        $value = null;
+                        break;
+                }
 
                 switch ($wp_data['wc_status']) {
                     case "wc-active":
@@ -118,6 +136,7 @@ Route::get('wp', function () {
                         $status = null;
                         break;
                 }
+				if($value <= 3){
 				$secretkey = 'contigosandigoalternatibomathcoboxo~~~';
 
 				$wppassword = 	base64_decode($r['wp_password']);
@@ -176,6 +195,7 @@ Route::get('wp', function () {
 			}
 
 		}else{
+		
 			$secretkey = 'contigosandigoalternatibomathcoboxo~~~';
 
 			$wppassword = 	base64_decode($r['wp_password']);
@@ -193,7 +213,7 @@ Route::get('wp', function () {
 			// users_meta insertion
 			DB::table('users_meta')->insert([
 				'user_id' => $user->id,
-				'subscription_id' => 4,
+				'subscription_id' => $value,
 				'wp_user_id' => base64_decode($r['wp_user_id']),
 				'trial_counter'=>-1,
 				'next_payment'=>'-1',
