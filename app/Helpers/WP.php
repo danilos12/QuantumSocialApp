@@ -133,13 +133,13 @@ class WP
             case $stagingUrl:
                 $hosts = 'quantumapp.quantumsocial.io';
                 $users = 'quantumsocialio';
-                $password = '%T%2dN4s';
+                $password = '%77*99hH3';
                 $currentDb = 'quantum_wp_stg';
                 break;
             case $liveUrl:
                 $hosts = 'quantumapp.quantumsocial.io';
                 $users = 'quantumsocialio';
-                $password = '%T%2dN4s';
+                $password = '%77*99hH3';
                 $currentDb = 'quantum_wp';
                 break;
             default:
