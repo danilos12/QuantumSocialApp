@@ -89,15 +89,7 @@ Route::get('wp', function () {
 				if(base64_decode($r['wp_product_id']) != '742'){
 
 
-				if ($wp_data['info']['product_name'] == "Membership Level - Solar") {
-					$value = 1;
-				} elseif ($wp_data['info']['product_name'] == "Membership Level - Galactic") {
-					$value = 2;
-				} elseif ($wp_data['info']['product_name'] == "Membership Level - Astral") {
-					$value = 3;
-				} else{
-					$value = null;
-				}
+			
 
 			$checkExistingEmail = base64_decode($r['wp_email']);
 

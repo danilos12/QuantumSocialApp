@@ -1,8 +1,7 @@
 # Laravel 8 and 9
 
 # Ignore the .env file containing environment variables
-.env
-/vendor
+
 
 # Ignore log files and debug output
 *.log
@@ -49,3 +48,7 @@ bootstrap/cache/*.php
 *.swo
 
 # Ignore Composer and NPM lock files if they should be managed by the deployment system
+composer.lock
+.env
+vendor/
+.gitignore
