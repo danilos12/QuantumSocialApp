@@ -395,7 +395,7 @@ class TwitterApi extends Controller
             $twitter_meta = $twitterMeta[0];
 
             // check access tokenW
-            $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id'], Auth::id());
+            $checkIfTokenExpired = TwitterHelper::isTokenExpired($twitter_meta['expires_in'], strtotime($twitter_meta['updated_at']), $twitter_meta['refresh_token'], $twitter_meta['access_token'], $twitter_meta['twitter_id']);
 
             // send tweet
             $headers = array(

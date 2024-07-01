@@ -137,7 +137,7 @@
 
                             <div class=" " style="display:flex;flex-direction: column;justify-content:center;align-items:center; width: 100%">
                                <span class="current-label">You are currently</span>
-                            
+                               
 							   	@if( !empty($plan) )
 
 								  <span class="current-plan">{{ ucfirst($tier) == 'Astro' ?'Astral Lifetime': ucfirst($tier)}} </span>

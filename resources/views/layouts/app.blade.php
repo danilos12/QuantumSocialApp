@@ -64,14 +64,11 @@
 {{-- pusher start --}}
   {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <script>
-
     // Enable pusher logging - don't include this in production
     Pusher.logToConsole = true;
-
     var pusher = new Pusher('25f52777301a06d4cde3', {
       cluster: 'us2'
     });
-
     var channel = pusher.subscribe('my-channel');
     channel.bind('my-event', function(data) {
       alert(JSON.stringify(data));
@@ -99,7 +96,7 @@
                   <span class="twitter-profile-name">
                     {{ isset($selected_user) ? $selected_user->twitter_name: 'Quantum User' }}
 
-                    @if (env('APP_URL') === 'https://stg.app.quantumsocial.io')
+                    @if (env('APP_URL') === 'https://stg.app.quantumsocial.io' || env('APP_URL') === 'http://app.quantumsocial.local')
                     <span id="time"></span>
                     @endif
                   </span>
@@ -228,7 +225,7 @@
 
         <div class="content-outer">
           <div class="content-inner">
-            
+
 
             @if(isset($message))
             <div class="alert alert-warning" role="alert" style="display:flex; justify-content: space-between">
@@ -239,7 +236,7 @@
               padding: 0.5em 1em;
               border-radius: 5px;">Update Payment</button>
             </div>
-            @else                      
+            @else
             @yield('content')
             @endif
           </div>
@@ -320,24 +317,22 @@
      $(document).ready(function() {
       // // Alert
       var alert = $('.warning-sign ');
-
       if(alert.length == 1) {
         setTimeout(function(){
           alert.fadeOut('slow');
         }, 5000);
       }
-      
+
       var $xalert = $('#twitterInfoAlert');
       if ($xalert.length == 1) {
         setTimeout(function(){
           $xalert.remove();
         }, 5000);
       }
-
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
         var menuId = e.target.dataset.target;
-     
+
         if (menuId) {
         // If menuId is defined, toggle its visibility
             $(`${menuId}`).toggle();
@@ -349,13 +344,10 @@
           // Replace 'your-menu-selector' with the appropriate selector for your menus
         }
       })
-
       // Sub Menu
       var uri =  "{{  basename($_SERVER['REQUEST_URI']) }}";
-
       $('.sub-menu').each(function(e, i) {
         var slug = $(this).text().toLowerCase();
-
         $(this).find('li').each(function(index, value) {
           if (value.id === $.trim(uri)) {
             $(this).closest('ul.sub-menu').toggle();
@@ -363,7 +355,6 @@
           var li = $(this).find('li');
         });
       })
-
       var timeDisplay = document.getElementById("time");
       function refreshTime() {
         var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});

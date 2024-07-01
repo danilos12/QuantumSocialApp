@@ -52,28 +52,15 @@ class AppServiceProvider extends ServiceProvider
                 // $time = Carbon::now('UTC');
                 // $view->with('time', $time);
 
-<<<<<<< HEAD
 
                 $checkAccess = WP::wp_status_and_wp_trialperiod();
 
 
 
-=======
-             
-                $checkAccess = WP::wp_status_and_wp_trialperiod();
-     
-   
-               
->>>>>>> 0f66be8d70a70103918aa5b9f886d8ce5fe16a8f
                 $view->with('statuses', $checkAccess['status']);
                 if ($checkAccess['status'] == 'wc-active' || $checkAccess['status'] == 'wc-completed' ) {
                     $accountActive = 0;
                     $view->with('accountActive', $accountActive);
-<<<<<<< HEAD
-
-=======
-                  
->>>>>>> 0f66be8d70a70103918aa5b9f886d8ce5fe16a8f
                 }
                 else {
                     $accountActive = 1;

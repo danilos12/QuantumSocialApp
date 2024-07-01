@@ -63,9 +63,9 @@ class UpdateSubscriptionStatus extends Command
             $result = [];
 
             if ($users) {
-                \Log::info('Users retrieved: ' . json_encode($users));
+                Log::info('Users retrieved: ' . json_encode($users));
             } else {
-                \Log::error('User not retrieved');
+                Log::error('User not retrieved');
             }
 
              // Track user IDs for which the API has been called
@@ -74,7 +74,7 @@ class UpdateSubscriptionStatus extends Command
             // Process each user
             foreach ($users as $user) {
                 // Log the user
-                \Log::info('Processing user: ' . json_encode($user));
+                Log::info('Processing user: ' . json_encode($user));
 
                 // Get user meta using the user ID
                 $userMetaQuery = $pdo->prepare("SELECT * FROM users_meta WHERE user_id = :id");
@@ -86,9 +86,9 @@ class UpdateSubscriptionStatus extends Command
                 foreach ($userMetas as $userMeta) {
                     // Check if the API has already been called for this user ID
                     // Log the user meta
-                    \Log::info('Processing user meta: ' . json_encode($userMeta));
+                    Log::info('Processing user meta: ' . json_encode($userMeta));
 
-                    \Log::info('subscription_id: ' . $userMeta['subscription_id']);
+                    Log::info('subscription_id: ' . $userMeta['subscription_id']);
 
                     // Call the API
 
@@ -104,8 +104,8 @@ class UpdateSubscriptionStatus extends Command
                     // Check if the API call was successful
                     if ($httpStatusCode === 200) {
                         // API call was successful
-                        \Log::info('API request successful. HTTP status code: ' . $httpStatusCode);
-                        \Log::info('API response: ' . json_encode($apiResult['response']));
+                        Log::info('API request successful. HTTP status code: ' . $httpStatusCode);
+                        Log::info('API response: ' . json_encode($apiResult['response']));
 
                         $jsonStart = strpos($apiResult['response'], '{');
                         $jsonData = substr($apiResult['response'], $jsonStart);
@@ -136,7 +136,7 @@ class UpdateSubscriptionStatus extends Command
                             // Process $apiResult
                     } else {
                         // API call failed
-                        \Log::error('API request failed. HTTP status code: ' . $httpStatusCode);
+                        Log::error('API request failed. HTTP status code: ' . $httpStatusCode);
 
                         $updateResult = QuantumAcctMeta::where('user_id', $user['id'])->update([
                             'trial_counter' => 0,
@@ -150,16 +150,16 @@ class UpdateSubscriptionStatus extends Command
                     }
 
                 }else{
-                    \Log::info('subscription_id_skipped: ' . $userMeta['subscription_id']);
+                    Log::info('subscription_id_skipped: ' . $userMeta['subscription_id']);
                 }
                 }
             }
 
-            \Log::info('Scheduled task completed successfully.');
+            Log::info('Scheduled task completed successfully.');
 
         } catch (\Exception $e) {
 
-            \Log::error('An error occurred: ' . $e->getMessage());
+            Log::error('An error occurred: ' . $e->getMessage());
         }
     }
 }

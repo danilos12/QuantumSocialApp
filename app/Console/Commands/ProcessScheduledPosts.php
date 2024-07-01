@@ -49,7 +49,7 @@ class ProcessScheduledPosts extends Command
         try {
             // Connect to the database
 
-            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app_stg', 'quantumsocialstg', 'eS5jR*n5Q*Ku');
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app_stg', 'quantumsocialstg', 'e772e%U*aa33');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // Get the current datetime
@@ -64,9 +64,9 @@ class ProcessScheduledPosts extends Command
             $scheduledPosts = $postsQuery->fetchAll(PDO::FETCH_ASSOC);
 
             if ($scheduledPosts) {
-                \Log::info('ScheduledPosts retrieved' . json_encode($scheduledPosts));
+                Log::info('ScheduledPosts retrieved' . json_encode($scheduledPosts));
             } else {
-                \Log::error('ScheduledPosts not retrieved' . json_encode($scheduledPosts));
+                Log::error('ScheduledPosts not retrieved' . json_encode($scheduledPosts));
             }
 
             // Process scheduled posts
@@ -82,7 +82,7 @@ class ProcessScheduledPosts extends Command
                 $userTwitterMeta = $twitter_meta->fetchAll(PDO::FETCH_ASSOC);
 
 
-                \Log::info('User Twitter Meta retrieved: ' . json_encode($userTwitterMeta));
+                Log::info('User Twitter Meta retrieved: ' . json_encode($userTwitterMeta));
 
 
                 $updateQuery = $pdo->prepare("UPDATE posts SET sched_method = 'send-now' WHERE id = :id AND DATE_FORMAT(sched_time, '%Y-%m-%d %H:%i') = :currentDateTime");
@@ -90,28 +90,28 @@ class ProcessScheduledPosts extends Command
                 $updateQuery->bindParam(':currentDateTime', $currentDateTime, PDO::PARAM_STR);
                 $success = $updateQuery->execute();
 
-                \Log::info('Success updating');
+                Log::info('Success updating');
                 // If the post was successfully updated, post to Twitter
                 if ($success) {
-                    \Log::info('Success Now tweeting' . print_r($userTwitterMeta[0], true));
-                    \Log::info('Success Now tweet' . print_r(['text' => urldecode($post['post_description'])], true));
+                    Log::info('Success Now tweeting' . print_r($userTwitterMeta[0], true));
+                    Log::info('Success Now tweet' . print_r(['text' => urldecode($post['post_description'])], true));
 
                     $postTweet = TwitterHelper::tweet2twitterSched($userTwitterMeta[0], ['text' => urldecode($post['post_description'])], "https://api.twitter.com/2/tweets", $post['user_id']);
-                    \Log::info('Tweet result: ' . $postTweet);
+                    Log::info('Tweet result: ' . $postTweet);
 
                     // Tweet the post
 
                 } else {
-                    \Log::info('Something went wrong: ' . json_encode($post));
+                    Log::info('Something went wrong: ' . json_encode($post));
                 }
 
             }
 
-            \Log::info('Scheduled task completed successfully.');
+            Log::info('Scheduled task completed successfully.');
 
 
         } catch (\Exception $e) {
-            \Log::error('An error occurred: ' . $e->getMessage());
+            Log::error('An error occurred: ' . $e->getMessage());
         }
 
     }
