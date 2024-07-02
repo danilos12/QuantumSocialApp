@@ -1,0 +1,24 @@
+name: SSH Deploy CI/CD
+
+on:
+  push:
+    branches: [staging]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: SSH Deploy
+      uses: quantum/ssh-action@master
+      with:
+        host: vps40603.dreamhostps.com
+        username: quantum_stgi
+        key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQChgx4BgyLXB/Ur4ezP2RTq4BUEARYia+0eOyujP9JB0el9C8nF5Pb3M9Y4lyfNjok6oUHTnd4ZN03KHX3aL+n6gPa1m6iBKFqY1J0bg10C+UMM+fZz0xceURMyAAcl+Df+b1isRJB8DC9h80WVqAfxvJZnUqA0e3P3UspuC5HmUtUjgFaWnlgqA9bxf0gobh3a9lu4xTvD1CFCbnrjiKZa/V6vI4WA8FLYr1adpoNQO9rRS4ndlu0E41HcQh822+yCvH9C64qmCwpFHxTpc2SfzQe8qBGgQbPW389GTE2KACgPsM72xwsYFCEGlqg8NZHIlrAPNV2tbUKKd3y8t7YrZVaywO5xu2kiewFMkzwrdFn659UcwE66LtoAcL30w50qX4PmBaUewCdXgJ7GeyPIcr0oroJCDKArdU46NGbfkPgpBNHfupShFPyFAE+Hc6EhvUAY5tVdlHI91wZxcTZMXF0Qb+iHhDM9797/AEvWqOCKP9mCe3fvIx5zg/eDy67dGCXJ3i6YbDuS+cjA/0O04JX2+3j+lNrxzn6F8rnaSz8L5WGVDk/zVMuMMZm0jwLIMRkNYQX3QSNBG53IFm0e4WUufis3pqoRY2gFxcuXawp4Pg3UhrplyjdTmJfhH+DmBxdmAfcO4HwERJJMQuHpaPbJOFlQ92jwpbnzQ1QVKw== imfaithangelou@gmail.com
+        script: |
+          cd stg.app.quantumsocial.io
+          git checkout staging
+          git pull origin staging
