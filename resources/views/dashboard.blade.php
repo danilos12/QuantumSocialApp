@@ -33,17 +33,17 @@
                         {{ Session::get('twitterInfo') }}
                     </div>
                 @endif
-       
+
 
                 <div class="first-row-container">
                     <div class="card75">
                         <div class="queued-single-post-wrapper queue-type-promo" status="active" queue-type="promo">
                             <div class="queued-single-post">
-                            
-                            @php 
+
+                            @php
                              $tier = $plan->subscription_name;
-                     
-                             $specifictiers = $tier == 'astro' ? 'astral' : $tier; 
+
+                             $specifictiers = $tier == 'astro' ? 'astral' : $tier;
                             @endphp
                             <img src="{{ asset('/public/ui-images/icons/tiers/' . $specifictiers . '.svg') }}" class="planet">
 
@@ -124,20 +124,20 @@
                                     <span class="card-description2">Team Members Remaining </span>
                                 </div>
                             </div>
-                        
+
                         </div>
                     </div>
                     <div class="card25 rounded-br w-full relative p-4">
-                      
+
                             <div class="flex flex-col  items-center justify-center h-full rounded-br">
-                         
+
                               <img src="{{ asset('/public/ui-images/icons/tiers/' . $specifictiers  .  '.svg') }}" class="planet-2" style="width: 133px; height: 145px">
-                         
-                          
+
+
 
                             <div class=" " style="display:flex;flex-direction: column;justify-content:center;align-items:center; width: 100%">
                                <span class="current-label">You are currently</span>
-                               
+
 							   	@if( !empty($plan) )
 
 								  <span class="current-plan">{{ ucfirst($tier) == 'Astro' ?'Astral Lifetime': ucfirst($tier)}} </span>
@@ -173,13 +173,13 @@
                                     </div>
                                 </div>
                             </div>  <!-- END .queued-single-post -->
-                      
-        
-               
+
+
+
                     </div>
                 </div>
-         
-            
+
+
             </div>
         </div>
 
@@ -217,15 +217,15 @@
     border-radius:25px;
 }
 .first-row-container,
-.second-row-container, 
+.second-row-container,
 .third-row-container {
     display: flex;
- 
+
         /* background-color: rgba(143, 116, 188, 0.1); */
 }
 
 .third-row-container {
- 
+
      justify-content:center;
       margin: 14px;
 }
@@ -409,7 +409,7 @@ background: rgba(143, 116, 188, 0.4);
     top: 1px;
     left: 1px;
 
-   
+
     opacity: 0.1;
     z-index: 51;
     rotate: 0deg;

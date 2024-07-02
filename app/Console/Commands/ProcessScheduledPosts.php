@@ -49,7 +49,7 @@ class ProcessScheduledPosts extends Command
         try {
             // Connect to the database
 
-            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app_stg', 'quantumsocialstg', 'e772e%U*aa33');
+            $pdo = env("APP_URL") == 'http://app.quantumsocial.local' ? new PDO('mysql:host=localhost;dbname=quantum_app', 'root', ''): new PDO('mysql:host=quantumapp.quantumsocial.io;dbname=quantum_app', 'quantumsocialio', '%77*99hH3');
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // Get the current datetime
@@ -64,9 +64,9 @@ class ProcessScheduledPosts extends Command
             $scheduledPosts = $postsQuery->fetchAll(PDO::FETCH_ASSOC);
 
             if ($scheduledPosts) {
-                Log::info('ScheduledPosts retrieved' . json_encode($scheduledPosts));
+                \Log::info('ScheduledPosts retrieved' . json_encode($scheduledPosts));
             } else {
-                Log::error('ScheduledPosts not retrieved' . json_encode($scheduledPosts));
+                \Log::error('ScheduledPosts not retrieved' . json_encode($scheduledPosts));
             }
 
             // Process scheduled posts

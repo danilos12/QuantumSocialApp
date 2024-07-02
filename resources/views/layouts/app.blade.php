@@ -64,11 +64,14 @@
 {{-- pusher start --}}
   {{-- <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <script>
+
     // Enable pusher logging - don't include this in production
     Pusher.logToConsole = true;
+
     var pusher = new Pusher('25f52777301a06d4cde3', {
       cluster: 'us2'
     });
+
     var channel = pusher.subscribe('my-channel');
     channel.bind('my-event', function(data) {
       alert(JSON.stringify(data));
@@ -96,7 +99,7 @@
                   <span class="twitter-profile-name">
                     {{ isset($selected_user) ? $selected_user->twitter_name: 'Quantum User' }}
 
-                    @if (env('APP_URL') === 'https://stg.app.quantumsocial.io' || env('APP_URL') === 'http://app.quantumsocial.local')
+                    @if (env('APP_URL') === 'https://stg.app.quantumsocial.io')
                     <span id="time"></span>
                     @endif
                   </span>
@@ -317,6 +320,7 @@
      $(document).ready(function() {
       // // Alert
       var alert = $('.warning-sign ');
+
       if(alert.length == 1) {
         setTimeout(function(){
           alert.fadeOut('slow');
@@ -329,6 +333,7 @@
           $xalert.remove();
         }, 5000);
       }
+
       $('.sub-menu').css('display', 'none');
       $('.menu-item').click(function(e) {
         var menuId = e.target.dataset.target;
@@ -344,10 +349,13 @@
           // Replace 'your-menu-selector' with the appropriate selector for your menus
         }
       })
+
       // Sub Menu
       var uri =  "{{  basename($_SERVER['REQUEST_URI']) }}";
+
       $('.sub-menu').each(function(e, i) {
         var slug = $(this).text().toLowerCase();
+
         $(this).find('li').each(function(index, value) {
           if (value.id === $.trim(uri)) {
             $(this).closest('ul.sub-menu').toggle();
@@ -355,6 +363,7 @@
           var li = $(this).find('li');
         });
       })
+
       var timeDisplay = document.getElementById("time");
       function refreshTime() {
         var dateString = new Date().toLocaleString("en-US", {timeZone: "UTC"});
