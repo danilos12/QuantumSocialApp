@@ -539,11 +539,15 @@ class TwitterApi extends Controller
     public function getUnselectedTwitterAccounts() {
 
         $getUnselectedTwitter = DB::table('twitter_accts')
-                ->leftJoin('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                ->select('twitter_accts.*', 'ut_acct_mngt.selected')
-                ->where('ut_acct_mngt.selected', "=", 0) // selected
-                ->where('twitter_accts.user_id', "=", $this->setDefaultId())
-                ->get();
+            ->leftJoin('ut_acct_mngt', function($join) {
+                $join->on('twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                    ->on('twitter_accts.user_id', '=', 'ut_acct_mngt.user_id');
+            })
+            ->select('twitter_accts.*', 'ut_acct_mngt.selected')
+            ->where('ut_acct_mngt.selected', '=', 0) // selected
+            ->where('twitter_accts.user_id', '=', $this->setDefaultId())
+            ->get();
+    
 
         return response()->json($getUnselectedTwitter);
     }
