@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Queue;
 use App\Helpers\TwitterHelper;
 use App\Helpers\MembershipHelper;
 use Illuminate\Support\Facades\Cache;
-
+use Illuminate\Support\Facades\Log;
 
 class TwitterApi extends Controller
 {
@@ -249,7 +249,7 @@ class TwitterApi extends Controller
                     default:
                         $data = "tweet.fields=created_at,author_id,public_metrics,text,attachments&max_results=30";
                         $request = $this->curlGetHttpRequest($url, $headers, $data);
-                        dd($url);
+                        // dd($url);
                         if (isset($request->data)) {
                             // get images of the tweet
                             $filteredData['data'] = $request->data;
@@ -444,11 +444,20 @@ class TwitterApi extends Controller
 
                 if ($updatedSelected > 0 && $updatedRow > 0) {
                     $selectedUser = DB::table('twitter_accts')
-                        ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                        ->select('twitter_accts.*', 'ut_acct_mngt.*')
-                        ->where('ut_acct_mngt.selected', "=", 1) // selected
-                        ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
-                        ->where('twitter_accts.deleted', "=", 0)
+                        // ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                        // ->select('twitter_accts.*', 'ut_acct_mngt.*')
+                        // ->where('ut_acct_mngt.selected', "=", 1) // selected
+                        // ->where('ut_acct_mngt.user_id', "=", $this->setDefaultId())
+                        // ->where('twitter_accts.deleted', "=", 0)
+                        // ->first();
+
+                        ->leftJoin('ut_acct_mngt', function($join) {
+                            $join->on('twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                                ->on('twitter_accts.user_id', '=', 'ut_acct_mngt.user_id');
+                        })
+                        ->select('twitter_accts.*', 'ut_acct_mngt.selected')
+                        ->where('ut_acct_mngt.selected', '=', 1) // selected
+                        ->where('twitter_accts.user_id', '=', $this->setDefaultId())
                         ->first();
 
                     return response()->json(['success' => true, 'stat' => 'success', 'message' => 'Accounts are updated', 'twitter_id' => $selectedUser->twitter_id]);
@@ -578,6 +587,62 @@ class TwitterApi extends Controller
 
     }
 
+    public function twitterUserLists($x_id) {
+        // dd($x_id);
+        $trialCredit = DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->value('trial_credits');
+
+        $bearerToken = $trialCredit ? env("TWITTER_BEARER_TOKEN") : TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+
+        $headers = array(
+            "Authorization: Bearer " . $bearerToken
+        );
+        
+        $url = 'https://api.twitter.com/2/users/' . $x_id .  '/owned_lists';
+        $data = '';
+        $userList = array();
+        
+        $response = $this->curlGetHttpRequest($url, $headers, $data);
+
+        if (!empty($response->data)) {
+            foreach ($response->data as $v) {
+                $userList[] = $v->name;
+            }
+        }
+
+        // Return the user list as JSON
+        return response()->json($userList);
+    }
+ 
+    public function twitterUserListsTweets($x_id) {
+        $trialCredit = DB::table('users_meta')
+                    ->where('user_id', $this->setDefaultId())
+                    ->value('trial_credits');
+
+        $bearerToken = $trialCredit ? env("TWITTER_BEARER_TOKEN") : TwitterHelper::getActiveAPI($this->setDefaultId())->bearer_token;
+
+        $headers = array(
+            "Authorization: Bearer " . $bearerToken
+        );
+        
+        $url = 'https://api.twitter.com/2/lists/' . $x_id .  '/tweets';
+        $data = '';
+        $userListTweets = array();
+        
+        $response = $this->curlGetHttpRequest($url, $headers, $data);
+
+        if (!empty($response->data)) {
+            foreach ($response->data as $v) {
+                $userListTweets['id'] = $v->id;
+                $userListTweets['text'] = $v->text;
+            }
+        }
+
+        // Return the user list as JSON
+        return response()->json($userListTweets);
+    }
+
     private function isAuthorized()
     {
         return Auth::guard('web')->check() || Auth::guard('member')->user()->admin_access == 1;
@@ -591,15 +656,54 @@ class TwitterApi extends Controller
 
     private function deleteTwitterAccount($twitterId, $userId)
     {
-        $deletedTwitter = Twitter::where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
-        if (!$deletedTwitter) {
-            return false;
+        try {
+            // Begin transaction
+            DB::beginTransaction();
+    
+            // Perform deletions and log each step
+            $deletedTwitter = DB::table('twitter_accts')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+            Log::info('Deleted from twitter table', ['deletedTwitter' => $deletedTwitter]);
+    
+            $deletePostings = DB::table('posts')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+            Log::info('Deleted from posts table', ['deletePostings' => $deletePostings]);
+    
+            $deleteTwitterMeta = DB::table('twitter_meta')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+            Log::info('Deleted from twitter_meta table', ['deleteTwitterMeta' => $deleteTwitterMeta]);
+    
+            $deleteUT_Acct_Mngt = DB::table('ut_acct_mngt')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
+            Log::info('Deleted from ut_acct_mngt table', ['deleteUT_Acct_Mngt' => $deleteUT_Acct_Mngt]);
+    
+            // Check if all deletions were successful
+            if (
+                $deletedTwitter === false || 
+                $deletePostings === false || 
+                $deleteTwitterMeta === false || 
+                $deleteUT_Acct_Mngt === false
+            ) {
+                // Rollback transaction if any deletion failed
+                DB::rollBack();
+                Log::error('Failed to delete Twitter account and related data', [
+                    'deletedTwitter' => $deletedTwitter,
+                    'deletePostings' => $deletePostings,
+                    'deleteTwitterMeta' => $deleteTwitterMeta,
+                    'deleteUT_Acct_Mngt' => $deleteUT_Acct_Mngt,
+                ]);
+                return false;
+            }
+    
+            // Commit transaction if all deletions succeeded
+            DB::commit();
+            Log::info('Successfully deleted Twitter account and related data');
+            return true;
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+    
+            // Log the error for debugging
+            Log::error('Error deleting Twitter account and related data: ' . $e->getMessage());
+    
+            return response()->json(['success' => false, 'message' => 'An error occurred while deleting Twitter account and related data.'], 500);
         }
-
-        $deleteTwitterMeta = DB::table('twitter_meta')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
-        $deleteUT_Acct_Mngt = DB::table('ut_acct_mngt')->where('twitter_id', $twitterId)->where('user_id', $userId)->delete();
-
-        return $deleteTwitterMeta && $deleteUT_Acct_Mngt;
     }
 
     private function buildResponse($stat, $message, $status, $additionalData = [])

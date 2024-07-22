@@ -339,10 +339,8 @@ class GeneralSettingController extends Controller
         try {
              // Validate first the email provided
             $email = $request->input('quantum_social_email');
-            $subscription = WP::getUserSubscription($email);      
-            
-            // dd($subscription);
-
+            $subscription = WP::getUserSubscription($email);          
+                       
             if (!$subscription) {
                 return response()->json(['status' => 404, 'message' => 'Subscription not found']);
             }
@@ -368,6 +366,13 @@ class GeneralSettingController extends Controller
     
             // Check if the update was successful
             if ($update->rowCount() > 0) {
+                 // delete all associated data in laravel linked to this acct 
+                $laravelUserID = DB::table('users')->where('email', $email)->value('id');   
+
+                if (!$this->deleteAssocQuantumdata($laravelUserID)) {
+                    return response()->json(['status' => 403, 'message' => 'Failed to delete Quantum account linked data']);
+                }
+                
                 return response()->json(['status' => 200, 'stat' => 'success', 'message' => 'Subscription cancelled successfully. You will be logged out automatically.']);
             } else {
                 return response()->json(['status' => 400, 'stat' => 'warning', 'message' => 'No rows updated']);
@@ -377,6 +382,52 @@ class GeneralSettingController extends Controller
             $trace = $e->getTrace();
             $message = $e->getMessage();
             return response()->json(['status' => 500, 'error' => $trace, 'message' => $message]);
+        }
+    }
+
+    public function deleteAssocQuantumdata($laravelUserID) {                    
+
+        try {
+            // Begin transaction
+            DB::beginTransaction();
+    
+            // Perform deletions and track their success
+            $deleteUserMeta = DB::table('users_meta')->where('user_id', $laravelUserID)->delete();
+            $deleteSettingsToggler = DB::table('settings_toggler_general')->where('user_id', $laravelUserID)->delete();
+            $deleteUserOnboard = DB::table('user_onboard')->where('user_id', $laravelUserID)->delete();
+            $deleteLinkedTwitter = DB::table('ut_acct_mngt')->where('user_id', $laravelUserID)->delete();
+            $deleteTwitterData = DB::table('twitter_accts')->where('user_id', $laravelUserID)->delete();
+            $deleteTwitterMetaData = DB::table('twitter_meta')->where('user_id', $laravelUserID)->delete();
+            $deleteUserData = DB::table('users')->where('id', $laravelUserID)->delete();
+            $deletePostsData = DB::table('posts')->where('user_id', $laravelUserID)->delete();
+    
+            // Check if all deletions were successful
+            if (
+                $deleteUserMeta === false || 
+                $deleteSettingsToggler === false || 
+                $deleteUserOnboard === false || 
+                $deleteLinkedTwitter === false || 
+                $deleteTwitterData === false || 
+                $deleteTwitterMetaData === false || 
+                $deleteUserData === false ||
+                $deletePostsData === false
+            ) {
+                // Rollback transaction if any deletion failed
+                DB::rollBack();
+                return response()->json(['success' => false, 'message' => 'Failed to delete user data.'], 500);
+            }
+    
+            // Commit transaction if all deletions succeeded
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'User data deleted successfully.'], 200);
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+    
+            // Log the error for debugging
+            Log::error('Error deleting user data: ' . $e->getMessage());
+    
+            return response()->json(['success' => false, 'message' => 'An error occurred while deleting user data.'], 500);
         }
     }
 

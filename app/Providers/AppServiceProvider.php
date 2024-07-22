@@ -91,19 +91,20 @@ class AppServiceProvider extends ServiceProvider
                 $count = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->count();
                 $view->with('acct_twitter_count', $count);
 
-                $twitter = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->get();
-
                 // to loop all the twitter accts
+                $twitter = Twitter::where(['user_id' => auth()->id(), 'deleted' => 0])->get();
                 $view->with('twitter_accts', $twitter);
 
                 $selectedUser = DB::table('twitter_accts')
-                    ->join('ut_acct_mngt', 'twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
-                    ->select('twitter_accts.*', 'ut_acct_mngt.*')
-                    ->where('ut_acct_mngt.selected', "=", 1) // selected
-                    ->where('ut_acct_mngt.user_id', "=", auth()->id())
-                    ->where('twitter_accts.deleted', "=", 0)
+                    ->leftJoin('ut_acct_mngt', function($join) {
+                        $join->on('twitter_accts.twitter_id', '=', 'ut_acct_mngt.twitter_id')
+                            ->on('twitter_accts.user_id', '=', 'ut_acct_mngt.user_id');
+                    })
+                    ->select('twitter_accts.*', 'ut_acct_mngt.selected')
+                    ->where('ut_acct_mngt.selected', '=', 1) // selected
+                    ->where('twitter_accts.user_id', '=', auth()->id())
                     ->first();
-                // dd($selectedUser, $twitter);
+
                 $view->with('selected_user', $selectedUser);
 
                 $token = TwitterToken::where(['user_id' => Auth::id(), 'twitter_id' => $selectedUser->twitter_id ?? 0 ])->first();

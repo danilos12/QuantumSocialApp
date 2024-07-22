@@ -412,32 +412,3 @@
 .mt-2 { margin-top: 0.5em;}
 </style>
 
-<script>
-    function deleteTwitterAccount(element) {
-
-      console.log(element)
-      // // Use the Fetch API to make an asynchronous request to the URL
-      fetch(APP_URL + '/twitter/remove', {
-          method: 'POST', // Or 'GET', 'PUT', etc. depending on your backend
-          body: JSON.stringify({ twitterId: TWITTER_ID }), // Send the Twitter ID as JSON data
-          headers: {
-              'Content-Type': 'application/json'
-          }
-      })
-    // .then(response => response.json()) // Parse the JSON response
-    // .then(data => {
-    //     // Get the alert message from the response
-    //     let alertMessage = data.message;
-    //     // Update the HTML element with the alert message
-    //     element.setAttribute('title', alertMessage);
-    //     // Show the tooltip
-    //     $(element).tooltip('show');
-    // })
-    // .catch(error => {
-    //     console.error('Error:', error);
-    //     // Handle errors
-    // });
-
-}
-
-</script>
