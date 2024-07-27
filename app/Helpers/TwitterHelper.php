@@ -95,31 +95,46 @@ class TwitterHelper
         \Log::info('twitter_id: ' . print_r($twitter_id, true));
 
         if (($expires_in + $created_at) <= time()) {
-
             $defaultId = (new self())->setDefaultId();
             $trialCredit = DB::table('users_meta')
                 ->where('user_id', $defaultId)
                 ->value('trial_credits');
-
-            if($trialCredit) {
-                $client_id = env('TWITTER_OAUTH_ID');
+        
+            // Check if user has their own API credentials
+            $userTokens = DB::table('settings_general_twapi')
+                ->where('user_id', $defaultId)
+                ->first();
+        
+            if ($userTokens && $userTokens->api_key && $userTokens->api_secret && $userTokens->bearer_token && $userTokens->oauth_id && $userTokens->oauth_secret) {
+                // User has their own API credentials, use them
+                $client_id = $userTokens->oauth_id;
+        
+                // Set trial credits to 0
+                DB::table('users_meta')
+                    ->where('user_id', $defaultId)
+                    ->update(['trial_credits' => 0]);
             } else {
-                $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
+                // No user credentials, use default based on trial credits
+                if ($trialCredit) {
+                    $client_id = env('TWITTER_OAUTH_ID'); // Hardcoded API credentials
+                } else {
+                    $client_id = TwitterHelper::getActiveAPI($defaultId)->oauth_id;
+                }
             }
-
-            // dd($refresh_token);
+        
+            // Log client_id for debugging
             \Log::info('client_id: ' . print_r($client_id, true));
             $d = TwitterHelper::refreshAccessToken($refresh_token, $client_id);
             session()->put('token_details', $d);
-
-            // update token in database
+        
+            // Update token in database
             $updateToken = TwitterToken::where('twitter_id', $twitter_id)
                 ->where('user_id', $defaultId)
                 ->update([
                     'access_token' => $d->access_token,
                     'refresh_token' => $d->refresh_token
                 ]);
-
+        
             if ($updateToken) {
                 // Return status and token value as an associative array
                 return ['status' => 200, 'token' => $d->access_token, 'message' => 'Token updated'];

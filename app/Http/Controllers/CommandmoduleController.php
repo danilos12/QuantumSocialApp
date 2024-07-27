@@ -83,14 +83,23 @@ class CommandmoduleController extends Controller
             ->where('user_id', $this->setDefaultId())
             ->whereMonth('created_at', now()->month)
             ->count();
-
+        
+        $defaultId = $this->setDefaultId();
         $trialCredit = DB::table('users_meta')
-            ->where('user_id', $this->setDefaultId())
+            ->where('user_id', $defaultId)
             ->value('trial_credits');
 
         $tokens = DB::table('settings_general_twapi')
-            ->where('user_id',  $this->setDefaultId())
+            ->where('user_id',  $defaultId)
             ->first();
+        
+        if ($tokens && $tokens->api_key && $tokens->api_secret 
+            && $tokens->bearer_token && $tokens->oauth_id 
+            && $tokens->oauth_secret) {
+            DB::table('users_meta')
+            ->where('user_id', $defaultId)
+            ->update(['trial_credits' => 0]);
+        }
 
         if ($trialCredit == 0 && (!$tokens || !$tokens->api_key 
             || !$tokens->api_secret || !$tokens->bearer_token 
