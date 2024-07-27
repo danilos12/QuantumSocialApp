@@ -345,8 +345,13 @@
                                   <!-- END ADD TEAM MEMBER MODAL -->
           </div>  <!-- END .team-account-outer -->
           <!--     END TEAM MEMBERS    -->
+          
 
-          @if($membership->trial_credits == 0)
+          @if($membership->trial_credits > 0)
+          <div id="credit-warning" class="alert alert-warning">
+            <strong>Warning:</strong> You have remaining API credits. If you proceed with entering new credentials, you may lose your remaining API credits.
+          </div>
+
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
               <span class="menu-section-header">X API Credential</span>
