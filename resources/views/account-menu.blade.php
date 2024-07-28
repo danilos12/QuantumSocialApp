@@ -351,6 +351,7 @@
           <div id="credit-warning" class="alert alert-warning">
             <strong>Warning:</strong> You have remaining API credits. If you proceed with entering new credentials, you may lose your remaining API credits.
           </div>
+          @endif
 
           <div class="menu-section-outer social-accounts-outer">
             <div class="menu-section-inner social-accounts-inner">
@@ -436,7 +437,7 @@
 
             </div>  <!-- END .social-accounts-inner -->
           </div>
-          @endif
+          
 
           <!-- END .social-accounts-outer -->
           @elseif(Auth::guard('member')->user()->api_access == 1)
