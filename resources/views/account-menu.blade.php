@@ -414,7 +414,7 @@
                       <span class="subTwirl-header">Callback URL</span>
                     </div>
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>
+                      <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : 'https://app.quantumsocial.io/twitter/oauth'  }}" readonly/>
                     </div>
                     <div class="menu-subTwirl-inner">
                       <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
@@ -505,7 +505,7 @@
                       <span class="subTwirl-header">Callback URL</span>
                     </div>
                     <div class="menu-subTwirl-inner">
-                      <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : ''  }}"/>
+                      <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : 'https://app.quantumsocial.io/twitter/oauth'  }}" readonly/>
                     </div>
                     <div class="menu-subTwirl-inner">
                       <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
