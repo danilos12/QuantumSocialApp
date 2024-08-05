@@ -575,7 +575,10 @@ class TwitterApi extends Controller
         $twitterId = $request->input('twitter_id');
         $userId = $this->setDefaultId();
 
-        if ($this->isAccountSelected($twitterId, $userId)) {
+        // Count the number of Twitter accounts associated with the user
+        $count = DB::table('ut_acct_mngt')->where('user_id', $userId)->count();
+
+        if ($count > 1 && $this->isAccountSelected($twitterId, $userId)) {
             return $this->buildResponse('warning', 'Unable to delete. This Twitter account is currently selected.', 500);
         }
 
@@ -584,7 +587,7 @@ class TwitterApi extends Controller
         }
 
         return $this->buildResponse('warning', 'Failed to delete Twitter account', 500);
-
+    
     }
 
     public function twitterUserLists($x_id) {

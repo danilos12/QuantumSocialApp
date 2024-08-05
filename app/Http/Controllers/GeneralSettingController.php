@@ -15,6 +15,7 @@ use App\Models\GeneralSettings;
 use App\Models\MasterTwitterApiCredentials;
 use App\Models\QuantumAcctMeta;
 use App\Models\TwitterApiCredentials;
+use App\Http\Controllers\dashboardController;
 use App\Models\UT_AcctMngt;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
@@ -197,6 +198,24 @@ class GeneralSettingController extends Controller
     public function twitterApiCredentials(Request $request, $id)
     {
         try {
+
+            if ($request->input('form_recipient') === 'onboard') {
+                // Create a new Request object and merge the data
+                $newRequest = new Request();
+                $newRequest->merge(['data' => 'onboard_done']);
+    
+                // Instantiate the DashboardController (preferably through Laravel's container)
+                $dashboard = app(DashboardController::class);
+    
+                // Call the onboarded method and capture its output
+                $result = $dashboard->onboarded($newRequest);
+
+
+                if ($result instanceof \Illuminate\Http\Response) {
+                    return $result;
+                }
+            }
+
             $userId = $this->setDefaultId();
             $api = MasterTwitterApiCredentials::firstOrCreate(['user_id' => $this->setDefaultId()]);
 

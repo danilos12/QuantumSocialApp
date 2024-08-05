@@ -264,7 +264,7 @@ class CommandmoduleController extends Controller
                     if ($postData['post_type_tweets'] === "retweet-tweets") {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('tweet_id' => $tweet_id), "https://api.twitter.com/2/users/" . $main_twitter_id . "/retweets");
 
-                        if ($responses->getStatusCode() === 200) {
+                        if ($responses->getOriginalContent()['status'] === 200) {
                             $insertData['active'] = 1;
                             CommandModule::create($insertData);
     
@@ -272,23 +272,13 @@ class CommandmoduleController extends Controller
                             // return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
 
                         } else {
-                            return response()->json(['status' => $responses->getStatusCode(), 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
+                            return response()->json(['status' => $responses->ggetOriginalContent()['status'], 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         }
 
-                        // if ($responses->getOriginalContent()['status'] === 500) {
-                        //     return response()->json(['status' => 500, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database']);
-                        // } elseif ($responses->getOriginalContent()['status'] === 403) {
-                        //     return response()->json(['status' => 403, 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
-                        // } else {
-                        //     $insertData['active'] = 1;
-                        //     CommandModule::create($insertData);
-
-                        //     $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
-                        // }
                     }  else {
                         $responses = TwitterHelper::tweet2twitter($twitter_meta, array('text' => urldecode($textarea)), "https://api.twitter.com/2/tweets");
-
-                        if ($responses->getStatusCode() === 200) {
+                        
+                        if ($responses->getOriginalContent()['status'] === 200) {
                             $insertData['active'] = 1;
                             CommandModule::create($insertData);
                             // Retrieve the last saved data
@@ -297,7 +287,7 @@ class CommandmoduleController extends Controller
                             $messages = $responses->getOriginalContent()['message'] . ' and saved to database';
                             // return response()->json(['status' => 200, 'stat' => 'success', 'message' => $responses->getOriginalContent()['message'] . ' and saved to database',  'tweet' => $lastSavedData]);
                         } else {
-                            return response()->json(['status' => $responses->getStatusCode(), 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
+                            return response()->json(['status' => $responses->getOriginalContent()['status'], 'stat' => 'warning', 'message' => $responses->getOriginalContent()['message']]);
                         }
                        
                     }

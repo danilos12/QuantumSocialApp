@@ -191,6 +191,15 @@ Route::get('/checkOnboard', [App\Http\Controllers\dashboardController::class, 'c
 Route::get('/tourStarted', [App\Http\Controllers\dashboardController::class, 'tourStarted'])->name('tourStarted');
 
 
+Route::get('/cache/remove', [App\Http\Controllers\CacheController::class, 'removeCache']);
+Route::get('/end', function() {
+    Session::forget('onboard_later');
+    session()->forget('onboard_later');
+    session()->flush();
+
+});
+   
+
 Route::middleware(['web'])->group(function () {
     // Your routes here
     Route::get('login', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');

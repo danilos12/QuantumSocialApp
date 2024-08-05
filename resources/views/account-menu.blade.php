@@ -109,6 +109,8 @@
 
         </div>  <!-- END .add-team-member-inner -->
       </div>  <!-- END .add-team-member-modal -->
+
+      
             
       <div class="cancel-subscription-modal" style="display: none">
         <div class="cancel-subscription-inner frosted">
@@ -416,6 +418,7 @@
                     <div class="menu-subTwirl-inner">
                       <input type="text" class="input-field" id="callback_url" name="callback_url" value="{{ isset($twitterApiMaster) ? $twitterApiMaster->callback_url : 'https://app.quantumsocial.io/twitter/oauth'  }}" readonly/>
                     </div>
+                    <input type="hidden" name="form_recipient" value="general-settings">
                     <div class="menu-subTwirl-inner">
                       <input type="submit" value="Save API credentials" class="subTwirl-buttons" style="margin-top: 0.5em; border: none">
                     </div>
