@@ -43,7 +43,7 @@
                             @php
                              $tier = $plan->subscription_name;
 
-                             $specifictiers = $tier == 'astro' ? 'astral' : $tier;
+                             $specifictiers = $tier == 'astro' || $tier == 'solar_ltd' || $tier == 'galactic_ltd' ? 'astral' : $tier;
                             @endphp
                             <img src="{{ asset('/public/ui-images/icons/tiers/' . $specifictiers . '.svg') }}" class="planet">
 
@@ -163,15 +163,18 @@
                                         <span class="card-description2">Remaining</span>
                                     </div>
                                 </div>
+                                
+                                @if ($plan->trial_counter !== -1)
                                 <div class="flex">
                                     <div class="a card-col-a">
-                                        <span class="actual">{{ $countTrial === -1 ? '∞' : $countTrial }}</span>
+                                        <span class="actual">{{ $countTrial }}</span>
                                     </div>
                                     <div class="b card-col-b">
                                         <span class="card-description1">days left in your</span>
                                         <span class="card-description2">Free Trial </span>
                                     </div>
                                 </div>
+                                @endif
                             </div>  <!-- END .queued-single-post -->
 
 
