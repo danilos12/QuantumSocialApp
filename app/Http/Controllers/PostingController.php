@@ -238,7 +238,7 @@ class PostingController extends Controller
 		$checkRole = MembershipHelper::tier($this->setDefaultId());
         
         // check if subscription is active
-        if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
+        if ($checkRole->status !== 1 && $checkRole->trial_counter = 0) {
 			$message = 'Your account is inactive. Please update your payment to continue using the features.';
 			return view('bulk-queue', compact('message', 'title'));
             // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
@@ -269,7 +269,7 @@ class PostingController extends Controller
 		->where('post_type', 'regular-tweets')
 		->exists();
 
-		if ($checkRole->status !== 1 && $checkRole->trial_counter < 1) {
+		if ($checkRole->status !== 1 && $checkRole->trial_counter = 0) {
 			$message = 'Your account is inactive. Please update your payment to continue using the features.';
 			return view('bulk-queue', compact('message', 'title'));
             // return response()->json(['status' => 500, 'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
