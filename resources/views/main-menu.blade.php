@@ -115,7 +115,7 @@
         <li class="menu-item" data-toggle="collapse" data-target="#campaigns">
         <!-- <a href="{{ route('promo-tweets') }}"></a> -->
             <img src = "{{asset('public/ui-images/icons/15-campaigns.svg')}} " class="menu-icon" />
-                Campaigns
+                Post Types
         </li>
         <ul class="sub-menu menu-margin" id="campaigns">
             <li id="promo">
@@ -136,18 +136,18 @@
                     PostStorms
                 </a>
             </li> --}}
-            @if (Auth::guard('web')->check() || (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin'))
-
-            <li id="tag-groups">
-                <a href="{{ route('tag-groups') }}">
-                    <img src="{{ asset('public/ui-images/icons/18-tag-groups.svg') }}" class="menu-icon" />
-                    Tag Groups
-                </a>
-            </li>
-
-        @endif
 
         </ul>
+        @if (Auth::guard('web')->check() || (Auth::guard('member')->check() && Auth::guard('member')->user()->role == 'Admin'))
+
+        <li id="tag-groups">
+            <a href="{{ route('tag-groups') }}">
+                <img src="{{ asset('public/ui-images/icons/18-tag-groups.svg') }}" class="menu-icon" />
+                Hashtag Manager
+            </a>
+        </li>
+
+        @endif
 
         {{-- <li class="menu-item">
             <a href="{{ route('trending-topics') }}">

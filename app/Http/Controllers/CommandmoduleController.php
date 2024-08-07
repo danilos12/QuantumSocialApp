@@ -372,7 +372,7 @@ class CommandmoduleController extends Controller
 
         $checkRole = MembershipHelper::tier($this->setDefaultId());
 
-        if ($checkRole->status !== 1 || $checkRole->trial_counter < 1) {
+        if ($checkRole->status !== 1 || $checkRole->trial_counter = 0) {
             return response()->json(['status' => 500,  'stat' => 'warning', 'message' => 'Your account is inactive. Please update your payment to continue using the features.']);
         }
 

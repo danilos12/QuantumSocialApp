@@ -16,7 +16,7 @@
                   <div class="page-head-n-sort">
                     <div class="head-left-wrap">
                       <span class="profile-heading">
-                        Tag Groups</span>
+                        Hashtag Manager</span>
                     </div>  <!-- END .head-left-wrap -->
                     <img src="{{ asset('public/')}}/ui-images/icons/add-post.svg" class="ui-icon new-tag-group-icon" />
                   </div>  <!-- END .page-head-n-sort -->
