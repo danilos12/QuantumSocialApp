@@ -102,7 +102,7 @@ class WP
                 $currentRestApi = Http::get('https://stg.wp.quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($wp_user_id)));
                 break;
             case $liveUrl:
-                $currentRestApi = Http::get('https://quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($wp_user_id)));
+                $currentRestApi = Http::get('https://billing.quantumsocial.io/wp-json/plan/membership/subscription?wp_user_id='. urlencode(base64_decode($wp_user_id)));
                 break;
             default:
                 throw new \Exception('Environment URL does not match any known environments.');
@@ -117,6 +117,7 @@ class WP
         $liveUrl = 'https://app.quantumsocial.io';
 
         $appUrl = env('APP_URL');
+        \Log::info('Environment details' . json_encode($appUrl));
 
         $hosts = null;
         $currentDb = null;
@@ -140,7 +141,7 @@ class WP
                 $hosts = 'quantumapp.quantumsocial.io';
                 $users = 'quantumsocialio';
                 $password = '%77*99hH3';
-                $currentDb = 'quantum_wp';
+                $currentDb = 'quantum_billing';
                 break;
             default:
                 throw new \Exception('Environment URL does not match any known environments.');
@@ -183,6 +184,7 @@ class WP
 
             // Fetch the first row as an associative array
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            \Log::info('user details' . json_encode($user));
 
             if (!$user) {
                 return null; // Return null if no user found
@@ -191,14 +193,49 @@ class WP
 
             // SELECT post join with postmeta
             // $subscription = $dbConnection->prepare("SELECT post_status FROM {$table_prefix}posts JOIN {$table_prefix}postmeta WHERE meta_value= :id AND post_type = shop_subscription DESC LIMIT 1");
-            $subscription = $dbConnection->prepare("SELECT * FROM {$table_prefix}posts JOIN {$table_prefix}postmeta WHERE meta_value= :id AND post_type = 'shop_subscription' ORDER BY ID DESC");
-            $subscription->bindParam(':id', $user['ID'], PDO::PARAM_INT);
-            $subscription->execute();
+            // $subscription = $dbConnection->prepare("SELECT * FROM {$table_prefix}posts JOIN {$table_prefix}postmeta WHERE meta_value= :id AND post_type = 'shop_subscription' ORDER BY ID DESC");
+            // $subscription->bindParam(':id', $user['ID'], PDO::PARAM_INT);
+            // $subscription->execute();
+            // \Log::info('fetch row subs' . json_encode($subscription));
 
-            // Fetch the first row as an associative array
-            $subscription = $subscription->fetch(PDO::FETCH_ASSOC);
+            $postmetaQuery = $dbConnection->prepare("
+                SELECT * 
+                FROM {$table_prefix}postmeta 
+                WHERE meta_value = :id
+                ORDER BY meta_id DESC
+                LIMIT 1
+            ");
+            $postmetaQuery->bindParam(':id', $user['ID'], PDO::PARAM_INT);
+            $postmetaQuery->execute();
+            $postmeta = $postmetaQuery->fetch(PDO::FETCH_ASSOC);
+            \Log::info('meta' . json_encode($postmeta));
 
-            return $subscription;
+            if ($postmeta) {
+                $postQuery = $dbConnection->prepare("
+                    SELECT * 
+                    FROM {$table_prefix}posts 
+                    WHERE ID = :post_id 
+                    AND post_type = 'shop_subscription'
+                    ORDER BY ID DESC
+                    LIMIT 1
+                ");
+                $postQuery->bindParam(':post_id', $postmeta['post_id'], PDO::PARAM_INT);
+                $postQuery->execute();
+                $post = $postQuery->fetch(PDO::FETCH_ASSOC);
+            }
+
+            if ($postmeta && $post) {
+                \Log::info('Fetched Postmeta: ' . json_encode($postmeta));
+                \Log::info('Fetched Post: ' . json_encode($post));
+
+                // Fetch the first row as an associative array
+                // $subscription = $post->fetch(PDO::FETCH_ASSOC);
+                return $post;
+            } else {
+                \Log::info('No data found for the given criteria.');
+                return false;
+            }
+         
         } catch (PDOException $e) {
             // Log the error and return null
             error_log('Database query error: ' . $e->getMessage());
