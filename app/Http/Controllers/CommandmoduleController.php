@@ -568,6 +568,7 @@ class CommandmoduleController extends Controller
                     
 
                     $posts = DB::table('posts')
+                        ->where('user_id', $this->setDefaultId() )
                         ->where('twitter_id', $id)
                         ->where('sched_time', '<', TwitterHelper::now(Auth::id()))
                         // ->where('active', 1)
