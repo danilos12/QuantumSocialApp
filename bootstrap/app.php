@@ -1,4 +1,5 @@
 <?php
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -16,27 +17,32 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
-| Load the appropriate .env file based on APP_ENV
+| Load the appropriate .env file based on the URL
 |--------------------------------------------------------------------------
 |
-| Here we will check the APP_ENV environment variable and load the
-| corresponding .env file. This allows us to use environment-specific
-| variables for local, production, or any other environment.
+| Here we will check the current URL (host) and load the corresponding
+| .env file. This allows us to use environment-specific variables for
+| local, production, or any other environment.
 |
 */
 
 $envFile = '.env'; // Default .env file
 
-if (getenv('APP_ENV') === 'local' && file_exists($app->environmentPath() . DIRECTORY_SEPARATOR . '.env.local')) {
+// Get the current host (domain or subdomain)
+$host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'];
+
+// Determine which .env file to load based on the URL
+if (strpos($host, 'app.quantumsocial.local') !== false) {
     $envFile = '.env.local';
-} elseif (getenv('APP_ENV') === 'production' && file_exists($app->environmentPath() . DIRECTORY_SEPARATOR . '.env.production')) {
+} elseif (strpos($host, 'dev.app.quantumsocial.io') !== false) {
+    $envFile = '.env.development';
+} elseif (strpos($host, 'stg.app.quantumsocial.io') !== false) {
+    $envFile = '.env.staging';
+} elseif (strpos($host, 'app.quantumsocial.io') !== false) {
     $envFile = '.env.production';
 }
 
-// Log the environment file being used
-error_log("Loading environment file: " . $envFile);
-
-// Bind Important Interfaces...
+// Load the selected environment file
 $app->loadEnvironmentFrom($envFile);
 
 /*
