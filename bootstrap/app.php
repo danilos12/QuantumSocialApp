@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -17,18 +16,28 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
-| Load .env.local if it exists
+| Load the appropriate .env file based on APP_ENV
 |--------------------------------------------------------------------------
 |
-| Here we will check if a .env.local file exists, and if so, load it into
-| the application. This allows us to use environment-specific variables
-| for local development, overriding the default .env file.
+| Here we will check the APP_ENV environment variable and load the
+| corresponding .env file. This allows us to use environment-specific
+| variables for local, production, or any other environment.
 |
 */
 
-if (file_exists($app->environmentPath() . DIRECTORY_SEPARATOR . '.env.local')) {
-    $app->loadEnvironmentFrom('.env.local');
+$envFile = '.env'; // Default .env file
+
+if (getenv('APP_ENV') === 'local' && file_exists($app->environmentPath() . DIRECTORY_SEPARATOR . '.env.local')) {
+    $envFile = '.env.local';
+} elseif (getenv('APP_ENV') === 'production' && file_exists($app->environmentPath() . DIRECTORY_SEPARATOR . '.env.production')) {
+    $envFile = '.env.production';
 }
+
+// Log the environment file being used
+error_log("Loading environment file: " . $envFile);
+
+// Bind Important Interfaces...
+$app->loadEnvironmentFrom($envFile);
 
 /*
 |--------------------------------------------------------------------------
